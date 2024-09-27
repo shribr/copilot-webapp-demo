@@ -1,0 +1,41 @@
+{
+    "components_appi_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "vaults_kv_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "storageAccounts_st_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "managedEnvironments_cae_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "searchServices_srch_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "accounts_cog_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "registries_cr_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "systemTopics_speventgridsystemtopic_name": {
+        "value": null
+    },
+    "accounts_cog_fr_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "storageAccounts_rgazuresearchopenai9d1c_name": {
+        "value": null
+    },
+    "workspaces_log_dcdaiprod_poc_001_name": {
+        "value": null
+    },
+    "storageAccounts_st_hubsearcho782529830947_name": {
+        "value": null
+    },
+    "accounts_computervisionsupercool_name": {
+        "value": null
+    }
+}
