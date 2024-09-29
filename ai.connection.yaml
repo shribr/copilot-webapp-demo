@@ -1,0 +1,4 @@
+name: 
+type: azure_ai_services
+endpoint: https://eastus.api.cognitive.microsoft.com/
+api_key: 

@@ -1,0 +1,11 @@
+*** LOG SEQUENCE: 1 ***
+2024-09-29 19:43:32 - Resource group 'myResourceGroup-1' deleted.
+2024-09-29 19:44:22 - Storage account 'mystorageacct4e04578e1' created.
+2024-09-29 19:44:36 - App Service Plan 'myAppServicePlan-4e04578e-1' created.
+2024-09-29 19:44:42 - Search Service 'mysearchservice-4e04578e-1' created.
+2024-09-29 19:44:44 - Log Analytics Workspace 'myloganalyticsworkspace-4e04578e-1' created.
+2024-09-29 19:44:47 - Cognitive Services account 'mycognitiveservice-4e04578e-1' created.
+2024-09-29 19:44:50 - Application Insights component 'myappinsights-4e04578e-1' created.
+2024-09-29 19:45:24 - Key Vault: 'myKeyVault-4e04578e-1' created.
+2024-09-29 19:46:16 - Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-4e04578e-1': (Line 715) : Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-4e04578e-1' with exit code 2
+2024-09-29 19:48:24 - Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-4e04578e-1': (Line 715) : Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-4e04578e-1' with exit code 1
