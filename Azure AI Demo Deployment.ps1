@@ -892,7 +892,7 @@ function CreateResources {
 
         #az functionapp create --name $functionAppName -os-type Linux --storage-account $storageAccountName --resource-group $resourceGroupName --plan $appServicePlanName --runtime dotnet --runtime-version $latestDontNetRuntimeFuncApp --functions-version 4 --output none
         az functionapp create --name $functionAppName `
-            --consumption-plan-location $consumerPlanLocation `
+            --consumption-plan-location $($location -replace '\s', '')  `
             --storage-account $storageAccountName `
             --resource-group $resourceGroupName `
             --runtime dotnet `
@@ -924,10 +924,10 @@ function CreateResources {
     $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
 
     # Check if the desired location is available
-    if ($availableLocations -contains $location) {
+    if ($availableLocations -contains $($location.ToUpper() -replace '\s', '')  ) {
         # Try to create a Document Intelligence account
         try {
-            az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $location --kind FormRecognizer --sku S0 --output none
+            az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
             Write-Host "Document Intelligence account '$documentIntelligenceName' created."
             Write-Log -message "Document Intelligence account '$documentIntelligenceName' created."
         }
