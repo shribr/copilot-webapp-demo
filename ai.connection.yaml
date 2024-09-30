@@ -1,4 +1,4 @@
-name: 
+name: cog-dcdai-prod-poc-001
 type: azure_ai_services
 endpoint: https://eastus.api.cognitive.microsoft.com/
-api_key: 
+api_key: ac76fa7edb664aebac06b45b64e6fd9b

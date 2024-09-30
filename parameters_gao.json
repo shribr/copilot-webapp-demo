@@ -1,4 +1,5 @@
 {
+    "aiHubName": "hub-ai-dcdai-prod-poc-001",
     "aiModelName": "aimodel-dcdai-prod-poc-001",
     "aiModelType": "gpt-4o",
     "aiModelVersion": "v1",
@@ -12,7 +13,7 @@
     "containerAppsEnvironmentName": "cae-dcdai-prod-poc-001",
     "containerRegistryName": "cr-dcdai-prod-poc-001",
     "cosmosDbAccountName": "cosmos-dcdai-prod-poc-001",
-    "documentIntelligenceName": "cog-dcdai-prod-poc-001",
+    "documentIntelligenceName": "docintel-dcdai-prod-poc-001",
     "eventHubNamespaceName": "eh-dcdai-prod-poc-001",
     "functionAppName": "func-dcdai-prod-poc-001",
     "keyVaultName": "kv-dcdai-prod-poc-001",
@@ -28,7 +29,7 @@
     "serviceBusNamespaceName": "sb-dcdai-prod-poc-001",
     "sharedDashboardName": "dash-dcdai-prod-poc-001",
     "sqlServerName": "sql-dcdai-prod-poc-001",
-    "storageAccountName": "stdcdai-prodpoc001",
+    "storageAccountName": "stdcdaiprodpoc001",
     "userAssignedIdentityName": "id-dcdai-prod-poc-001",
     "virtualNetworkName": "vnet-dcdai-prod-poc-001",
     "webAppName": "app-dcdai-prod-poc-001"

@@ -510,7 +510,7 @@ function CreateResources {
     $appServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Web" -resourceType "serverFarms"
     $searchApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
     $logAnalyticsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.OperationalInsights" -resourceType "workspaces"
-    $cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+    #$cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
     #$keyVaultApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.KeyVault" -resourceType "vaults"
     $appInsightsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Insights" -resourceType "components"
    
@@ -887,11 +887,12 @@ function CreateResources {
 
     # Try to create a Function App
     try {
+        $consumerPlanLocation = az functionapp list-consumption-locations --query "[?name=='$location'].name" --output tsv
         $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp" -os "linux" -version "4"
 
         #az functionapp create --name $functionAppName -os-type Linux --storage-account $storageAccountName --resource-group $resourceGroupName --plan $appServicePlanName --runtime dotnet --runtime-version $latestDontNetRuntimeFuncApp --functions-version 4 --output none
         az functionapp create --name $functionAppName `
-            --consumption-plan-location $location `
+            --consumption-plan-location $consumerPlanLocation `
             --storage-account $storageAccountName `
             --resource-group $resourceGroupName `
             --runtime dotnet `
@@ -919,14 +920,25 @@ function CreateResources {
     }
 
     # Try to create a Document Intelligence account
-    try {
-        az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $location --kind FormRecognizer --sku S0 --output none
-        Write-Host "Document Intelligence account '$documentIntelligenceName' created."
-        Write-Log -message "Document Intelligence account '$documentIntelligenceName' created."
+
+    $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
+
+    # Check if the desired location is available
+    if ($availableLocations -contains $location) {
+        # Try to create a Document Intelligence account
+        try {
+            az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $location --kind FormRecognizer --sku S0 --output none
+            Write-Host "Document Intelligence account '$documentIntelligenceName' created."
+            Write-Log -message "Document Intelligence account '$documentIntelligenceName' created."
+        }
+        catch {
+            Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
-    catch {
-        Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    else {
+        Write-Error "The desired location '$location' is not available for FormRecognizer."
+        Write-Log -message "The desired location '$location' is not available for FormRecognizer."
     }
 
     <#
@@ -1046,6 +1058,19 @@ function CreateAIHubAndModel {
         Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
+    <#
+    # Create OpenAI Service
+    try {
+        az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
+        Write-Host "OpenAI Service: '$openAIName' created."
+        Write-Log -message "OpenAI Service: '$openAIName' created."
+    }
+    catch {
+        Write-Error "Failed to create OpenAI Service '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create OpenAI Service '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+    #>
+
     # Try to create an Azure Machine Learning workspace (AI Hub)
     try {
         az ml workspace create --name $aiHubName --resource-group $resourceGroupName --location $location --output none
@@ -1108,7 +1133,7 @@ function ReadAIConnectionFile {
 
     $filePath = "ai.connection.yaml"
 
-    #$apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
+    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
 
     $content = @"
 name: $cognitiveServiceName
