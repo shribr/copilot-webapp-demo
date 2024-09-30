@@ -1,323 +1,129 @@
 *** LOG SEQUENCE: 1 ***
-2024-09-29 22:22:21 - Resource group 'myResourceGroup-1' deleted.
-2024-09-29 22:23:01 - Storage account 'mystorageacct025d36051' created.
-2024-09-29 22:23:14 - App Service Plan 'myAppServicePlan-025d3605-1' created.
-2024-09-29 22:23:20 - Search Service 'mysearchservice-025d3605-1' created.
-2024-09-29 22:23:22 - Log Analytics Workspace 'myloganalyticsworkspace-025d3605-1' created.
-2024-09-29 22:23:24 - Cognitive Services account 'mycognitiveservice-025d3605-1' created.
-2024-09-29 22:23:27 - Application Insights component 'myappinsights-025d3605-1' created.
-2024-09-29 22:23:29 - User Assigned Identity 'myUserAssignedId-025d3605-1' created.
-2024-09-29 22:23:51 - Web App 'myWebApp-025d3605-1' created.
-2024-09-29 22:23:52 - Managed identity 'myUserAssignedId-025d3605-1' assigned to Web App 'myWebApp-025d3605-1'.
-2024-09-29 22:24:26 - Key Vault: 'myKeyVault-025d3605-1' created with Vault Access Policies.
-2024-09-29 22:24:27 - Policy permissions set for user: ''.
-2024-09-29 22:24:28 - Policy permissions set for application: 'myWebApp-025d3605-1'.
-2024-09-29 22:24:28 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:29 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:29 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:30 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:30 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:31 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:31 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:32 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:32 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:34 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:34 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:35 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:35 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:36 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:36 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:37 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:37 - Failed to generate random password: (Line 857) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:24:38 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-025d3605-1'.
-2024-09-29 22:24:39 - Failed to create Function App 'myFunctionApp-025d3605-1': (Line 174) : Cannot index into a null array.
 *** LOG SEQUENCE: 2 ***
-2024-09-29 22:48:42 - Resource group 'myResourceGroup-1' deleted.
-2024-09-29 22:49:30 - Storage account 'mystorageacct1b89530e1' created.
-2024-09-29 22:49:39 - App Service Plan 'myAppServicePlan-1b89530e-1' created.
-2024-09-29 22:49:45 - Search Service 'mysearchservice-1b89530e-1' created.
-2024-09-29 22:49:48 - Log Analytics Workspace 'myloganalyticsworkspace-1b89530e-1' created.
-2024-09-29 22:49:51 - Cognitive Services account 'mycognitiveservice-1b89530e-1' created.
-2024-09-29 22:49:54 - Application Insights component 'myappinsights-1b89530e-1' created.
-2024-09-29 22:49:56 - User Assigned Identity 'myUserAssignedId-1b89530e-1' created.
-2024-09-29 22:50:17 - Web App 'myWebApp-1b89530e-1' created.
-2024-09-29 22:50:19 - Managed identity 'myUserAssignedId-1b89530e-1' assigned to Web App 'myWebApp-1b89530e-1'.
-2024-09-29 22:50:52 - Key Vault: 'myKeyVault-1b89530e-1' created with Vault Access Policies.
-2024-09-29 22:50:54 - Policy permissions set for user: ' '.
-2024-09-29 22:50:55 - Policy permissions set for application: 'myUserAssignedId-1b89530e-1'.
-2024-09-29 22:50:55 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:50:56 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:50:56 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:50:57 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:50:57 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:50:58 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:50:58 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:50:59 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:50:59 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:51:00 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:51:00 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:51:01 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:51:01 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:51:02 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:51:02 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:51:03 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:51:03 - Failed to generate random password: (Line 864) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 22:51:04 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-1b89530e-1'.
-2024-09-29 22:51:06 - Failed to create Function App 'myFunctionApp-1b89530e-1': (Line 178) : Cannot index into a null array.
-2024-09-29 22:51:38 - Azure OpenAI account 'myOpenAI-1b89530e-1' created.
-2024-09-29 22:52:41 - Document Intelligence account 'myDocIntel-1b89530e-1' created.
-2024-09-29 22:52:43 - AI Hub: 'myAIHub-1b89530e-1' created.
-2024-09-29 22:53:16 - AI Service: 'myAIService-1b89530e-1' created.
-2024-09-29 22:53:17 - AI Model deployment: 'myAIModel-1b89530e-1' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 05 MIN : 53 SEC : 985 MS ***
-
 *** LOG SEQUENCE: 3 ***
-2024-09-29 23:15:10 - Resource group 'myResourceGroup-1' deleted.
-2024-09-29 23:16:04 - Storage account 'mystorageacct744392e91' created.
-2024-09-29 23:16:16 - App Service Plan 'myAppServicePlan-744392e9-1' created.
-2024-09-29 23:16:23 - Search Service 'mysearchservice-744392e9-1' created.
-2024-09-29 23:16:26 - Log Analytics Workspace 'myloganalyticsworkspace-744392e9-1' created.
-2024-09-29 23:16:29 - Cognitive Services account 'mycognitiveservice-744392e9-1' created.
-2024-09-29 23:16:32 - Application Insights component 'myappinsights-744392e9-1' created.
-2024-09-29 23:16:34 - User Assigned Identity 'myUserAssignedId-744392e9-1' created.
-2024-09-29 23:16:58 - Web App 'myWebApp-744392e9-1' created.
-2024-09-29 23:17:00 - Managed identity 'myUserAssignedId-744392e9-1' assigned to Web App 'myWebApp-744392e9-1'.
-2024-09-29 23:17:35 - Key Vault: 'myKeyVault-744392e9-1' created with Vault Access Policies.
-2024-09-29 23:17:36 - Policy permissions set for user: ' '.
-2024-09-29 23:17:37 - Policy permissions set for application: 'myUserAssignedId-744392e9-1'.
-2024-09-29 23:17:38 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:39 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:39 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:40 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:40 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:41 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:41 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:42 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:42 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:43 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:43 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:44 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:44 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:45 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:45 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:47 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:47 - Failed to generate random password: (Line 871) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-29 23:17:48 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-744392e9-1'.
-2024-09-29 23:17:50 - Failed to create Function App 'myFunctionApp-744392e9-1': (Line 182) : Cannot index into a null array.
-2024-09-29 23:18:23 - Azure OpenAI account 'myOpenAI-744392e9-1' created.
-2024-09-29 23:19:26 - Document Intelligence account 'myDocIntel-744392e9-1' created.
-2024-09-29 23:19:28 - AI Hub: 'myAIHub-744392e9-1' created.
-2024-09-29 23:20:01 - AI Service: 'myAIService-744392e9-1' created.
-2024-09-29 23:20:02 - AI Model deployment: 'myAIModel-744392e9-1' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 12 SEC : 414 MS ***
-
 *** LOG SEQUENCE: 4 ***
-2024-09-30 00:07:03 - Resource group 'myResourceGroup-1' deleted.
-2024-09-30 00:07:46 - Storage account 'mystorageacct50c37e171' created.
-2024-09-30 00:07:58 - App Service Plan 'myAppServicePlan-50c37e17-1' created.
-2024-09-30 00:08:04 - Search Service 'mysearchservice-50c37e17-1' created.
-2024-09-30 00:08:06 - Log Analytics Workspace 'myloganalyticsworkspace-50c37e17-1' created.
-2024-09-30 00:08:10 - Cognitive Services account 'mycognitiveservice-50c37e17-1' created.
-2024-09-30 00:08:12 - Application Insights component 'myappinsights-50c37e17-1' created.
-2024-09-30 00:08:14 - User Assigned Identity 'myUserAssignedId-50c37e17-1' created.
-2024-09-30 00:08:36 - Web App 'myWebApp-50c37e17-1' created.
-2024-09-30 00:08:40 - Managed identity 'myUserAssignedId-50c37e17-1' assigned to Web App 'myWebApp-50c37e17-1'.
-2024-09-30 00:09:21 - Key Vault: 'myKeyVault-50c37e17-1' created with Vault Access Policies.
-2024-09-30 00:09:22 - Keyvault 'myKeyVault-50c37e17-1' policy permissions set for user: ''.
-2024-09-30 00:09:23 - Keyvault 'myKeyVault-50c37e17-1' policy permissions set for application: 'myUserAssignedId-50c37e17-1'.
-2024-09-30 00:13:17 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:21 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:33 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:34 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:34 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:35 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:35 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:36 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:36 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:37 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:37 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:38 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:38 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:40 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:40 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:41 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:41 - Failed to generate random password: (Line 887) : Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Char".
-2024-09-30 00:13:42 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-50c37e17-1'.
-2024-09-30 00:13:45 - Failed to create Function App 'myFunctionApp-50c37e17-1': (Line 182) : Cannot index into a null array.
-2024-09-30 00:14:19 - Azure OpenAI account 'myOpenAI-50c37e17-1' created.
-2024-09-30 00:15:24 - Document Intelligence account 'myDocIntel-50c37e17-1' created.
-2024-09-30 00:15:25 - AI Hub: 'myAIHub-50c37e17-1' created.
-2024-09-30 00:15:59 - AI Service: 'myAIService-50c37e17-1' created.
-2024-09-30 00:16:13 - Azure Machine Learning workspace 'myAIHub-50c37e17-1' created.
-2024-09-30 00:16:15 - AI Model deployment: 'myAIModel-50c37e17-1' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 10 MIN : 31 SEC : 500 MS ***
-
+2024-09-30 14:32:56 - Failed to create Storage Account 'STDCDAIPRODPOC001': (Line 297) : 
+{
+  "error": {
+    "code": "AccountNameInvalid",
+    "message": "STDCDAIPRODPOC001 is not a valid storage account name. Storage account name must be between 3 and 24 characters in length and use numbers and lower-case letters only."
+  }
+}
 *** LOG SEQUENCE: 5 ***
-2024-09-30 01:00:28 - Resource group 'myResourceGroup-1' deleted.
-2024-09-30 01:01:24 - Storage account 'mystorageacct599720401' created.
-2024-09-30 01:01:34 - App Service Plan 'myAppServicePlan-59972040-1' created.
-2024-09-30 01:01:40 - Search Service 'mysearchservice-59972040-1' created.
-2024-09-30 01:01:43 - Log Analytics Workspace 'myloganalyticsworkspace-59972040-1' created.
-2024-09-30 01:02:29 - Cognitive Services account 'mycognitiveservice-59972040-1' created.
-2024-09-30 01:02:31 - Application Insights component 'myappinsights-59972040-1' created.
-2024-09-30 01:02:33 - User Assigned Identity 'myUserAssignedId-59972040-1' created.
-2024-09-30 01:02:35 - User 'myUserAssignedId-59972040-1' assigned to role: 'Contributor'.
-2024-09-30 01:02:36 - User 'myUserAssignedId-59972040-1' assigned to role: 'Cognitive Services OpenAI User'.
-2024-09-30 01:02:38 - User 'myUserAssignedId-59972040-1' assigned to role: 'Search Index Data Reader'.
-2024-09-30 01:02:42 - User 'myUserAssignedId-59972040-1' assigned to role: 'Storage Blob Data Reader'.
-2024-09-30 01:03:04 - Web App 'myWebApp-59972040-1' created.
-2024-09-30 01:03:38 - Key Vault: 'myKeyVault-59972040-1' created with Vault Access Policies.
-2024-09-30 01:03:39 - Keyvault 'myKeyVault-59972040-1' policy permissions set for user: ''.
-2024-09-30 01:03:40 - Keyvault 'myKeyVault-59972040-1' policy permissions set for application: 'myUserAssignedId-59972040-1'.
-2024-09-30 01:03:40 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:41 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:41 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:42 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:42 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:43 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:43 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:44 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:44 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:45 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:45 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:46 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:46 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:47 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:47 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:48 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:48 - Failed to generate random password: (Line 900) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:03:50 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-59972040-1'.
-2024-09-30 01:03:51 - Failed to create Function App 'myFunctionApp-59972040-1': (Line 182) : Cannot index into a null array.
-2024-09-30 01:04:39 - Azure OpenAI account 'myOpenAI-59972040-1' created.
-2024-09-30 01:05:41 - Document Intelligence account 'myDocIntel-59972040-1' created.
-2024-09-30 01:05:43 - AI Hub: 'myAIHub-59972040-1' created.
-2024-09-30 01:06:16 - AI Service: 'myAIService-59972040-1' created.
-2024-09-30 01:06:29 - Azure Machine Learning workspace 'myAIHub-59972040-1' created.
-2024-09-30 01:06:30 - AI Model deployment: 'myAIModel-59972040-1' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 07 MIN : 21 SEC : 454 MS ***
+2024-09-30 14:34:51 - Storage account 'stdcdaiprodpoc001' created.
+2024-09-30 14:35:06 - App Service Plan 'ASP-DCDAI-PROD-POC-001' created.
+2024-09-30 14:35:12 - Search Service 'srch-dcdai-prod-poc-001' created.
+2024-09-30 14:35:15 - Log Analytics Workspace 'log-dcdai-prod-poc-001' created.
+2024-09-30 14:35:19 - Cognitive Services account 'cog-dcdai-prod-poc-001' created.
+2024-09-30 14:35:22 - Failed to create Application Insights component '': (Line 297) : 
+{
+  "error": {
+    "code": "UnsupportedResourceOperation",
+    "message": "The resource type \u0027components\u0027 does not support this operation."
+  }
+}
+2024-09-30 14:35:25 - User Assigned Identity 'myUserAssignedId-50c37e17-1' created.
+2024-09-30 14:35:28 - User 'myUserAssignedId-50c37e17-1' assigned to role: 'Contributor'.
+2024-09-30 14:35:30 - User 'myUserAssignedId-50c37e17-1' assigned to role: 'Cognitive Services OpenAI User'.
+2024-09-30 14:35:31 - User 'myUserAssignedId-50c37e17-1' assigned to role: 'Search Index Data Reader'.
+2024-09-30 14:35:32 - User 'myUserAssignedId-50c37e17-1' assigned to role: 'Storage Blob Data Reader'.
+2024-09-30 14:35:58 - Web App 'myWebApp-59972040-1' created.
+2024-09-30 14:36:34 - Key Vault: 'kv-dcdai-prod-poc-001' created with Vault Access Policies.
+2024-09-30 14:36:37 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
+2024-09-30 14:36:38 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for application: 'myUserAssignedId-50c37e17-1'.
+2024-09-30 14:36:41 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:43 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:44 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:46 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:48 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:49 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:52 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:53 - Secret: 'UseAOAI' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:36:55 - Secret: 'UseVision' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:37:01 - Function App 'FUNC-DCDAI-PROD-POC-001' created.
+2024-09-30 14:37:06 - Azure OpenAI account 'OPENAI-DCDAI-PROD-POC-001' created.
+2024-09-30 14:37:08 - Document Intelligence account 'COG-DCDAI-PROD-POC-001' created.
+2024-09-30 14:37:12 - AI Hub: 'AIHUB-DCDAI-PROD-POC-001' created.
+2024-09-30 14:37:47 - AI Service: 'AISERVICE-DCDAI-PROD-POC-001' created.
+2024-09-30 14:38:01 - Azure Machine Learning workspace 'AIHUB-DCDAI-PROD-POC-001' created.
+2024-09-30 14:38:03 - AI Model deployment: 'AIMODEL-DCDAI-PROD-POC-001' created.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 36 SEC : 265 MS ***
 
 *** LOG SEQUENCE: 6 ***
-2024-09-30 01:28:42 - Resource group 'myResourceGroup-1' deleted.
-2024-09-30 01:29:29 - Storage account 'mystorageacct8bd1bde71' created.
-2024-09-30 01:29:42 - App Service Plan 'myAppServicePlan-8bd1bde7-1' created.
-2024-09-30 01:29:48 - Search Service 'mysearchservice-8bd1bde7-1' created.
-2024-09-30 01:29:51 - Log Analytics Workspace 'myloganalyticsworkspace-8bd1bde7-1' created.
-2024-09-30 01:29:54 - Cognitive Services account 'mycognitiveservice-8bd1bde7-1' created.
-2024-09-30 01:29:57 - Application Insights component 'myappinsights-8bd1bde7-1' created.
-2024-09-30 01:29:59 - User Assigned Identity 'myUserAssignedId-8bd1bde7-1' created.
-2024-09-30 01:30:01 - User 'myUserAssignedId-8bd1bde7-1' assigned to role: 'Contributor'.
-2024-09-30 01:30:02 - User 'myUserAssignedId-8bd1bde7-1' assigned to role: 'Cognitive Services OpenAI User'.
+2024-09-30 14:48:28 - Storage account 'stdcdaiprodpoc001' created.
+2024-09-30 14:48:39 - App Service Plan 'ASP-DCDAI-PROD-POC-001' created.
+2024-09-30 14:48:46 - Search Service 'srch-dcdai-prod-poc-001' created.
+2024-09-30 14:48:49 - Log Analytics Workspace 'log-dcdai-prod-poc-001' created.
+2024-09-30 14:48:52 - Cognitive Services account 'cog-dcdai-prod-poc-001' created.
+2024-09-30 14:48:54 - Failed to create Application Insights component '': (Line 299) : 
+{
+  "error": {
+    "code": "UnsupportedResourceOperation",
+    "message": "The resource type \u0027components\u0027 does not support this operation."
+  }
+}
+2024-09-30 14:48:58 - User Assigned Identity 'ID-DCDAI-PROD-POC-001' created.
+2024-09-30 14:49:01 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Contributor'.
+2024-09-30 14:49:02 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Cognitive Services OpenAI User'.
+2024-09-30 14:49:03 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Search Index Data Reader'.
+2024-09-30 14:49:05 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Storage Blob Data Reader'.
+2024-09-30 14:49:27 - Web App 'myWebApp-59972040-1' created.
+2024-09-30 14:49:31 - Key Vault: 'kv-dcdai-prod-poc-001' created with Vault Access Policies.
+2024-09-30 14:49:32 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
+2024-09-30 14:49:33 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for application: 'ID-DCDAI-PROD-POC-001'.
+2024-09-30 14:49:39 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:49:45 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:49:51 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:49:57 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:50:03 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:50:10 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:50:15 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:50:21 - Secret: 'UseAOAI' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
 *** LOG SEQUENCE: 7 ***
-2024-09-30 01:35:18 - Resource group 'myResourceGroup-1' deleted.
-2024-09-30 01:36:05 - Storage account 'mystorageacctf1d0ce661' created.
-2024-09-30 01:36:16 - App Service Plan 'myAppServicePlan-f1d0ce66-1' created.
-2024-09-30 01:36:22 - Search Service 'mysearchservice-f1d0ce66-1' created.
-2024-09-30 01:36:25 - Log Analytics Workspace 'myloganalyticsworkspace-f1d0ce66-1' created.
-2024-09-30 01:36:29 - Cognitive Services account 'mycognitiveservice-f1d0ce66-1' created.
-2024-09-30 01:36:31 - Application Insights component 'myappinsights-f1d0ce66-1' created.
-2024-09-30 01:36:34 - User Assigned Identity 'myUserAssignedId-f1d0ce66-1' created.
-2024-09-30 01:36:36 - User 'myUserAssignedId-f1d0ce66-1' assigned to role: 'Contributor'.
-2024-09-30 01:36:37 - User 'myUserAssignedId-f1d0ce66-1' assigned to role: 'Cognitive Services OpenAI User'.
-2024-09-30 01:36:38 - User 'myUserAssignedId-f1d0ce66-1' assigned to role: 'Search Index Data Reader'.
-2024-09-30 01:36:40 - User 'myUserAssignedId-f1d0ce66-1' assigned to role: 'Storage Blob Data Reader'.
-2024-09-30 01:37:02 - Web App 'myWebApp-f1d0ce66-1' created.
-2024-09-30 01:37:35 - Key Vault: 'myKeyVault-f1d0ce66-1' created with Vault Access Policies.
-2024-09-30 01:37:56 - Keyvault 'myKeyVault-f1d0ce66-1' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-2024-09-30 01:38:04 - Keyvault 'myKeyVault-f1d0ce66-1' policy permissions set for application: 'myUserAssignedId-f1d0ce66-1'.
-2024-09-30 01:38:10 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:21 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:21 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:22 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:22 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:23 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:23 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:24 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:24 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:25 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:25 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:26 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:26 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:27 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:27 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:29 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:29 - Failed to generate random password: (Line 908) : Method invocation failed because [System.Security.Cryptography.RandomNumberGeneratorImplementation] does not contain a method named 'GetInt32'.
-2024-09-30 01:38:30 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-f1d0ce66-1'.
-2024-09-30 01:38:32 - Failed to create Function App 'myFunctionApp-f1d0ce66-1': (Line 187) : Cannot index into a null array.
-2024-09-30 01:39:05 - Azure OpenAI account 'myOpenAI-f1d0ce66-1' created.
-2024-09-30 01:40:08 - Document Intelligence account 'myDocIntel-f1d0ce66-1' created.
-2024-09-30 01:40:10 - AI Hub: 'myAIHub-f1d0ce66-1' created.
-2024-09-30 01:40:43 - AI Service: 'myAIService-f1d0ce66-1' created.
-2024-09-30 01:40:55 - Azure Machine Learning workspace 'myAIHub-f1d0ce66-1' created.
-2024-09-30 01:40:56 - AI Model deployment: 'myAIModel-f1d0ce66-1' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 56 SEC : 472 MS ***
-
-*** LOG SEQUENCE: 8 ***
-2024-09-30 01:43:13 - Resource group 'myResourceGroup-1' deleted.
-2024-09-30 01:44:06 - Storage account 'mystorageacct477c16b11' created.
-2024-09-30 01:44:17 - App Service Plan 'myAppServicePlan-477c16b1-1' created.
-2024-09-30 01:44:23 - Search Service 'mysearchservice-477c16b1-1' created.
-2024-09-30 01:44:25 - Log Analytics Workspace 'myloganalyticsworkspace-477c16b1-1' created.
-2024-09-30 01:44:28 - Cognitive Services account 'mycognitiveservice-477c16b1-1' created.
-2024-09-30 01:44:30 - Application Insights component 'myappinsights-477c16b1-1' created.
-2024-09-30 01:44:32 - User Assigned Identity 'myUserAssignedId-477c16b1-1' created.
-2024-09-30 01:44:35 - User 'myUserAssignedId-477c16b1-1' assigned to role: 'Contributor'.
-2024-09-30 01:44:36 - User 'myUserAssignedId-477c16b1-1' assigned to role: 'Cognitive Services OpenAI User'.
-2024-09-30 01:44:37 - User 'myUserAssignedId-477c16b1-1' assigned to role: 'Search Index Data Reader'.
-2024-09-30 01:44:38 - User 'myUserAssignedId-477c16b1-1' assigned to role: 'Storage Blob Data Reader'.
-2024-09-30 01:45:04 - Web App 'myWebApp-477c16b1-1' created.
-2024-09-30 01:45:38 - Key Vault: 'myKeyVault-477c16b1-1' created with Vault Access Policies.
-2024-09-30 01:45:39 - Keyvault 'myKeyVault-477c16b1-1' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-2024-09-30 01:45:40 - Keyvault 'myKeyVault-477c16b1-1' policy permissions set for application: 'myUserAssignedId-477c16b1-1'.
-2024-09-30 01:45:42 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:43 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:44 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:46 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:47 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:48 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:49 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:50 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:52 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-477c16b1-1'.
-2024-09-30 01:45:53 - Failed to create Function App 'myFunctionApp-477c16b1-1': (Line 187) : Cannot index into a null array.
-2024-09-30 01:46:26 - Azure OpenAI account 'myOpenAI-477c16b1-1' created.
-2024-09-30 01:47:29 - Document Intelligence account 'myDocIntel-477c16b1-1' created.
-2024-09-30 01:47:30 - AI Hub: 'myAIHub-477c16b1-1' created.
-2024-09-30 01:48:03 - AI Service: 'myAIService-477c16b1-1' created.
-2024-09-30 01:48:15 - Azure Machine Learning workspace 'myAIHub-477c16b1-1' created.
-2024-09-30 01:48:17 - AI Model deployment: 'myAIModel-477c16b1-1' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 22 SEC : 653 MS ***
-
-*** LOG SEQUENCE: 9 ***
-2024-09-30 02:47:04 - Resource group 'myResourceGroup-1' deleted.
-2024-09-30 02:47:47 - Storage account 'mystorageacctb9023be21' created.
-2024-09-30 02:47:58 - App Service Plan 'myAppServicePlan-b9023be2-1' created.
-2024-09-30 02:48:04 - Search Service 'mysearchservice-b9023be2-1' created.
-2024-09-30 02:48:07 - Log Analytics Workspace 'myloganalyticsworkspace-b9023be2-1' created.
-2024-09-30 02:48:10 - Cognitive Services account 'mycognitiveservice-b9023be2-1' created.
-2024-09-30 02:48:13 - Application Insights component 'myappinsights-b9023be2-1' created.
-2024-09-30 02:48:15 - User Assigned Identity 'myUserAssignedId-b9023be2-1' created.
-2024-09-30 02:48:17 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Contributor'.
-2024-09-30 02:48:18 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Cognitive Services OpenAI User'.
-2024-09-30 02:48:19 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Search Index Data Reader'.
-2024-09-30 02:48:20 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Storage Blob Data Reader'.
-2024-09-30 02:48:43 - Web App 'myWebApp-b9023be2-1' created.
-2024-09-30 02:49:16 - Key Vault: 'myKeyVault-b9023be2-1' created with Vault Access Policies.
-2024-09-30 02:49:17 - Keyvault 'myKeyVault-b9023be2-1' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-2024-09-30 02:49:18 - Key Vault 'myKeyVault-b9023be2-1' policy permissions set for application: 'myUserAssignedId-b9023be2-1'.
-2024-09-30 02:49:20 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:21 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:22 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:24 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:25 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:27 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:28 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:29 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:49:31 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-b9023be2-1'.
-2024-09-30 02:50:10 - Function App 'myFunctionApp-b9023be2-1' created.
-2024-09-30 02:50:43 - Azure OpenAI account 'myOpenAI-b9023be2-1' created.
-2024-09-30 02:51:46 - Document Intelligence account 'myDocIntel-b9023be2-1' created.
-2024-09-30 02:51:48 - AI Hub: 'myAIHub-b9023be2-1' created.
-2024-09-30 02:52:20 - AI Service: 'myAIService-b9023be2-1' created.
-2024-09-30 02:52:33 - Azure Machine Learning workspace 'myAIHub-b9023be2-1' created.
-2024-09-30 02:52:34 - AI Model deployment: 'myAIModel-b9023be2-1' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 07 MIN : 49 SEC : 938 MS ***
+2024-09-30 14:51:38 - Failed to create Storage Account 'stdcdaiprodpoc001': (Line 301) : 
+{
+  "error": {
+    "code": "StorageAccountAlreadyExists",
+    "message": "The storage account named stdcdaiprodpoc001 already exists under the subscription."
+  }
+}
+2024-09-30 14:51:49 - App Service Plan 'ASP-DCDAI-PROD-POC-001' created.
+2024-09-30 14:51:52 - Failed to create Search Service 'srch-dcdai-prod-poc-001': (Line 301) : 
+{
+  "error": {
+    "code": "ServiceNameUnavailable",
+    "message": "Cannot provision service \u0027srch-dcdai-prod-poc-001\u0027 because a service with this name is already in use, or another request to provision a service with this name is still in progress RequestId: adfb1f69-0c95-404f-b8d4-a928ab046d62",
+    "target": null,
+    "details": null
+  }
+}
+2024-09-30 14:51:54 - Log Analytics Workspace 'log-dcdai-prod-poc-001' created.
+2024-09-30 14:51:57 - Cognitive Services account 'cog-dcdai-prod-poc-001' created.
+2024-09-30 14:52:00 - Application Insights component 'appi-dcdai-prod-poc-001' created.
+2024-09-30 14:52:05 - User Assigned Identity 'ID-DCDAI-PROD-POC-001' created.
+2024-09-30 14:52:08 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Contributor'.
+2024-09-30 14:52:09 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Cognitive Services OpenAI User'.
+2024-09-30 14:52:10 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Search Index Data Reader'.
+2024-09-30 14:52:11 - User 'ID-DCDAI-PROD-POC-001' assigned to role: 'Storage Blob Data Reader'.
+2024-09-30 14:52:34 - Web App 'APP-DCDAI-PROD-POC-001' created.
+2024-09-30 14:52:39 - Key Vault: 'kv-dcdai-prod-poc-001' created with Vault Access Policies.
+2024-09-30 14:52:40 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
+2024-09-30 14:52:41 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for application: 'ID-DCDAI-PROD-POC-001'.
+2024-09-30 14:52:47 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:52:53 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:52:59 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:53:05 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:53:11 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:53:17 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:53:23 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:53:28 - Secret: 'UseAOAI' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:53:34 - Secret: 'UseVision' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-09-30 14:53:38 - Function App 'FUNC-DCDAI-PROD-POC-001' created.
+2024-09-30 14:53:41 - Azure OpenAI account 'OPENAI-DCDAI-PROD-POC-001' created.
+2024-09-30 14:53:46 - Document Intelligence account 'COG-DCDAI-PROD-POC-001' created.
+2024-09-30 14:53:48 - AI Hub: 'AIHUB-DCDAI-PROD-POC-001' created.
+2024-09-30 14:54:23 - AI Service: 'AISERVICE-DCDAI-PROD-POC-001' created.
+2024-09-30 14:54:34 - Azure Machine Learning workspace 'AIHUB-DCDAI-PROD-POC-001' created.
+2024-09-30 14:54:35 - AI Model deployment: 'AIMODEL-DCDAI-PROD-POC-001' created.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 12 SEC : 420 MS ***
 

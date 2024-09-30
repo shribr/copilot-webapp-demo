@@ -1,41 +1,36 @@
 {
-    "components_appi_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "vaults_kv_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "storageAccounts_st_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "managedEnvironments_cae_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "searchServices_srch_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "accounts_cog_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "registries_cr_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "systemTopics_speventgridsystemtopic_name": {
-        "value": null
-    },
-    "accounts_cog_fr_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "storageAccounts_rgazuresearchopenai9d1c_name": {
-        "value": null
-    },
-    "workspaces_log_dcdaiprod_poc_001_name": {
-        "value": null
-    },
-    "storageAccounts_st_hubsearcho782529830947_name": {
-        "value": null
-    },
-    "accounts_computervisionsupercool_name": {
-        "value": null
-    }
+    "aiHubName": "AIHUB-DCDAI-PROD-POC-001",
+    "aiModelName": "AIMODEL-DCDAI-PROD-POC-001",
+    "aiModelType": "gpt-4o",
+    "aiModelVersion": "v1",
+    "aiServiceName": "AISERVICE-DCDAI-PROD-POC-001",
+    "apiManagementServiceName": "API-DCDAI-PROD-POC-001",
+    "appendUniqueSuffix": false,
+    "appServicePlanName": "ASP-DCDAI-PROD-POC-001",
+    "appInsightsName": "APPI-DCDAI-PROD-POC-001",
+    "cognitiveServiceName": "COG-DCDAI-PROD-POC-001",
+    "containerAppName": "CA-DCDAI-PROD-POC-001",
+    "containerAppsEnvironmentName": "CAE-DCDAI-PROD-POC-001",
+    "containerRegistryName": "CR-DCDAI-PROD-POC-001",
+    "cosmosDbAccountName": "COSMOS-DCDAI-PROD-POC-001",
+    "documentIntelligenceName": "COG-DCDAI-PROD-POC-001",
+    "eventHubNamespaceName": "EH-DCDAI-PROD-POC-001",
+    "functionAppName": "FUNC-DCDAI-PROD-POC-001",
+    "keyVaultName": "KV-DCDAI-PROD-POC-001",
+    "location": "East US",
+    "logAnalyticsWorkspaceName": "LOG-DCDAI-PROD-POC-001",
+    "managedIdentityName": "ID-DCDAI-PROD-POC-001",
+    "openAIName": "OPENAI-DCDAI-PROD-POC-001",
+    "portalDashboardName": "PORTALDASH-DCDAI-PROD-POC-001",
+    "redisCacheName": "REDIS-DCDAI-PROD-POC-001",
+    "resourceGroupName": "RG-DCDAI-PROD-POC-001",
+    "resourceSuffix": 1,
+    "searchServiceName": "SRCH-DCDAI-PROD-POC-001",
+    "serviceBusNamespaceName": "SB-DCDAI-PROD-POC-001",
+    "sharedDashboardName": "DASH-DCDAI-PROD-POC-001",
+    "sqlServerName": "SQL-DCDAI-PROD-POC-001",
+    "storageAccountName": "STDCDAIPRODPOC001",
+    "userAssignedIdentityName": "ID-DCDAI-PROD-POC-001",
+    "virtualNetworkName": "VNET-DCDAI-PROD-POC-001",
+    "webAppName": "APP-DCDAI-PROD-POC-001"
 }

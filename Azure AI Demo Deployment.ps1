@@ -62,7 +62,7 @@
 
 # Set the default parameters file
 param (
-    [string]$parametersFile = "parameters.json"
+    [string]$parametersFile = "parameters_gao.json"
 )
 
 # Mapping of global resource types
@@ -94,32 +94,47 @@ $globalKeyVaultSecrets = @(
 # Initialize the parameters
 function InitializeParameters {
     param (
-        [string]$parametersFile
+        [string]$parametersFile = "parameters_gao.json"
     )
 
     # Load parameters from the JSON file
     $parameters = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
-    # Retrieve the location
-    $global:location = $parameters.location
-    # Retrieve the resource suffix
-    $global:resourceSuffix = $parameters.resourceSuffix
-    # Initialize the result variable
-    $global:result = $false
-    # Generate a unique resource GUID
-    $global:resourceGuid = SplitGuid
-    # Retrieve the resource group name
-    $global:resourceGroupName = $parameters.resourceGroupName
-    # Retrieve the model name and type
-    $global:aiModelName = $parameters.aiModelName
-    # Retrieve the model type
-    $global:aiModelType = $parameters.aiModelType
-    # Retrieve the AI Hub name
+    # Initialize global variables for each item in the parameters_gao.json file
     $global:aiHubName = $parameters.aiHubName
-    # Retrieve the AI model version
+    $global:aiModelName = $parameters.aiModelName
+    $global:aiModelType = $parameters.aiModelType
     $global:aiModelVersion = $parameters.aiModelVersion
-    # Retrieve the AI service name
     $global:aiServiceName = $parameters.aiServiceName
+    $global:apiManagementServiceName = $parameters.apiManagementServiceName
+    $global:appendUniqueSuffix = $parameters.appendUniqueSuffix
+    $global:appServicePlanName = $parameters.appServicePlanName
+    $global:appInsightsName = $parameters.appInsightsName
+    $global:cognitiveServiceName = $parameters.cognitiveServiceName
+    $global:containerAppName = $parameters.containerAppName
+    $global:containerAppsEnvironmentName = $parameters.containerAppsEnvironmentName
+    $global:containerRegistryName = $parameters.containerRegistryName
+    $global:cosmosDbAccountName = $parameters.cosmosDbAccountName
+    $global:documentIntelligenceName = $parameters.documentIntelligenceName
+    $global:eventHubNamespaceName = $parameters.eventHubNamespaceName
+    $global:functionAppName = $parameters.functionAppName
+    $global:keyVaultName = $parameters.keyVaultName.ToLower()
+    $global:location = $parameters.location
+    $global:logAnalyticsWorkspaceName = $parameters.logAnalyticsWorkspaceName
+    $global:managedIdentityName = $parameters.managedIdentityName
+    $global:openAIName = $parameters.openAIName
+    $global:portalDashboardName = $parameters.portalDashboardName
+    $global:redisCacheName = $parameters.redisCacheName
+    $global:resourceGroupName = $parameters.resourceGroupName
+    $global:resourceSuffix = $parameters.resourceSuffix
+    $global:searchServiceName = $parameters.searchServiceName
+    $global:serviceBusNamespaceName = $parameters.serviceBusNamespaceName
+    $global:sharedDashboardName = $parameters.sharedDashboardName
+    $global:sqlServerName = $parameters.sqlServerName
+    $global:storageAccountName = $parameters.storageAccountName.ToLower()
+    $global:userAssignedIdentityName = $parameters.userAssignedIdentityName
+    $global:virtualNetworkName = $parameters.virtualNetworkName
+    $global:webAppName = $parameters.webAppName
 
     #**********************************************************************************************************************
     # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
@@ -139,21 +154,46 @@ function InitializeParameters {
     $parameters | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
 
     return @{
-        parameters        = $parameters
-        subscriptionId    = $subscriptionId
-        tenantId          = $tenantId
-        objectId          = $objectId
-        userPrincipalName = $userPrincipalName
-        location          = $location
-        resourceSuffix    = $resourceSuffix
-        result            = $result
-        resourceGuid      = $resourceGuid
-        resourceGroupName = $resourceGroupName
-        aiModelName       = $aiModelName
-        aiModelType       = $aiModelType
-        aiHubName         = $aiHubName
-        aiModelVersion    = $aiModelVersion
-        aiServiceName     = $aiServiceName
+        aiHubName                    = $aiHubName
+        aiModelName                  = $aiModelName
+        aiModelType                  = $aiModelType
+        aiModelVersion               = $aiModelVersion
+        aiServiceName                = $aiServiceName
+        apiManagementServiceName     = $apiManagementServiceName
+        appendUniqueSuffix           = $appendUniqueSuffix
+        appServicePlanName           = $appServicePlanName
+        appInsightsName              = $appInsightsName
+        cognitiveServiceName         = $cognitiveServiceName
+        containerAppName             = $containerAppName
+        containerAppsEnvironmentName = $containerAppsEnvironmentName
+        containerRegistryName        = $containerRegistryName
+        cosmosDbAccountName          = $cosmosDbAccountName
+        documentIntelligenceName     = $documentIntelligenceName
+        eventHubNamespaceName        = $eventHubNamespaceName
+        functionAppName              = $functionAppName
+        keyVaultName                 = $keyVaultName
+        location                     = $location
+        logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
+        managedIdentityName          = $managedIdentityName
+        openAIName                   = $openAIName
+        portalDashboardName          = $portalDashboardName
+        redisCacheName               = $redisCacheName
+        resourceGroupName            = $resourceGroupName
+        resourceGuid                 = $resourceGuid
+        resourceSuffix               = $resourceSuffix
+        result                       = $result
+        searchServiceName            = $searchServiceName
+        serviceBusNamespaceName      = $serviceBusNamespaceName
+        sharedDashboardName          = $sharedDashboardName
+        sqlServerName                = $sqlServerName
+        storageAccountName           = $storageAccountName
+        subscriptionId               = $subscriptionId
+        tenantId                     = $tenantId
+        userAssignedIdentityName     = $userAssignedIdentityName
+        userPrincipalName            = $userPrincipalName
+        virtualNetworkName           = $virtualNetworkName
+        webAppName                   = $webAppName
+        parameters                   = $parameters
     }
 }
 
@@ -1144,11 +1184,35 @@ function StartDeployment {
     # Check if the resource group exists
     $resourceGroupName = ResourceGroupExists -resourceSuffix $resourceSuffix
 
-    # Find a unique suffix
-    $resourceSuffix = FindUniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
+    if ($appendUniqueSuffix -eq $true) {
 
-    #CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -resourceGroupName $resourceGroupName -location $location
+        #$resourceGroupName = "$resourceGroupName$resourceSuffix"
 
+        # Find a unique suffix
+        $resourceSuffix = FindUniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
+    }
+    else {
+        $userPrincipalName = "$($parameters.userPrincipalName)"
+
+        CreateResources -storageAccountName $storageAccountName `
+            -appServicePlanName $appServicePlanName `
+            -searchServiceName $searchServiceName `
+            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
+            -cognitiveServiceName $cognitiveServiceName `
+            -keyVaultName $keyVaultName `
+            -appInsightsName $appInsightsName `
+            -portalDashboardName $portalDashboardName `
+            -managedEnvironmentName $managedEnvironmentName `
+            -userAssignedIdentityName $userAssignedIdentityName `
+            -userPrincipalName $userPrincipalName `
+            -webAppName $webAppName `
+            -functionAppName $functionAppName `
+            -openAIName $openAIName `
+            -documentIntelligenceName $documentIntelligenceName
+    }
+
+    CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
+    
     # End the timer
     $endTime = Get-Date
     $executionTime = $endTime - $startTime
@@ -1175,6 +1239,8 @@ $initParams = InitializeParameters -parametersFile $parametersFile
 
 # Extract initialized parameters
 $parameters = $initParams.parameters
+
+<#
 $subscriptionId = $initParams.subscriptionId
 $tenantId = $initParams.tenantId
 $objectId = $initParams.objectId
@@ -1188,6 +1254,8 @@ $aiModelType = $initParams.aiModelType
 $aiHubName = $parameters.aiHubName
 $aiModelVersion = $parameters.aiModelVersion
 $aiServiceName = $parameters.aiServiceName
+$appendUniqueSuffix = $parameters.appendUniqueSuffix
+#>
 
 $userPrincipalName = $parameters.userPrincipalName
 
