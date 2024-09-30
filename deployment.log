@@ -316,3 +316,8 @@
 2024-09-30 02:50:43 - Azure OpenAI account 'myOpenAI-b9023be2-1' created.
 2024-09-30 02:51:46 - Document Intelligence account 'myDocIntel-b9023be2-1' created.
 2024-09-30 02:51:48 - AI Hub: 'myAIHub-b9023be2-1' created.
+2024-09-30 02:52:20 - AI Service: 'myAIService-b9023be2-1' created.
+2024-09-30 02:52:33 - Azure Machine Learning workspace 'myAIHub-b9023be2-1' created.
+2024-09-30 02:52:34 - AI Model deployment: 'myAIModel-b9023be2-1' created.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 07 MIN : 49 SEC : 938 MS ***
+
