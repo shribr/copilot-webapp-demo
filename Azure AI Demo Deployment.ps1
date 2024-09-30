@@ -100,12 +100,6 @@ function InitializeParameters {
     # Load parameters from the JSON file
     $parameters = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
-    # Retrieve the subscription ID
-    $global:subscriptionId = az account show --query "id" --output tsv
-    # Retrieve the tenant ID
-    $global:tenantId = az account show --query "tenantId" --output tsv
-    # Retrieve the object ID of the signed-in user
-    $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
     # Retrieve the location
     $global:location = $parameters.location
     # Retrieve the resource suffix
@@ -124,13 +118,27 @@ function InitializeParameters {
     $global:aiHubName = $parameters.aiHubName
     # Retrieve the AI model version
     $global:aiModelVersion = $parameters.aiModelVersion
+    # Retrieve the AI service name
     $global:aiServiceName = $parameters.aiServiceName
+
+    #**********************************************************************************************************************
+    # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
+
+    # Retrieve the subscription ID
+    $global:subscriptionId = az account show --query "id" --output tsv
+    # Retrieve the tenant ID
+    $global:tenantId = az account show --query "tenantId" --output tsv
+    # Retrieve the object ID of the signed-in user
+    $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
+    # Retrieve the user principal name
+    $global:userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
 
     return @{
         parameters        = $parameters
         subscriptionId    = $subscriptionId
         tenantId          = $tenantId
         objectId          = $objectId
+        userPrincipalName = $userPrincipalName
         location          = $location
         resourceSuffix    = $resourceSuffix
         result            = $result
@@ -401,6 +409,7 @@ function FindUniqueSuffix {
         -portalDashboardName $portalDashboardName `
         -managedEnvironmentName $managedEnvironmentName `
         -userAssignedIdentityName $userAssignedIdentityName `
+        -userPrincipalName $userPrincipalName `
         -webAppName $webAppName `
         -functionAppName $functionAppName `
         -openAIName $openAIName `
@@ -424,6 +433,7 @@ function CreateResources {
         [string]$portalDashboardName,
         [string]$managedEnvironmentName,
         [string]$userAssignedIdentityName,
+        [string]$userPrincipalName,
         [string]$webAppName,
         [string]$functionAppName,
         [string]$openAIName,
@@ -703,9 +713,13 @@ function CreateResources {
         Write-Host "Web App '$webAppName' created."
         Write-Log -message "Web App '$webAppName' created."
 
+        # Construct the fully qualified resource ID for the User Assigned Identity
+        $userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+        $webAppResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Web/sites/$webAppName"
+
         # Assign the managed identity to the web app
         try {
-            az webapp identity assign --name $webAppName --resource-group $resourceGroupName --identities $userAssignedIdentityName
+            az webapp identity assign --name $webAppName --resource-group $resourceGroupName --scope $webAppResourceId --identities $userAssignedIdentityResourceId --output none
             Write-Host "Managed identity '$userAssignedIdentityName' assigned to Web App '$webAppName'."
             Write-Log -message "Managed identity '$userAssignedIdentityName' assigned to Web App '$webAppName'."
         }
@@ -719,43 +733,68 @@ function CreateResources {
         Write-Log -message "Failed to create Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
-    # Create the Key Vault with RBAC enabled
+    $useRBAC = $false
+
+    # Create the Key Vault with the appropriate permission model
     try {
-        az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "Key Vault: '$keyVaultName' created."
-        Write-Log -message "Key Vault: '$keyVaultName' created."
-
-        # Assign RBAC roles to the managed identity
-        try {
-            $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
-            az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
-            az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
-            az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
-            az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
-
-            Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
-            Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+        if ($useRBAC) {
+            az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+            Write-Host "Key Vault: '$keyVaultName' created with RBAC enabled."
+            Write-Log -message "Key Vault: '$keyVaultName' created with RBAC enabled."
         }
-        catch {
-            Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        else {
+            az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+            Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+            Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
         }
 
-        try {
-            az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $webAppName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge encrypt decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-            Write-Host "Policy permissions set for Key Vault: '$keyVaultName'."
-            Write-Log -message "Policy permissions set for Key Vault: '$keyVaultName'."
+        if ($useRBAC) {
+            # Assign RBAC roles to the managed identity
+            try {
+                $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
+                
+                az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
+                az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
+                az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
+                az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
+
+                Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+                Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+            }
+            catch {
+                Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
-        catch {
-            Write-Error "Failed to set policy permissions for Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to set policy permissions for Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        else {
+            # Set access policies for both user
+            try {
+                # Set policy for the user
+                az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge encrypt decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+                Write-Host "Keyvault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+                Write-Log -message "Keyvault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+            }
+            catch {
+                Write-Error "Failed to set Keyvault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to set Keyvault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+
+            # Set policy for the application
+            try {
+                az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge encrypt decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+                Write-Host "Keyvault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+                Write-Log -message "Keyvault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+            }
+            catch {
+                Write-Error "Failed to set Keyvault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to set Keyvault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
     }
     catch {
         Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
-
 
     # Loop through the array of secrets and store each one in the Key Vault
     foreach ($secretName in $globalKeyVaultSecrets) {
@@ -777,9 +816,16 @@ function CreateResources {
     try {
         $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp"
 
-        az functionapp create --name $functionAppName -os-type Linux --storage-account $storageAccountName --resource-group $resourceGroupName --plan $appServicePlanName --runtime dotnet --runtime-version $latestDontNetRuntimeFuncApp --functions-version 4 --output none
-        #$functionApp = New-AzFunctionApp -ResourceGroupName $resourceGroupName -Name $functionAppName -StorageAccountName $storageAccountName -AppServicePlan $appServicePlanName -Location $location
-
+        #az functionapp create --name $functionAppName -os-type Linux --storage-account $storageAccountName --resource-group $resourceGroupName --plan $appServicePlanName --runtime dotnet --runtime-version $latestDontNetRuntimeFuncApp --functions-version 4 --output none
+        az functionapp create --name $functionAppName `
+            --consumption-plan-location $location `
+            --storage-account $storageAccountName `
+            --resource-group $resourceGroupName `
+            --runtime dotnet `
+            --runtime-version $latestDontNetRuntimeFuncApp `
+            --functions-version 4 `
+            --output none
+                          
         Write-Host "Function App '$functionAppName' created."
         Write-Log -message "Function App '$functionAppName' created."
     }
@@ -831,29 +877,49 @@ function New-RandomPassword {
         [int]$nonAlphanumericCount = 2
     )
 
-    $alphanumericChars = [char[]]"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    $nonAlphanumericChars = [char[]]"!@#$%^&*()-_=+[]{}|;:,.<>?/~"
+    try {
+        $alphanumericChars = [char[]]"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
+        $nonAlphanumericChars = [char[]]"!@#$%^&*()-_=+[]{}|;:,.<>?/~".ToCharArray()
+    
+        $passwordChars = New-Object char[] $length
+    
+        for ($i = 0; $i -lt ($length - $nonAlphanumericCount); $i++) {
+            $passwordChars[$i] = $alphanumericChars[(Get-RandomInt -max $alphanumericChars.Length)]
+        }
+    
+        for ($i = ($length - $nonAlphanumericCount); $i -lt $length; $i++) {
+            $passwordChars[$i] = $nonAlphanumericChars[(Get-RandomInt -max $nonAlphanumericChars.Length)]
+        }
+    
+        #Shuffle the characters to ensure randomness
+        for ($i = 0; $i -lt $length; $i++) {
+            $j = $random.GetInt32($length)
+            $temp = $passwordChars[$i]
+            $passwordChars[$i] = $passwordChars[$j]
+            $passwordChars[$j] = $temp
+        }
+    
+        return -join $passwordChars
+    }
+    catch {
+        Write-Error "Failed to generate random password: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to generate random password: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        return $null
+    }
+}
+
+# Helper function to get a random integer
+function Get-RandomInt {
+    param (
+        [int]$max
+    )
 
     $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-    $passwordChars = New-Object char[] $length
+    $bytes = New-Object byte[] 4
+    $random.GetBytes($bytes)
+    [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 
-    for ($i = 0; $i -lt ($length - $nonAlphanumericCount); $i++) {
-        $passwordChars[$i] = $alphanumericChars[$random.GetInt32($alphanumericChars.Length)]
-    }
-
-    for ($i = ($length - $nonAlphanumericCount); $i -lt $length; $i++) {
-        $passwordChars[$i] = $nonAlphanumericChars[$random.GetInt32($nonAlphanumericChars.Length)]
-    }
-
-    #Shuffle the characters to ensure randomness
-    for ($i = 0; $i -lt $length; $i++) {
-        $j = $random.GetInt32($length)
-        $temp = $passwordChars[$i]
-        $passwordChars[$i] = $passwordChars[$j]
-        $passwordChars[$j] = $temp
-    }
-
-    return -join $passwordChars
+    return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 }
 
 # Function to delete Azure resource groups
@@ -905,6 +971,17 @@ function CreateAIHubAndModel {
     catch {
         Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Try to create an Azure Machine Learning workspace (AI Hub)
+    try {
+        az ml workspace create --name $aiHubName --resource-group $resourceGroupName --location $location --output none
+        Write-Host "Azure Machine Learning workspace '$aiHubName' created."
+        Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
+    }
+    catch {
+        Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
     # Create AI Model Deployment
@@ -1080,6 +1157,8 @@ $aiModelType = $initParams.aiModelType
 $aiHubName = $parameters.aiHubName
 $aiModelVersion = $parameters.aiModelVersion
 $aiServiceName = $parameters.aiServiceName
+
+$userPrincipalName = $parameters.userPrincipalName
 
 # Start the deployment
 StartDeployment
