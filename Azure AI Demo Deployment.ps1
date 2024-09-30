@@ -670,7 +670,9 @@ function CreateResources {
 
     # Try to create a Cognitive Services account
     try {
-        Invoke-AzureRestMethod -method "PUT" -url $cognitiveServicesUrl -jsonBody $jsonBody
+        #Invoke-AzureRestMethod -method "PUT" -url $cognitiveServicesUrl -jsonBody $jsonBody
+        az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku $sku --kind CognitiveServices
+
         Write-Host "Cognitive Services account '$cognitiveServiceName' created."
         Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
     }
