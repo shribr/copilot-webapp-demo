@@ -133,6 +133,11 @@ function InitializeParameters {
     # Retrieve the user principal name
     $global:userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
 
+    $parameters | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
+    $parameters | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
+    $parameters | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
+    $parameters | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
+
     return @{
         parameters        = $parameters
         subscriptionId    = $subscriptionId
@@ -166,20 +171,38 @@ function SplitGuid {
 # Function to get the latest .NET runtime version
 function Get-LatestDotNetRuntime {
     param(
-        [string]$resourceType
+        [string]$resourceType,
+        [string]$os,
+        [string]$version
     )
 
     if ($resourceType -eq "functionapp") {
-        $runtime = az functionapp list-runtimes --query "[?platform=='dotnet'].majorVersion" --output json | ConvertFrom-Json
+        $functionRuntimes = az functionapp list-runtimes --output json | ConvertFrom-Json
+
+        if ($os -eq "linux") {
+            #$runtimes = $functionRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' -and $_.version -eq $version } | Select-Object -ExpandProperty version
+            $runtimes = $functionRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
+        else {
+            $runtimes = $functionRuntimes.windows | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
     }
     elseif ($resourceType -eq "webapp") {
-        $runtime = az webapp list-runtimes --query "[?platform=='dotnet'].majorVersion" --output json | ConvertFrom-Json
+        $webpAppRuntimes = az webapp list-runtimes --output json | ConvertFrom-Json
+
+        if ($os -eq "linux") {
+            $runtimes = $webpAppRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
+        else {
+            $runtimes = $webpAppRuntimes.windows | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
     }
     else {
         throw "Unsupported resource type: $resourceType"
     }
 
-    $latestRuntime = ($runtime | Sort-Object -Descending)[0]
+    $latestRuntime = ($runtimes | Sort-Object -Descending)[0]
+
     return $latestRuntime
 }
 
@@ -399,6 +422,8 @@ function FindUniqueSuffix {
         }
     } while ($resourceExists)
 
+    $userPrincipalName = "$($parameters.userPrincipalName)"
+
     CreateResources -storageAccountName $storageAccountName `
         -appServicePlanName $appServicePlanName `
         -searchServiceName $searchServiceName `
@@ -455,6 +480,7 @@ function CreateResources {
     Write-Host "storageAccountName: $storageAccountName"
     Write-Host "appServicePlanName: $appServicePlanName"
     Write-Host "location: $location"
+    Write-Host "userPrincipalName: $userPrincipalName"
 
 
     # **********************************************************************************************************************
@@ -786,12 +812,12 @@ function CreateResources {
             # Set policy for the application
             try {
                 az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge encrypt decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-                Write-Host "Keyvault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
-                Write-Log -message "Keyvault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+                Write-Host "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+                Write-Log -message "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
             }
             catch {
-                Write-Error "Failed to set Keyvault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to set Keyvault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
     }
@@ -803,8 +829,9 @@ function CreateResources {
     # Loop through the array of secrets and store each one in the Key Vault
     foreach ($secretName in $globalKeyVaultSecrets) {
         # Generate a random value for the secret
-        $secretValue = New-RandomPassword
-    
+        #$secretValue = New-RandomPassword
+        $secretValue = "TESTSECRET"
+
         try {
             az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
             Write-Host "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
@@ -818,7 +845,7 @@ function CreateResources {
 
     # Try to create a Function App
     try {
-        $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp"
+        $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp" -os "linux" -version "4"
 
         #az functionapp create --name $functionAppName -os-type Linux --storage-account $storageAccountName --resource-group $resourceGroupName --plan $appServicePlanName --runtime dotnet --runtime-version $latestDontNetRuntimeFuncApp --functions-version 4 --output none
         az functionapp create --name $functionAppName `
@@ -980,7 +1007,7 @@ function CreateAIHubAndModel {
     # Try to create an Azure Machine Learning workspace (AI Hub)
     try {
         az ml workspace create --name $aiHubName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "Azure Machine Learning workspace '$aiHubName' created."
+        Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
         Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
     }
     catch {
