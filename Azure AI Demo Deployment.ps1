@@ -118,7 +118,7 @@ function InitializeParameters {
     $global:documentIntelligenceName = $parameters.documentIntelligenceName
     $global:eventHubNamespaceName = $parameters.eventHubNamespaceName
     $global:functionAppName = $parameters.functionAppName
-    $global:keyVaultName = $parameters.keyVaultName.ToLower()
+    $global:keyVaultName = $parameters.keyVaultName
     $global:location = $parameters.location
     $global:logAnalyticsWorkspaceName = $parameters.logAnalyticsWorkspaceName
     $global:managedIdentityName = $parameters.managedIdentityName
@@ -131,7 +131,7 @@ function InitializeParameters {
     $global:serviceBusNamespaceName = $parameters.serviceBusNamespaceName
     $global:sharedDashboardName = $parameters.sharedDashboardName
     $global:sqlServerName = $parameters.sqlServerName
-    $global:storageAccountName = $parameters.storageAccountName.ToLower()
+    $global:storageAccountName = $parameters.storageAccountName
     $global:userAssignedIdentityName = $parameters.userAssignedIdentityName
     $global:virtualNetworkName = $parameters.virtualNetworkName
     $global:webAppName = $parameters.webAppName
@@ -651,7 +651,7 @@ function CreateResources {
 
     $cognitiveServiceName = Get-ValidServiceName -serviceName $cognitiveServiceName
 
-    $cognitiveServicesUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.CognitiveServices/accounts/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $cognitiveServiceName, $cognitiveServicesApiVersion
+    #$cognitiveServicesUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.CognitiveServices/accounts/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $cognitiveServiceName, $cognitiveServicesApiVersion
 
     #Write-Host "Constructed cognitiveServicesUrl: $cognitiveServicesUrl"
     #Write-Log -message "Constructed cognitiveServicesUrl: $cognitiveServicesUrl"
@@ -671,7 +671,7 @@ function CreateResources {
     # Try to create a Cognitive Services account
     try {
         #Invoke-AzureRestMethod -method "PUT" -url $cognitiveServicesUrl -jsonBody $jsonBody
-        az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku $sku --kind CognitiveServices
+        az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku "S0" --kind CognitiveServices
 
         Write-Host "Cognitive Services account '$cognitiveServiceName' created."
         Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
