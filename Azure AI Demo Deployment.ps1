@@ -701,6 +701,25 @@ function CreateResources {
         az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
         Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
         Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
+
+        # Construct the fully qualified resource ID for the User Assigned Identity
+        try {
+            #$userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+            $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
+            $roles = @("Contributor", "Cognitive Services OpenAI User", "Search Index Data Reader", "Storage Blob Data Reader")  # List of roles to assign
+            $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
+            
+            foreach ($role in $roles) {
+                az role assignment create --assignee $assigneePrincipalId --role $role --scope $scope
+
+                Write-Host "User '$userAssignedIdentityName' assigned to role: '$role'."
+                Write-Log -message "User '$userAssignedIdentityName' assigned to role: '$role'."
+            }
+        }
+        catch {
+            Write-Error "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
     catch {
         Write-Error "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -712,21 +731,6 @@ function CreateResources {
         az webapp create --name $webAppName --resource-group $resourceGroupName --plan $appServicePlanName --output none
         Write-Host "Web App '$webAppName' created."
         Write-Log -message "Web App '$webAppName' created."
-
-        # Construct the fully qualified resource ID for the User Assigned Identity
-        $userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
-        $webAppResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Web/sites/$webAppName"
-
-        # Assign the managed identity to the web app
-        try {
-            az webapp identity assign --name $webAppName --resource-group $resourceGroupName --scope $webAppResourceId --identities $userAssignedIdentityResourceId --output none
-            Write-Host "Managed identity '$userAssignedIdentityName' assigned to Web App '$webAppName'."
-            Write-Log -message "Managed identity '$userAssignedIdentityName' assigned to Web App '$webAppName'."
-        }
-        catch {
-            Write-Error "Failed to assign managed identity '$userAssignedIdentityName' to Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to assign managed identity '$userAssignedIdentityName' to Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
     }
     catch {
         Write-Error "Failed to create Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -767,7 +771,7 @@ function CreateResources {
             }
         }
         else {
-            # Set access policies for both user
+            # Set access policies for user
             try {
                 # Set policy for the user
                 az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge encrypt decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
@@ -884,11 +888,11 @@ function New-RandomPassword {
         $passwordChars = New-Object char[] $length
     
         for ($i = 0; $i -lt ($length - $nonAlphanumericCount); $i++) {
-            $passwordChars[$i] = $alphanumericChars[(Get-RandomInt -max $alphanumericChars.Length)]
+            $passwordChars[$i] = $alphanumericChars[(Get-Random -Maximum $alphanumericChars.Length)]
         }
     
         for ($i = ($length - $nonAlphanumericCount); $i -lt $length; $i++) {
-            $passwordChars[$i] = $nonAlphanumericChars[(Get-RandomInt -max $nonAlphanumericChars.Length)]
+            $passwordChars[$i] = $nonAlphanumericChars[(Get-Random -Maximum $nonAlphanumericChars.Length)]
         }
     
         #Shuffle the characters to ensure randomness
