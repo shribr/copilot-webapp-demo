@@ -801,12 +801,12 @@ function CreateResources {
             try {
                 # Set policy for the user
                 az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge encrypt decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-                Write-Host "Keyvault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
-                Write-Log -message "Keyvault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+                Write-Host "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+                Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
             }
             catch {
-                Write-Error "Failed to set Keyvault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to set Keyvault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
 
             # Set policy for the application

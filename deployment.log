@@ -286,3 +286,33 @@
 2024-09-30 01:48:17 - AI Model deployment: 'myAIModel-477c16b1-1' created.
 *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 22 SEC : 653 MS ***
 
+*** LOG SEQUENCE: 9 ***
+2024-09-30 02:47:04 - Resource group 'myResourceGroup-1' deleted.
+2024-09-30 02:47:47 - Storage account 'mystorageacctb9023be21' created.
+2024-09-30 02:47:58 - App Service Plan 'myAppServicePlan-b9023be2-1' created.
+2024-09-30 02:48:04 - Search Service 'mysearchservice-b9023be2-1' created.
+2024-09-30 02:48:07 - Log Analytics Workspace 'myloganalyticsworkspace-b9023be2-1' created.
+2024-09-30 02:48:10 - Cognitive Services account 'mycognitiveservice-b9023be2-1' created.
+2024-09-30 02:48:13 - Application Insights component 'myappinsights-b9023be2-1' created.
+2024-09-30 02:48:15 - User Assigned Identity 'myUserAssignedId-b9023be2-1' created.
+2024-09-30 02:48:17 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Contributor'.
+2024-09-30 02:48:18 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Cognitive Services OpenAI User'.
+2024-09-30 02:48:19 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Search Index Data Reader'.
+2024-09-30 02:48:20 - User 'myUserAssignedId-b9023be2-1' assigned to role: 'Storage Blob Data Reader'.
+2024-09-30 02:48:43 - Web App 'myWebApp-b9023be2-1' created.
+2024-09-30 02:49:16 - Key Vault: 'myKeyVault-b9023be2-1' created with Vault Access Policies.
+2024-09-30 02:49:17 - Keyvault 'myKeyVault-b9023be2-1' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
+2024-09-30 02:49:18 - Key Vault 'myKeyVault-b9023be2-1' policy permissions set for application: 'myUserAssignedId-b9023be2-1'.
+2024-09-30 02:49:20 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:21 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:22 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:24 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:25 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:27 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:28 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:29 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:49:31 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-b9023be2-1'.
+2024-09-30 02:50:10 - Function App 'myFunctionApp-b9023be2-1' created.
+2024-09-30 02:50:43 - Azure OpenAI account 'myOpenAI-b9023be2-1' created.
+2024-09-30 02:51:46 - Document Intelligence account 'myDocIntel-b9023be2-1' created.
+2024-09-30 02:51:48 - AI Hub: 'myAIHub-b9023be2-1' created.
