@@ -124,6 +124,7 @@ function InitializeParameters {
     $global:aiHubName = $parameters.aiHubName
     # Retrieve the AI model version
     $global:aiModelVersion = $parameters.aiModelVersion
+    $global:aiServiceName = $parameters.aiServiceName
 
     return @{
         parameters        = $parameters
@@ -139,6 +140,7 @@ function InitializeParameters {
         aiModelType       = $aiModelType
         aiHubName         = $aiHubName
         aiModelVersion    = $aiModelVersion
+        aiServiceName     = $aiServiceName
     }
 }
 
@@ -367,6 +369,7 @@ function FindUniqueSuffix {
         $documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
         $aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
         $aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
+        $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
 
         $resourceExists = ResourceExists $storageAccountName "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
         ResourceExists $appServicePlanName "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
@@ -403,7 +406,7 @@ function FindUniqueSuffix {
         -openAIName $openAIName `
         -documentIntelligenceName $documentIntelligenceName
 
-    CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -resourceGroupName $resourceGroupName -location $location
+    CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
 
     return $resourceSuffix
 }
@@ -683,44 +686,6 @@ function CreateResources {
     # End create resources using the Azure REST API
     #**********************************************************************************************************************
     
-    # Create Key Vault
-    try {
-        az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --output none
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "Key Vault: '$keyVaultName' created."
-            Write-Log -message "Key Vault: '$keyVaultName' created."
-        }
-        else {
-            throw "Failed to create Key Vault with exit code $LASTEXITCODE"
-        }
-    }
-    catch {
-        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-
-    # Loop through the array of secrets and store each one in the Key Vault
-    foreach ($secretName in $globalKeyVaultSecrets) {
-        # Generate a random value for the secret
-        $secretValue = [System.Web.Security.Membership]::GeneratePassword(16, 2)
-    
-        try {
-            az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
-                Write-Log -message "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
-            }
-            else {
-                throw "Failed to store secret '$secretName' in Key Vault '$keyVaultName' with exit code $LASTEXITCODE"
-            }
-        }
-        catch {
-            Write-Error "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-
     # Try to create a User Assigned Identity
     try {
         az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
@@ -737,10 +702,75 @@ function CreateResources {
         az webapp create --name $webAppName --resource-group $resourceGroupName --plan $appServicePlanName --output none
         Write-Host "Web App '$webAppName' created."
         Write-Log -message "Web App '$webAppName' created."
+
+        # Assign the managed identity to the web app
+        try {
+            az webapp identity assign --name $webAppName --resource-group $resourceGroupName --identities $userAssignedIdentityName
+            Write-Host "Managed identity '$userAssignedIdentityName' assigned to Web App '$webAppName'."
+            Write-Log -message "Managed identity '$userAssignedIdentityName' assigned to Web App '$webAppName'."
+        }
+        catch {
+            Write-Error "Failed to assign managed identity '$userAssignedIdentityName' to Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to assign managed identity '$userAssignedIdentityName' to Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
     catch {
         Write-Error "Failed to create Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Create the Key Vault with RBAC enabled
+    try {
+        az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --output none
+        Write-Host "Key Vault: '$keyVaultName' created."
+        Write-Log -message "Key Vault: '$keyVaultName' created."
+
+        # Assign RBAC roles to the managed identity
+        try {
+            $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+            az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
+            az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
+            az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
+            az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
+
+            Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+            Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+        }
+        catch {
+            Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+
+        try {
+            az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $webAppName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge encrypt decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+            Write-Host "Policy permissions set for Key Vault: '$keyVaultName'."
+            Write-Log -message "Policy permissions set for Key Vault: '$keyVaultName'."
+        }
+        catch {
+            Write-Error "Failed to set policy permissions for Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to set policy permissions for Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    catch {
+        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+
+    # Loop through the array of secrets and store each one in the Key Vault
+    foreach ($secretName in $globalKeyVaultSecrets) {
+        # Generate a random value for the secret
+        $secretValue = New-RandomPassword
+    
+        try {
+            az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
+            Write-Host "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
+            Write-Log -message "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
+        }
+        catch {
+            Write-Error "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     # Try to create a Function App
@@ -792,17 +822,38 @@ function CreateResources {
         Write-Log -message "Failed to create Managed Environment: $_"
     }
     #>
+}
 
-    # Try to create a User Assigned Identity
-    try {
-        az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
-        Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
+# Function to get the latest API version
+function New-RandomPassword {
+    param (
+        [int]$length = 16,
+        [int]$nonAlphanumericCount = 2
+    )
+
+    $alphanumericChars = [char[]]"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    $nonAlphanumericChars = [char[]]"!@#$%^&*()-_=+[]{}|;:,.<>?/~"
+
+    $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    $passwordChars = New-Object char[] $length
+
+    for ($i = 0; $i -lt ($length - $nonAlphanumericCount); $i++) {
+        $passwordChars[$i] = $alphanumericChars[$random.GetInt32($alphanumericChars.Length)]
     }
-    catch {
-        Write-Error "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+    for ($i = ($length - $nonAlphanumericCount); $i -lt $length; $i++) {
+        $passwordChars[$i] = $nonAlphanumericChars[$random.GetInt32($nonAlphanumericChars.Length)]
     }
+
+    #Shuffle the characters to ensure randomness
+    for ($i = 0; $i -lt $length; $i++) {
+        $j = $random.GetInt32($length)
+        $temp = $passwordChars[$i]
+        $passwordChars[$i] = $passwordChars[$j]
+        $passwordChars[$j] = $temp
+    }
+
+    return -join $passwordChars
 }
 
 # Function to delete Azure resource groups
@@ -829,38 +880,39 @@ function CreateAIHubAndModel {
         [string]$aiModelName,
         [string]$aiModelType,
         [string]$aiModelVersion,
+        [string]$aiServiceName,
         [string]$resourceGroupName,
         [string]$location
     )
     
     # Create AI Hub
     try {
-        az cognitiveservices account create --name $aiHubName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "AI Hub: '$aiHubName' created."
-            Write-Log -message "AI Hub: '$aiHubName' created."
-        }
-        else {
-            throw "Failed to create AI Hub with exit code $LASTEXITCODE"
-        }
-
+        az cognitiveservices account create --name $aiHubName --resource-group $resourceGroupName --location $location --kind AIHub --sku S0 --output none
+        Write-Host "AI Hub: '$aiHubName' created."
+        Write-Log -message "AI Hub: '$aiHubName' created."
     }
     catch {
         Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
+    # Create AI Service
+    try {
+        az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
+        Write-Host "AI Service: '$aiServiceName' created."
+        Write-Log -message "AI Service: '$aiServiceName' created."
+    }
+    catch {
+        Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
     # Create AI Model Deployment
     try {
         #az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
         az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "AI Model deployment: '$aiModelName' created."
-            Write-Log -message "AI Model deployment: '$aiModelName' created."
-        }
-        else {
-            throw "Failed to create AI Model deployment '$aiModelName' with exit code $LASTEXITCODE"
-        }
+        Write-Host "AI Model deployment: '$aiModelName' created."
+        Write-Log -message "AI Model deployment: '$aiModelName' created."
     }
     catch {
         Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1027,6 +1079,7 @@ $aiModelName = $initParams.aiModelName
 $aiModelType = $initParams.aiModelType
 $aiHubName = $parameters.aiHubName
 $aiModelVersion = $parameters.aiModelVersion
+$aiServiceName = $parameters.aiServiceName
 
 # Start the deployment
 StartDeployment

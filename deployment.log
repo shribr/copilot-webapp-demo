@@ -9,3 +9,93 @@
 2024-09-29 19:45:24 - Key Vault: 'myKeyVault-4e04578e-1' created.
 2024-09-29 19:46:16 - Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-4e04578e-1': (Line 715) : Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-4e04578e-1' with exit code 2
 2024-09-29 19:48:24 - Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-4e04578e-1': (Line 715) : Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-4e04578e-1' with exit code 1
+*** LOG SEQUENCE: 2 ***
+*** LOG SEQUENCE: 3 ***
+2024-09-29 20:11:32 - Storage account 'mystorageacct1dd8fd321' created.
+2024-09-29 20:11:44 - App Service Plan 'myAppServicePlan-1dd8fd32-1' created.
+2024-09-29 20:11:49 - Search Service 'mysearchservice-1dd8fd32-1' created.
+2024-09-29 20:11:52 - Log Analytics Workspace 'myloganalyticsworkspace-1dd8fd32-1' created.
+2024-09-29 20:11:55 - Cognitive Services account 'mycognitiveservice-1dd8fd32-1' created.
+2024-09-29 20:11:57 - Application Insights component 'myappinsights-1dd8fd32-1' created.
+2024-09-29 20:12:31 - Key Vault: 'myKeyVault-1dd8fd32-1' created.
+2024-09-29 20:12:32 - Policy permissions set for Key Vault: 'myKeyVault-1dd8fd32-1'.
+2024-09-29 20:13:41 - Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:46 - Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:47 - Failed to store secret 'AzureOpenAiServiceEndpoint' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'AzureOpenAiServiceEndpoint' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:48 - Failed to store secret 'AzureSearchIndex' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'AzureSearchIndex' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:50 - Failed to store secret 'AzureSearchServiceEndpoint' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'AzureSearchServiceEndpoint' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:51 - Failed to store secret 'AzureStorageAccountEndpoint' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'AzureStorageAccountEndpoint' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:52 - Failed to store secret 'AzureStorageContainer' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'AzureStorageContainer' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:53 - Failed to store secret 'UseAOAI' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'UseAOAI' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:54 - Failed to store secret 'UseVision' in Key Vault 'myKeyVault-1dd8fd32-1': (Line 726) : Failed to store secret 'UseVision' in Key Vault 'myKeyVault-1dd8fd32-1' with exit code 1
+2024-09-29 20:13:56 - User Assigned Identity 'myUserAssignedId-1dd8fd32-1' created.
+2024-09-29 20:14:17 - Web App 'myWebApp-1dd8fd32-1' created.
+2024-09-29 20:14:19 - Failed to create Function App 'myFunctionApp-1dd8fd32-1': (Line 172) : Cannot index into a null array.
+2024-09-29 20:14:52 - Azure OpenAI account 'myOpenAI-1dd8fd32-1' created.
+2024-09-29 20:15:26 - Document Intelligence account 'myDocIntel-1dd8fd32-1' created.
+2024-09-29 20:15:27 - User Assigned Identity 'myUserAssignedId-1dd8fd32-1' created.
+2024-09-29 20:16:03 - AI Hub: 'myAIHub-1dd8fd32-1' created.
+2024-09-29 20:16:05 - Failed to create AI Model deployment 'myAIModel-1dd8fd32-1': (Line 905) : Failed to create AI Model deployment 'myAIModel-1dd8fd32-1' with exit code 1
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 05 MIN : 15 SEC : 684 MS ***
+
+*** LOG SEQUENCE: 4 ***
+2024-09-29 20:27:39 - Resource group 'myResourceGroup-1' deleted.
+2024-09-29 20:28:17 - Storage account 'mystorageacctb0e4d1991' created.
+2024-09-29 20:28:29 - App Service Plan 'myAppServicePlan-b0e4d199-1' created.
+2024-09-29 20:28:35 - Search Service 'mysearchservice-b0e4d199-1' created.
+2024-09-29 20:28:37 - Log Analytics Workspace 'myloganalyticsworkspace-b0e4d199-1' created.
+2024-09-29 20:28:40 - Cognitive Services account 'mycognitiveservice-b0e4d199-1' created.
+2024-09-29 20:28:43 - Application Insights component 'myappinsights-b0e4d199-1' created.
+2024-09-29 20:28:45 - User Assigned Identity 'myUserAssignedId-b0e4d199-1' created.
+2024-09-29 20:29:07 - Web App 'myWebApp-b0e4d199-1' created.
+2024-09-29 20:29:41 - Key Vault: 'myKeyVault-b0e4d199-1' created.
+2024-09-29 20:29:42 - Policy permissions set for Key Vault: 'myKeyVault-b0e4d199-1'.
+2024-09-29 20:29:43 - Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'AzureOpenAiChatGptDeployment' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:44 - Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'AzureOpenAiEmbeddingDeployment' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:45 - Failed to store secret 'AzureOpenAiServiceEndpoint' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'AzureOpenAiServiceEndpoint' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:46 - Failed to store secret 'AzureSearchIndex' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'AzureSearchIndex' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:47 - Failed to store secret 'AzureSearchServiceEndpoint' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'AzureSearchServiceEndpoint' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:48 - Failed to store secret 'AzureStorageAccountEndpoint' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'AzureStorageAccountEndpoint' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:50 - Failed to store secret 'AzureStorageContainer' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'AzureStorageContainer' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:51 - Failed to store secret 'UseAOAI' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'UseAOAI' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:52 - Failed to store secret 'UseVision' in Key Vault 'myKeyVault-b0e4d199-1': (Line 751) : Failed to store secret 'UseVision' in Key Vault 'myKeyVault-b0e4d199-1' with exit code 1
+2024-09-29 20:29:54 - Failed to create Function App 'myFunctionApp-b0e4d199-1': (Line 174) : Cannot index into a null array.
+2024-09-29 20:30:32 - Azure OpenAI account 'myOpenAI-b0e4d199-1' created.
+2024-09-29 20:32:05 - Document Intelligence account 'myDocIntel-b0e4d199-1' created.
+2024-09-29 20:32:06 - User Assigned Identity 'myUserAssignedId-b0e4d199-1' created.
+2024-09-29 20:32:07 - Failed to create AI Hub 'myAIHub-b0e4d199-1': (Line 891) : Failed to create AI Hub with exit code 1
+2024-09-29 20:32:40 - AI Service: 'myAIService-b0e4d199-1' created.
+2024-09-29 20:32:41 - Failed to create AI Model deployment 'myAIModel-b0e4d199-1': (Line 926) : Failed to create AI Model deployment 'myAIModel-b0e4d199-1' with exit code 1
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 20 SEC : 465 MS ***
+
+*** LOG SEQUENCE: 5 ***
+2024-09-29 21:00:01 - Resource group 'myResourceGroup-1' deleted.
+2024-09-29 21:00:52 - Storage account 'mystorageacct8bad5cd01' created.
+2024-09-29 21:01:04 - App Service Plan 'myAppServicePlan-8bad5cd0-1' created.
+2024-09-29 21:01:13 - Search Service 'mysearchservice-8bad5cd0-1' created.
+2024-09-29 21:01:15 - Log Analytics Workspace 'myloganalyticsworkspace-8bad5cd0-1' created.
+2024-09-29 21:01:18 - Cognitive Services account 'mycognitiveservice-8bad5cd0-1' created.
+2024-09-29 21:01:20 - Application Insights component 'myappinsights-8bad5cd0-1' created.
+2024-09-29 21:01:22 - User Assigned Identity 'myUserAssignedId-8bad5cd0-1' created.
+2024-09-29 21:01:44 - Web App 'myWebApp-8bad5cd0-1' created.
+2024-09-29 21:01:47 - Managed identity 'myUserAssignedId-8bad5cd0-1' assigned to Web App 'myWebApp-8bad5cd0-1'.
+2024-09-29 21:02:20 - Key Vault: 'myKeyVault-8bad5cd0-1' created.
+2024-09-29 21:02:24 - RBAC roles assigned to managed identity: 'myUserAssignedId-8bad5cd0-1'.
+2024-09-29 21:02:25 - Policy permissions set for Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:26 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:27 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:28 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:29 - Secret: 'AzureSearchIndex' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:30 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:31 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:33 - Secret: 'AzureStorageContainer' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:34 - Secret: 'UseAOAI' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:35 - Secret: 'UseVision' stored in Key Vault: 'myKeyVault-8bad5cd0-1'.
+2024-09-29 21:02:36 - Failed to create Function App 'myFunctionApp-8bad5cd0-1': (Line 174) : Cannot index into a null array.
+2024-09-29 21:03:09 - Azure OpenAI account 'myOpenAI-8bad5cd0-1' created.
+2024-09-29 21:04:12 - Document Intelligence account 'myDocIntel-8bad5cd0-1' created.
+2024-09-29 21:04:13 - AI Hub: 'myAIHub-8bad5cd0-1' created.
+2024-09-29 21:04:46 - AI Service: 'myAIService-8bad5cd0-1' created.
+2024-09-29 21:04:47 - AI Model deployment: 'myAIModel-8bad5cd0-1' created.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 05 SEC : 034 MS ***
+

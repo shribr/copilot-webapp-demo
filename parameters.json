@@ -18,6 +18,7 @@
     "documentIntelligenceName": "myDocIntel",
     "aiModelName": "myAIModel",
     "aiHubName": "myAIHub",
+    "aiServiceName": "myAIService",
     "aiModelVersiion": "v1",
     "aiModelType": "gpt-4o"
 }
