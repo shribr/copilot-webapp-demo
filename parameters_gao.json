@@ -24,7 +24,7 @@
     "openAIName": "openai-dcdai-prod-poc-001",
     "portalDashboardName": "portaldash-dcdai-prod-poc-001",
     "redisCacheName": "redis-dcdai-prod-poc-001",
-    "resourceGroupName": "rg-dcdai-prod-poc-001",
+    "resourceGroupName": "RG-DCDAI-COPILOTDEMO-001",
     "resourceSuffix": 1,
     "searchServiceName": "srch-dcdai-prod-poc-001",
     "serviceBusNamespaceName": "sb-dcdai-prod-poc-001",

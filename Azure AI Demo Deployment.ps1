@@ -1041,10 +1041,13 @@ function CreateAIHubAndModel {
         [string]$location
     )
     
+    #$aiHubWorkspaceName = "workspace-$aiHubName"
+
     # Create AI Hub
     try {
         $ErrorActionPreference = 'Stop'
-        az cognitiveservices account create --name $aiHubName --resource-group $resourceGroupName --location $location --kind AIHub --sku S0 --output none
+        az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
+        #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
         Write-Host "AI Hub: '$aiHubName' created."
         Write-Log -message "AI Hub: '$aiHubName' created."
     }
