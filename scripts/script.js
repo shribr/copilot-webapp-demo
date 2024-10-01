@@ -28,7 +28,7 @@ $(document).ready(function() {
         chatDisplay.scrollTop(chatDisplay[0].scrollHeight);
     }
 
-    function getQueryParam(param) {
+        function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
     }
