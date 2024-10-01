@@ -1,62 +1,36 @@
 *** LOG SEQUENCE: 1 ***
-2024-10-01 01:21:29 - Storage account 'stdcdaiprodpoc001' created.
-2024-10-01 01:21:42 - App Service Plan 'asp-dcdai-prod-poc-001' created.
-2024-10-01 01:21:49 - Search Service 'srch-dcdai-prod-poc-001' created.
-2024-10-01 01:21:52 - Log Analytics Workspace 'log-dcdai-prod-poc-001' created.
-2024-10-01 01:21:57 - Application Insights component 'appi-dcdai-prod-poc-001' created.
-2024-10-01 01:22:00 - Cognitive Services account 'cog-dcdai-prod-poc-001' created.
-2024-10-01 01:22:03 - User Assigned Identity 'id-dcdai-prod-poc-001' created.
-2024-10-01 01:22:05 - User 'id-dcdai-prod-poc-001' assigned to role: 'Contributor'.
-2024-10-01 01:22:06 - User 'id-dcdai-prod-poc-001' assigned to role: 'Cognitive Services OpenAI User'.
-2024-10-01 01:22:09 - User 'id-dcdai-prod-poc-001' assigned to role: 'Search Index Data Reader'.
-2024-10-01 01:22:13 - User 'id-dcdai-prod-poc-001' assigned to role: 'Storage Blob Data Reader'.
-2024-10-01 01:22:34 - Web App 'app-dcdai-prod-poc-001' created.
-2024-10-01 01:23:10 - Key Vault: 'kv-dcdai-prod-poc-001' created with Vault Access Policies.
-2024-10-01 01:23:12 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-2024-10-01 01:23:13 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for application: 'id-dcdai-prod-poc-001'.
-2024-10-01 01:23:14 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:15 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:16 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:17 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:18 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:20 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:21 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:22 - Secret: 'UseAOAI' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:23:23 - Secret: 'UseVision' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-*** LOG SEQUENCE: 2 ***
-2024-10-01 01:35:15 - Storage account 'stdcdaiprodpoc001' created.
-2024-10-01 01:35:30 - App Service Plan 'asp-dcdai-prod-poc-001' created.
-2024-10-01 01:35:37 - Search Service 'srch-dcdai-prod-poc-001' created.
-2024-10-01 01:35:45 - Log Analytics Workspace 'log-dcdai-prod-poc-001' created.
-2024-10-01 01:35:50 - Application Insights component 'appi-dcdai-prod-poc-001' created.
-2024-10-01 01:35:54 - Cognitive Services account 'cog-dcdai-prod-poc-001' created.
-2024-10-01 01:35:57 - User Assigned Identity 'id-dcdai-prod-poc-001' created.
-2024-10-01 01:35:59 - User 'id-dcdai-prod-poc-001' assigned to role: 'Contributor'.
-2024-10-01 01:36:00 - User 'id-dcdai-prod-poc-001' assigned to role: 'Cognitive Services OpenAI User'.
-2024-10-01 01:36:02 - User 'id-dcdai-prod-poc-001' assigned to role: 'Search Index Data Reader'.
-2024-10-01 01:36:05 - User 'id-dcdai-prod-poc-001' assigned to role: 'Storage Blob Data Reader'.
-2024-10-01 01:36:27 - Web App 'app-dcdai-prod-poc-001' created.
-2024-10-01 01:37:05 - Key Vault: 'kv-dcdai-prod-poc-001' created with Vault Access Policies.
-2024-10-01 01:37:06 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-2024-10-01 01:37:07 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for application: 'id-dcdai-prod-poc-001'.
-2024-10-01 01:37:09 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:10 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:11 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:12 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:14 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:15 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:16 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:17 - Secret: 'UseAOAI' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:37:18 - Secret: 'UseVision' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
-2024-10-01 01:39:14 - Function App 'func-dcdai-prod-poc-001' created.
-2024-10-01 01:39:48 - Azure OpenAI account 'openai-dcdai-prod-poc-001' created.
-2024-10-01 01:40:53 - Document Intelligence account 'docintel-dcdai-prod-poc-001' created.
-2024-10-01 01:40:58 - AI Hub: 'hub-ai-dcdai-prod-poc-001' created.
-2024-10-01 01:41:32 - AI Service: 'aiservice-dcdai-prod-poc-001' created.
-2024-10-01 01:41:44 - Azure Machine Learning workspace 'hub-ai-dcdai-prod-poc-001' created.
-2024-10-01 01:41:45 - AI Model deployment: 'aimodel-dcdai-prod-poc-001' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 07 MIN : 08 SEC : 311 MS ***
+2024-10-01 13:43:46 - Storage account 'stdcdaiprodpoc001' created.
+2024-10-01 13:44:01 - App Service Plan 'asp-dcdai-prod-poc-001' created.
+2024-10-01 13:44:08 - Search Service 'srch-dcdai-prod-poc-001' created.
+2024-10-01 13:44:17 - Log Analytics Workspace 'log-dcdai-prod-poc-001' created.
+2024-10-01 13:44:22 - Application Insights component 'appi-dcdai-prod-poc-001' created.
+2024-10-01 13:44:26 - Cognitive Services account 'cog-dcdai-prod-poc-001' created.
+2024-10-01 13:44:29 - User Assigned Identity 'id-dcdai-prod-poc-001' created.
+2024-10-01 13:44:31 - User 'id-dcdai-prod-poc-001' assigned to role: 'Contributor'.
+2024-10-01 13:44:32 - User 'id-dcdai-prod-poc-001' assigned to role: 'Cognitive Services OpenAI User'.
+2024-10-01 13:44:33 - User 'id-dcdai-prod-poc-001' assigned to role: 'Search Index Data Reader'.
+2024-10-01 13:44:35 - User 'id-dcdai-prod-poc-001' assigned to role: 'Storage Blob Data Reader'.
+2024-10-01 13:44:57 - Web App 'app-dcdai-prod-poc-001' created.
+2024-10-01 13:45:33 - Key Vault: 'kv-dcdai-prod-poc-001' created with Vault Access Policies.
+2024-10-01 13:45:35 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
+2024-10-01 13:45:36 - Key Vault 'kv-dcdai-prod-poc-001' policy permissions set for application: 'id-dcdai-prod-poc-001'.
+2024-10-01 13:45:38 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:39 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:40 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:41 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:43 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:44 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:45 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:46 - Secret: 'UseAOAI' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:45:48 - Secret: 'UseVision' stored in Key Vault: 'kv-dcdai-prod-poc-001'.
+2024-10-01 13:46:43 - Function App 'func-dcdai-prod-poc-001' created.
+2024-10-01 13:47:18 - Azure OpenAI account 'openai-dcdai-prod-poc-001' created.
+2024-10-01 13:48:22 - Document Intelligence account 'docintel-dcdai-prod-poc-001' created.
+2024-10-01 13:49:23 - AI Hub: 'hub-ai-dcdai-prod-poc-001' created.
+2024-10-01 13:49:57 - AI Service: 'aiservice-dcdai-prod-poc-001' created.
+2024-10-01 13:50:25 - File 'ai.connection.yaml' created and populated.
+2024-10-01 13:51:05 - Azure Machine Learning workspace 'hub-ai-dcdai-prod-poc-001' created.
+2024-10-01 13:51:16 - Azure AI Machine Learning Hub connection 'hub-ai-dcdai-prod-poc-001' created.
+2024-10-01 13:51:17 - AI Model deployment: 'aimodel-dcdai-prod-poc-001' created.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 08 MIN : 08 SEC : 073 MS ***
 
-2024-10-01 13:24:32 - File 'ai.connection.yaml' created and populated.
-2024-10-01 13:26:02 - File 'ai.connection.yaml' created and populated.
-2024-10-01 13:26:25 - File 'ai.connection.yaml' created and populated.
