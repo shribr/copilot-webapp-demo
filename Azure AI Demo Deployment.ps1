@@ -119,6 +119,7 @@ function InitializeParameters {
     $global:cosmosDbAccountName = $parameters.cosmosDbAccountName
     $global:documentIntelligenceName = $parameters.documentIntelligenceName
     $global:eventHubNamespaceName = $parameters.eventHubNamespaceName
+    $global:functionAppServicePlanName = $parameters.functionAppServicePlanName
     $global:functionAppName = $parameters.functionAppName
     $global:keyVaultName = $parameters.keyVaultName
     $global:location = $parameters.location
@@ -173,6 +174,7 @@ function InitializeParameters {
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
         functionAppName              = $functionAppName
+        functionAppServicePlanName   = $functionAppServicePlanName
         keyVaultName                 = $keyVaultName
         location                     = $location
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
@@ -503,6 +505,7 @@ function CreateResources {
         [string]$userPrincipalName,
         [string]$webAppName,
         [string]$functionAppName,
+        [string]$functionAppServicePlanName,
         [string]$openAIName,
         [string]$documentIntelligenceName
     )
@@ -757,7 +760,18 @@ function CreateResources {
         #$consumerPlanLocation = az functionapp list-consumption-locations --query "[?name=='$location'].name" --output tsv
         $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp" -os "linux" -version "4"
 
-        #az functionapp create --name $functionAppName -os-type Linux --storage-account $storageAccountName --resource-group $resourceGroupName --plan $appServicePlanName --runtime dotnet --runtime-version $latestDontNetRuntimeFuncApp --functions-version 4 --output none
+        az appservice plan create --name $functionAppServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --is-linux --output none
+        
+        az functionapp create --name $functionAppName `
+            --consumption-plan-location $($location -replace '\s', '')  `
+            --storage-account $storageAccountName `
+            --resource-group $resourceGroupName `
+            --runtime dotnet `
+            --runtime-version $latestDontNetRuntimeFuncApp `
+            --functions-version 4 `
+            --plan $functionAppServicePlanName `
+            --output none
+                          
         az functionapp create --name $functionAppName `
             --consumption-plan-location $($location -replace '\s', '')  `
             --storage-account $storageAccountName `
@@ -766,11 +780,20 @@ function CreateResources {
             --runtime-version $latestDontNetRuntimeFuncApp `
             --functions-version 4 `
             --output none
-                          
+
         Write-Host "Function App '$functionAppName' created."
         Write-Log -message "Function App '$functionAppName' created."
     }
     catch {
+        az functionapp create --name $functionAppName `
+            --consumption-plan-location $($location -replace '\s', '')  `
+            --storage-account $storageAccountName `
+            --resource-group $resourceGroupName `
+            --runtime dotnet `
+            --runtime-version $latestDontNetRuntimeFuncApp `
+            --functions-version 4 `
+            --output none
+
         Write-Error "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
@@ -937,7 +960,6 @@ function CreateSecrets {
     }
 }
 
-
 # Function to get the latest API version
 function New-RandomPassword {
     param (
@@ -1021,6 +1043,7 @@ function CreateAIHubAndModel {
     
     # Create AI Hub
     try {
+        $ErrorActionPreference = 'Stop'
         az cognitiveservices account create --name $aiHubName --resource-group $resourceGroupName --location $location --kind AIHub --sku S0 --output none
         Write-Host "AI Hub: '$aiHubName' created."
         Write-Log -message "AI Hub: '$aiHubName' created."
@@ -1029,6 +1052,7 @@ function CreateAIHubAndModel {
         # Check if the error is due to soft deletion
         if ($_ -match "has been soft-deleted") {
             try {
+                $ErrorActionPreference = 'Stop'
                 # Attempt to restore the soft-deleted Cognitive Services account
                 az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
                 Write-Host "AI Hub '$aiHubName' restored."
@@ -1047,6 +1071,7 @@ function CreateAIHubAndModel {
 
     # Create AI Service
     try {
+        $ErrorActionPreference = 'Stop'
         az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
         Write-Host "AI Service: '$aiServiceName' created."
         Write-Log -message "AI Service: '$aiServiceName' created."
@@ -1056,21 +1081,9 @@ function CreateAIHubAndModel {
         Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
-    <#
-    # Create OpenAI Service
-    try {
-        az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
-        Write-Host "OpenAI Service: '$openAIName' created."
-        Write-Log -message "OpenAI Service: '$openAIName' created."
-    }
-    catch {
-        Write-Error "Failed to create OpenAI Service '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create OpenAI Service '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-    #>
-
     # Try to create an Azure Machine Learning workspace (AI Hub)
     try {
+        $ErrorActionPreference = 'Stop'
         az ml workspace create --name $aiHubName --resource-group $resourceGroupName --location $location --output none
         Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
         Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
@@ -1082,6 +1095,7 @@ function CreateAIHubAndModel {
 
     # Create AI Model Deployment
     try {
+        $ErrorActionPreference = 'Stop'
         #az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
         az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
         Write-Host "AI Model deployment: '$aiModelName' created."
@@ -1232,6 +1246,7 @@ function StartDeployment {
             -userPrincipalName $userPrincipalName `
             -webAppName $webAppName `
             -functionAppName $functionAppName `
+            -functionAppServicePlanName $functionAppServicePlanName `
             -openAIName $openAIName `
             -documentIntelligenceName $documentIntelligenceName
     }
