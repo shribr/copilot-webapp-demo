@@ -335,3 +335,12 @@ nav ul li a:hover {
 #upload-info h2 {
     margin-top: 0;
 }
+
+#existing-documents {
+    margin-top: 20px;
+}
+
+#existing-documents h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
