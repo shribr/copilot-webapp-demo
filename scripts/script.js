@@ -1,6 +1,7 @@
 $(document).ready(function() {
     $('#send-button').on('click', sendMessage);
 
+    //code to send chat message to Azure Copilot
     async function sendMessage() {
         const userInput = $('#user-input').val();
         if (!userInput) return;
@@ -28,7 +29,8 @@ $(document).ready(function() {
         chatDisplay.scrollTop(chatDisplay[0].scrollHeight);
     }
 
-        function getQueryParam(param) {
+    //code to toggle between chat and document screens
+    function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
     }

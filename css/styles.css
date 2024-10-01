@@ -12,6 +12,56 @@ body {
     background-color: #f4f4f9;
 }
 
+/* Ensure the body takes the full viewport height and uses Flexbox */
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    /* Remove default margin */
+    background-color: #f4f4f9;
+}
+
+/* Toolbar styles */
+#toolbar {
+    background-color: rgba(13, 12, 52, 1);
+    /* Blue color */
+    color: white;
+    padding: 15px 30px;
+    /* Add padding to the toolbar */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Content container styles */
+#content-container {
+    display: flex;
+    flex: 1;
+    /* Take remaining space */
+}
+
+/* Navigation styles */
+#nav-container {
+    background-color: #ffffff;
+    color: #333;
+    padding: 20px;
+    width: 200px;
+    flex-shrink: 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Main content styles */
+#main-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    /* Take remaining space */
+}
+
 /* Toolbar styles */
 #toolbar {
     background-color: rgba(13, 12, 52, 1);
@@ -37,20 +87,32 @@ body {
     font-size: 1em;
 }
 
+#main-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* Ensure it takes full width */
+    height: 100%;
+    /* Ensure it takes full height */
+}
+
 /* Navigation styles */
 #nav-container {
     background-color: #ffffff;
     color: #333;
     padding: 20px;
-    /* Add padding to the navigation container */
     width: 200px;
-    /* Adjust the width of the navigation container */
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     height: calc(100vh - 60px);
-    /* Adjust for toolbar height */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    justify-content: top;
+    /* Center content vertically */
+    align-items: top;
+    /* Center content horizontally */
 }
 
 #nav-container nav ul {
@@ -87,15 +149,6 @@ body {
 #nav-container nav ul li a.active {
     background-color: #0078d4;
     color: white;
-}
-
-/* Main content styles */
-#main-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    padding: 30px;
-    overflow-y: auto;
 }
 
 /* Chat container styles */
