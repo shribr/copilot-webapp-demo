@@ -54,6 +54,12 @@ nav ul li a:hover {
     padding: 20px;
 }
 
+#document-container {
+    display: none;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
 #chat-display {
     flex: 1;
     overflow-y: auto;

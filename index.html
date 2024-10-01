@@ -6,24 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with Azure Copilot</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="scripts/script.js"></script>
 </head>
 
 <body>
     <div id="nav-container">
         <nav>
             <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Documents</a></li>
-                <li><a href="#">Chat</a></li>
+                <li><a href="?screen=home">Home</a></li>
+                <li><a href="?screen=documents">Documents</a></li>
+                <li><a href="?screen=chat">Chat</a></li>
             </ul>
         </nav>
     </div>
-    <div id="chat-container">
+    <div id="chat-container" style="display: none;">
         <div id="chat-display"></div>
         <input type="text" id="user-input" placeholder="Type your message here...">
         <button id="send-button">Send</button>
     </div>
-    <script src="scripts/script.js"></script>
+    <div id="document-container" style="display: none;">
+        <h1>Upload Documents</h1>
+        <div class="upload-section">
+            <label for="file-upload">Upload File:</label>
+            <input type="file" id="file-upload" title="file-upload" />
+            <button id="upload-button">Upload</button>
+        </div>
+        <div class="search-section">
+            <input type="text" id="search-bar" label="" placeholder="Search documents..." />
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Preview</th>
+                    <th>Status</th>
+                    <th>Name</th>
+                    <th>Contact List</th>
+                    <th>Last Modified</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24"
+                            aria-hidden="true"><!--!-->
+                            <path d="M0 0h24v24H0z" fill="none"></path>
+                            <path
+                                d="M11.5 9C10.12 9 9 10.12 9 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S12.88 9 11.5 9zM20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-3.21 14.21l-2.91-2.91c-.69.44-1.51.7-2.39.7C9.01 16 7 13.99 7 11.5S9.01 7 11.5 7 16 9.01 16 11.5c0 .88-.26 1.69-.7 2.39l2.91 2.9-1.42 1.42z">
+                            </path>
+                        </svg></td>
+                    <td>Approved</td>
+                    <td>Builder process whitepaper-1.pdf</td>
+                    <td><a href="#">Contact List</a></td>
+                    <td>2024-09-30</td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+    </div>
 </body>
 
 </html>
