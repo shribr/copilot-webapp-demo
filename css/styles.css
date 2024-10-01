@@ -106,13 +106,17 @@ body {
     width: 200px;
     flex-shrink: 0;
     display: flex;
-    flex-direction: column;
+    /*flex-direction: column;*/
     height: calc(100vh - 60px);
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     justify-content: top;
     /* Center content vertically */
     align-items: top;
     /* Center content horizontally */
+}
+
+.nav-item {
+    text-align: left !important
 }
 
 nav ul li a {
@@ -149,9 +153,10 @@ nav ul li a:hover {
 #nav-container nav ul {
     list-style-type: none;
     padding: 0;
-    margin: 20px 0 0 0;
+    margin: 0px 0 0 0;
     /* Shift navbar items down */
     flex-grow: 1;
+    text-align: left !important;
 }
 
 #nav-container nav ul li {
