@@ -65,6 +65,8 @@ param (
     [string]$parametersFile = "parameters_gao.json"
 )
 
+$ErrorActionPreference = 'Stop'
+
 # Mapping of global resource types
 $globalResourceTypes = @(
     "Microsoft.Storage/storageAccounts",
@@ -506,13 +508,13 @@ function CreateResources {
     )
 
     # Get the latest API versions
-    $storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
-    $appServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Web" -resourceType "serverFarms"
-    $searchApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
-    $logAnalyticsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.OperationalInsights" -resourceType "workspaces"
+    #$storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
+    #$appServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Web" -resourceType "serverFarms"
+    #$searchApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
+    #$logAnalyticsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.OperationalInsights" -resourceType "workspaces"
     #$cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
     #$keyVaultApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.KeyVault" -resourceType "vaults"
-    $appInsightsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Insights" -resourceType "components"
+    #$appInsightsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Insights" -resourceType "components"
    
     # Debug statements to print variable values
     Write-Host "subscriptionId: $subscriptionId"
@@ -522,32 +524,11 @@ function CreateResources {
     Write-Host "location: $location"
     Write-Host "userPrincipalName: $userPrincipalName"
 
-
-    # **********************************************************************************************************************
-    # Create resources using the Azure REST API
-    # **********************************************************************************************************************
-
     # **********************************************************************************************************************
     # Create a storage account
 
-    $storageAccountUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Storage/storageAccounts/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $storageAccountName, $storageApiVersion
-    
-    #Write-Host "Constructed storageAccountUrl: $storageAccountUrl"
-
-    $storageAccountProperties = @{
-        location   = $location
-        sku        = @{
-            name = "Standard_LRS"
-        }
-        kind       = "StorageV2"
-        properties = @{}
-    }
-
-    # Convert the properties to JSON and inspect
-    $jsonBody = $storageAccountProperties | ConvertTo-Json -Depth 10
-
     try {
-        Invoke-AzureRestMethod -method "PUT" -url $storageAccountUrl -jsonBody $jsonBody
+        az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
         Write-Host "Storage account '$storageAccountName' created."
         Write-Log -message "Storage account '$storageAccountName' created."
     }
@@ -559,25 +540,8 @@ function CreateResources {
     # **********************************************************************************************************************
     # Create an App Service Plan
 
-    $appServicePlanUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/serverFarms/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $appServicePlanName, $appServiceApiVersion
-
-    #Write-Host "Constructed appServicePlanUrl: $appServicePlanUrl"
-    #Write-Log -message "Constructed appServicePlanUrl: $appServicePlanUrl"
-
-    $appServicePlanProperties = @{
-        location   = $location
-        sku        = @{
-            name = "B1"
-        }
-        properties = @{}
-    }
-
-    # Convert the properties to JSON and inspect
-    $jsonBody = $appServicePlanProperties | ConvertTo-Json -Depth 10
-
-    # Try to create an App Service Plan
     try {
-        Invoke-AzureRestMethod -method "PUT" -url $appServicePlanUrl -jsonBody $jsonBody
+        az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --output none
         Write-Host "App Service Plan '$appServicePlanName' created."
         Write-Log -message "App Service Plan '$appServicePlanName' created."
     }
@@ -590,26 +554,11 @@ function CreateResources {
     # Create a Search Service
 
     $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
-
-    $searchServiceUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Search/searchServices/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $searchServiceName, $searchApiVersion
-
-    #Write-Host "Constructed searchServiceUrl: $searchServiceUrl"
-    #Write-Log -message "Constructed searchServiceUrl: $searchServiceUrl"
-    
-    $searchServiceProperties = @{
-        location   = $location
-        sku        = @{
-            name = "basic"
-        }
-        properties = @{}
-    }
-
-    # Convert the properties to JSON and inspect
-    $jsonBody = $searchServiceProperties | ConvertTo-Json -Depth 10
+    $searchServiceSku = "basic"
 
     # Try to create a Search Service
     try {
-        Invoke-AzureRestMethod -method "PUT" -url $searchServiceUrl -jsonBody $jsonBody
+        az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku $searchServiceSku --output none
         Write-Host "Search Service '$searchServiceName' created."
         Write-Log -message "Search Service '$searchServiceName' created."
     }
@@ -623,21 +572,9 @@ function CreateResources {
 
     $logAnalyticsWorkspaceName = Get-ValidServiceName -serviceName $logAnalyticsWorkspaceName
 
-    $logAnalyticsWorkspaceUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.OperationalInsights/workspaces/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $logAnalyticsWorkspaceName, $logAnalyticsApiVersion
-
-    #Write-Host "Constructed logAnalyticsWorkspaceUrl: $logAnalyticsWorkspaceUrl"
-    #Write-Log -message "Constructed logAnalyticsWorkspaceUrl: $logAnalyticsWorkspaceUrl"
-
-    $logAnalyticsWorkspaceProperties = @{
-        location   = $location
-        properties = @{}
-    }
-    # Convert the properties to JSON and inspect
-    $jsonBody = $logAnalyticsWorkspaceProperties | ConvertTo-Json -Depth 10
-
+    # Try to create a Log Analytics Workspace
     try {
-        Invoke-AzureRestMethod -method "PUT" -url $logAnalyticsWorkspaceUrl -jsonBody $jsonBody
-
+        az monitor log-analytics workspace create --workspace-name $logAnalyticsWorkspaceName --resource-group $resourceGroupName --location $location --output none
         Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
         Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
     }
@@ -647,111 +584,13 @@ function CreateResources {
     }
 
     #**********************************************************************************************************************
-    # Create a Cognitive Services account
-
-    $cognitiveServiceName = Get-ValidServiceName -serviceName $cognitiveServiceName
-
-    #$cognitiveServicesUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.CognitiveServices/accounts/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $cognitiveServiceName, $cognitiveServicesApiVersion
-
-    #Write-Host "Constructed cognitiveServicesUrl: $cognitiveServicesUrl"
-    #Write-Log -message "Constructed cognitiveServicesUrl: $cognitiveServicesUrl"
-
-    $cognitiveServicesProperties = @{
-        location   = $location
-        sku        = @{
-            name = "S0"
-        }
-        kind       = "CognitiveServices"
-        properties = @{}
-    }
-
-    # Convert the properties to JSON and inspect
-    $jsonBody = $cognitiveServicesProperties | ConvertTo-Json -Depth 10
-
-    # Try to create a Cognitive Services account
-    try {
-        #Invoke-AzureRestMethod -method "PUT" -url $cognitiveServicesUrl -jsonBody $jsonBody
-        az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku "S0" --kind CognitiveServices
-
-        Write-Host "Cognitive Services account '$cognitiveServiceName' created."
-        Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
-    }
-    catch {
-        Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    <#
-    #**********************************************************************************************************************
-    # Create a Key Vault
-
-    $keyVaultName = Get-ValidServiceName -serviceName $keyVaultName
-
-    $keyVaultUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.KeyVault/vaults/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $keyVaultName, $keyVaultApiVersion
-
-    #Write-Host "Constructed keyVaultUrl: $keyVaultUrl"
-    
-    $keyVaultProperties = @{
-        sku        = @{
-            family = "A"
-            name   = "standard"
-        }
-        tenantId   = $tenantId
-        properties = @{
-            accessPolicies = @(
-                @{
-                    tenantId    = $tenantId
-                    objectId    = $objectId
-                    permissions = @{
-                        keys         = @("get", "list", "update", "create", "import", "delete", "backup", "restore", "recover", "purge", "encrypt", "decrypt", "unwrapKey", "wrapKey")
-                        secrets      = @("get", "list", "set", "delete", "backup", "restore", "recover", "purge", "encrypt", "decrypt")
-                        certificates = @("get", "list", "delete", "create", "import", "update", "managecontacts", "getissuers", "listissuers", "setissuers", "deleteissuers", "manageissuers", "recover", "purge")
-                    }
-                }
-            )
-        }
-    }
-
-    # Convert the properties to JSON and inspect
-    $jsonBody = $keyVaultProperties | ConvertTo-Json -Depth 10
-
-    # Try to create a Key Vault
-    try {
-        Invoke-AzureRestMethod -method "PUT" -url $keyVaultUrl -jsonBody $jsonBody 
-        Write-Host "Key Vault '$keyVaultName' created."
-        Write-Log -message "Key Vault '$keyVaultName' created."
-    }
-    catch {
-        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-    #>
-
-    #**********************************************************************************************************************
     # Create an Application Insights component
 
     $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
 
-    $appInsightsUrl = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/components/{2}?api-version={3}" -f $subscriptionId, $resourceGroupName, $appInsightsName, $appInsightsApiVersion
-
-    #Write-Host "Constructed appInsightsUrl: $appInsightsUrl"
-    #Write-Log -message "Constructed appInsightsUrl: $appInsightsUrl"
-    
-    $appInsightsProperties = @{
-        location   = $location
-        kind       = "web"
-        properties = @{
-            Application_Type = "web"
-        }
-    }
-
-    # Convert the properties to JSON and inspect
-    $jsonBody = $appInsightsProperties | ConvertTo-Json -Depth 10
-
-    #Try to create an Application Insights component
+    # Try to create an Application Insights component
     try {
-        Invoke-AzureRestMethod -method "PUT" -url $appInsightsUrl -jsonBody $jsonBody
-    
+        az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
         Write-Host "Application Insights component '$appInsightsName' created."
         Write-Log -message "Application Insights component '$appInsightsName' created."
     }
@@ -761,11 +600,41 @@ function CreateResources {
     }
 
     #**********************************************************************************************************************
-    # End create resources using the Azure REST API
-    #**********************************************************************************************************************
-    
-    # Try to create a User Assigned Identity
+    # Create a Cognitive Services account
+
+    $cognitiveServiceName = Get-ValidServiceName -serviceName $cognitiveServiceName
+
     try {
+        $ErrorActionPreference = 'Stop'
+        az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
+        Write-Host "Cognitive Services account '$cognitiveServiceName' created."
+        Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
+    }
+    catch {
+        # Check if the error is due to soft deletion
+        if ($_ -match "has been soft-deleted") {
+            try {
+                # Attempt to restore the soft-deleted Cognitive Services account
+                az cognitiveservices account recover --name $cognitiveServiceName --resource-group $resourceGroupName --location $location
+                Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
+                Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
+            }
+            catch {
+                Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+        else {
+            Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+
+    #**********************************************************************************************************************
+    # Create User Assigned Identity
+
+    try {
+        $ErrorActionPreference = 'Stop'
         az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
         Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
         Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
@@ -794,7 +663,9 @@ function CreateResources {
         Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
-    # Try to create a Web App
+    #**********************************************************************************************************************
+    # Create Web Application
+
     try {
         az webapp create --name $webAppName --resource-group $resourceGroupName --plan $appServicePlanName --output none
         Write-Host "Web App '$webAppName' created."
@@ -807,86 +678,82 @@ function CreateResources {
 
     $useRBAC = $false
 
-    # Create the Key Vault with the appropriate permission model
+    #**********************************************************************************************************************
+    # Create Key Vault
+
     try {
+        $ErrorActionPreference = 'Stop'
         if ($useRBAC) {
             az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
             Write-Host "Key Vault: '$keyVaultName' created with RBAC enabled."
             Write-Log -message "Key Vault: '$keyVaultName' created with RBAC enabled."
+
+            # Assign RBAC roles to the managed identity
+            AssignRBACRoles -userAssignedIdentityName $userAssignedIdentityName
         }
         else {
             az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
             Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
             Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
-        }
 
-        if ($useRBAC) {
-            # Assign RBAC roles to the managed identity
-            try {
-                $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
-                
-                az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
-                az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
-                az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
-                az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
-
-                Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
-                Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
-            }
-            catch {
-                Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-        }
-        else {
-            # Set access policies for user
-            try {
-                # Set policy for the user
-                az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-                Write-Host "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
-                Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
-            }
-            catch {
-                Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-
-            # Set policy for the application
-            try {
-                az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge decrypt --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-                Write-Host "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
-                Write-Log -message "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
-            }
-            catch {
-                Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
+            # Set vault access policies for user
+            SetVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
         }
     }
     catch {
-        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        # Check if the error is due to soft deletion
+        if ($_ -match "has been soft-deleted") {
+            if ($useRBAC) {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Key Vault
+                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+                    Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                    Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                    # Assign RBAC roles to the managed identity
+                    AssignRBACRoles -userAssignedIdentityName $userAssignedIdentityName
+                }
+                catch {
+                    Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Key Vault
+                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+                    Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                    Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                    SetVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+                }
+                catch {
+                    Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+        }
+        else {
+            Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
-    # Loop through the array of secrets and store each one in the Key Vault
-    foreach ($secretName in $globalKeyVaultSecrets) {
-        # Generate a random value for the secret
-        #$secretValue = New-RandomPassword
-        $secretValue = "TESTSECRET"
+    CreateKeyVaultRoles -keyVaultName $keyVaultName `
+        -resourceGroupName $resourceGroupName `
+        -userAssignedIdentityName $userAssignedIdentityName `
+        -userPrincipalName $userPrincipalName `
+        -useRBAC $useRBAC
 
-        try {
-            az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
-            Write-Host "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
-            Write-Log -message "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
-        }
-        catch {
-            Write-Error "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
+    CreateSecrets -keyVaultName $keyVaultName `
+        -resourceGroupName $resourceGroupName
 
-    # Try to create a Function App
+    #**********************************************************************************************************************
+    # Create a Function App
     try {
+        $ErrorActionPreference = 'Stop'
         #$consumerPlanLocation = az functionapp list-consumption-locations --query "[?name=='$location'].name" --output tsv
         $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp" -os "linux" -version "4"
 
@@ -908,18 +775,38 @@ function CreateResources {
         Write-Log -message "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
-    # Try to create an Azure OpenAI account
+    #**********************************************************************************************************************
+    # Create OpenAI account
+
     try {
+        $ErrorActionPreference = 'Stop'
         az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
         Write-Host "Azure OpenAI account '$openAIName' created."
         Write-Log -message "Azure OpenAI account '$openAIName' created."
     }
     catch {
-        Write-Error "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        # Check if the error is due to soft deletion
+        if ($_ -match "has been soft-deleted") {
+            try {
+                $ErrorActionPreference = 'Stop'
+                # Attempt to restore the soft-deleted Cognitive Services account
+                az cognitiveservices account recover --name $openAIName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind OpenAI --sku S0 --output none
+                Write-Host "OpenAI account '$openAIName' restored."
+                Write-Log -message "OpenAI account '$openAIName' restored."
+            }
+            catch {
+                Write-Error "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+        else {
+            Write-Error "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }   
     }
 
-    # Try to create a Document Intelligence account
+    #**********************************************************************************************************************
+    # Create Document Intelligence account
 
     $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
 
@@ -927,33 +814,129 @@ function CreateResources {
     if ($availableLocations -contains $($location.ToUpper() -replace '\s', '')  ) {
         # Try to create a Document Intelligence account
         try {
+            $ErrorActionPreference = 'Stop'
             az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
             Write-Host "Document Intelligence account '$documentIntelligenceName' created."
             Write-Log -message "Document Intelligence account '$documentIntelligenceName' created."
         }
-        catch {
-            Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        catch {     
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted") {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    az cognitiveservices account recover --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
+                    Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
+                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored."
+                }
+                catch {
+                    Write-Error "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }        
         }
     }
     else {
         Write-Error "The desired location '$location' is not available for FormRecognizer."
         Write-Log -message "The desired location '$location' is not available for FormRecognizer."
     }
+}
 
-    <#
-    # Try to create a Managed Environment
+# Function to set Key Vault access policies
+function SetVaultAccessPolicies {
+    param([string]$keyVaultName, 
+        [string]$resourceGroupName, 
+        [string]$userPrincipalName)
+    
     try {
-        az appservice ase create --name $managedEnvironmentName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "Managed Environment '$managedEnvironmentName' created."
-        Write-Log -message "Managed Environment '$managedEnvironmentName' created."
+        $ErrorActionPreference = 'Stop'
+        # Set policy for the user
+        az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        Write-Host "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
     }
     catch {
-        Write-Error "Failed to create Managed Environment: $_"
-        Write-Log -message "Failed to create Managed Environment: $_"
+        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
-    #>
 }
+
+# Function to assign RBAC roles to a managed identity
+function AssignRBACRoles {
+    params(
+        [string]$userAssignedIdentityName
+    )
+    try {
+        $ErrorActionPreference = 'Stop'
+        $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
+                
+        az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
+        az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
+        az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
+        az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
+
+        Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+        Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+    }
+    catch {
+        Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+#Create Key Vault Roles
+function CreateKeyVaultRoles {
+    param (
+        [string]$keyVaultName,
+        [string]$resourceGroupName,
+        [string]$userAssignedIdentityName,
+        [string]$userPrincipalName,
+        [bool]$useRBAC,
+        [string]$location
+    )
+
+    # Set policy for the application
+    try {
+        $ErrorActionPreference = 'Stop'
+        az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        Write-Host "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+    }
+    catch {
+        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Function to create secrets in Key Vault
+function CreateSecrets {
+    param (
+        [string]$keyVaultName,
+        [string]$resourceGroupName
+    )
+    # Loop through the array of secrets and store each one in the Key Vault
+    foreach ($secretName in $globalKeyVaultSecrets) {
+        # Generate a random value for the secret
+        #$secretValue = New-RandomPassword
+        $secretValue = "TESTSECRET"
+
+        try {
+            $ErrorActionPreference = 'Stop'
+            az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
+            Write-Host "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
+            Write-Log -message "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
+        }
+        catch {
+            Write-Error "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+}
+
 
 # Function to get the latest API version
 function New-RandomPassword {
@@ -1043,8 +1026,23 @@ function CreateAIHubAndModel {
         Write-Log -message "AI Hub: '$aiHubName' created."
     }
     catch {
-        Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        # Check if the error is due to soft deletion
+        if ($_ -match "has been soft-deleted") {
+            try {
+                # Attempt to restore the soft-deleted Cognitive Services account
+                az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
+                Write-Host "AI Hub '$aiHubName' restored."
+                Write-Log -message "AI Hub '$aiHubName' restored."
+            }
+            catch {
+                Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+        else {
+            Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }    
     }
 
     # Create AI Service
@@ -1266,23 +1264,6 @@ $initParams = InitializeParameters -parametersFile $parametersFile
 
 # Extract initialized parameters
 $parameters = $initParams.parameters
-
-<#
-$subscriptionId = $initParams.subscriptionId
-$tenantId = $initParams.tenantId
-$objectId = $initParams.objectId
-$location = $initParams.location
-$resourceSuffix = $initParams.resourceSuffix
-$result = $initParams.result
-$resourceGuid = $initParams.resourceGuid
-$resourceGroupName = $initParams.resourceGroupName
-$aiModelName = $initParams.aiModelName
-$aiModelType = $initParams.aiModelType
-$aiHubName = $parameters.aiHubName
-$aiModelVersion = $parameters.aiModelVersion
-$aiServiceName = $parameters.aiServiceName
-$appendUniqueSuffix = $parameters.appendUniqueSuffix
-#>
 
 $userPrincipalName = $parameters.userPrincipalName
 
