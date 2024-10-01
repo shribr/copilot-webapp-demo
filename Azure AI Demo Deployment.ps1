@@ -1084,16 +1084,29 @@ function CreateAIHubAndModel {
         Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
+    ReadAIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
+
     # Try to create an Azure Machine Learning workspace (AI Hub)
     try {
         $ErrorActionPreference = 'Stop'
-        az ml workspace create --name $aiHubName --resource-group $resourceGroupName --location $location --output none
+        az ml workspace create --kind hub --name $aiHubName --resource-group $resourceGroupName --location $location --output none
         Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
         Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
     }
     catch {
         Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Create AI Hub connection
+    try {
+        az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
+        Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
+        Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created."
+    }
+    catch {
+        Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
     # Create AI Model Deployment
@@ -1143,7 +1156,7 @@ function Get-CognitiveServicesApiKey {
 function ReadAIConnectionFile {
     param (
         [string]$resourceGroupName,
-        [string]$cognitiveServiceName
+        [string]$aiServiceName
     )
 
     $filePath = "ai.connection.yaml"
@@ -1151,10 +1164,11 @@ function ReadAIConnectionFile {
     $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
 
     $content = @"
-name: $cognitiveServiceName
+name: $aiServiceName
 type: azure_ai_services
 endpoint: https://eastus.api.cognitive.microsoft.com/
 api_key: $apiKey
+ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$aiServiceName
 "@
 
     try {
