@@ -1,5 +1,0 @@
-name: aiservice-dcdai-prod-poc-001
-type: azure_ai_services
-endpoint: https://eastus.api.cognitive.microsoft.com
-api_key: fa4173ebc9b9435f81841c513805668e
-ai_services_resource_id: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/rg-dcdai-prod-poc-001-1/providers/Microsoft.CognitiveServices/accounts/aiservice-dcdai-prod-poc-001
