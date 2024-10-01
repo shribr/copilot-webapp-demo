@@ -1,12 +1,12 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('send-button').addEventListener('click', sendMessage);
+$(document).ready(function() {
+    $('#send-button').on('click', sendMessage);
 
     async function sendMessage() {
-        const userInput = document.getElementById('user-input').value;
+        const userInput = $('#user-input').val();
         if (!userInput) return;
 
         displayMessage('User', userInput);
-        document.getElementById('user-input').value = '';
+        $('#user-input').val('');
 
         const response = await fetch('https://eastus.api.cognitive.microsoft.com/', {
             method: 'POST',
@@ -22,22 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function displayMessage(sender, message) {
-        const chatDisplay = document.getElementById('chat-display');
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `${sender}: ${message}`;
-        chatDisplay.appendChild(messageElement);
-        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+        const chatDisplay = $('#chat-display');
+        const messageElement = $('<div>').text(`${sender}: ${message}`);
+        chatDisplay.append(messageElement);
+        chatDisplay.scrollTop(chatDisplay[0].scrollHeight);
     }
 
-    $(document).ready(function() {
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
-    });
-});
-
-$(document).ready(function() {
     function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
@@ -61,4 +51,12 @@ $(document).ready(function() {
 
     const screen = getQueryParam('screen');
     toggleDisplay(screen);
+
+    // Add event listeners to navigation links
+    $('#nav-container nav ul li a').on('click', function(event) {
+        event.preventDefault();
+        const screen = new URL(this.href).searchParams.get('screen');
+        toggleDisplay(screen);
+        history.pushState(null, '', this.href);
+    });
 });

@@ -1,108 +1,104 @@
+/* General styles */
 body {
     font-family: Arial, sans-serif;
-    display: flex;
-    height: 100vh;
     margin: 0;
-    background-color: #f0f0f0;
-}
-
-#nav-container {
-    width: 200px;
-    background-color: #333;
-    color: #fff;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    height: 100vh;
 }
 
-nav ul {
+/* Toolbar styles */
+#toolbar {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#toolbar .title {
+    font-size: 1.5em;
+}
+
+#toolbar .links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+/* Navigation styles */
+#nav-container {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    width: 200px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 50px);
+    /* Adjust for toolbar height */
+}
+
+#nav-container nav ul {
     list-style-type: none;
     padding: 0;
+    margin: 0;
+    flex-grow: 1;
 }
 
-nav ul li {
-    margin: 20px 0;
+#nav-container nav ul li {
+    margin-bottom: 10px;
 }
 
-nav ul li a {
-    color: #fff;
+#nav-container nav ul li a {
+    color: white;
     text-decoration: none;
-    font-size: 18px;
 }
 
-nav ul li a:hover {
-    text-decoration: underline;
-}
-
-#main-container {
-    flex: 1;
+/* Main content styles */
+#main-content {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    flex-grow: 1;
     padding: 20px;
+    overflow-y: auto;
 }
 
+/* Chat container styles */
 #chat-container {
-    width: 100%;
-    max-width: 900px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-#document-container {
     display: none;
-    flex-direction: column;
-    margin-bottom: 20px;
+    padding: 20px;
 }
 
 #chat-display {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 20px;
-    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-
-#input-container {
-    display: flex;
+    padding: 10px;
+    height: 300px;
+    overflow-y: scroll;
+    margin-bottom: 10px;
 }
 
 #user-input {
-    /*flex: 1; */
-    padding: 4px 4px 4px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    /* Add vertical margin between textarea and send button */
-    height: 50px;
-    /* Shrink the height */
-    resize: both;
-    /* Prevent resizing */
-    box-sizing: border-box;
-    /* Include padding and border in the element's total width and height */
-}
-
-#user-input::placeholder {
-    vertical-align: top;
-    /* Top align placeholder text */
+    width: calc(100% - 80px);
+    padding: 10px;
+    margin-right: 10px;
 }
 
 #send-button {
     padding: 10px 20px;
-    border: none;
-    background-color: #0078d4;
-    color: #fff;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
-#send-button:hover {
-    background-color: #005a9e;
+/* Document container styles */
+#document-container {
+    display: none;
+    padding: 20px;
+}
+
+#document-container .document {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
 }
