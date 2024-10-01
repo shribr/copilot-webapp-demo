@@ -10,9 +10,11 @@ body {
 
 /* Toolbar styles */
 #toolbar {
-    background-color: #333;
+    background-color: #007BFF;
+    /* Nice blue color */
     color: white;
-    padding: 10px;
+    padding: 10px 20px;
+    /* Add padding to the toolbar */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -32,8 +34,10 @@ body {
 #nav-container {
     background-color: #333;
     color: white;
-    padding: 10px;
-    width: 200px;
+    padding: 10px 20px;
+    /* Add padding to the navigation container */
+    width: 150px;
+    /* Make the navigation container narrower */
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
