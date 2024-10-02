@@ -30,6 +30,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
    or
 
    yarn install
+
    ```
 
 3. Development
@@ -42,6 +43,7 @@ To start the development server, run:
     or
 
     yarn start
+
     ```
 
 This will start the Parcel development server and open your application in the default web browser.
