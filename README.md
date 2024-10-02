@@ -32,7 +32,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
    yarn install
    ```
 
-Development
+3. Development
 
 To start the development server, run:
 
@@ -50,11 +50,14 @@ This will start the Parcel development server and open your application in the d
 Building for Production
 To build the project for production, run:
 
+```sh
 npm run build
 
-# or
+or
 
 yarn build
+
+```
 
 This will create a dist directory with the bundled files.
 
