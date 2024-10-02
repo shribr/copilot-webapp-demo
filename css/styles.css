@@ -42,14 +42,11 @@ body {
     /* Take remaining space */
 }
 
-/* Navigation styles */
-#nav-container {
-    background-color: #ffffff;
-    color: #333;
-    padding: 20px;
-    width: 200px;
-    flex-shrink: 0;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+#main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
 }
 
 /* Toolbar styles */
@@ -75,13 +72,6 @@ body {
     text-decoration: none;
     margin-left: 20px;
     font-size: 1em;
-}
-
-#main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px;
 }
 
 /* Navigation styles */
@@ -160,7 +150,7 @@ nav ul li a:hover {
     justify-content: flex-start;
     text-transform: inherit;
     background-color: transparent;
-    transition: background-color 250ms cubic-bezier(.4,0,.2,1) 0ms,box-shadow 250ms cubic-bezier(.4,0,.2,1) 0ms,border 250ms cubic-bezier(.4,0,.2,1) 0ms,padding 250ms cubic-bezier(.4,0,.2,1) 0ms;
+    transition: background-color 250ms cubic-bezier(.4, 0, .2, 1) 0ms, box-shadow 250ms cubic-bezier(.4, 0, .2, 1) 0ms, border 250ms cubic-bezier(.4, 0, .2, 1) 0ms, padding 250ms cubic-bezier(.4, 0, .2, 1) 0ms;
     align-items: flex-start;
 }
 
@@ -175,30 +165,39 @@ nav ul li a:hover {
 
 /* Chat container styles */
 #chat-container {
-    display: none;
-    padding: 20px;
-    background-color: #ffffff;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
     border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width:1000px
+    width:100%
 }
 
 #chat-display {
-    border: 1px solid #ccc;
-    padding: 10px;
     height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
     margin-bottom: 10px;
-    border-radius: 4px;
-    background-color: #f9f9f9;
+    width: 800px
 }
 
-#user-input {
-    width: calc(100% - 100px);
+#chat-input {
+    width: calc(100% - 82px);
     padding: 10px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+label[for="chat-input"] {
+    display: block;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    font-weight: bold;
 }
 
 #chat-input::placeholder {
@@ -206,9 +205,17 @@ nav ul li a:hover {
     /* Adjust the padding as needed */
 }
 
-#chat-input
-{
-    width: calc(100% - 100px);
+#chat-container button {
+    background-color: rgba(13, 12, 52, 1);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#chat-container button:hover {
+    background-color: #0056b3;
 }
 
 #send-button {
@@ -219,6 +226,7 @@ nav ul li a:hover {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+
 }
 
 #send-button:hover {
@@ -288,6 +296,17 @@ nav ul li a:hover {
     background-color: #ddd;
 }
 
+#existing-documents {
+    margin-top: 20px;
+}
+
+#existing-documents h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* File upload styles */
+
 #file-upload {
     display: flex;
     align-items: center;
@@ -321,7 +340,7 @@ nav ul li a:hover {
 }
 
 .upload-button:hover {
-    background-color: #0056b3;
+    background-color: rgba(13, 12, 52, 1);
 }
 
 #upload-info {
@@ -336,11 +355,3 @@ nav ul li a:hover {
     margin-top: 0;
 }
 
-#existing-documents {
-    margin-top: 20px;
-}
-
-#existing-documents h2 {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
