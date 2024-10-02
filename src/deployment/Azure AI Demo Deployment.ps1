@@ -156,11 +156,14 @@ function InitializeParameters {
     $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
     # Retrieve the user principal name
     $global:userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
+    # Retrieve the resource GUID
+    $global:resourceGuid = SplitGuid
 
     $parameters | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
     $parameters | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
     $parameters | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
     $parameters | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
+    $parameters | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
 
     return @{
         aiHubName                    = $aiHubName
@@ -439,26 +442,23 @@ function FindUniqueSuffix {
     )
 
     do {
-
-        if ($resourceSuffix -gt 1) {
-            $storageAccountName = "$($parameters.storageAccountName)$resourceGuid$resourceSuffix"
-            $appServicePlanName = "$($parameters.appServicePlanName)-$resourceGuid-$resourceSuffix"
-            $searchServiceName = "$($parameters.searchServiceName)-$resourceGuid-$resourceSuffix"
-            $logAnalyticsWorkspaceName = "$($parameters.logAnalyticsWorkspaceName)-$resourceGuid-$resourceSuffix"
-            $cognitiveServiceName = "$($parameters.cognitiveServiceName)-$resourceGuid-$resourceSuffix"
-            $keyVaultName = "$($parameters.keyVaultName)-$resourceGuid-$resourceSuffix"
-            $appInsightsName = "$($parameters.appInsightsName)-$resourceGuid-$resourceSuffix"
-            $portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
-            $managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
-            $userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
-            $webAppName = "$($parameters.webAppName)-$resourceGuid-$resourceSuffix"
-            $functionAppName = "$($parameters.functionAppName)-$resourceGuid-$resourceSuffix"
-            $openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
-            $documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
-            $aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
-            $aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
-            $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
-        }
+        $storageAccountName = "$($parameters.storageAccountName)$resourceGuid$resourceSuffix"
+        $appServicePlanName = "$($parameters.appServicePlanName)-$resourceGuid-$resourceSuffix"
+        $searchServiceName = "$($parameters.searchServiceName)-$resourceGuid-$resourceSuffix"
+        $logAnalyticsWorkspaceName = "$($parameters.logAnalyticsWorkspaceName)-$resourceGuid-$resourceSuffix"
+        $cognitiveServiceName = "$($parameters.cognitiveServiceName)-$resourceGuid-$resourceSuffix"
+        $keyVaultName = "$($parameters.keyVaultName)-$resourceGuid-$resourceSuffix"
+        $appInsightsName = "$($parameters.appInsightsName)-$resourceGuid-$resourceSuffix"
+        $portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
+        $managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
+        $userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
+        $webAppName = "$($parameters.webAppName)-$resourceGuid-$resourceSuffix"
+        $functionAppName = "$($parameters.functionAppName)-$resourceGuid-$resourceSuffix"
+        $openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
+        $documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
+        $aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
+        $aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
+        $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
         
         $resourceExists = ResourceExists $storageAccountName "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
         ResourceExists $appServicePlanName "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
@@ -474,7 +474,7 @@ function FindUniqueSuffix {
         ResourceExists $functionAppName "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or
         ResourceExists $openAIName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         ResourceExists $documentIntelligenceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName
-        
+
         if ($resourceExists) {
             $resourceSuffix++
         }
