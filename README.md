@@ -27,14 +27,11 @@ This project is a web application that allows users to chat with Azure Copilot. 
    ```sh
    npm install
 
+   or
+
+    yarn install
+
    ```
-
-# or
-
-```sh
-yarn install
-
-```
 
 Development
 
@@ -43,7 +40,7 @@ To start the development server, run:
 ```sh
 npm start
 
-# or
+or
 
 yarn start
 
