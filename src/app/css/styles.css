@@ -165,7 +165,7 @@ nav ul li a:hover {
 
 /* Chat container styles */
 #chat-container {
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 20px;
@@ -205,6 +205,14 @@ label[for="chat-input"] {
     /* Adjust the padding as needed */
 }
 
+#chat-info {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
 #chat-container button {
     background-color: rgba(13, 12, 52, 1);
     color: white;
@@ -239,6 +247,7 @@ label[for="chat-input"] {
     padding: 20px;
     background-color: #ffffff;
     border-radius: 8px;
+    border: 1px solid #ddd;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 100%
 }

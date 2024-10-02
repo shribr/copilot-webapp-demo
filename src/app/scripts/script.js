@@ -1,4 +1,7 @@
 $(document).ready(function () {
+
+    getDocuments();
+
     $('#send-button').on('click', sendMessage);
 
     //code to send chat message to Azure Copilot
@@ -134,3 +137,31 @@ $(document).ready(function () {
         });
     });
 });
+
+function getDocuments() {
+    // Fetch the list of blobs from the Azure Storage container
+    fetch("https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&sp=rwdlacupiytfx&se=2024-10-02T14:42:41Z&st=2024-10-02T06:42:41Z&spr=https&srt=sco&sig=sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D&comp=list", {
+        method: 'GET',
+        mode: 'no-cors',
+        headers: {
+            'x-ms-version': '2020-04-08'
+        }
+    })
+        .then(response => response.text())
+        .then(data => {
+            // Parse the XML response
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data, "application/xml");
+            const blobs = xmlDoc.getElementsByTagName("Blob");
+
+            // Iterate over the blobs and process them
+            const fileList = document.getElementById('file-list');
+            Array.from(blobs).forEach(blob => {
+                const blobName = blob.getElementsByTagName("Name")[0].textContent;
+                const listItem = document.createElement('li');
+                listItem.textContent = blobName;
+                fileList.appendChild(listItem);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
