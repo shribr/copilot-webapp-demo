@@ -42,8 +42,7 @@ To start the development server, run:
     or
 
     yarn start
-
-    ````
+    ```
 
 This will start the Parcel development server and open your application in the default web browser.
 
