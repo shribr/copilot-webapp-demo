@@ -33,7 +33,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
    ```
 
-3. Development
+### Development
 
 To start the development server, run:
 
@@ -49,6 +49,7 @@ To start the development server, run:
 This will start the Parcel development server and open your application in the default web browser.
 
 Building for Production
+
 To build the project for production, run:
 
 ```
@@ -62,32 +63,36 @@ yarn build
 
 This will create a dist directory with the bundled files.
 
-Deployment
+### Deployment
+
 You can deploy the contents of the dist directory to your web server or hosting service.
 
-Project Structure
+### Project Structure
 
-index.html - Main HTML file for the application
-css/styles.css - CSS styles for the application
-src/ - Source files for your application
-dist/ - Bundled output files (generated after running the build script)
-package.json - Project configuration and dependencies
-deploy.ps1 - PowerShell script for deployment
+- index.html - Main HTML file for the application
+- css/styles.css - CSS styles for the application
+- src/ - Source files for your application
+- dist/ - Bundled output files (generated after running the build script)
+- package.json - Project configuration and dependencies
+- deploy.ps1 - PowerShell script for deployment
 
-Scripts
+### Scripts
 
+```
 npm start / yarn start - Start the development server
 npm run build / yarn build - Build the project for production
+```
 
-HTML Structure
+### HTML Structure
 
 The index.html file includes the following sections:
 
-Toolbar: Contains the title and navigation links (Settings, Profile, Help).
-Content Container: Contains the navigation menu with links to different screens (Home, Documents).
+- Toolbar: Contains the title and navigation links (Settings, Profile, Help).
+- Content Container: Contains the navigation menu with links to different screens (Home, Documents).
 
 Excerpt from index.html
 
+```
 <body class="flex-container">
     <div id="toolbar">
         <div class="title">Chat with Azure Copilot</div>
@@ -121,19 +126,12 @@ Excerpt from index.html
         </div>
     </div>
 </body>
+```
 
-Contributing
+### Contributing
+
 Contributions are welcome! Please open an issue or submit a pull request.
 
-License
+### License
+
 This project is licensed under the MIT License. See the LICENSE file for details.
-
-Replace placeholders like `your-username` with the actual values for your project.
-
-```
-
-```
-
-```
-
-```
