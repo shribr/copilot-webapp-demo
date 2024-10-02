@@ -32,8 +32,6 @@ This project is a web application that allows users to chat with Azure Copilot. 
    yarn install
    ```
 
-`````
-
 Development
 
 To start the development server, run:
@@ -127,4 +125,7 @@ License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 Replace placeholders like `your-username` with the actual values for your project.
-`````
+
+```
+
+```
