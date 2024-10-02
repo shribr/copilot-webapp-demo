@@ -48,7 +48,7 @@ yarn start
 
 This will start the Parcel development server and open your application in the default web browser.
 
-Building for Production
+### Building for Production
 
 To build the project for production, run:
 
