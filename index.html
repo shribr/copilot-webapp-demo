@@ -84,12 +84,21 @@
                     </p>
                 </div>
                 <div id="file-upload">
-                    <label class="file-label">Upload a document:</label>
-                    <input title="File Upload" type="file" id="file-input" class="file-input" />
-                    <button id="upload-button" class="upload-button">Upload</button>
+                    <label class="file-label">Upload documents:</label>
+                    <input title="File Upload" type="file" id="file-input" class="file-input" multiple />
+                    <button id="choose-files-button" class="choose-files-button">Choose Files</button>
+                </div>
+                <div id="file-list-container">
+                    <h3>Selected Files</h3>
+                    <p id="no-files-placeholder">No files selected</p>
+                    <ul id="file-list"></ul>
+                    <button id="upload-button" class="upload-button" disabled>Upload</button>
                 </div>
                 <div id="existing-documents">
-                    <h2>Existing Documents</h2>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <h2>Existing Documents</h2>
+                        <input type="text" id="filter-input" placeholder="Filter by name" />
+                    </div>
                     <div id="document-list">
                         <div class="document-row header">
                             <div class="document-cell">Preview</div>
