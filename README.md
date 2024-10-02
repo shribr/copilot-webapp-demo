@@ -32,7 +32,6 @@ This project is a web application that allows users to chat with Azure Copilot. 
    yarn install
    ```
 
-````
 3. Development
 
 To start the development server, run:
@@ -132,4 +131,7 @@ Replace placeholders like `your-username` with the actual values for your projec
 ```
 
 ```
-````
+
+```
+
+```
