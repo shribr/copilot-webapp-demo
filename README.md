@@ -24,21 +24,30 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
 2. Install the dependencies:
 
-npm install
+   ```sh
+   npm install
+
+   ```
 
 # or
 
+```sh
 yarn install
+
+```
 
 Development
 
 To start the development server, run:
 
+```sh
 npm start
 
 # or
 
 yarn start
+
+```
 
 This will start the Parcel development server and open your application in the default web browser.
 
