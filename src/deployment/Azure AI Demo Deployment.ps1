@@ -108,10 +108,13 @@ function InitializeParameters {
     $global:aiModelType = $parameters.aiModelType
     $global:aiModelVersion = $parameters.aiModelVersion
     $global:aiServiceName = $parameters.aiServiceName
+    $global:aiProjectName = $parameters.aiProjectName
     $global:apiManagementServiceName = $parameters.apiManagementServiceName
     $global:appendUniqueSuffix = $parameters.appendUniqueSuffix
     $global:appServicePlanName = $parameters.appServicePlanName
     $global:appInsightsName = $parameters.appInsightsName
+    $global:blobStorageAccountName = $parameters.blobStorageAccountName
+    $global:blobStorageContainerName = $parameters.blobStorageContainerName
     $global:cognitiveServiceName = $parameters.cognitiveServiceName
     $global:containerAppName = $parameters.containerAppName
     $global:containerAppsEnvironmentName = $parameters.containerAppsEnvironmentName
@@ -131,6 +134,9 @@ function InitializeParameters {
     $global:resourceGroupName = $parameters.resourceGroupName
     $global:resourceSuffix = $parameters.resourceSuffix
     $global:searchServiceName = $parameters.searchServiceName
+    $global:searchIndexName = $parameters.searchIndexName
+    $global:searchIndexFieldNames = $parameters.searchIndexFieldNames
+    $global:searchIndexerName = $parameters.searchIndexerName
     $global:serviceBusNamespaceName = $parameters.serviceBusNamespaceName
     $global:sharedDashboardName = $parameters.sharedDashboardName
     $global:sqlServerName = $parameters.sqlServerName
@@ -162,10 +168,13 @@ function InitializeParameters {
         aiModelType                  = $aiModelType
         aiModelVersion               = $aiModelVersion
         aiServiceName                = $aiServiceName
+        aiProjectName                = $aiProjectName
         apiManagementServiceName     = $apiManagementServiceName
         appendUniqueSuffix           = $appendUniqueSuffix
         appServicePlanName           = $appServicePlanName
         appInsightsName              = $appInsightsName
+        blobStorageAccountName       = $blobStorageAccountName
+        blobStorageContainerName     = $blobStorageContainerName
         cognitiveServiceName         = $cognitiveServiceName
         containerAppName             = $containerAppName
         containerAppsEnvironmentName = $containerAppsEnvironmentName
@@ -187,6 +196,9 @@ function InitializeParameters {
         resourceSuffix               = $resourceSuffix
         result                       = $result
         searchServiceName            = $searchServiceName
+        searchIndexName              = $searchIndexName
+        searchIndexFieldNames        = $searchIndexFieldNames
+        searchIndexerName            = $searchIndexerName
         serviceBusNamespaceName      = $serviceBusNamespaceName
         sharedDashboardName          = $sharedDashboardName
         sqlServerName                = $sqlServerName
@@ -540,6 +552,9 @@ function CreateResources {
         Write-Log -message "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
+    $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
+    $storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
+
     # **********************************************************************************************************************
     # Create an App Service Plan
 
@@ -568,6 +583,28 @@ function CreateResources {
     catch {
         Write-Error "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Try to create a Search Service datasource
+    try {
+        az search datasource create --name $searchDatasourceName --service-name $searchServiceName --resource-group $resourceGroupName --connection-string $storageConnectionString --type azureblob --container name=$blobStorageContainerName --output none
+        Write-Host "Search Service datasource '$searchDatasourceName' for '$searchServiceName' created."
+        Write-Log -message "Search Service datasource '$searchDatasourceName' for '$searchServiceName' created."
+    }
+    catch {
+        Write-Error "Failed to create Search Service datasource '$searchDatasourceName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Search Service datasource '$searchDatasourceName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Try to create a Search Service index
+    try {
+        az search index create --name $searchIndexName --service-name $searchServiceName --resource-group $resourceGroupName --fields '[{"name": "id", "type": "Edm.String", "key": true, "searchable": false}, {"name": "content", "type": "Edm.String", "searchable": true}]' --output none
+        Write-Host "Search Service index '$searchIndexName' for '$searchServiceName' created."
+        Write-Log -message "Search Service index '$searchIndexName' for '$searchServiceName' created."
+    }
+    catch {
+        Write-Error "Failed to create Search Service index '$searchIndexName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Search Service index '$searchIndexName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
     # **********************************************************************************************************************
@@ -1120,6 +1157,17 @@ function CreateAIHubAndModel {
     catch {
         Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Create AI Project
+    try {
+        az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
+        Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
+        Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created."
+    }
+    catch {
+        Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
