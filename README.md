@@ -37,14 +37,14 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
 To start the development server, run:
 
-    ```
-    npm start
+```
+npm start
 
-    or
+or
 
-    yarn start
+yarn start
 
-    ```
+```
 
 This will start the Parcel development server and open your application in the default web browser.
 
