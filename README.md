@@ -16,7 +16,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
 1. Clone the repository:
 
-   ```sh
+   ```
    git clone https://github.com/your-username/azure-ai-demo.git
    cd azure-ai-demo
 
@@ -24,7 +24,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
 2. Install the dependencies:
 
-   ```sh
+   ```
    npm install
 
    or
@@ -37,7 +37,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
 To start the development server, run:
 
-    ```sh
+    ```
     npm start
 
     or
@@ -51,7 +51,7 @@ This will start the Parcel development server and open your application in the d
 Building for Production
 To build the project for production, run:
 
-```sh
+```
 npm run build
 
 or
