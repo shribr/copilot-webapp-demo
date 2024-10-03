@@ -21,24 +21,11 @@ $(document).ready(function () {
         const uploadButton = document.getElementById('upload-button');
         fileList.innerHTML = ''; // Clear the list
 
-        const updatePlaceholder = () => {
-            const fileCount = document.getElementById('file-input').files.length;
-            if (fileCount === 0) {
-                noFilesPlaceholder.textContent = 'No files selected';
-                noFilesPlaceholder.style.display = 'block';
-                uploadButton.disabled = true;
-            } else {
-                noFilesPlaceholder.textContent = `${fileCount} file(s) selected`;
-                noFilesPlaceholder.style.display = 'block';
-                uploadButton.disabled = false;
-            }
-        };
-
         updatePlaceholder();
 
         Array.from(event.target.files).forEach((file, index) => {
             const listItem = document.createElement('li');
-            listItem.textContent = file.name;
+            listItem.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
 
             const removeButton = document.createElement('button');
             removeButton.textContent = 'Remove';
@@ -64,6 +51,8 @@ $(document).ready(function () {
             listItem.appendChild(removeButton);
             fileList.appendChild(listItem);
         });
+
+        updatePlaceholder();
     });
 
     // Trigger file input click when custom button is clicked
@@ -88,6 +77,7 @@ $(document).ready(function () {
     });
 });
 
+//code to get documents from Azure Storage
 function getDocuments() {
     // Fetch the list of blobs from the Azure Storage container
     fetch("https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&sp=rwdlacupiytfx&se=2024-10-02T14:42:41Z&st=2024-10-02T06:42:41Z&spr=https&srt=sco&sig=sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D&comp=list", {
@@ -116,7 +106,6 @@ function getDocuments() {
         .catch(error => console.error('Error:', error));
 }
 
-
 //code to send chat message to Azure Copilot
 async function sendMessage() {
     const userInput = $('#user-input').val();
@@ -138,6 +127,7 @@ async function sendMessage() {
     displayMessage('Azure Copilot', data.reply);
 }
 
+//code to display chat messages
 function displayMessage(sender, message) {
     const chatDisplay = $('#chat-display');
     const messageElement = $('<div>').text(`${sender}: ${message}`);
@@ -151,6 +141,7 @@ function getQueryParam(param) {
     return urlParams.get(param);
 }
 
+//code to toggle between chat and document screens
 function toggleDisplay(screen) {
     const $chatContainer = $('#chat-container');
     const $documentContainer = $('#document-container');
@@ -164,5 +155,32 @@ function toggleDisplay(screen) {
     } else {
         $chatContainer.hide();
         $documentContainer.hide();
+    }
+}
+
+//code to update placeholder text
+function updatePlaceholder() {
+    const noFilesPlaceholder = document.getElementById('no-files-placeholder');
+    const fileList = document.getElementById('file-list');
+    const files = document.getElementById('file-input').files;
+    const uploadButton = document.getElementById('upload-button');
+
+    const fileCount = files.length;
+    let totalSize = 0;
+
+    for (let i = 0; i < fileCount; i++) {
+        totalSize += files[i].size;
+    }
+
+    // Convert total size to KB
+    const totalSizeKB = (totalSize / 1024).toFixed(2);
+    if (fileCount === 0) {
+        noFilesPlaceholder.textContent = 'No files selected';
+        noFilesPlaceholder.style.display = 'block';
+        uploadButton.disabled = true;
+    } else {
+        noFilesPlaceholder.textContent = `${fileCount} file(s) selected (${totalSizeKB} KB)`;
+        noFilesPlaceholder.style.display = 'block';
+        uploadButton.disabled = false;
     }
 }
