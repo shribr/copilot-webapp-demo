@@ -1,6 +1,7 @@
 $(document).ready(function () {
 
     getDocuments();
+    //updateFileCount();
 
     $('#send-button').on('click', sendMessage);
 
@@ -17,7 +18,7 @@ $(document).ready(function () {
 
     document.getElementById('file-input').addEventListener('change', function (event) {
         const fileList = document.getElementById('file-list');
-        const noFilesPlaceholder = document.getElementById('no-files-placeholder');
+        const noFilesPlaceholder = document.getElementById('num-files-selected-placeholder');
         const uploadButton = document.getElementById('upload-button');
         fileList.innerHTML = ''; // Clear the list
 
@@ -41,6 +42,7 @@ $(document).ready(function () {
 
                 listItem.remove();
                 updatePlaceholder();
+                updateFileCount(); // Update the file count whenever a file is removed
 
                 // Clear the file input if no files are left
                 if (filesArray.length === 0) {
@@ -76,6 +78,12 @@ $(document).ready(function () {
         });
     });
 });
+
+// Function to update the file count
+function updateFileCount() {
+    const fileCount = document.getElementById('file-input').files.length;
+    document.getElementById('file-count').textContent = `Files selected: ${fileCount}`;
+}
 
 //code to get documents from Azure Storage
 function getDocuments() {
@@ -160,7 +168,7 @@ function toggleDisplay(screen) {
 
 //code to update placeholder text
 function updatePlaceholder() {
-    const noFilesPlaceholder = document.getElementById('no-files-placeholder');
+    const noFilesPlaceholder = document.getElementById('num-files-selected-placeholder');
     const fileList = document.getElementById('file-list');
     const files = document.getElementById('file-input').files;
     const uploadButton = document.getElementById('upload-button');
