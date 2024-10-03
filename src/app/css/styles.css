@@ -398,7 +398,7 @@ label[for="chat-input"] {
     background-color: #cc0000;
 }
 
-#no-files-placeholder {
+#num-files-selected-placeholder {
     color: #888;
     font-style: italic;
     text-align: center;
