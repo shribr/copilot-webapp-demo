@@ -1273,10 +1273,15 @@ function DeployNodeJSFunctionApp {
         $ErrorActionPreference = 'Stop'
         
         # Navigate to the project directory
-        #Set-Location -Path $sasFunctionAppPath
+        Set-Location -Path $sasFunctionAppPath
 
-        # compress the function app code
-        zip -r $sasFunctionAppPath.zip "$sasFunctionAppPath"
+        # Compress the function app code
+        $zipFilePath = "$sasFunctionAppPath\function-app-code.zip"
+        if (Test-Path $zipFilePath) {
+            Remove-Item $zipFilePath
+        }
+
+        zip -r function-app-code.zip *
 
         # Initialize a git repository if not already done
         if (-not (Test-Path -Path ".git")) {
