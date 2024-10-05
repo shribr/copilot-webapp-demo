@@ -144,6 +144,7 @@ function InitializeParameters {
     $global:userAssignedIdentityName = $parameters.userAssignedIdentityName
     $global:virtualNetworkName = $parameters.virtualNetworkName
     $global:webAppName = $parameters.webAppName
+    $global:functionAppPath = $parameters.functionAppPath
 
     #**********************************************************************************************************************
     # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
@@ -212,6 +213,7 @@ function InitializeParameters {
         userPrincipalName            = $userPrincipalName
         virtualNetworkName           = $virtualNetworkName
         webAppName                   = $webAppName
+        functionAppPath            = $functionAppPath
         parameters                   = $parameters
     }
 }
@@ -1232,6 +1234,67 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
     }
 }
 
+# Function to create a Node.js Function App
+function CreateNodeJSFunctionApp {
+    param (
+        [string]$functionAppName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$storageAccountName
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+        az functionapp create --name $functionAppName --consumption-plan-location $location --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
+        Write-Host "Node.js Function App '$functionAppName' created."
+        Write-Log -message "Node.js Function App '$functionAppName' created."
+
+        DeployNodeJSFunctionApp -functionAppName $functionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+    }
+    catch {
+        Write-Error "Failed to create Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Function to deploy a Node.js Function App
+function DeployNodeJSFunctionApp {
+    param (
+        [string]$functionAppName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$storageAccountName
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+        
+        # Navigate to the project directory
+        Set-Location -Path $functionAppPath
+
+        # compress the function app code
+        zip -r $functionAppCodePath.zip $functionAppCodePath
+
+        # Initialize a git repository if not already done
+        if (-not (Test-Path -Path ".git")) {
+            git init
+            git add .
+            git commit -m "Initial commit"
+        }
+
+        # Push code to Azure
+        git push azure master
+
+        az functionapp deployment source config-zip --name $functionAppName --resource-group $resourceGroupName --src $functionAppCodePath --output none
+        Write-Host "Node.js Function App '$functionAppName' deployed."
+        Write-Log -message "Node.js Function App '$functionAppName' deployed."
+    }
+    catch {
+        Write-Error "Failed to deploy Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to deploy Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
 # Function to write messages to a log file
 function Write-Log {
     param (
@@ -1320,6 +1383,8 @@ function StartDeployment {
 
     CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     
+    CreateNodeJSFunctionApp -functionAppName $functionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+
     # End the timer
     $endTime = Get-Date
     $executionTime = $endTime - $startTime

@@ -1,3 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+
+// Load configuration from config.json
+const configPath = path.resolve('/app', 'config.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
 $(document).ready(function () {
 
     getDocuments();
@@ -77,6 +84,16 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Event listener for upload button
+    document.getElementById('upload-button').addEventListener('click', function () {
+        const files = document.getElementById('file-input').files;
+        if (files.length > 0) {
+            uploadFilesToAzure(files);
+        } else {
+            console.log('No files selected for upload.');
+        }
+    });
 });
 
 // Function to update the file count
@@ -88,7 +105,7 @@ function updateFileCount() {
 //code to get documents from Azure Storage
 function getDocuments() {
     // Fetch the list of blobs from the Azure Storage container
-    fetch("https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&sp=rwdlacupiytfx&se=2024-10-02T14:42:41Z&st=2024-10-02T06:42:41Z&spr=https&srt=sco&sig=sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D&comp=list", {
+    fetch("https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&sp=rwdlacupiytfx&se=2024-10-02T14:42:41Z&st=2024-10-02T06:42:41Z&spr=https&srt=sco&sig=&comp=list", {
         method: 'GET',
         mode: 'no-cors',
         headers: {
@@ -191,4 +208,34 @@ function updatePlaceholder() {
         noFilesPlaceholder.style.display = 'block';
         uploadButton.disabled = false;
     }
+}
+
+//code to upload files to Azure Storage
+async function uploadFilesToAzure(files) {
+    const accountName = config.AZURE_ACCOUNT_NAME;
+    const sasToken = config.AZURE_SAS_TOKEN;
+    const containerName = config.AZURE_CONTAINER_NAME;
+    const storageUrl = `https://${accountName}.${config.AZURE_STORAGE_URL}`;
+
+    const blobServiceClient = new Azure.Storage.Blob.BlobServiceClient(`${storageUrl}?${sasToken}`);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+
+    for (const file of files) {
+        const blockBlobClient = containerClient.getBlockBlobClient(file.name);
+        try {
+            const uploadBlobResponse = await blockBlobClient.uploadBrowserData(file);
+            console.log(`Upload successful for ${file.name}. requestId: ${uploadBlobResponse.requestId}`);
+        } catch (error) {
+            console.error(`Error uploading file ${file.name} to Azure Storage:`, error.message);
+        }
+    }
+
+    // Clear the file input after successful upload
+    clearFileInput();
+}
+
+//code to clear file input
+function clearFileInput() {
+    const fileInput = document.getElementById('file-input');
+    fileInput.value = ''; // Clear the file input
 }

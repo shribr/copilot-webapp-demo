@@ -39,5 +39,6 @@
     "storageAccountName": "stdcdaiprodpoc001",
     "userAssignedIdentityName": "id-dcdai-prod-poc-001",
     "virtualNetworkName": "vnet-dcdai-prod-poc-001",
-    "webAppName": "app-dcdai-prod-poc-001"
+    "webAppName": "app-dcdai-prod-poc-001",
+    "functionAppPath": "src/deployment/functions"
 }

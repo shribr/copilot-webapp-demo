@@ -13,7 +13,7 @@ $(document).ready(function() {
     });
     document.getElementById("file-input").addEventListener("change", function(event) {
         const fileList = document.getElementById("file-list");
-        const noFilesPlaceholder = document.getElementById("no-files-placeholder");
+        const noFilesPlaceholder = document.getElementById("num-files-selected-placeholder");
         const uploadButton = document.getElementById("upload-button");
         fileList.innerHTML = ""; // Clear the list
         updatePlaceholder();
@@ -133,7 +133,7 @@ function toggleDisplay(screen) {
 }
 //code to update placeholder text
 function updatePlaceholder() {
-    const noFilesPlaceholder = document.getElementById("no-files-placeholder");
+    const noFilesPlaceholder = document.getElementById("num-files-selected-placeholder");
     const fileList = document.getElementById("file-list");
     const files = document.getElementById("file-input").files;
     const uploadButton = document.getElementById("upload-button");
