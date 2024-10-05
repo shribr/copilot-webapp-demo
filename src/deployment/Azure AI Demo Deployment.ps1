@@ -62,7 +62,7 @@
 
 # Set the default parameters file
 param (
-    [string]$parametersFile = "parameters_gao.json"
+    [string]$parametersFile = "parameters.json"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -96,7 +96,7 @@ $globalKeyVaultSecrets = @(
 # Initialize the parameters
 function InitializeParameters {
     param (
-        [string]$parametersFile = "parameters_gao.json"
+        [string]$parametersFile = "parameters.json"
     )
 
     # Load parameters from the JSON file
@@ -145,6 +145,7 @@ function InitializeParameters {
     $global:virtualNetworkName = $parameters.virtualNetworkName
     $global:webAppName = $parameters.webAppName
     $global:functionAppPath = $parameters.functionAppPath
+    $global:sasFunctionAppName = $parameters.sasFunctionName
 
     #**********************************************************************************************************************
     # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
@@ -187,6 +188,7 @@ function InitializeParameters {
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
         functionAppName              = $functionAppName
+        functionAppPath              = $functionAppPath
         functionAppServicePlanName   = $functionAppServicePlanName
         keyVaultName                 = $keyVaultName
         location                     = $location
@@ -199,6 +201,7 @@ function InitializeParameters {
         resourceGuid                 = $resourceGuid
         resourceSuffix               = $resourceSuffix
         result                       = $result
+        sasFunctionAppName           = $sasFunctionAppName
         searchServiceName            = $searchServiceName
         searchIndexName              = $searchIndexName
         searchIndexFieldNames        = $searchIndexFieldNames
@@ -212,8 +215,7 @@ function InitializeParameters {
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
         virtualNetworkName           = $virtualNetworkName
-        webAppName                   = $webAppName
-        functionAppPath            = $functionAppPath
+        webAppName                   = $webAppName        
         parameters                   = $parameters
     }
 }
@@ -1242,18 +1244,18 @@ function CreateNodeJSFunctionApp {
         [string]$location,
         [string]$storageAccountName
     )
-
+    
     try {
         $ErrorActionPreference = 'Stop'
-        az functionapp create --name $functionAppName --consumption-plan-location $location --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
-        Write-Host "Node.js Function App '$functionAppName' created."
-        Write-Log -message "Node.js Function App '$functionAppName' created."
+        az functionapp create --name $sasFunctionAppName --consumption-plan-location $location --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
+        Write-Host "Node.js Function App '$sasFunctionAppName' created."
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' created."
 
-        DeployNodeJSFunctionApp -functionAppName $functionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+        DeployNodeJSFunctionApp -functionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
     }
     catch {
-        Write-Error "Failed to create Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
@@ -1383,7 +1385,7 @@ function StartDeployment {
 
     CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     
-    CreateNodeJSFunctionApp -functionAppName $functionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+    CreateNodeJSFunctionApp -functionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
 
     # End the timer
     $endTime = Get-Date
