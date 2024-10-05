@@ -133,6 +133,8 @@ function InitializeParameters {
     $global:redisCacheName = $parameters.redisCacheName
     $global:resourceGroupName = $parameters.resourceGroupName
     $global:resourceSuffix = $parameters.resourceSuffix
+    $global:sasFunctionAppName = $parameters.sasFunctionName
+    $global:sasFunctionAppPath = $parameters.sasFunctionAppPath
     $global:searchServiceName = $parameters.searchServiceName
     $global:searchIndexName = $parameters.searchIndexName
     $global:searchIndexFieldNames = $parameters.searchIndexFieldNames
@@ -144,8 +146,6 @@ function InitializeParameters {
     $global:userAssignedIdentityName = $parameters.userAssignedIdentityName
     $global:virtualNetworkName = $parameters.virtualNetworkName
     $global:webAppName = $parameters.webAppName
-    $global:functionAppPath = $parameters.functionAppPath
-    $global:sasFunctionAppName = $parameters.sasFunctionName
 
     #**********************************************************************************************************************
     # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
@@ -202,6 +202,7 @@ function InitializeParameters {
         resourceSuffix               = $resourceSuffix
         result                       = $result
         sasFunctionAppName           = $sasFunctionAppName
+        sasFunctionAppPath           = $sasFunctionAppPath
         searchServiceName            = $searchServiceName
         searchIndexName              = $searchIndexName
         searchIndexFieldNames        = $searchIndexFieldNames
@@ -1239,7 +1240,7 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
 # Function to create a Node.js Function App
 function CreateNodeJSFunctionApp {
     param (
-        [string]$functionAppName,
+        [string]$sasFunctionAppName,
         [string]$resourceGroupName,
         [string]$location,
         [string]$storageAccountName
@@ -1247,22 +1248,22 @@ function CreateNodeJSFunctionApp {
     
     try {
         $ErrorActionPreference = 'Stop'
-        az functionapp create --name $sasFunctionAppName --consumption-plan-location $location --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
+        az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
         Write-Host "Node.js Function App '$sasFunctionAppName' created."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' created."
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath "/src/deployment/deployment.log"
 
         DeployNodeJSFunctionApp -functionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
     }
     catch {
         Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "/src/deployment/deployment.log"
     }
 }
 
 # Function to deploy a Node.js Function App
 function DeployNodeJSFunctionApp {
     param (
-        [string]$functionAppName,
+        [string]$sasFunctionAppName,
         [string]$resourceGroupName,
         [string]$location,
         [string]$storageAccountName
@@ -1272,10 +1273,10 @@ function DeployNodeJSFunctionApp {
         $ErrorActionPreference = 'Stop'
         
         # Navigate to the project directory
-        Set-Location -Path $functionAppPath
+        #Set-Location -Path $sasFunctionAppPath
 
         # compress the function app code
-        zip -r $functionAppCodePath.zip $functionAppCodePath
+        zip -r $sasFunctionAppPath.zip "$sasFunctionAppPath"
 
         # Initialize a git repository if not already done
         if (-not (Test-Path -Path ".git")) {
@@ -1287,23 +1288,24 @@ function DeployNodeJSFunctionApp {
         # Push code to Azure
         git push azure master
 
-        az functionapp deployment source config-zip --name $functionAppName --resource-group $resourceGroupName --src $functionAppCodePath --output none
-        Write-Host "Node.js Function App '$functionAppName' deployed."
-        Write-Log -message "Node.js Function App '$functionAppName' deployed."
+        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $functionAppCodePath --output none
+        Write-Host "Node.js Function App '$sasFunctionAppName' deployed."
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "/src/deployment/deployment.log"
     }
     catch {
-        Write-Error "Failed to deploy Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to deploy Node.js Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "/src/deployment/deployment.log"
     }
 }
 
 # Function to write messages to a log file
 function Write-Log {
     param (
-        [string]$message
+        [string]$message,
+        [string]$logFilePath = "deployment.log"
     )
 
-    $logFilePath = "deployment.log"
+    #$logFilePath = "deployment.log"
 
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logMessage = "$timestamp - $message"

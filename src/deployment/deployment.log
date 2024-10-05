@@ -33,15 +33,3 @@
 2024-10-01 13:51:16 - Azure AI Machine Learning Hub connection 'hub-ai-dcdai-prod-poc-001' created.
 2024-10-01 13:51:17 - AI Model deployment: 'aimodel-dcdai-prod-poc-001' created.
 *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 08 MIN : 08 SEC : 073 MS ***
-
-*** LOG SEQUENCE: 2 ***
-2024-10-05 01:03:37 - Node.js Function App '' created.
-2024-10-05 01:04:40 - Node.js Function App '' created.
-2024-10-05 01:05:21 - Node.js Function App '' created.
-2024-10-05 01:05:46 - Node.js Function App '' created.
-2024-10-05 01:06:14 - Node.js Function App '' created.
-2024-10-05 01:06:36 - Node.js Function App '' created.
-2024-10-05 01:07:22 - Node.js Function App '' created.
-2024-10-05 01:08:24 - Node.js Function App '' created.
-2024-10-05 01:09:39 - Node.js Function App '' created.
-2024-10-05 01:10:57 - Node.js Function App '' created.
