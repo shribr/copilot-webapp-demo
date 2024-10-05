@@ -30,7 +30,7 @@
     "resourceGroupName": "RG-DCDAI-COPILOTDEMO-001",
     "resourceSuffix": 1,
     "sasFunctionAppName": "func-sastoken-dcdai-prod-poc-001",
-    "sasFunctionAppPath": "functions",
+    "sasFunctionAppPath": "functions/sasToken",
     "searchServiceName": "srch-dcdai-prod-poc-001",
     "searchIndexName": "srch-index-dcdai-prod-poc-001",
     "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",

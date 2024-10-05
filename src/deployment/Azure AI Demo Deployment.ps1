@@ -1276,7 +1276,7 @@ function DeployNodeJSFunctionApp {
 
         $currentFolderName = Split-Path -Path $sasFunctionAppPath -Leaf
         
-        if ($currentFolderName -ne "functions") {
+        if ($currentFolderName -ne "sasTokenn") {
             Set-Location -Path $sasFunctionAppPath
         }
 
