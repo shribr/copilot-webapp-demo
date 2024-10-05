@@ -1273,15 +1273,20 @@ function DeployNodeJSFunctionApp {
         $ErrorActionPreference = 'Stop'
         
         # Navigate to the project directory
-        Set-Location -Path $sasFunctionAppPath
+
+        $currentFolderName = Split-Path -Path $sasFunctionAppPath -Leaf
+        
+        if ($currentFolderName -ne "functions") {
+            Set-Location -Path $sasFunctionAppPath
+        }
 
         # Compress the function app code
-        $zipFilePath = "$sasFunctionAppPath\function-app-code.zip"
+        $zipFilePath = "function-app-code.zip"
         if (Test-Path $zipFilePath) {
             Remove-Item $zipFilePath
         }
 
-        zip -r function-app-code.zip *
+        zip -r $zipFilePath *
 
         # Initialize a git repository if not already done
         if (-not (Test-Path -Path ".git")) {
@@ -1293,7 +1298,7 @@ function DeployNodeJSFunctionApp {
         # Push code to Azure
         git push azure master
 
-        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $functionAppCodePath --output none
+        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $sasFunctionAppPath --output none
         Write-Host "Node.js Function App '$sasFunctionAppName' deployed."
         Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "/src/deployment/deployment.log"
     }
