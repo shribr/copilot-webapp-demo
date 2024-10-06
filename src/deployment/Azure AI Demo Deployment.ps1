@@ -133,7 +133,7 @@ function InitializeParameters {
     $global:redisCacheName = $parameters.redisCacheName
     $global:resourceGroupName = $parameters.resourceGroupName
     $global:resourceSuffix = $parameters.resourceSuffix
-    $global:sasFunctionAppName = $parameters.sasFunctionName
+    $global:sasFunctionAppName = $parameters.sasFunctionAppName
     $global:sasFunctionAppPath = $parameters.sasFunctionAppPath
     $global:searchServiceName = $parameters.searchServiceName
     $global:searchIndexName = $parameters.searchIndexName
@@ -1252,7 +1252,7 @@ function CreateNodeJSFunctionApp {
         Write-Host "Node.js Function App '$sasFunctionAppName' created."
         Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath "/src/deployment/deployment.log"
 
-        DeployNodeJSFunctionApp -functionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+        DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
     }
     catch {
         Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1276,12 +1276,12 @@ function DeployNodeJSFunctionApp {
 
         $currentFolderName = Split-Path -Path $sasFunctionAppPath -Leaf
         
-        if ($currentFolderName -ne "sasTokenn") {
+        if ($currentFolderName -ne "sasToken") {
             Set-Location -Path $sasFunctionAppPath
         }
 
         # Compress the function app code
-        $zipFilePath = "function-app-code.zip"
+        $zipFilePath = "function-app-sastoken-code.zip"
         if (Test-Path $zipFilePath) {
             Remove-Item $zipFilePath
         }
@@ -1306,6 +1306,25 @@ function DeployNodeJSFunctionApp {
         Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "/src/deployment/deployment.log"
     }
+}
+
+# Function to alphabetize the parameters object
+function SortParameters {
+    param (
+        [Parameter(Mandatory=$true)]
+        [psobject]$Parameters
+    )
+
+    # Convert properties to an array and sort them by name
+    $sortedProperties = $Parameters.PSObject.Properties | Sort-Object Name
+
+    # Create a new sorted parameters object
+    $sortedParametersObject = New-Object PSObject
+    foreach ($property in $sortedProperties) {
+        $sortedParametersObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
+    }
+
+    return $sortedParametersObject
 }
 
 # Function to write messages to a log file
@@ -1423,8 +1442,9 @@ $initParams = InitializeParameters -parametersFile $parametersFile
 #Write-Host "Parameters initialized."
 #Write-Log -message "Parameters initialized."
 
-# Extract initialized parameters
-$parameters = $initParams.parameters
+# Alphabetize the parameters object
+$global:parameters = SortParameters -Parameters $initParams.parameters
+
 
 $userPrincipalName = $parameters.userPrincipalName
 
