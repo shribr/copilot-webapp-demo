@@ -239,3 +239,13 @@ function clearFileInput() {
     const fileInput = document.getElementById('file-input');
     fileInput.value = ''; // Clear the file input
 }
+
+async function getSasToken() {
+    const sasFunctionAppUrl = config.AZURE_FUNCTION_APP_URL;
+    const response = await fetch(`${sasFunctionAppUrl}`); // Assuming the Azure Function App endpoint is /api/getSasToken
+    if (!response.ok) {
+        throw new Error('Failed to fetch SAS token');
+    }
+    const data = await response.json();
+    return data.sasToken;
+}
