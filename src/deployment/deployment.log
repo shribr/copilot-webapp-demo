@@ -32,4 +32,6 @@
 2024-10-01 13:51:05 - Azure Machine Learning workspace 'hub-ai-dcdai-prod-poc-001' created.
 2024-10-01 13:51:16 - Azure AI Machine Learning Hub connection 'hub-ai-dcdai-prod-poc-001' created.
 2024-10-01 13:51:17 - AI Model deployment: 'aimodel-dcdai-prod-poc-001' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 08 MIN : 08 SEC : 073 MS ***
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 08 MIN : 08 SEC : 073 MS 
+****** LOG SEQUENCE: 2 ***
+2024-10-05 21:26:08 - Node.js Function App 'func-sastoken-dcdai-prod-poc-001' deployed.

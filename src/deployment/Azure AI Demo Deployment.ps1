@@ -1246,17 +1246,24 @@ function CreateNodeJSFunctionApp {
         [string]$storageAccountName
     )
     
+    # Navigate to the project directory
+    $currentPath = Get-Location
+    $currentFolderName = Split-Path -Path $currentPath -Leaf
+
+    # Reference the parent folder
+    $parentFolderPath = Split-Path -Path $currentPath -Parent
+
     try {
         $ErrorActionPreference = 'Stop'
         az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
         Write-Host "Node.js Function App '$sasFunctionAppName' created."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath "/src/deployment/deployment.log"
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath $currentPath
 
         DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
     }
     catch {
         Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "/src/deployment/deployment.log"
+        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $currentPath
     }
 }
 
@@ -1269,24 +1276,32 @@ function DeployNodeJSFunctionApp {
         [string]$storageAccountName
     )
 
+    # Navigate to the project directory
+    $currentPath = Get-Location
+    $currentFolderName = Split-Path -Path $currentPath -Leaf
+
+    # Reference the parent folder
+    $parentFolderPath = Split-Path -Path $currentPath -Parent
+    
     try {
         $ErrorActionPreference = 'Stop'
-        
-        # Navigate to the project directory
-
-        $currentFolderName = Split-Path -Path $sasFunctionAppPath -Leaf
         
         if ($currentFolderName -ne "sasToken") {
             Set-Location -Path $sasFunctionAppPath
         }
-
-        # Compress the function app code
-        $zipFilePath = "function-app-sastoken-code.zip"
-        if (Test-Path $zipFilePath) {
-            Remove-Item $zipFilePath
+        try {
+            # Compress the function app code
+            $zipFilePath = "function-app-sastoken-code.zip"
+            if (Test-Path $zipFilePath) {
+                Remove-Item $zipFilePath
+            }
+    
+            zip -r $zipFilePath *
         }
-
-        zip -r $zipFilePath *
+        catch {
+            Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+        }
 
         # Initialize a git repository if not already done
         if (-not (Test-Path -Path ".git")) {
@@ -1298,20 +1313,20 @@ function DeployNodeJSFunctionApp {
         # Push code to Azure
         git push azure master
 
-        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $sasFunctionAppPath/$zipFilePath --output none
+        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $zipFilePath --output none
         Write-Host "Node.js Function App '$sasFunctionAppName' deployed."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "/src/deployment/deployment.log"
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "$currentPath/deployment.log"
     }
     catch {
         Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "/src/deployment/deployment.log"
+        Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
     }
 }
 
 # Function to alphabetize the parameters object
 function SortParameters {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [psobject]$Parameters
     )
 
@@ -1378,7 +1393,9 @@ function StartDeployment {
     # Start the timer
     $startTime = Get-Date
 
-    #return
+    DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+
+    return
 
     # Delete existing resource groups with the same name
     DeleteAzureResourceGroups
