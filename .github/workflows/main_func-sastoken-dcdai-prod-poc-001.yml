@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/deployment/functions/sasToken' # set this to the path to your web app project, defaults to the repository root
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '20.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
@@ -58,9 +58,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_CB7066EE444D4FD4A2254A5A86C66ED5 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DE1B00419D634D0BA21A6D1FDC0DFBB0 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F4F6A7FF365040749A98A85A79809E14 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_ED9A618261754221ADDB55AFA51B0D78 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FC2B06DE28C64ACB85A59F9455352040 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3E968798581640F6B9D9D1174E21744A }}
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
