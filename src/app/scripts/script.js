@@ -126,11 +126,7 @@ function getDocuments() {
     //const containerClient = blobServiceClient.getContainerClient(containerName);
 
     fetch(`${storageUrl}`, {
-        method: 'GET',
-        mode: 'no-cors',
-        headers: {
-            'x-ms-version': '2020-04-08'
-        }
+        method: 'GET'
     })
         .then(response => response.text())
         .then(data => {
