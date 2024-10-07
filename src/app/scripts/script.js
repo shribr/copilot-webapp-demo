@@ -1,9 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-
-// Load configuration from config.json
-const configPath = path.resolve('/app', 'config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 $(document).ready(function () {
 
@@ -104,11 +98,32 @@ function updateFileCount() {
 
 //code to get documents from Azure Storage
 function getDocuments() {
-    // Fetch the list of blobs from the Azure Storage container
-    const accountName = config.AZURE_ACCOUNT_NAME;
-    const sasToken = config.AZURE_SAS_TOKEN;
-    const containerName = config.AZURE_CONTAINER_NAME;
-    const storageUrl = `https://${accountName}.${config.AZURE_STORAGE_URL}`;
+
+    const accountName = "stdcdaiprodpoc001";
+    const azureStorageUrl = "blob.core.windows.net";
+
+    //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
+    const containerName = "content";
+
+    const sv = "2022-11-02";
+    const ss = "bfqt";
+    const srt = "sco";
+    const sp = "rwdlacupiytfx";
+    const se = "2024-10-07T11:27:12Z";
+    const st = "2024-10-07T03:27:12Z";
+    const spr = "https";
+    const sig = "1%2B4xVbGWQ%2FFeK4Ypg3xq4CMDuSTkTAI2SF%2Bq0a%2FlSsI%3D";
+    const comp = "list";
+    const include = "metadata";
+    const restype = "container";
+
+    // Construct the SAS token from the individual components
+    const sasToken = `comp=${comp}&include=${include}&restype=${restype}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+
+    //const blobServiceClient = new azure.StoragBlob.BlobServiceClient(`${storageUrl}?${sasToken}`);
+    //const containerClient = blobServiceClient.getContainerClient(containerName);
 
     fetch(`${storageUrl}`, {
         method: 'GET',
@@ -217,12 +232,32 @@ function updatePlaceholder() {
 
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
-    const accountName = config.AZURE_ACCOUNT_NAME;
-    const sasToken = config.AZURE_SAS_TOKEN;
-    const containerName = config.AZURE_CONTAINER_NAME;
-    const storageUrl = `https://${accountName}.${config.AZURE_STORAGE_URL}`;
+    //const accountName = config.AZURE_ACCOUNT_NAME;
+    //const sasToken = config.AZURE_SAS_TOKEN;
+    //const containerName = config.AZURE_CONTAINER_NAME;
 
-    const blobServiceClient = new Azure.Storage.Blob.BlobServiceClient(`${storageUrl}?${sasToken}`);
+    const accountName = "stdcdaiprodpoc001";
+    const azureStorageUrl = "blob.core.windows.net";
+    //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
+    const containerName = "content";
+    const sv = "2022-11-02";
+    const ss = "bfqt";
+    const srt = "sco";
+    const sp = "rwdlacupiytfx";
+    const se = "2024-10-07T11:27:12Z";
+    const st = "2024-10-07T03:27:12Z";
+    const spr = "https";
+    const sig = "1%2B4xVbGWQ%2FFeK4Ypg3xq4CMDuSTkTAI2SF%2Bq0a%2FlSsI%3D";
+    const comp = "list";
+    const include = "metadata";
+    const restype = "container";
+
+    // Construct the SAS token from the individual components
+    const sasToken = `comp=${comp}&include=${include}&restype=${container}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+
+    const blobServiceClient = new azure.StoragBlob.BlobServiceClient(`${storageUrl}?${sasToken}`);
     const containerClient = blobServiceClient.getContainerClient(containerName);
 
     for (const file of files) {

@@ -55,6 +55,12 @@ $(document).ready(function() {
             else row.style.display = "none";
         });
     });
+    // Event listener for upload button
+    document.getElementById("upload-button").addEventListener("click", function() {
+        const files = document.getElementById("file-input").files;
+        if (files.length > 0) uploadFilesToAzure(files);
+        else console.log("No files selected for upload.");
+    });
 });
 // Function to update the file count
 function updateFileCount() {
@@ -63,8 +69,27 @@ function updateFileCount() {
 }
 //code to get documents from Azure Storage
 function getDocuments() {
-    // Fetch the list of blobs from the Azure Storage container
-    fetch("https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&sp=rwdlacupiytfx&se=2024-10-02T14:42:41Z&st=2024-10-02T06:42:41Z&spr=https&srt=sco&sig=sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D&comp=list", {
+    const accountName = "stdcdaiprodpoc001";
+    const azureStorageUrl = "blob.core.windows.net";
+    //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
+    const containerName = "content";
+    const sv = "2022-11-02";
+    const ss = "bfqt";
+    const srt = "sco";
+    const sp = "rwdlacupiytfx";
+    const se = "2024-10-07T11:27:12Z";
+    const st = "2024-10-07T03:27:12Z";
+    const spr = "https";
+    const sig = "1%2B4xVbGWQ%2FFeK4Ypg3xq4CMDuSTkTAI2SF%2Bq0a%2FlSsI%3D";
+    const comp = "list";
+    const include = "metadata";
+    const restype = "container";
+    // Construct the SAS token from the individual components
+    const sasToken = `comp=${comp}&include=${include}&restype=${restype}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+    //const blobServiceClient = new azure.StoragBlob.BlobServiceClient(`${storageUrl}?${sasToken}`);
+    //const containerClient = blobServiceClient.getContainerClient(containerName);
+    fetch(`${storageUrl}`, {
         method: "GET",
         mode: "no-cors",
         headers: {
@@ -151,6 +176,55 @@ function updatePlaceholder() {
         noFilesPlaceholder.style.display = "block";
         uploadButton.disabled = false;
     }
+}
+//code to upload files to Azure Storage
+async function uploadFilesToAzure(files) {
+    //const accountName = config.AZURE_ACCOUNT_NAME;
+    //const sasToken = config.AZURE_SAS_TOKEN;
+    //const containerName = config.AZURE_CONTAINER_NAME;
+    const accountName = "stdcdaiprodpoc001";
+    const azureStorageUrl = "blob.core.windows.net";
+    //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
+    const containerName = "content";
+    const sv = "2022-11-02";
+    const ss = "bfqt";
+    const srt = "sco";
+    const sp = "rwdlacupiytfx";
+    const se = "2024-10-07T11:27:12Z";
+    const st = "2024-10-07T03:27:12Z";
+    const spr = "https";
+    const sig = "1%2B4xVbGWQ%2FFeK4Ypg3xq4CMDuSTkTAI2SF%2Bq0a%2FlSsI%3D";
+    const comp = "list";
+    const include = "metadata";
+    const restype = "container";
+    // Construct the SAS token from the individual components
+    const sasToken = `comp=${comp}&include=${include}&restype=${container}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+    const blobServiceClient = new azure.StoragBlob.BlobServiceClient(`${storageUrl}?${sasToken}`);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    for (const file of files){
+        const blockBlobClient = containerClient.getBlockBlobClient(file.name);
+        try {
+            const uploadBlobResponse = await blockBlobClient.uploadBrowserData(file);
+            console.log(`Upload successful for ${file.name}. requestId: ${uploadBlobResponse.requestId}`);
+        } catch (error) {
+            console.error(`Error uploading file ${file.name} to Azure Storage:`, error.message);
+        }
+    }
+    // Clear the file input after successful upload
+    clearFileInput();
+}
+//code to clear file input
+function clearFileInput() {
+    const fileInput = document.getElementById("file-input");
+    fileInput.value = ""; // Clear the file input
+}
+async function getSasToken() {
+    const sasFunctionAppUrl = config.AZURE_FUNCTION_APP_URL;
+    const response = await fetch(`${sasFunctionAppUrl}`); // Assuming the Azure Function App endpoint is /api/getSasToken
+    if (!response.ok) throw new Error("Failed to fetch SAS token");
+    const data = await response.json();
+    return data.sasToken;
 }
 
 //# sourceMappingURL=index.b84822ce.js.map

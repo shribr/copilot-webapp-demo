@@ -1,3 +1,4 @@
+.parcel-cache
 .parcel-cache/6ed9d37aa0633dad-BundleGraph-0
 .parcel-cache/7f973df67467291d-AssetGraph-0
 .parcel-cache/c6f057f92782afb7-AssetGraph-0
@@ -6,6 +7,7 @@
 .parcel-cache/requestGraph-5f9786e38cbf69b8-0
 .parcel-cache/requestGraph-nodes-0-5f9786e38cbf69b8-0
 .parcel-cache/snapshot-5f9786e38cbf69b8.txt
+node_modules
 node_modules/.package-lock.json
 node_modules/@parcel/core/node_modules/dotenv/CHANGELOG.md
 node_modules/@parcel/core/node_modules/dotenv/config.js
@@ -30,3 +32,19 @@ node_modules/dotenv/lib/main.js
 .vscode/settings.json
 .vscode/tasks.json
 nvm_install.sh
+.parcel-cache/6ed9d37aa0633dad-BundleGraph-0
+.parcel-cache/6ed9d37aa0633dad-BundleGraph-0
+.parcel-cache/7f973df67467291d-AssetGraph-0
+.parcel-cache/c6f057f92782afb7-AssetGraph-0
+.parcel-cache/data.mdb
+.parcel-cache/lock.mdb
+.parcel-cache/requestGraph-5f9786e38cbf69b8-0
+.parcel-cache/requestGraph-nodes-0-5f9786e38cbf69b8-0
+.parcel-cache/snapshot-5f9786e38cbf69b8.txt
+node_modules/.package-lock.json
+.parcel-cache/snapshot-5f9786e38cbf69b8.txt
+.parcel-cache/c6f057f92782afb7-AssetGraph-0
+.parcel-cache/7f973df67467291d-AssetGraph-0
+.parcel-cache/6ed9d37aa0633dad-BundleGraph-0
+.parcel-cache/c6f057f92782afb7-AssetGraph-0
+.parcel-cache/data.mdb

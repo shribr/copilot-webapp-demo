@@ -60,6 +60,11 @@
         Prerequisites: Azure CLI, PowerShell Core, Azure subscription.
 #>
 
+# Set the default parameters file
+param (
+    [string]$parametersFile = "parameters.json"
+)
+
 # Function to deploy a Node.js Function App
 function Deploy-NodeJSFunctionApp {
     param (
@@ -89,7 +94,7 @@ function Deploy-NodeJSFunctionApp {
                 Remove-Item $zipFilePath
             }
     
-            zip -r $zipFilePath *
+            zip -r $zipFilePath * .env ../node_modules
         }
         catch {
             Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -110,6 +115,9 @@ function Deploy-NodeJSFunctionApp {
         git push azure master
 
         az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $zipFilePath --output none
+        
+        #az func azure functionapp publish $sasFunctionAppName
+
         Write-Host "Node.js Function App '$sasFunctionAppName' deployed."
         Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "$currentPath/deployment.log"
     }
@@ -584,7 +592,7 @@ function New-NodeJSFunctionApp {
 
     try {
         $ErrorActionPreference = 'Stop'
-        az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
+        az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --os-type Windows --output none
         Write-Host "Node.js Function App '$sasFunctionAppName' created."
         Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath $currentPath/deployment.log
 
@@ -1445,11 +1453,6 @@ function Write-Log {
 #**********************************************************************************************************************
 # Main script
 #**********************************************************************************************************************
-
-# Set the default parameters file
-param (
-    [string]$parametersFile = "parameters.json"
-)
 
 $ErrorActionPreference = 'Stop'
 
