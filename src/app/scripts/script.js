@@ -1,9 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-
-// Load configuration from config.json
-const configPath = path.resolve('/app', 'config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 $(document).ready(function () {
 
@@ -104,18 +98,35 @@ function updateFileCount() {
 
 //code to get documents from Azure Storage
 function getDocuments() {
-    // Fetch the list of blobs from the Azure Storage container
-    const accountName = config.AZURE_ACCOUNT_NAME;
-    const sasToken = config.AZURE_SAS_TOKEN;
-    const containerName = config.AZURE_CONTAINER_NAME;
-    const storageUrl = `https://${accountName}.${config.AZURE_STORAGE_URL}`;
+
+    const accountName = "stdcdaiprodpoc001";
+    const azureStorageUrl = "blob.core.windows.net";
+
+    //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
+    const containerName = "content";
+
+    const sv = "2022-11-02";
+    const ss = "bfqt";
+    const srt = "sco";
+    const sp = "rwdlacupiytfx";
+    const se = "2024-10-07T11:27:12Z";
+    const st = "2024-10-07T03:27:12Z";
+    const spr = "https";
+    const sig = "1%2B4xVbGWQ%2FFeK4Ypg3xq4CMDuSTkTAI2SF%2Bq0a%2FlSsI%3D";
+    const comp = "list";
+    const include = "metadata";
+    const restype = "container";
+
+    // Construct the SAS token from the individual components
+    const sasToken = `comp=${comp}&include=${include}&restype=${restype}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+
+    //const blobServiceClient = new azure.StoragBlob.BlobServiceClient(`${storageUrl}?${sasToken}`);
+    //const containerClient = blobServiceClient.getContainerClient(containerName);
 
     fetch(`${storageUrl}`, {
-        method: 'GET',
-        mode: 'no-cors',
-        headers: {
-            'x-ms-version': '2020-04-08'
-        }
+        method: 'GET'
     })
         .then(response => response.text())
         .then(data => {
@@ -124,14 +135,76 @@ function getDocuments() {
             const xmlDoc = parser.parseFromString(data, "application/xml");
             const blobs = xmlDoc.getElementsByTagName("Blob");
 
-            // Iterate over the blobs and process them
-            const fileList = document.getElementById('file-list');
-            Array.from(blobs).forEach(blob => {
-                const blobName = blob.getElementsByTagName("Name")[0].textContent;
-                const listItem = document.createElement('li');
-                listItem.textContent = blobName;
-                fileList.appendChild(listItem);
-            });
+            // Get the document list and sample rows
+            const docList = document.getElementById('document-list');
+            const sampleRows = document.querySelectorAll('.document-row.sample');
+
+            // Clear existing document rows except the header
+            const existingRows = docList.querySelectorAll('.document-row:not(.header)');
+            existingRows.forEach(row => row.style.display = 'none');
+
+            if (blobs.length === 0) {
+                // Show sample rows if no results
+                sampleRows.forEach(row => row.style.display = '');
+            } else {
+                // Hide sample rows if there are results
+                sampleRows.forEach(row => row.style.display = 'none');
+
+                // Iterate over the blobs and process them
+                Array.from(blobs).forEach(blob => {
+                    const blobName = blob.getElementsByTagName("Name")[0].textContent;
+                    const lastModified = blob.getElementsByTagName("Last-Modified")[0].textContent;
+                    const contentType = blob.getElementsByTagName("Content-Type")[0].textContent;
+
+                    // Create the document row
+                    const documentRow = document.createElement('div');
+                    documentRow.className = 'document-row';
+
+                    // Create the document cells
+                    const previewCell = document.createElement('div');
+                    previewCell.className = 'document-cell';
+                    const previewButton = document.createElement('button');
+                    previewButton.textContent = 'Preview';
+                    previewCell.appendChild(previewButton);
+
+                    const statusCell = document.createElement('div');
+                    statusCell.className = 'document-cell';
+                    statusCell.textContent = 'Active';
+
+                    const nameCell = document.createElement('div');
+                    nameCell.className = 'document-cell';
+                    nameCell.textContent = blobName;
+
+                    const typeCell = document.createElement('div');
+                    typeCell.className = 'document-cell';
+                    typeCell.textContent = contentType;
+
+                    const dateCell = document.createElement('div');
+                    dateCell.className = 'document-cell';
+                    const formattedDate = new Date(lastModified).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    }).replace(',', '');
+                    dateCell.textContent = formattedDate;
+
+                    //test
+
+                    // Append the cells to the document row
+                    documentRow.appendChild(previewCell);
+                    documentRow.appendChild(statusCell);
+                    documentRow.appendChild(nameCell);
+                    documentRow.appendChild(typeCell);
+                    documentRow.appendChild(dateCell);
+
+                    // Append the document row to the document list
+                    docList.appendChild(documentRow);
+                });
+            }
         })
         .catch(error => console.error('Error:', error));
 }
@@ -217,12 +290,32 @@ function updatePlaceholder() {
 
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
-    const accountName = config.AZURE_ACCOUNT_NAME;
-    const sasToken = config.AZURE_SAS_TOKEN;
-    const containerName = config.AZURE_CONTAINER_NAME;
-    const storageUrl = `https://${accountName}.${config.AZURE_STORAGE_URL}`;
+    //const accountName = config.AZURE_ACCOUNT_NAME;
+    //const sasToken = config.AZURE_SAS_TOKEN;
+    //const containerName = config.AZURE_CONTAINER_NAME;
 
-    const blobServiceClient = new Azure.Storage.Blob.BlobServiceClient(`${storageUrl}?${sasToken}`);
+    const accountName = "stdcdaiprodpoc001";
+    const azureStorageUrl = "blob.core.windows.net";
+    //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
+    const containerName = "content";
+    const sv = "2022-11-02";
+    const ss = "bfqt";
+    const srt = "sco";
+    const sp = "rwdlacupiytfx";
+    const se = "2024-10-07T11:27:12Z";
+    const st = "2024-10-07T03:27:12Z";
+    const spr = "https";
+    const sig = "1%2B4xVbGWQ%2FFeK4Ypg3xq4CMDuSTkTAI2SF%2Bq0a%2FlSsI%3D";
+    const comp = "list";
+    const include = "metadata";
+    const restype = "container";
+
+    // Construct the SAS token from the individual components
+    const sasToken = `comp=${comp}&include=${include}&restype=${container}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+
+    const blobServiceClient = new azure.StoragBlob.BlobServiceClient(`${storageUrl}?${sasToken}`);
     const containerClient = blobServiceClient.getContainerClient(containerName);
 
     for (const file of files) {
