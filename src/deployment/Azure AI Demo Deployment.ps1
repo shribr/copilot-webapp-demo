@@ -5,7 +5,7 @@
 # make sure you have an active Azure subscription and have logged in using the 'az login' command.
 # To execute this script, run the following command:
 # .\Azure AI Demo Deployment.ps1
-#
+# TEST
 #**********************************************************************************************************************
 <#
 .SYNOPSIS
