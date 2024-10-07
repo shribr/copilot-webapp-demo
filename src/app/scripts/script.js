@@ -290,14 +290,12 @@ function updatePlaceholder() {
 
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
-    //const accountName = config.AZURE_ACCOUNT_NAME;
-    //const sasToken = config.AZURE_SAS_TOKEN;
-    //const containerName = config.AZURE_CONTAINER_NAME;
-
     const accountName = "stdcdaiprodpoc001";
     const azureStorageUrl = "blob.core.windows.net";
+
     //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
     const containerName = "content";
+
     const sv = "2022-11-02";
     const ss = "bfqt";
     const srt = "sco";
@@ -311,20 +309,32 @@ async function uploadFilesToAzure(files) {
     const restype = "container";
 
     // Construct the SAS token from the individual components
-    const sasToken = `comp=${comp}&include=${include}&restype=${container}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+    const sasToken = `comp=${comp}&include=${include}&restype=${restype}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
 
-    const blobServiceClient = new azure.StoragBlob.BlobServiceClient(`${storageUrl}?${sasToken}`);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
+    async function uploadFiles(files) {
+        for (const file of files) {
+            const uploadUrl = `${storageUrl}/${file.name}?${sasToken}`;
+            try {
+                const response = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'x-ms-blob-type': 'BlockBlob',
+                        'Content-Type': file.type
+                    },
+                    body: file
+                });
 
-    for (const file of files) {
-        const blockBlobClient = containerClient.getBlockBlobClient(file.name);
-        try {
-            const uploadBlobResponse = await blockBlobClient.uploadBrowserData(file);
-            console.log(`Upload successful for ${file.name}. requestId: ${uploadBlobResponse.requestId}`);
-        } catch (error) {
-            console.error(`Error uploading file ${file.name} to Azure Storage:`, error.message);
+                if (response.ok) {
+                    console.log(`Upload successful for ${file.name}.`);
+                } else {
+                    const errorText = await response.text();
+                    console.error(`Error uploading file ${file.name} to Azure Storage:`, errorText);
+                }
+            } catch (error) {
+                console.error(`Error uploading file ${file.name} to Azure Storage:`, error.message);
+            }
         }
     }
 
@@ -336,6 +346,10 @@ async function uploadFilesToAzure(files) {
 function clearFileInput() {
     const fileInput = document.getElementById('file-input');
     fileInput.value = ''; // Clear the file input
+
+    const selectedFilesDiv = document.getElementById('file-list');
+    selectedFilesDiv.innerHTML = ''; // Clear the list of selected files
+    updatePlaceholder(); // Update the placeholder text
 }
 
 async function getSasToken() {
