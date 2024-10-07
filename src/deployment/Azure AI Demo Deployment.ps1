@@ -60,47 +60,284 @@
         Prerequisites: Azure CLI, PowerShell Core, Azure subscription.
 #>
 
-# Set the default parameters file
-param (
-    [string]$parametersFile = "parameters.json"
-)
+# Function to deploy a Node.js Function App
+function Deploy-NodeJSFunctionApp {
+    param (
+        [string]$sasFunctionAppName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$storageAccountName
+    )
 
-$ErrorActionPreference = 'Stop'
+    # Navigate to the project directory
+    $currentPath = Get-Location
+    $currentFolderName = Split-Path -Path $currentPath -Leaf
 
-# Mapping of global resource types
-$globalResourceTypes = @(
-    "Microsoft.Storage/storageAccounts",
-    "Microsoft.KeyVault/vaults",
-    "Microsoft.Sql/servers",
-    "Microsoft.DocumentDB/databaseAccounts",
-    "Microsoft.Web/serverFarms",
-    "Microsoft.Web/sites",
-    "Microsoft.DataFactory/factories",
-    "Microsoft.ContainerRegistry/registries",
-    "Microsoft.CognitiveServices/accounts",
-    "Microsoft.Search/searchServices"
-)
+    # Reference the parent folder
+    #$parentFolderPath = Split-Path -Path $currentPath -Parent
+    
+    try {
+        $ErrorActionPreference = 'Stop'
+        
+        if ($currentFolderName -ne "sasToken") {
+            Set-Location -Path $sasFunctionAppPath
+        }
+        try {
+            # Compress the function app code
+            $zipFilePath = "function-app-sastoken-code.zip"
+            if (Test-Path $zipFilePath) {
+                Remove-Item $zipFilePath
+            }
+    
+            zip -r $zipFilePath *
+        }
+        catch {
+            Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+        }
 
-$globalKeyVaultSecrets = @(
-    “AzureOpenAiChatGptDeployment”, 
-    “AzureOpenAiEmbeddingDeployment”, 
-    “AzureOpenAiServiceEndpoint”, 
-    “AzureSearchIndex”, 
-    “AzureSearchServiceEndpoint”, 
-    “AzureStorageAccountEndpoint”, 
-    “AzureStorageContainer”, 
-    “UseAOAI”, 
-    “UseVision”
-)
+        # Initialize a git repository if not already done
+        if (-not (Test-Path -Path ".git")) {
+            git init
+            git add .
+            git commit -m "Initial commit"
+        }
+
+        # Set the WEBSITE_RUN_FROM_PACKAGE parameter
+        az functionapp config appsettings set --name $sasFunctionAppName --resource-group $resourceGroupName --settings WEBSITE_RUN_FROM_PACKAGE=1
+
+        # Push code to Azure
+        git push azure master
+
+        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $zipFilePath --output none
+        Write-Host "Node.js Function App '$sasFunctionAppName' deployed."
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "$currentPath/deployment.log"
+    }
+    catch {
+        Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+    }
+}
+
+# Function to get Cognitive Services API key
+function Get-CognitiveServicesApiKey {
+    param (
+        [string]$resourceGroupName,
+        [string]$cognitiveServiceName
+    )
+
+    try {
+        # Run the Azure CLI command and capture the output
+        $apiKeysJson = az cognitiveservices account keys list --resource-group $resourceGroupName --name $cognitiveServiceName
+
+        # Parse the JSON output into a PowerShell object
+        $apiKeys = $apiKeysJson | ConvertFrom-Json
+
+        # Access the keys
+        $key1 = $apiKeys.key1
+        $key2 = $apiKeys.key2
+
+        # Output the keys to verify
+        Write-Host "Key 1: $key1"
+        Write-Host "Key 2: $key2"
+        return $key1
+    }
+    catch {
+        Write-Error "Failed to retrieve API key for Cognitive Services resource: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        return $null
+    }
+}
+
+# Function to get the latest API version for a resource type
+function Get-LatestApiVersion {
+    param (
+        [string]$resourceProviderNamespace,
+        [string]$resourceType
+    )
+
+    $apiVersions = az provider show --namespace $resourceProviderNamespace --query "resourceTypes[?resourceType=='$resourceType'].apiVersions[]" --output json | ConvertFrom-Json
+    $latestApiVersion = ($apiVersions | Sort-Object -Descending)[0]
+    return $latestApiVersion
+}
+
+# Function to get the latest .NET runtime version
+function Get-LatestDotNetRuntime {
+    param(
+        [string]$resourceType,
+        [string]$os,
+        [string]$version
+    )
+
+    if ($resourceType -eq "functionapp") {
+        $functionRuntimes = az functionapp list-runtimes --output json | ConvertFrom-Json
+
+        if ($os -eq "linux") {
+            #$runtimes = $functionRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' -and $_.version -eq $version } | Select-Object -ExpandProperty version
+            $runtimes = $functionRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
+        else {
+            $runtimes = $functionRuntimes.windows | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
+    }
+    elseif ($resourceType -eq "webapp") {
+        $webpAppRuntimes = az webapp list-runtimes --output json | ConvertFrom-Json
+
+        if ($os -eq "linux") {
+            $runtimes = $webpAppRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
+        else {
+            $runtimes = $webpAppRuntimes.windows | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
+        }
+    }
+    else {
+        throw "Unsupported resource type: $resourceType"
+    }
+
+    $latestRuntime = ($runtimes | Sort-Object -Descending)[0]
+
+    return $latestRuntime
+}
+
+# Helper function to get a random integer
+function Get-RandomInt {
+    param (
+        [int]$max
+    )
+
+    $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    $bytes = New-Object byte[] 4
+    $random.GetBytes($bytes)
+    [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
+
+    return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
+}
+
+# Function to find a unique suffix
+function Get-UniqueSuffix {
+    param (
+        [int]$resourceSuffix,
+        [string]$resourceGroupName
+    )
+
+    do {
+        $storageAccountName = "$($parameters.storageAccountName)$resourceGuid$resourceSuffix"
+        $appServicePlanName = "$($parameters.appServicePlanName)-$resourceGuid-$resourceSuffix"
+        $searchServiceName = "$($parameters.searchServiceName)-$resourceGuid-$resourceSuffix"
+        $logAnalyticsWorkspaceName = "$($parameters.logAnalyticsWorkspaceName)-$resourceGuid-$resourceSuffix"
+        $cognitiveServiceName = "$($parameters.cognitiveServiceName)-$resourceGuid-$resourceSuffix"
+        $keyVaultName = "$($parameters.keyVaultName)-$resourceGuid-$resourceSuffix"
+        $appInsightsName = "$($parameters.appInsightsName)-$resourceGuid-$resourceSuffix"
+        $portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
+        $managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
+        $userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
+        $webAppName = "$($parameters.webAppName)-$resourceGuid-$resourceSuffix"
+        $functionAppName = "$($parameters.functionAppName)-$resourceGuid-$resourceSuffix"
+        $openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
+        $documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
+        $aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
+        $aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
+        $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
+        
+        $resourceExists = Test-ResourceExists $storageAccountName "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $appServicePlanName "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $searchServiceName "Microsoft.Search/searchServices" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $logAnalyticsWorkspaceName "Microsoft.OperationalInsights/workspaces" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $cognitiveServiceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $keyVaultName "Microsoft.KeyVault/vaults" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $appInsightsName "Microsoft.Insights/components" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $portalDashboardName "Microsoft.Portal/dashboards" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $managedEnvironmentName "Microsoft.App/managedEnvironments" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $userAssignedIdentityName "Microsoft.ManagedIdentity/userAssignedIdentities" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $webAppName "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $functionAppName "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $openAIName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists $documentIntelligenceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName
+
+        if ($resourceExists) {
+            $resourceSuffix++
+        }
+    } while ($resourceExists)
+
+    $userPrincipalName = "$($parameters.userPrincipalName)"
+
+    New-Resources -storageAccountName $storageAccountName `
+        -appServicePlanName $appServicePlanName `
+        -searchServiceName $searchServiceName `
+        -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
+        -cognitiveServiceName $cognitiveServiceName `
+        -keyVaultName $keyVaultName `
+        -appInsightsName $appInsightsName `
+        -portalDashboardName $portalDashboardName `
+        -managedEnvironmentName $managedEnvironmentName `
+        -userAssignedIdentityName $userAssignedIdentityName `
+        -userPrincipalName $userPrincipalName `
+        -webAppName $webAppName `
+        -functionAppName $functionAppName `
+        -openAIName $openAIName `
+        -documentIntelligenceName $documentIntelligenceName
+
+    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
+
+    return $resourceSuffix
+}
+
+# Ensure the service name is valid
+function Get-ValidServiceName {
+    param (
+        [string]$serviceName
+    )
+    # Convert to lowercase
+    $serviceName = $serviceName.ToLower()
+
+    # Remove invalid characters
+    $serviceName = $serviceName -replace '[^a-z0-9-]', ''
+
+    # Remove leading and trailing dashes
+    $serviceName = $serviceName.Trim('-')
+
+    # Remove consecutive dashes
+    $serviceName = $serviceName -replace '--+', '-'
+
+    return $serviceName
+}
+
+# Function to invoke an Azure REST API method
+function Invoke-AzureRestMethod {
+    param (
+        [string]$method,
+        [string]$url,
+        [string]$jsonBody = $null
+    )
+
+    # Get the access token
+    $token = az account get-access-token --query accessToken --output tsv
+
+    $body = $jsonBody | ConvertFrom-Json
+
+    $token = az account get-access-token --query accessToken --output tsv
+    $headers = @{
+        "Authorization" = "Bearer $token"
+        "Content-Type"  = "application/json"
+    }
+
+    try {
+        $response = Invoke-RestMethod -Method $method -Uri $url -Headers $headers -Body ($body | ConvertTo-Json -Depth 10)
+        return $response
+    }
+    catch {
+        Write-Host "Error: $_"
+        throw $_
+    }
+}
 
 # Initialize the parameters
-function InitializeParameters {
+function Initialize-Parameters {
     param (
         [string]$parametersFile = "parameters.json"
     )
 
     # Navigate to the project directory
-    NavigateToDeployment
+    Set-DeploymentDirectory
         
     # Load parameters from the JSON file
     $parameters = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
@@ -162,7 +399,7 @@ function InitializeParameters {
     # Retrieve the user principal name
     $global:userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
     # Retrieve the resource GUID
-    $global:resourceGuid = SplitGuid
+    $global:resourceGuid = Split-Guid
 
     $parameters | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
     $parameters | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
@@ -224,311 +461,181 @@ function InitializeParameters {
     }
 }
 
-# Function to navigate to the 'deployment' directory
-function NavigateToDeployment {
-    while ($true) {
-        $currentPath = Get-Location
-        $currentFolderName = Split-Path -Path $currentPath -Leaf
-
-        if ($currentFolderName -eq "deployment") {
-            Write-Host "Reached the 'deployment' directory."
-            break
-        }
-        else {
-            Set-Location -Path ".."
-        }
-    }
-}
-
-# Function to split a GUID and return the first 8 characters
-function SplitGuid {
-
-    $newGuid = [guid]::NewGuid().ToString()
-    $newGuid = $newGuid -replace "-", ""
-
-    $newGuid = $newGuid.Substring(0, 8)
-
-    return $newGuid
-}
-
-# Function to get the latest .NET runtime version
-function Get-LatestDotNetRuntime {
-    param(
-        [string]$resourceType,
-        [string]$os,
-        [string]$version
-    )
-
-    if ($resourceType -eq "functionapp") {
-        $functionRuntimes = az functionapp list-runtimes --output json | ConvertFrom-Json
-
-        if ($os -eq "linux") {
-            #$runtimes = $functionRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' -and $_.version -eq $version } | Select-Object -ExpandProperty version
-            $runtimes = $functionRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
-        }
-        else {
-            $runtimes = $functionRuntimes.windows | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
-        }
-    }
-    elseif ($resourceType -eq "webapp") {
-        $webpAppRuntimes = az webapp list-runtimes --output json | ConvertFrom-Json
-
-        if ($os -eq "linux") {
-            $runtimes = $webpAppRuntimes.linux | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
-        }
-        else {
-            $runtimes = $webpAppRuntimes.windows | Where-Object { $_.runtime -eq 'dotnet' } | Select-Object -ExpandProperty version
-        }
-    }
-    else {
-        throw "Unsupported resource type: $resourceType"
-    }
-
-    $latestRuntime = ($runtimes | Sort-Object -Descending)[0]
-
-    return $latestRuntime
-}
-
-# Ensure the service name is valid
-function Get-ValidServiceName {
+# Function to create AI Hub and AI Model
+function New-AIHubAndModel {
     param (
-        [string]$serviceName
+        [string]$aiHubName,
+        [string]$aiModelName,
+        [string]$aiModelType,
+        [string]$aiModelVersion,
+        [string]$aiServiceName,
+        [string]$resourceGroupName,
+        [string]$location
     )
-    # Convert to lowercase
-    $serviceName = $serviceName.ToLower()
+    
+    #$aiHubWorkspaceName = "workspace-$aiHubName"
 
-    # Remove invalid characters
-    $serviceName = $serviceName -replace '[^a-z0-9-]', ''
-
-    # Remove leading and trailing dashes
-    $serviceName = $serviceName.Trim('-')
-
-    # Remove consecutive dashes
-    $serviceName = $serviceName -replace '--+', '-'
-
-    return $serviceName
-}
-
-# Function to get the latest API version for a resource type
-function Get-LatestApiVersion {
-    param (
-        [string]$resourceProviderNamespace,
-        [string]$resourceType
-    )
-
-    $apiVersions = az provider show --namespace $resourceProviderNamespace --query "resourceTypes[?resourceType=='$resourceType'].apiVersions[]" --output json | ConvertFrom-Json
-    $latestApiVersion = ($apiVersions | Sort-Object -Descending)[0]
-    return $latestApiVersion
-}
-
-# Function to invoke an Azure REST API method
-function Invoke-AzureRestMethod {
-    param (
-        [string]$method,
-        [string]$url,
-        [string]$jsonBody = $null
-    )
-
-    # Get the access token
-    $token = az account get-access-token --query accessToken --output tsv
-
-    $body = $jsonBody | ConvertFrom-Json
-
-    $token = az account get-access-token --query accessToken --output tsv
-    $headers = @{
-        "Authorization" = "Bearer $token"
-        "Content-Type"  = "application/json"
-    }
-
+    # Create AI Hub
     try {
-        $response = Invoke-RestMethod -Method $method -Uri $url -Headers $headers -Body ($body | ConvertTo-Json -Depth 10)
-        return $response
+        $ErrorActionPreference = 'Stop'
+        az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
+        #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
+        Write-Host "AI Hub: '$aiHubName' created."
+        Write-Log -message "AI Hub: '$aiHubName' created."
     }
     catch {
-        Write-Host "Error: $_"
-        throw $_
+        # Check if the error is due to soft deletion
+        if ($_ -match "has been soft-deleted") {
+            try {
+                $ErrorActionPreference = 'Stop'
+                # Attempt to restore the soft-deleted Cognitive Services account
+                az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
+                Write-Host "AI Hub '$aiHubName' restored."
+                Write-Log -message "AI Hub '$aiHubName' restored."
+            }
+            catch {
+                Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+        else {
+            Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }    
+    }
+
+    # Create AI Service
+    try {
+        $ErrorActionPreference = 'Stop'
+        az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
+        Write-Host "AI Service: '$aiServiceName' created."
+        Write-Log -message "AI Service: '$aiServiceName' created."
+    }
+    catch {
+        Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    Read-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
+
+    # Try to create an Azure Machine Learning workspace (AI Hub)
+    try {
+        $ErrorActionPreference = 'Stop'
+        az ml workspace create --kind hub --name $aiHubName --resource-group $resourceGroupName --location $location --output none
+        Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
+        Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
+    }
+    catch {
+        Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Create AI Hub connection
+    try {
+        az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
+        Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
+        Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created."
+    }
+    catch {
+        Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Create AI Model Deployment
+    try {
+        $ErrorActionPreference = 'Stop'
+        #az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
+        az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
+        Write-Host "AI Model deployment: '$aiModelName' created."
+        Write-Log -message "AI Model deployment: '$aiModelName' created."
+    }
+    catch {
+        Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    # Create AI Project
+    try {
+        az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
+        Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
+        Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created."
+    }
+    catch {
+        Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
-# Function to check if a resource group exists
-function ResourceGroupExists {
+# Function to create a Node.js Function App
+function New-NodeJSFunctionApp {
     param (
-        [int]$resourceSuffix
+        [string]$sasFunctionAppName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$storageAccountName
     )
-    do {
-        $resourceGroupName = "$($parameters.resourceGroupName)-$resourceSuffix"
-        $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
+    
+    # Navigate to the project directory
+    $currentPath = Get-Location
+    #$currentFolderName = Split-Path -Path $currentPath -Leaf
 
-        try {
-            if ($resourceGroupExists -eq "true") {
-                Write-Host "Resource group '$resourceGroupName' exists."
-                $resourceSuffix++
-            }
-            else {
-                az group create --name $resourceGroupName --location $location --output none
-                Write-Host "Resource group '$resourceGroupName' created."
-                $resourceGroupExists = $false
-                        
-            }
-        }
-        catch {
-            Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-            Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-        }
+    # Reference the parent folder
+    #$parentFolderPath = Split-Path -Path $currentPath -Parent
 
-    } while ($resourceGroupExists)
+    try {
+        $ErrorActionPreference = 'Stop'
+        az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
+        Write-Host "Node.js Function App '$sasFunctionAppName' created."
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath $currentPath/deployment.log
 
-    return $resourceGroupName
-}
-
-# Function to check if a resource exists
-function ResourceExists {
-    param (
-        [string]$resourceName,
-        [string]$resourceType,
-        [string]$resourceGroupName
-    )
-
-    if ($globalResourceTypes -contains $resourceType) {
-        switch ($resourceType) {
-            "Microsoft.Storage/storageAccounts" {
-                $nameAvailable = az storage account check-name --name $resourceName --query "nameAvailable" --output tsv
-
-                if ($nameAvailable -eq "true") {
-                    $result = ""
-                }
-                else {
-                    $result = $nameAvailable
-                }
-            }
-            "Microsoft.KeyVault/vaults" {
-                $result = az keyvault list --query "[?name=='$resourceName'].name" --output tsv
-                $deletedVault = az keyvault list-deleted --query "[?name=='$resourceName'].name" --output tsv
-
-                if (-not [string]::IsNullOrEmpty($deletedVault)) {
-                    $result = $true
-                }
-            }
-            "Microsoft.Sql/servers" {
-                $result = az sql server list --query "[?name=='$resourceName'].name" --output tsv
-            }
-            "Microsoft.DocumentDB/databaseAccounts" {
-                $result = az cosmosdb list --query "[?name=='$resourceName'].name" --output tsv
-            }
-            "Microsoft.Web/serverFarms" {
-                $result = az appservice plan list --query "[?name=='$resourceName'].name" --output tsv
-            }
-            "Microsoft.Web/sites" {
-                $result = az webapp list --query "[?name=='$resourceName'].name" --output tsv
-            }
-            "Microsoft.DataFactory/factories" {
-                $result = az datafactory list --query "[?name=='$resourceName'].name" --output tsv
-            }
-            "Microsoft.ContainerRegistry/registries" {
-                $result = az acr list --query "[?name=='$resourceName'].name" --output tsv
-            }
-            "Microsoft.CognitiveServices/accounts" {
-                $result = az cognitiveservices account list --query "[?name=='$resourceName'].name" --output tsv
-            }
-            "Microsoft.Search/searchServices" {
-                $result = az search service list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
-            }
-        }
-
-        if (-not [string]::IsNullOrEmpty($result)) {
-            Write-Host "$resourceName exists."
-            return $true
-        }
-        else {
-            Write-Host "$resourceName does not exist."
-            return $false
-        }
-    } 
-    else {
-        # Check within the subscription
-        $result = az resource list --name $resourceName --resource-type $resourceType --query "[].name" --output tsv
-        if (-not [string]::IsNullOrEmpty($result)) {
-            Write-Host "$resourceName exists."
-            return $true
-        }
-        else {
-            Write-Host "$resourceName does not exist."
-            return $false
-        }
+        Deploy-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+    }
+    catch {
+        Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $currentPath/deployment.log
     }
 }
 
-# Function to find a unique suffix
-function FindUniqueSuffix {
+# Function to get the latest API version
+function New-RandomPassword {
     param (
-        [int]$resourceSuffix,
-        [string]$resourceGroupName
+        [int]$length = 16,
+        [int]$nonAlphanumericCount = 2
     )
 
-    do {
-        $storageAccountName = "$($parameters.storageAccountName)$resourceGuid$resourceSuffix"
-        $appServicePlanName = "$($parameters.appServicePlanName)-$resourceGuid-$resourceSuffix"
-        $searchServiceName = "$($parameters.searchServiceName)-$resourceGuid-$resourceSuffix"
-        $logAnalyticsWorkspaceName = "$($parameters.logAnalyticsWorkspaceName)-$resourceGuid-$resourceSuffix"
-        $cognitiveServiceName = "$($parameters.cognitiveServiceName)-$resourceGuid-$resourceSuffix"
-        $keyVaultName = "$($parameters.keyVaultName)-$resourceGuid-$resourceSuffix"
-        $appInsightsName = "$($parameters.appInsightsName)-$resourceGuid-$resourceSuffix"
-        $portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
-        $managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
-        $userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
-        $webAppName = "$($parameters.webAppName)-$resourceGuid-$resourceSuffix"
-        $functionAppName = "$($parameters.functionAppName)-$resourceGuid-$resourceSuffix"
-        $openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
-        $documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
-        $aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
-        $aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
-        $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
-        
-        $resourceExists = ResourceExists $storageAccountName "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
-        ResourceExists $appServicePlanName "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
-        ResourceExists $searchServiceName "Microsoft.Search/searchServices" -resourceGroupName $resourceGroupName -or
-        ResourceExists $logAnalyticsWorkspaceName "Microsoft.OperationalInsights/workspaces" -resourceGroupName $resourceGroupName -or
-        ResourceExists $cognitiveServiceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        ResourceExists $keyVaultName "Microsoft.KeyVault/vaults" -resourceGroupName $resourceGroupName -or
-        ResourceExists $appInsightsName "Microsoft.Insights/components" -resourceGroupName $resourceGroupName -or
-        ResourceExists $portalDashboardName "Microsoft.Portal/dashboards" -resourceGroupName $resourceGroupName -or
-        ResourceExists $managedEnvironmentName "Microsoft.App/managedEnvironments" -resourceGroupName $resourceGroupName -or
-        ResourceExists $userAssignedIdentityName "Microsoft.ManagedIdentity/userAssignedIdentities" -resourceGroupName $resourceGroupName -or
-        ResourceExists $webAppName "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or
-        ResourceExists $functionAppName "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or
-        ResourceExists $openAIName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        ResourceExists $documentIntelligenceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName
-
-        if ($resourceExists) {
-            $resourceSuffix++
+    try {
+        $alphanumericChars = [char[]]"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
+        $nonAlphanumericChars = [char[]]"!@#$%^&*()-_=+[]{}|;:,.<>?/~".ToCharArray()
+    
+        $passwordChars = New-Object char[] $length
+    
+        for ($i = 0; $i -lt ($length - $nonAlphanumericCount); $i++) {
+            $passwordChars[$i] = $alphanumericChars[(Get-Random -Maximum $alphanumericChars.Length)]
         }
-    } while ($resourceExists)
-
-    $userPrincipalName = "$($parameters.userPrincipalName)"
-
-    CreateResources -storageAccountName $storageAccountName `
-        -appServicePlanName $appServicePlanName `
-        -searchServiceName $searchServiceName `
-        -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
-        -cognitiveServiceName $cognitiveServiceName `
-        -keyVaultName $keyVaultName `
-        -appInsightsName $appInsightsName `
-        -portalDashboardName $portalDashboardName `
-        -managedEnvironmentName $managedEnvironmentName `
-        -userAssignedIdentityName $userAssignedIdentityName `
-        -userPrincipalName $userPrincipalName `
-        -webAppName $webAppName `
-        -functionAppName $functionAppName `
-        -openAIName $openAIName `
-        -documentIntelligenceName $documentIntelligenceName
-
-    CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
-
-    return $resourceSuffix
+    
+        for ($i = ($length - $nonAlphanumericCount); $i -lt $length; $i++) {
+            $passwordChars[$i] = $nonAlphanumericChars[(Get-Random -Maximum $nonAlphanumericChars.Length)]
+        }
+    
+        #Shuffle the characters to ensure randomness
+        for ($i = 0; $i -lt $length; $i++) {
+            $j = $random.GetInt32($length)
+            $temp = $passwordChars[$i]
+            $passwordChars[$i] = $passwordChars[$j]
+            $passwordChars[$j] = $temp
+        }
+    
+        return -join $passwordChars
+    }
+    catch {
+        Write-Error "Failed to generate random password: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to generate random password: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        return $null
+    }
 }
 
 # Function to create resources
-function CreateResources {
+function New-Resources {
     param (
         [string]$storageAccountName,
         [string]$appServicePlanName,
@@ -755,7 +862,7 @@ function CreateResources {
             Write-Log -message "Key Vault: '$keyVaultName' created with RBAC enabled."
 
             # Assign RBAC roles to the managed identity
-            AssignRBACRoles -userAssignedIdentityName $userAssignedIdentityName
+            Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
         }
         else {
             az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
@@ -763,7 +870,7 @@ function CreateResources {
             Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
 
             # Set vault access policies for user
-            SetVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+            Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
         }
     }
     catch {
@@ -778,7 +885,7 @@ function CreateResources {
                     Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
 
                     # Assign RBAC roles to the managed identity
-                    AssignRBACRoles -userAssignedIdentityName $userAssignedIdentityName
+                    Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
                 }
                 catch {
                     Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -793,7 +900,7 @@ function CreateResources {
                     Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
                     Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
 
-                    SetVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+                    Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
                 }
                 catch {
                     Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -807,13 +914,13 @@ function CreateResources {
         }
     }
 
-    CreateKeyVaultRoles -keyVaultName $keyVaultName `
+    New-KeyVaultRoles -keyVaultName $keyVaultName `
         -resourceGroupName $resourceGroupName `
         -userAssignedIdentityName $userAssignedIdentityName `
         -userPrincipalName $userPrincipalName `
         -useRBAC $useRBAC
 
-    CreateSecrets -keyVaultName $keyVaultName `
+    New-Secrets -keyVaultName $keyVaultName `
         -resourceGroupName $resourceGroupName
 
     #**********************************************************************************************************************
@@ -932,302 +1039,8 @@ function CreateResources {
     }
 }
 
-# Function to set Key Vault access policies
-function SetVaultAccessPolicies {
-    param([string]$keyVaultName, 
-        [string]$resourceGroupName, 
-        [string]$userPrincipalName)
-    
-    try {
-        $ErrorActionPreference = 'Stop'
-        # Set policy for the user
-        az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-        Write-Host "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
-        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
-    }
-    catch {
-        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-}
-
-# Function to assign RBAC roles to a managed identity
-function AssignRBACRoles {
-    params(
-        [string]$userAssignedIdentityName
-    )
-    try {
-        $ErrorActionPreference = 'Stop'
-        $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
-                
-        az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
-        az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
-        az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
-        az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
-
-        Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
-        Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
-    }
-    catch {
-        Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-}
-
-#Create Key Vault Roles
-function CreateKeyVaultRoles {
-    param (
-        [string]$keyVaultName,
-        [string]$resourceGroupName,
-        [string]$userAssignedIdentityName,
-        [string]$userPrincipalName,
-        [bool]$useRBAC,
-        [string]$location
-    )
-
-    # Set policy for the application
-    try {
-        $ErrorActionPreference = 'Stop'
-        az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-        Write-Host "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
-        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
-    }
-    catch {
-        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-}
-
-# Function to create secrets in Key Vault
-function CreateSecrets {
-    param (
-        [string]$keyVaultName,
-        [string]$resourceGroupName
-    )
-    # Loop through the array of secrets and store each one in the Key Vault
-    foreach ($secretName in $globalKeyVaultSecrets) {
-        # Generate a random value for the secret
-        #$secretValue = New-RandomPassword
-        $secretValue = "TESTSECRET"
-
-        try {
-            $ErrorActionPreference = 'Stop'
-            az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
-            Write-Host "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
-            Write-Log -message "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
-        }
-        catch {
-            Write-Error "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-}
-
-# Function to get the latest API version
-function New-RandomPassword {
-    param (
-        [int]$length = 16,
-        [int]$nonAlphanumericCount = 2
-    )
-
-    try {
-        $alphanumericChars = [char[]]"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
-        $nonAlphanumericChars = [char[]]"!@#$%^&*()-_=+[]{}|;:,.<>?/~".ToCharArray()
-    
-        $passwordChars = New-Object char[] $length
-    
-        for ($i = 0; $i -lt ($length - $nonAlphanumericCount); $i++) {
-            $passwordChars[$i] = $alphanumericChars[(Get-Random -Maximum $alphanumericChars.Length)]
-        }
-    
-        for ($i = ($length - $nonAlphanumericCount); $i -lt $length; $i++) {
-            $passwordChars[$i] = $nonAlphanumericChars[(Get-Random -Maximum $nonAlphanumericChars.Length)]
-        }
-    
-        #Shuffle the characters to ensure randomness
-        for ($i = 0; $i -lt $length; $i++) {
-            $j = $random.GetInt32($length)
-            $temp = $passwordChars[$i]
-            $passwordChars[$i] = $passwordChars[$j]
-            $passwordChars[$j] = $temp
-        }
-    
-        return -join $passwordChars
-    }
-    catch {
-        Write-Error "Failed to generate random password: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to generate random password: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        return $null
-    }
-}
-
-# Helper function to get a random integer
-function Get-RandomInt {
-    param (
-        [int]$max
-    )
-
-    $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-    $bytes = New-Object byte[] 4
-    $random.GetBytes($bytes)
-    [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
-
-    return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
-}
-
-# Function to delete Azure resource groups
-function DeleteAzureResourceGroups {
-    $resourceGroups = az group list --query "[?starts_with(name, 'myResourceGroup')].name" --output tsv
-
-    foreach ($rg in $resourceGroups) {
-        try {
-            az group delete --name $rg --yes --output none
-            Write-Host "Resource group '$rg' deleted."
-            Write-Log -message "Resource group '$rg' deleted."
-        }
-        catch {
-            Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-            Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-        }
-    }
-}
-
-# Function to create AI Hub and AI Model
-function CreateAIHubAndModel {
-    param (
-        [string]$aiHubName,
-        [string]$aiModelName,
-        [string]$aiModelType,
-        [string]$aiModelVersion,
-        [string]$aiServiceName,
-        [string]$resourceGroupName,
-        [string]$location
-    )
-    
-    #$aiHubWorkspaceName = "workspace-$aiHubName"
-
-    # Create AI Hub
-    try {
-        $ErrorActionPreference = 'Stop'
-        az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
-        #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
-        Write-Host "AI Hub: '$aiHubName' created."
-        Write-Log -message "AI Hub: '$aiHubName' created."
-    }
-    catch {
-        # Check if the error is due to soft deletion
-        if ($_ -match "has been soft-deleted") {
-            try {
-                $ErrorActionPreference = 'Stop'
-                # Attempt to restore the soft-deleted Cognitive Services account
-                az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
-                Write-Host "AI Hub '$aiHubName' restored."
-                Write-Log -message "AI Hub '$aiHubName' restored."
-            }
-            catch {
-                Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-        }
-        else {
-            Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }    
-    }
-
-    # Create AI Service
-    try {
-        $ErrorActionPreference = 'Stop'
-        az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
-        Write-Host "AI Service: '$aiServiceName' created."
-        Write-Log -message "AI Service: '$aiServiceName' created."
-    }
-    catch {
-        Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    ReadAIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
-
-    # Try to create an Azure Machine Learning workspace (AI Hub)
-    try {
-        $ErrorActionPreference = 'Stop'
-        az ml workspace create --kind hub --name $aiHubName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
-        Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
-    }
-    catch {
-        Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    # Create AI Hub connection
-    try {
-        az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
-        Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
-        Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created."
-    }
-    catch {
-        Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    # Create AI Model Deployment
-    try {
-        $ErrorActionPreference = 'Stop'
-        #az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
-        az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
-        Write-Host "AI Model deployment: '$aiModelName' created."
-        Write-Log -message "AI Model deployment: '$aiModelName' created."
-    }
-    catch {
-        Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    # Create AI Project
-    try {
-        az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
-        Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
-        Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created."
-    }
-    catch {
-        Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-}
-
-# Function to get Cognitive Services API key
-function Get-CognitiveServicesApiKey {
-    param (
-        [string]$resourceGroupName,
-        [string]$cognitiveServiceName
-    )
-
-    try {
-        # Run the Azure CLI command and capture the output
-        $apiKeysJson = az cognitiveservices account keys list --resource-group $resourceGroupName --name $cognitiveServiceName
-
-        # Parse the JSON output into a PowerShell object
-        $apiKeys = $apiKeysJson | ConvertFrom-Json
-
-        # Access the keys
-        $key1 = $apiKeys.key1
-        $key2 = $apiKeys.key2
-
-        # Output the keys to verify
-        Write-Host "Key 1: $key1"
-        Write-Host "Key 2: $key2"
-        return $key1
-    }
-    catch {
-        Write-Error "Failed to retrieve API key for Cognitive Services resource: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        return $null
-    }
-}
-
 # Function to read AI connection file
-function ReadAIConnectionFile {
+function Read-AIConnectionFile {
     param (
         [string]$resourceGroupName,
         [string]$aiServiceName
@@ -1256,94 +1069,132 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
     }
 }
 
-# Function to create a Node.js Function App
-function CreateNodeJSFunctionApp {
-    param (
-        [string]$sasFunctionAppName,
-        [string]$resourceGroupName,
-        [string]$location,
-        [string]$storageAccountName
-    )
-    
-    # Navigate to the project directory
-    $currentPath = Get-Location
-    #$currentFolderName = Split-Path -Path $currentPath -Leaf
+# Function to delete Azure resource groups
+function Remove-AzureResourceGroups {
+    $resourceGroups = az group list --query "[?starts_with(name, 'myResourceGroup')].name" --output tsv
 
-    # Reference the parent folder
-    #$parentFolderPath = Split-Path -Path $currentPath -Parent
-
-    try {
-        $ErrorActionPreference = 'Stop'
-        az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
-        Write-Host "Node.js Function App '$sasFunctionAppName' created."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath $currentPath/deployment.log
-
-        DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
-    }
-    catch {
-        Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $currentPath/deployment.log
+    foreach ($rg in $resourceGroups) {
+        try {
+            az group delete --name $rg --yes --output none
+            Write-Host "Resource group '$rg' deleted."
+            Write-Log -message "Resource group '$rg' deleted."
+        }
+        catch {
+            Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+            Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+        }
     }
 }
 
-# Function to deploy a Node.js Function App
-function DeployNodeJSFunctionApp {
-    param (
-        [string]$sasFunctionAppName,
-        [string]$resourceGroupName,
-        [string]$location,
-        [string]$storageAccountName
-    )
+# Function to navigate to the 'deployment' directory
+function Set-DeploymentDirectory {
+    while ($true) {
+        $currentPath = Get-Location
+        $currentFolderName = Split-Path -Path $currentPath -Leaf
 
-    # Navigate to the project directory
-    $currentPath = Get-Location
-    $currentFolderName = Split-Path -Path $currentPath -Leaf
+        if ($currentFolderName -eq "deployment") {
+            Write-Host "Reached the 'deployment' directory."
+            break
+        }
+        else {
+            Set-Location -Path ".."
+        }
+    }
+}
 
-    # Reference the parent folder
-    #$parentFolderPath = Split-Path -Path $currentPath -Parent
+# Function to set Key Vault access policies
+function Set-KeyVaultAccessPolicies {
+    param([string]$keyVaultName, 
+        [string]$resourceGroupName, 
+        [string]$userPrincipalName)
     
     try {
         $ErrorActionPreference = 'Stop'
-        
-        if ($currentFolderName -ne "sasToken") {
-            Set-Location -Path $sasFunctionAppPath
-        }
-        try {
-            # Compress the function app code
-            $zipFilePath = "function-app-sastoken-code.zip"
-            if (Test-Path $zipFilePath) {
-                Remove-Item $zipFilePath
-            }
-    
-            zip -r $zipFilePath *
-        }
-        catch {
-            Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
-        }
-
-        # Initialize a git repository if not already done
-        if (-not (Test-Path -Path ".git")) {
-            git init
-            git add .
-            git commit -m "Initial commit"
-        }
-
-        # Push code to Azure
-        git push azure master
-
-        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $zipFilePath --output none
-        Write-Host "Node.js Function App '$sasFunctionAppName' deployed."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "$currentPath/deployment.log"
+        # Set policy for the user
+        az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        Write-Host "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
     }
     catch {
-        Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+#Create Key Vault Roles
+function Set-KeyVaultRoles {
+    param (
+        [string]$keyVaultName,
+        [string]$resourceGroupName,
+        [string]$userAssignedIdentityName,
+        [string]$userPrincipalName,
+        [bool]$useRBAC,
+        [string]$location
+    )
+
+    # Set policy for the application
+    try {
+        $ErrorActionPreference = 'Stop'
+        az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        Write-Host "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+    }
+    catch {
+        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Function to create secrets in Key Vault
+function Set-KeyVaultSecrets {
+    param (
+        [string]$keyVaultName,
+        [string]$resourceGroupName
+    )
+    # Loop through the array of secrets and store each one in the Key Vault
+    foreach ($secretName in $globalKeyVaultSecrets) {
+        # Generate a random value for the secret
+        #$secretValue = New-RandomPassword
+        $secretValue = "TESTSECRET"
+
+        try {
+            $ErrorActionPreference = 'Stop'
+            az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
+            Write-Host "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
+            Write-Log -message "Secret: '$secretName' stored in Key Vault: '$keyVaultName'."
+        }
+        catch {
+            Write-Error "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to store secret '$secretName' in Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+}
+
+# Function to assign RBAC roles to a managed identity
+function Set-RBACRoles {
+    params(
+        [string]$userAssignedIdentityName
+    )
+    try {
+        $ErrorActionPreference = 'Stop'
+        $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
+                
+        az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
+        az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
+        az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
+        az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
+
+        Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+        Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+    }
+    catch {
+        Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
 # Function to alphabetize the parameters object
-function SortParameters {
+function Sort-Parameters {
     param (
         [Parameter(Mandatory = $true)]
         [psobject]$Parameters
@@ -1361,23 +1212,19 @@ function SortParameters {
     return $sortedParametersObject
 }
 
-# Function to write messages to a log file
-function Write-Log {
-    param (
-        [string]$message,
-        [string]$logFilePath = "deployment.log"
-    )
+# Function to split a GUID and return the first 8 characters
+function Split-Guid {
 
-    #$logFilePath = "deployment.log"
+    $newGuid = [guid]::NewGuid().ToString()
+    $newGuid = $newGuid -replace "-", ""
 
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logMessage = "$timestamp - $message"
+    $newGuid = $newGuid.Substring(0, 8)
 
-    Add-Content -Path $logFilePath -Value $logMessage
+    return $newGuid
 }
 
 # Function to start the deployment
-function StartDeployment {
+function Start-Deployment {
 
     $logFilePath = "deployment.log"
 
@@ -1412,29 +1259,29 @@ function StartDeployment {
     # Start the timer
     $startTime = Get-Date
 
-    CreateNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
+    New-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
 
-    #DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+    #Deploy-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
 
     return
 
     # Delete existing resource groups with the same name
-    DeleteAzureResourceGroups
+    Remove-AzureResourceGroups
 
     # Check if the resource group exists
-    $resourceGroupName = ResourceGroupExists -resourceSuffix $resourceSuffix
+    $resourceGroupName = Test-ResourceGroupExists -resourceSuffix $resourceSuffix
 
     if ($appendUniqueSuffix -eq $true) {
 
         #$resourceGroupName = "$resourceGroupName$resourceSuffix"
 
         # Find a unique suffix
-        $resourceSuffix = FindUniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
+        $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
     }
     else {
         $userPrincipalName = "$($parameters.userPrincipalName)"
 
-        CreateResources -storageAccountName $storageAccountName `
+        New-Resources -storageAccountName $storageAccountName `
             -appServicePlanName $appServicePlanName `
             -searchServiceName $searchServiceName `
             -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
@@ -1452,9 +1299,9 @@ function StartDeployment {
             -documentIntelligenceName $documentIntelligenceName
     }
 
-    CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
+    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     
-    CreateNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
+    New-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
 
     # End the timer
     $endTime = Get-Date
@@ -1471,17 +1318,175 @@ function StartDeployment {
     Add-Content -Path $logFilePath -Value ""
 }
 
+# Function to check if a resource group exists
+function Test-ResourceGroupExists {
+    param (
+        [int]$resourceSuffix
+    )
+    do {
+        $resourceGroupName = "$($parameters.resourceGroupName)-$resourceSuffix"
+        $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
+
+        try {
+            if ($resourceGroupExists -eq "true") {
+                Write-Host "Resource group '$resourceGroupName' exists."
+                $resourceSuffix++
+            }
+            else {
+                az group create --name $resourceGroupName --location $location --output none
+                Write-Host "Resource group '$resourceGroupName' created."
+                $resourceGroupExists = $false
+                        
+            }
+        }
+        catch {
+            Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+            Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+        }
+
+    } while ($resourceGroupExists)
+
+    return $resourceGroupName
+}
+
+# Function to check if a resource exists
+function Test-ResourceExists {
+    param (
+        [string]$resourceName,
+        [string]$resourceType,
+        [string]$resourceGroupName
+    )
+
+    if ($globalResourceTypes -contains $resourceType) {
+        switch ($resourceType) {
+            "Microsoft.Storage/storageAccounts" {
+                $nameAvailable = az storage account check-name --name $resourceName --query "nameAvailable" --output tsv
+
+                if ($nameAvailable -eq "true") {
+                    $result = ""
+                }
+                else {
+                    $result = $nameAvailable
+                }
+            }
+            "Microsoft.KeyVault/vaults" {
+                $result = az keyvault list --query "[?name=='$resourceName'].name" --output tsv
+                $deletedVault = az keyvault list-deleted --query "[?name=='$resourceName'].name" --output tsv
+
+                if (-not [string]::IsNullOrEmpty($deletedVault)) {
+                    $result = $true
+                }
+            }
+            "Microsoft.Sql/servers" {
+                $result = az sql server list --query "[?name=='$resourceName'].name" --output tsv
+            }
+            "Microsoft.DocumentDB/databaseAccounts" {
+                $result = az cosmosdb list --query "[?name=='$resourceName'].name" --output tsv
+            }
+            "Microsoft.Web/serverFarms" {
+                $result = az appservice plan list --query "[?name=='$resourceName'].name" --output tsv
+            }
+            "Microsoft.Web/sites" {
+                $result = az webapp list --query "[?name=='$resourceName'].name" --output tsv
+            }
+            "Microsoft.DataFactory/factories" {
+                $result = az datafactory list --query "[?name=='$resourceName'].name" --output tsv
+            }
+            "Microsoft.ContainerRegistry/registries" {
+                $result = az acr list --query "[?name=='$resourceName'].name" --output tsv
+            }
+            "Microsoft.CognitiveServices/accounts" {
+                $result = az cognitiveservices account list --query "[?name=='$resourceName'].name" --output tsv
+            }
+            "Microsoft.Search/searchServices" {
+                $result = az search service list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
+            }
+        }
+
+        if (-not [string]::IsNullOrEmpty($result)) {
+            Write-Host "$resourceName exists."
+            return $true
+        }
+        else {
+            Write-Host "$resourceName does not exist."
+            return $false
+        }
+    } 
+    else {
+        # Check within the subscription
+        $result = az resource list --name $resourceName --resource-type $resourceType --query "[].name" --output tsv
+        if (-not [string]::IsNullOrEmpty($result)) {
+            Write-Host "$resourceName exists."
+            return $true
+        }
+        else {
+            Write-Host "$resourceName does not exist."
+            return $false
+        }
+    }
+}
+
+# Function to write messages to a log file
+function Write-Log {
+    param (
+        [string]$message,
+        [string]$logFilePath = "deployment.log"
+    )
+
+    #$logFilePath = "deployment.log"
+
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logMessage = "$timestamp - $message"
+
+    Add-Content -Path $logFilePath -Value $logMessage
+}
+
+
 #**********************************************************************************************************************
 # Main script
 #**********************************************************************************************************************
 
+# Set the default parameters file
+param (
+    [string]$parametersFile = "parameters.json"
+)
+
+$ErrorActionPreference = 'Stop'
+
+# Mapping of global resource types
+$globalResourceTypes = @(
+    "Microsoft.Storage/storageAccounts",
+    "Microsoft.KeyVault/vaults",
+    "Microsoft.Sql/servers",
+    "Microsoft.DocumentDB/databaseAccounts",
+    "Microsoft.Web/serverFarms",
+    "Microsoft.Web/sites",
+    "Microsoft.DataFactory/factories",
+    "Microsoft.ContainerRegistry/registries",
+    "Microsoft.CognitiveServices/accounts",
+    "Microsoft.Search/searchServices"
+)
+
+# List of all KeyVault secret keys
+$globalKeyVaultSecrets = @(
+    “AzureOpenAiChatGptDeployment”, 
+    “AzureOpenAiEmbeddingDeployment”, 
+    “AzureOpenAiServiceEndpoint”, 
+    “AzureSearchIndex”, 
+    “AzureSearchServiceEndpoint”, 
+    “AzureStorageAccountEndpoint”, 
+    “AzureStorageContainer”, 
+    “UseAOAI”, 
+    “UseVision”
+)
+
 # Initialize parameters
-$initParams = InitializeParameters -parametersFile $parametersFile
+$initParams = Initialize-Parameters -parametersFile $parametersFile
 #Write-Host "Parameters initialized."
 #Write-Log -message "Parameters initialized."
 
 # Alphabetize the parameters object
-$global:parameters = SortParameters -Parameters $initParams.parameters
+$global:parameters = Sort-Parameters -Parameters $initParams.parameters
 
 
 $userPrincipalName = $parameters.userPrincipalName
