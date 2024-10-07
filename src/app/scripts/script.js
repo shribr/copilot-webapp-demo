@@ -101,7 +101,7 @@ function getDocuments() {
 
     const accountName = "stdcdaiprodpoc001";
     const azureStorageUrl = "blob.core.windows.net";
-
+    // https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-10-07T22:31:41Z&st=2024-10-07T14:31:41Z&spr=https&sig=SvTIXlua6ZxXuSPXnBSMdIpsGydM2kXq4F6a213pHOM%3D
     //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
     const containerName = "content";
 
@@ -109,10 +109,10 @@ function getDocuments() {
     const ss = "bfqt";
     const srt = "sco";
     const sp = "rwdlacupiytfx";
-    const se = "2024-10-07T11:27:12Z";
-    const st = "2024-10-07T03:27:12Z";
+    const se = "2025-10-07T22:31:41Z";
+    const st = "2024-10-07T14:31:41Z";
     const spr = "https";
-    const sig = "1%2B4xVbGWQ%2FFeK4Ypg3xq4CMDuSTkTAI2SF%2Bq0a%2FlSsI%3D";
+    const sig = "SvTIXlua6ZxXuSPXnBSMdIpsGydM2kXq4F6a213pHOM%3D";
     const comp = "list";
     const include = "metadata";
     const restype = "container";
@@ -211,13 +211,19 @@ function getDocuments() {
 
 //code to send chat message to Azure Copilot
 async function sendMessage() {
-    const userInput = $('#user-input').val();
+    const userInput = $('#chat-input').val();
     if (!userInput) return;
 
     displayMessage('User', userInput);
     $('#user-input').val('');
 
-    const response = await fetch('https://eastus.api.cognitive.microsoft.com/', {
+    const apiKey = '2ae4f6606d43424da89d09c372406a7f';
+    const apiVersion = '2024-02-15-preview';
+    const deploymentId = 'gpt-4o';
+    const region = 'eastus';
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}&api-key=${apiKey}`;
+
+    const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -360,4 +366,22 @@ async function getSasToken() {
     }
     const data = await response.json();
     return data.sasToken;
+}
+
+function SearchDocuments() {
+    // Initialize and connect to your search service
+    var automagic = new AzSearch.Automagic({ index: "index-srch-dcdai-prod-poc-001", queryKey: "0JcqOThOtX0u0MefUDwzCtLsrrMUmOTP2RjikqhJ15AzSeCy8nR2", service: "srch-dcdai-prod-poc-001", dnsSuffix: "search.windows.net" });
+
+    const resultTemplate = `<div class="col-xs-12 col-sm-9 col-md-9"><h4>{{metadata_title}}</h4><div class="resultDescription">{{{content}}}</div></div>`;
+
+    // add a results view using the template defined above
+    automagic.addResults("results", { count: true }, resultTemplate);
+
+    // Adds a pager control << 1 2 3 ... >>
+    automagic.addPager("pager");
+
+    automagic.addSearchBox("searchBox");
+
+    // Adds a button to clear any applied filters
+    automagic.addClearFiltersButton("clearFilters");
 }

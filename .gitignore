@@ -8,6 +8,7 @@
 .parcel-cache/requestGraph-nodes-0-5f9786e38cbf69b8-0
 .parcel-cache/snapshot-5f9786e38cbf69b8.txt
 node_modules
+dist
 node_modules/.package-lock.json
 node_modules/@parcel/core/node_modules/dotenv/CHANGELOG.md
 node_modules/@parcel/core/node_modules/dotenv/config.js
