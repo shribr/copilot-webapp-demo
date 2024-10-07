@@ -35,3 +35,16 @@
 *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 08 MIN : 08 SEC : 073 MS 
 ****** LOG SEQUENCE: 2 ***
 2024-10-05 21:26:08 - Node.js Function App 'func-sastoken-dcdai-prod-poc-001' deployed.
+*** LOG SEQUENCE: 3 ***
+*** LOG SEQUENCE: 4 ***
+*** LOG SEQUENCE: 5 ***
+*** LOG SEQUENCE: 6 ***
+*** LOG SEQUENCE: 7 ***
+2024-10-06 15:47:16 - Node.js Function App 'func-sastoken-dcdai-prod-poc-001' created.
+2024-10-06 15:47:39 - Node.js Function App 'func-sastoken-dcdai-prod-poc-001' deployed.
+*** LOG SEQUENCE: 8 ***
+2024-10-06 16:12:55 - Node.js Function App 'func-sastoken' created.
+2024-10-06 16:12:57 - Node.js Function App 'func-sastoken' deployed.
+*** LOG SEQUENCE: 9 ***
+2024-10-06 16:15:47 - Node.js Function App 'func-sastoken-001' created.
+2024-10-06 16:16:10 - Node.js Function App 'func-sastoken-001' deployed.

@@ -31,7 +31,7 @@
     "redisCacheName": "redis-dcdai-prod-poc-001",
     "resourceGroupName": "RG-DCDAI-COPILOTDEMO-001-1",
     "resourceSuffix": 1,
-    "sasFunctionAppName": "func-sastoken-dcdai-prod-poc-001",
+    "sasFunctionAppName": "func-sastoken-001",
     "sasFunctionAppPath": "functions/sasToken",
     "searchServiceName": "srch-dcdai-prod-poc-001",
     "searchIndexName": "srch-index-dcdai-prod-poc-001",

@@ -99,6 +99,9 @@ function InitializeParameters {
         [string]$parametersFile = "parameters.json"
     )
 
+    # Navigate to the project directory
+    NavigateToDeployment
+        
     # Load parameters from the JSON file
     $parameters = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
@@ -218,6 +221,22 @@ function InitializeParameters {
         virtualNetworkName           = $virtualNetworkName
         webAppName                   = $webAppName        
         parameters                   = $parameters
+    }
+}
+
+# Function to navigate to the 'deployment' directory
+function NavigateToDeployment {
+    while ($true) {
+        $currentPath = Get-Location
+        $currentFolderName = Split-Path -Path $currentPath -Leaf
+
+        if ($currentFolderName -eq "deployment") {
+            Write-Host "Reached the 'deployment' directory."
+            break
+        }
+        else {
+            Set-Location -Path ".."
+        }
     }
 }
 
@@ -1248,22 +1267,22 @@ function CreateNodeJSFunctionApp {
     
     # Navigate to the project directory
     $currentPath = Get-Location
-    $currentFolderName = Split-Path -Path $currentPath -Leaf
+    #$currentFolderName = Split-Path -Path $currentPath -Leaf
 
     # Reference the parent folder
-    $parentFolderPath = Split-Path -Path $currentPath -Parent
+    #$parentFolderPath = Split-Path -Path $currentPath -Parent
 
     try {
         $ErrorActionPreference = 'Stop'
         az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --output none
         Write-Host "Node.js Function App '$sasFunctionAppName' created."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath $currentPath
+        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath $currentPath/deployment.log
 
         DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
     }
     catch {
         Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $currentPath
+        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $currentPath/deployment.log
     }
 }
 
@@ -1281,7 +1300,7 @@ function DeployNodeJSFunctionApp {
     $currentFolderName = Split-Path -Path $currentPath -Leaf
 
     # Reference the parent folder
-    $parentFolderPath = Split-Path -Path $currentPath -Parent
+    #$parentFolderPath = Split-Path -Path $currentPath -Parent
     
     try {
         $ErrorActionPreference = 'Stop'
@@ -1393,7 +1412,9 @@ function StartDeployment {
     # Start the timer
     $startTime = Get-Date
 
-    DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+    CreateNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
+
+    #DeployNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
 
     return
 
@@ -1433,7 +1454,7 @@ function StartDeployment {
 
     CreateAIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     
-    CreateNodeJSFunctionApp -functionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
+    CreateNodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
 
     # End the timer
     $endTime = Get-Date

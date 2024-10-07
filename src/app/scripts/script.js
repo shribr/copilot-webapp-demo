@@ -105,7 +105,12 @@ function updateFileCount() {
 //code to get documents from Azure Storage
 function getDocuments() {
     // Fetch the list of blobs from the Azure Storage container
-    fetch("https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&sp=rwdlacupiytfx&se=2024-10-02T14:42:41Z&st=2024-10-02T06:42:41Z&spr=https&srt=sco&sig=&comp=list", {
+    const accountName = config.AZURE_ACCOUNT_NAME;
+    const sasToken = config.AZURE_SAS_TOKEN;
+    const containerName = config.AZURE_CONTAINER_NAME;
+    const storageUrl = `https://${accountName}.${config.AZURE_STORAGE_URL}`;
+
+    fetch(`${storageUrl}`, {
         method: 'GET',
         mode: 'no-cors',
         headers: {
