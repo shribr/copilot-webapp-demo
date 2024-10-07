@@ -192,6 +192,8 @@ function getDocuments() {
                     }).replace(',', '');
                     dateCell.textContent = formattedDate;
 
+                    //test
+
                     // Append the cells to the document row
                     documentRow.appendChild(previewCell);
                     documentRow.appendChild(statusCell);
