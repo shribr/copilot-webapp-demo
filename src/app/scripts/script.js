@@ -135,14 +135,74 @@ function getDocuments() {
             const xmlDoc = parser.parseFromString(data, "application/xml");
             const blobs = xmlDoc.getElementsByTagName("Blob");
 
-            // Iterate over the blobs and process them
-            const fileList = document.getElementById('file-list');
-            Array.from(blobs).forEach(blob => {
-                const blobName = blob.getElementsByTagName("Name")[0].textContent;
-                const listItem = document.createElement('li');
-                listItem.textContent = blobName;
-                fileList.appendChild(listItem);
-            });
+            // Get the document list and sample rows
+            const docList = document.getElementById('document-list');
+            const sampleRows = document.querySelectorAll('.document-row.sample');
+
+            // Clear existing document rows except the header
+            const existingRows = docList.querySelectorAll('.document-row:not(.header)');
+            existingRows.forEach(row => row.style.display = 'none');
+
+            if (blobs.length === 0) {
+                // Show sample rows if no results
+                sampleRows.forEach(row => row.style.display = '');
+            } else {
+                // Hide sample rows if there are results
+                sampleRows.forEach(row => row.style.display = 'none');
+
+                // Iterate over the blobs and process them
+                Array.from(blobs).forEach(blob => {
+                    const blobName = blob.getElementsByTagName("Name")[0].textContent;
+                    const lastModified = blob.getElementsByTagName("Last-Modified")[0].textContent;
+                    const contentType = blob.getElementsByTagName("Content-Type")[0].textContent;
+
+                    // Create the document row
+                    const documentRow = document.createElement('div');
+                    documentRow.className = 'document-row';
+
+                    // Create the document cells
+                    const previewCell = document.createElement('div');
+                    previewCell.className = 'document-cell';
+                    const previewButton = document.createElement('button');
+                    previewButton.textContent = 'Preview';
+                    previewCell.appendChild(previewButton);
+
+                    const statusCell = document.createElement('div');
+                    statusCell.className = 'document-cell';
+                    statusCell.textContent = 'Active';
+
+                    const nameCell = document.createElement('div');
+                    nameCell.className = 'document-cell';
+                    nameCell.textContent = blobName;
+
+                    const typeCell = document.createElement('div');
+                    typeCell.className = 'document-cell';
+                    typeCell.textContent = contentType;
+
+                    const dateCell = document.createElement('div');
+                    dateCell.className = 'document-cell';
+                    const formattedDate = new Date(lastModified).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    }).replace(',', '');
+                    dateCell.textContent = formattedDate;
+
+                    // Append the cells to the document row
+                    documentRow.appendChild(previewCell);
+                    documentRow.appendChild(statusCell);
+                    documentRow.appendChild(nameCell);
+                    documentRow.appendChild(typeCell);
+                    documentRow.appendChild(dateCell);
+
+                    // Append the document row to the document list
+                    docList.appendChild(documentRow);
+                });
+            }
         })
         .catch(error => console.error('Error:', error));
 }
