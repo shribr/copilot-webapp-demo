@@ -1267,11 +1267,11 @@ function Start-Deployment {
     # Start the timer
     $startTime = Get-Date
 
-    New-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
+    #New-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
 
     #Deploy-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
 
-    return
+    #return
 
     # Delete existing resource groups with the same name
     Remove-AzureResourceGroups
