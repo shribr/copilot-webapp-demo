@@ -252,6 +252,24 @@ label[for="chat-input"] {
     width: 100%
 }
 
+#clear-filter-button {
+    border: 1px solid #d3d3d3;
+    /* Light gray border */
+    background: none;
+    /* Ensure no background */
+    padding: 5px;
+    /* Add some padding */
+    cursor: pointer;
+    /* Change cursor to pointer */
+}
+
+#clear-filter-button svg {
+    color: #d3d3d3;
+    /* Light gray color */
+    fill: currentColor;
+    /* Use current text color */
+}
+
 #document-container .document {
     border: 1px solid #ccc;
     padding: 15px;
@@ -319,6 +337,8 @@ label[for="chat-input"] {
     display: flex;
     align-items: center;
     justify-content: space-between;
+        /* Ensure space between title and filter elements */
+
 }
 
 /* File upload styles */
@@ -468,13 +488,46 @@ label[for="chat-input"] {
     margin-top: 0;
 }
 
+#filter-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    /* Push the filter container to the right */
+}
+
 #filter-input {
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    margin-right: 4px;
+        /* Add 4px of padding between the input and the button */
 }
 
 #filter-input::placeholder {
     padding-left: 5px;
     /* Add padding to the placeholder text */
+}
+
+#clear-filter-button,
+#filter-button {
+    border: 1px solid #d3d3d3;
+    /* Light gray border */
+    background: none;
+    /* Ensure no background */
+    padding: 5px;
+    /* Add some padding */
+    cursor: pointer;
+    /* Change cursor to pointer */
+    color: #d3d3d3;
+    /* Light gray color */
+    border-radius: 4px;
+    /* Rounded corners */
+}
+
+#clear-filter-button svg,
+#filter-button svg {
+    fill: currentColor;
+    /* Use current text color */
+    stroke: currentColor;
+    /* Use current text color */
 }

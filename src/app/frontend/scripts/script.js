@@ -71,8 +71,21 @@ $(document).ready(function () {
     document.getElementById('filter-input').addEventListener('input', function (event) {
         const filterValue = event.target.value.toLowerCase();
         const documentRows = document.querySelectorAll('#document-list .document-row:not(.header)');
+        const clearFilterButton = document.getElementById('clear-filter-button');
+        const filterButton = document.getElementById('filter-button');
+
+        if (filterValue) {
+            clearFilterButton.style.display = 'block';
+            filterButton.style.display = 'none';
+        } else {
+            clearFilterButton.style.display = 'none';
+            filterButton.style.display = 'block';
+        }
 
         documentRows.forEach(row => {
+            if (row.style.display === 'none') {
+                return; // Skip hidden rows
+            }
             const nameCell = row.querySelector('.document-cell:nth-child(3)');
             if (nameCell.textContent.toLowerCase().includes(filterValue)) {
                 row.style.display = '';
@@ -80,6 +93,18 @@ $(document).ready(function () {
                 row.style.display = 'none';
             }
         });
+    });
+
+    document.getElementById('clear-filter-button').addEventListener('click', function () {
+        document.getElementById('filter-input').value = ''; // Clear the filter input
+        const documentRows = document.querySelectorAll('#document-list .document-row:not(.header)');
+        documentRows.forEach(row => {
+            if (!row.classList.contains('sample')) {
+                row.style.display = ''; // Reset the visibility of all rows except sample ones
+            }
+        });
+        this.style.display = 'none'; // Hide the clear filter button
+        document.getElementById('filter-button').style.display = 'block'; // Show the filter button
     });
 
     // Event listener for upload button
@@ -111,16 +136,17 @@ function getDocuments() {
     const ss = "bfqt";
     const srt = "sco";
     const sp = "rwdlacupiytfx";
-    const se = "2025-10-07T22:31:41Z";
-    const st = "2024-10-07T14:31:41Z";
+    const se = "2025-10-08T04:00:00Z";
+    const st = "2024-10-08T04:00:00Z";
     const spr = "https";
-    const sig = "";
+    const sig = "sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D";
     const comp = "list";
     const include = "metadata";
     const restype = "container";
 
+    //https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-10-08T04:00:00Z&st=2024-10-08T04:00:00Z&spr=https&sig=sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D
     // Construct the SAS token from the individual components
-    const sasToken = `comp=${comp}&include=${include}&restype=${restype}&sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+    const sasToken = `sv=${sv}&comp=${comp}&include=${include}&restype=${restype}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
 
@@ -304,13 +330,17 @@ async function uploadFilesToAzure(files) {
     const ss = "bfqt";
     const srt = "sco";
     const sp = "rwdlacupiytfx";
-    const se = "2025-10-08T10:38:04Z";
-    const st = "2024-10-08T02:38:04Z";
-    const spr = "https,http";
-    const sig = "";
+    const se = "2025-10-08T04:00:00Z";
+    const st = "2024-10-08T04:00:00Z";
+    const spr = "https";
+    const sig = "sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D";
+    const comp = "list";
+    const include = "metadata";
+    const restype = "container";
 
+    //https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-10-08T04:00:00Z&st=2024-10-08T04:00:00Z&spr=https&sig=sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D
     // Construct the SAS token from the individual components
-    const sasToken = `sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+    const sasToken = `sv=${sv}&comp=${comp}&include=${include}&restype=${restype}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
