@@ -1,7 +1,7 @@
 {
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_ACCOUNT_NAME": "stdcdaiprodpoc001",
-  "AZURE_SAS_TOKEN": "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D",
+  "AZURE_SAS_TOKEN": "",
   "AZURE_CONTAINER_NAME": "content",
   "AZURE_FUNCTION_APP_URL": "https://func-sastoken-dcdai-prod-poc-001.azurewebsites.net"
 }

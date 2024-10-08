@@ -105,8 +105,6 @@ function getDocuments() {
 
     const accountName = "stdcdaiprodpoc001";
     const azureStorageUrl = "blob.core.windows.net";
-    // https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-10-07T22:31:41Z&st=2024-10-07T14:31:41Z&spr=https&sig=SvTIXlua6ZxXuSPXnBSMdIpsGydM2kXq4F6a213pHOM%3D
-    //const sasToken = "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D";
     const containerName = "content";
 
     const sv = "2022-11-02";
@@ -116,7 +114,7 @@ function getDocuments() {
     const se = "2025-10-07T22:31:41Z";
     const st = "2024-10-07T14:31:41Z";
     const spr = "https";
-    const sig = "SvTIXlua6ZxXuSPXnBSMdIpsGydM2kXq4F6a213pHOM%3D";
+    const sig = "";
     const comp = "list";
     const include = "metadata";
     const restype = "container";
@@ -218,7 +216,7 @@ async function sendMessage() {
     displayMessage('User', userInput);
     $('#user-input').val('');
 
-    const apiKey = '2ae4f6606d43424da89d09c372406a7f';
+    const apiKey = '';
     const apiVersion = '2024-02-15-preview';
     const deploymentId = 'gpt-4o';
     const region = 'eastus';
@@ -228,7 +226,7 @@ async function sendMessage() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer 835bba103fea40c9adab54ee45dc6902'
+            'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({ message: userInput })
     });
@@ -300,7 +298,7 @@ async function uploadFilesToAzure(files) {
     const accountName = "stdcdaiprodpoc001";
     const azureStorageUrl = "blob.core.windows.net";
     const containerName = "content";
-    const accessKey = "7ICGZAi24IwTm2gtVPCj7wocAL+uhgVsPFYdLvUFOK/OfqoL1eOJOsABk2WwgdLkQGfYT58tbR4F+ASt6Va8cA==";
+    const accessKey = "7";
 
     const sv = "2022-11-02";
     const ss = "bfqt";
@@ -309,7 +307,7 @@ async function uploadFilesToAzure(files) {
     const se = "2025-10-08T10:38:04Z";
     const st = "2024-10-08T02:38:04Z";
     const spr = "https,http";
-    const sig = "iVt9fV1hFglxuh0GlDdPRmATOqrbwcCDUrAv%2BHVrUTM%3D";
+    const sig = "";
 
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sv}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
@@ -409,22 +407,4 @@ async function getSasToken() {
     }
     const data = await response.json();
     return data.sasToken;
-}
-
-function SearchDocuments() {
-    // Initialize and connect to your search service
-    var automagic = new AzSearch.Automagic({ index: "index-srch-dcdai-prod-poc-001", queryKey: "0JcqOThOtX0u0MefUDwzCtLsrrMUmOTP2RjikqhJ15AzSeCy8nR2", service: "srch-dcdai-prod-poc-001", dnsSuffix: "search.windows.net" });
-
-    const resultTemplate = `<div class="col-xs-12 col-sm-9 col-md-9"><h4>{{metadata_title}}</h4><div class="resultDescription">{{{content}}}</div></div>`;
-
-    // add a results view using the template defined above
-    automagic.addResults("results", { count: true }, resultTemplate);
-
-    // Adds a pager control << 1 2 3 ... >>
-    automagic.addPager("pager");
-
-    automagic.addSearchBox("searchBox");
-
-    // Adds a button to clear any applied filters
-    automagic.addClearFiltersButton("clearFilters");
 }
