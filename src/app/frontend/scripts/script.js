@@ -1,3 +1,5 @@
+//const { DefaultAzureCredential } = require("@azure/identity");
+//const { BlobServiceClient } = require("@azure/storage-blob");
 
 $(document).ready(function () {
 
@@ -355,6 +357,7 @@ async function uploadFilesToAzure(files) {
     clearFileInput();
 }
 
+/*
 // Function to upload files to Azure Blob Storage using the Azure JavaScript libraries
 async function uploadFilesToAzureUsingLibrary(files) {
     const accountName = "stdcdaiprodpoc001";
@@ -365,10 +368,10 @@ async function uploadFilesToAzureUsingLibrary(files) {
     const connectionString = `DefaultEndpointsProtocol=https;AccountName=${accountName};AccountKey=${accessKey};EndpointSuffix=core.windows.net`;
 
     // Create a BlobServiceClient
-    const blobClient = BlobServiceClient.fromConnectionString(connectionString);
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
 
     // Get a container client
-    const containerClient = blobClient.getContainerClient(containerName);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
 
     for (const file of files) {
         // Get a block blob client
@@ -386,6 +389,7 @@ async function uploadFilesToAzureUsingLibrary(files) {
     // Clear the file input after successful upload
     clearFileInput();
 }
+*/
 
 //code to clear file input
 function clearFileInput() {
