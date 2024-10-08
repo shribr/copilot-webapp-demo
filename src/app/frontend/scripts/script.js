@@ -355,40 +355,6 @@ async function uploadFilesToAzure(files) {
     clearFileInput();
 }
 
-/*
-// Function to upload files to Azure Blob Storage using the Azure JavaScript libraries
-async function uploadFilesToAzureUsingLibrary(files) {
-    const accountName = "stdcdaiprodpoc001";
-    const containerName = "content";
-    const accessKey = "7ICGZAi24IwTm2gtVPCj7wocAL+uhgVsPFYdLvUFOK/OfqoL1eOJOsABk2WwgdLkQGfYT58tbR4F+ASt6Va8cA=="; // Replace with your actual access key
-
-    // Construct the connection string
-    const connectionString = `DefaultEndpointsProtocol=https;AccountName=${accountName};AccountKey=${accessKey};EndpointSuffix=core.windows.net`;
-
-    // Create a BlobServiceClient
-    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-
-    // Get a container client
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-
-    for (const file of files) {
-        // Get a block blob client
-        const blockBlobClient = containerClient.getBlockBlobClient(file.name);
-
-        try {
-            // Upload the file
-            const uploadBlobResponse = await blockBlobClient.uploadBrowserData(file);
-            console.log(`Upload successful for ${file.name}. Request ID: ${uploadBlobResponse.requestId}`);
-        } catch (error) {
-            console.error(`Error uploading file ${file.name} to Azure Storage:`, error.message);
-        }
-    }
-
-    // Clear the file input after successful upload
-    clearFileInput();
-}
-*/
-
 //code to clear file input
 function clearFileInput() {
     const fileInput = document.getElementById('file-input');
