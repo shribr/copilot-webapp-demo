@@ -261,6 +261,7 @@ label[for="chat-input"] {
     /* Add some padding */
     cursor: pointer;
     /* Change cursor to pointer */
+    display: none;
 }
 
 #clear-filter-button svg {
@@ -530,4 +531,13 @@ label[for="chat-input"] {
     /* Use current text color */
     stroke: currentColor;
     /* Use current text color */
+}
+
+#document-list .document-row .content-type svg {
+    fill: currentColor;
+    /* Use current text color */
+    stroke: currentColor;
+    /* Use current text color */
+    color: #d3d3d3;
+    /* Light gray color */
 }

@@ -1,0 +1,29 @@
+{
+  "AZURE_STORAGE_URL": "blob.core.windows.net",
+  "AZURE_ACCOUNT_NAME": "stdcdaiprodpoc001",
+  "AZURE_SAS_TOKEN": "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D",
+  "AZURE_CONTAINER_NAME": "content",
+  "AZURE_FUNCTION_APP_URL": "https://func-sastoken-dcdai-prod-poc-001.azurewebsites.net",
+  "ACCOUNT_NAME": "stdcdaiprodpoc001",
+  "CONTAINER_NAME": "content",
+  "SAS_TOKEN": {
+    "SV": "2022-11-02",
+    "SS": "bfqt",
+    "SRT": "sco",
+    "SP": "rwdlacupiytfx",
+    "SE": "2025-10-08T04:00:00Z",
+    "ST": "2024-10-08T04:00:00Z",
+    "SPR": "https",
+    "SIG": "sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D",
+    "COMP": "list",
+    "INCLUDE": "metadata",
+    "RESTYPE": "container"
+  },
+  "FILE_EXTENSIONS": {
+    "PDF": [".pdf"],
+    "IMAGE": [".png", ".jpg", ".jpeg", ".gif", ".ico", ".jfif"],
+    "DOC": [".doc", ".docx"],
+    "EXCEL": [".xls", ".xlsx"],
+    "PPT": [".ppt", ".pptx"]
+  }
+}
