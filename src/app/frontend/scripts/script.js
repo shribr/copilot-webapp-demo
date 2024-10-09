@@ -1,4 +1,4 @@
-const iconStyle = "color";
+var iconStyle = "color";
 
 // Function to fetch the configuration
 async function fetchConfig() {
@@ -127,6 +127,38 @@ $(document).ready(function () {
             console.log('No files selected for upload.');
         }
     });
+
+    document.getElementById('link-settings').addEventListener('click', function (event) {
+        event.preventDefault();
+        iconStyle = iconStyle === 'monotone' ? 'color' : 'monotone';
+        const toggleDisplay = (elements) => {
+            for (let i = 0; i < elements.length; i++) {
+                const element = elements[i];
+                const currentDisplay = window.getComputedStyle(element).display;
+                element.style.display = currentDisplay === 'none' ? 'inline' : 'none';
+            }
+        };
+
+        const iconElements = document.getElementsByClassName('iconify');
+        const iconColorElements = document.getElementsByClassName('iconify-color');
+
+        toggleDisplay(iconElements);
+        toggleDisplay(iconColorElements);
+        // Handle settings click
+        console.log('Settings clicked');
+    });
+
+    document.getElementById('link-profile').addEventListener('click', function (event) {
+        event.preventDefault();
+        // Handle profile click
+        console.log('Profile clicked');
+    });
+
+    document.getElementById('link-help').addEventListener('click', function (event) {
+        event.preventDefault();
+        // Handle help click
+        console.log('Help clicked');
+    });
 });
 
 //code to get documents from Azure Storage
@@ -186,8 +218,8 @@ async function getDocuments() {
                     //const previewButton = document.createElement('button');
                     //previewButton.textContent = 'Preview';
                     //previewCell.appendChild(previewButton);
-                    const magStyle = iconStyle === 'color' ? `${config.MAGNIFYING_GLASS.COLOR}` : `${config.MAGNIFYING_GLASS.MONOTONE}`;
-                    previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${magStyle}</a>`;
+                    //const magStyle = iconStyle === 'color' ? `${config.MAGNIFYING_GLASS.COLOR}` : `${config.MAGNIFYING_GLASS.MONOTONE}`;
+                    previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.MAGNIFYING_GLASS.COLOR}${config.MAGNIFYING_GLASS.MONOTONE}</a>`;
 
                     const statusCell = document.createElement('div');
                     statusCell.className = 'document-cell preview';
@@ -208,7 +240,7 @@ async function getDocuments() {
                     for (const [key, value] of Object.entries(fileTypes)) {
                         const svgStyle = iconStyle === 'color' ? `${value.SVG_COLOR}` : `${value.SVG}`;
                         if (value.EXTENSION.some(ext => blobName.toLowerCase().endsWith(ext))) {
-                            contentTypeCell.innerHTML = `${svgStyle} ${contentType}`;
+                            contentTypeCell.innerHTML = `${value.SVG}${value.SVG_COLOR} ${contentType}`;
                             fileTypeFound = true;
                             break;
                         }
@@ -216,7 +248,7 @@ async function getDocuments() {
 
                     if (!fileTypeFound) {
                         const svgStyle = iconStyle === 'color' ? `${fileTypes.TXT.SVG_COLOR}` : `${fileTypes.TXT.SVG}`;
-                        contentTypeCell.innerHTML = `${svgStyle} ${contentType}`;
+                        contentTypeCell.innerHTML = `${fileTypes.TXT.SVG}${fileTypes.TXT.SVG_COLOR} ${contentType}`;
                         //contentTypeCell.textContent = contentType;
                     }
 

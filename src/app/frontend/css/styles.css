@@ -380,6 +380,16 @@ label[for="chat-input"] {
         margin-top: 10px;
 }
 
+.iconify
+{
+    display:none;
+}
+
+.iconify-color
+{
+    display: inline;
+}
+
 .file-label {
     margin-right: 10px;
     font-weight: bold;
@@ -390,6 +400,7 @@ label[for="chat-input"] {
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    display: none;
 }
 
 #file-list-container {
@@ -434,11 +445,6 @@ label[for="chat-input"] {
     color: #888;
     font-style: italic;
     text-align: center;
-}
-
-#file-upload {
-    display: flex;
-    align-items: center;
 }
 
 .custom-file-input {
@@ -545,10 +551,10 @@ label[for="chat-input"] {
 }
 
 #document-list .document-row .content-type svg {
-    fill: currentColor;
-    /* Use current text color */
+    
+    /*fill: currentColor;  
     stroke: currentColor;
-    /* Use current text color */
     color: #d3d3d3;
-    /* Light gray color */
+    */
+
 }
