@@ -12,6 +12,10 @@ body {
     background-color: #f4f4f9;
 }
 
+a {
+    color: rgba(13, 12, 52, 1);
+}
+
 /* Ensure the body takes the full viewport height and uses Flexbox */
 .flex-container {
     display: flex;
@@ -295,6 +299,13 @@ label[for="chat-input"] {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+}
+
+.preview {
+    text-align: center;
+    /*padding: 12px;*/
+    justify-content: center;
+    align-items: center;
 }
 
 .document-row.header .document-cell {
