@@ -11,7 +11,9 @@ $(document).ready(function () {
 
     getDocuments();
 
-    $('#send-button').on('click', sendMessage);
+    createSidenavLinks();
+
+    $('#send-button').on('click', submitQuestion);
 
     const screen = getQueryParam('screen');
     toggleDisplay(screen);
@@ -161,6 +163,106 @@ $(document).ready(function () {
     });
 });
 
+async function submitQuestion() {
+
+    const config = await fetchConfig();
+    const chatInput = document.getElementById('chat-input');
+    const chatDisplay = document.getElementById('chat-display');
+
+    // Retrieve the text from the input field
+    const message = chatInput.value.trim();
+
+    if (message) {
+        // Create a new chat bubble element
+        const chatBubble = document.createElement('div');
+        chatBubble.className = 'chat-bubble user';
+
+        // Create tabs
+        const tabs = document.createElement('div');
+        tabs.className = 'tabs';
+
+        // Loop through CHAT_TABS to create tabs dynamically
+        Object.entries(config.CHAT_TABS).forEach(([key, value], index) => {
+            const tab = document.createElement('div');
+            tab.className = `tab ${index === 0 ? 'active' : ''}`;
+            tab.innerHTML = `${value.SVG} ${value.TEXT}`;
+            tabs.appendChild(tab);
+        });
+
+        // Create tab contents
+        const answerContent = document.createElement('div');
+        answerContent.className = 'tab-content active';
+        answerContent.textContent = message;
+
+        const thoughtProcessContent = document.createElement('div');
+        thoughtProcessContent.className = 'tab-content';
+        thoughtProcessContent.textContent = 'Thought process content goes here.';
+
+        const supportingContentContent = document.createElement('div');
+        supportingContentContent.className = 'tab-content';
+        supportingContentContent.textContent = 'Supporting content goes here.';
+
+        // Append tabs and contents to chat bubble
+        chatBubble.appendChild(tabs);
+        chatBubble.appendChild(answerContent);
+        chatBubble.appendChild(thoughtProcessContent);
+        chatBubble.appendChild(supportingContentContent);
+
+        // Append the chat bubble to the chat-display div
+        chatDisplay.appendChild(chatBubble);
+
+        // Clear the input field
+        chatInput.value = '';
+
+        // Scroll to the bottom of the chat display
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+        // Add event listeners to tabs
+        const tabElements = tabs.querySelectorAll('.tab');
+        const tabContents = chatBubble.querySelectorAll('.tab-content');
+
+        tabElements.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                tabElements.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                tab.classList.add('active');
+                tabContents[index].classList.add('active');
+            });
+        });
+    }
+}
+
+async function createSidenavLinks() {
+    try {
+        const config = await fetchConfig();
+
+        const sidenav = document.getElementById('nav-container').querySelector('nav ul');
+        const sidenavLinks = Object.values(config.SIDEBAR_NAV_ITEMS);
+
+        // Debugging: Log the sidenavLinks to check its type and content
+        console.log('sidenavLinks:', sidenavLinks);
+
+        // Validate that sidenavLinks is an array
+        if (Array.isArray(sidenavLinks)) {
+            sidenavLinks.forEach(link => {
+                const sidenavItem = document.createElement('li');
+                const sidenavLink = document.createElement('a');
+
+                sidenavLink.href = link.URL;
+                sidenavLink.setAttribute('aria-label', link.TEXT);
+                sidenavLink.innerHTML = `${link.SVG} ${link.TEXT}`;
+                sidenavItem.appendChild(sidenavLink);
+                sidenav.appendChild(sidenavItem);
+            });
+        } else {
+            console.error('sidenavLinks is not an array:', sidenavLinks);
+        }
+    } catch (error) {
+        console.error('Failed to create sidenav links:', error);
+    }
+}
+
 //code to get documents from Azure Storage
 async function getDocuments() {
     const config = await fetchConfig();
@@ -177,13 +279,17 @@ async function getDocuments() {
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
 
     fetch(`${storageUrl}`, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            'Content-Type': 'text/xml',
+            'Cache-Control': 'no-cache'
+        }
     })
         .then(response => response.text())
         .then(data => {
             // Parse the XML response
             const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(data, "application/xml");
+            const xmlDoc = parser.parseFromString(data, "text/xml");
             const blobs = xmlDoc.getElementsByTagName("Blob");
 
             // Get the document list and sample rows
@@ -271,7 +377,7 @@ async function getDocuments() {
 }
 
 //code to send chat message to Azure Copilot
-async function sendMessage() {
+async function getAnswer() {
     const userInput = $('#chat-input').val();
     if (!userInput) return;
 
@@ -437,6 +543,7 @@ function clearFileInput() {
     updatePlaceholder(); // Update the placeholder text
 }
 
+//code to upload files to Azure Storage using Azure Storage JavaScript library
 async function getSasToken() {
     const sasFunctionAppUrl = config.AZURE_FUNCTION_APP_URL;
     const response = await fetch(`${sasFunctionAppUrl}`); // Assuming the Azure Function App endpoint is /api/getSasToken

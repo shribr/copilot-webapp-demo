@@ -26,40 +26,6 @@
         <div id="nav-container">
             <nav>
                 <ul>
-                    <li>
-                        <a href="?screen=home" class="nav-item">
-                            <svg width="28" height="28" fill="currentColor" class="bi bi-house" focusable="false"
-                                viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
-                            </svg>
-                            Home
-                        </a>
-                    </li>
-                    <li>
-                        <a href="?screen=documents" class="nav-item">
-                            <svg width="28" height="28" fill="currentColor" class="bi bi-file-earmark-text"
-                                focusable="false" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                                <path
-                                    d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2.06 11L15 15.28 12.06 17l.78-3.33-2.59-2.24 3.41-.29L15 8l1.34 3.14 3.41.29-2.59 2.24.78 3.33z">
-                                </path>
-                            </svg>
-                            Documents
-                        </a>
-                    </li>
-                    <li>
-                        <a href="?screen=chat" class="nav-item">
-                            <svg width="28" height="28" fill="currentColor" class="bi bi-file-earmark-text"
-                                focusable="false" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M0 0h24v24H0z" fill="none"></path>
-                                <path
-                                    d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z">
-                                </path>
-                            </svg>
-                            Chat
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </div>
@@ -75,8 +41,10 @@
                     </ul>
                     <div id="chat-display"></div>
                     <label for="chat-input">Prompt:</label>
-                    <input type="text" id="chat-input" placeholder="Type your message here" />
-                    <button id="send-button">Send</button>
+                    <div id="chat-input-container">
+                        <input type="text" id="chat-input" placeholder="Type your message here" />
+                        <button id="send-button">Send</button>
+                    </div>
                 </div>
             </div>
             <div id="document-container">
@@ -107,13 +75,6 @@
                         <div id="filter-container">
                             <input type="text" id="filter-input" placeholder="Filter by name" />
                             <button id="clear-filter-button" title="Clear Filter">
-                                <!--<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M3 4H21L14 12.5V19L10 21V12.5L3 4Z" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                    <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>-->
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -127,11 +88,6 @@
                                 </svg>
                             </button>
                             <button id="filter-button" title="Filter">
-                                <!--<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M3 4H21L14 12.5V19L10 21V12.5L3 4Z" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>-->
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
