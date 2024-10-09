@@ -553,8 +553,8 @@ label[for="chat-input"] {
 
 .chat-bubble {
   background-color: #87ceeb;
-  /* Sky blue color */
-
+  border-radius: 8px;
+  border: 1px solid #ddd;
   margin: 5px 0;
   /* Adjusted width */
   white-space: nowrap;
@@ -660,8 +660,8 @@ label[for="chat-input"] {
 
 svg {
   overflow: visible;
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
 }
 
 .tab.active svg {

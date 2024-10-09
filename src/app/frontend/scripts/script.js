@@ -245,16 +245,22 @@ async function createSidenavLinks() {
 
         // Validate that sidenavLinks is an array
         if (Array.isArray(sidenavLinks)) {
-            sidenavLinks.forEach(link => {
+            for (const [key, value] of Object.entries(config.SIDEBAR_NAV_ITEMS)) {
                 const sidenavItem = document.createElement('li');
                 const sidenavLink = document.createElement('a');
 
-                sidenavLink.href = link.URL;
-                sidenavLink.setAttribute('aria-label', link.TEXT);
-                sidenavLink.innerHTML = `${link.SVG} ${link.TEXT}`;
+                sidenavLink.href = value.URL;
+                sidenavLink.setAttribute('aria-label', value.TEXT);
+                sidenavLink.setAttribute('title', value.TEXT);
+                sidenavLink.setAttribute('data-tooltip', value.TEXT);
+                sidenavLink.setAttribute('id', `sidenav-item-${key}`);
+                sidenavLink.innerHTML = `${value.SVG} ${value.TEXT}`;
+
                 sidenavItem.appendChild(sidenavLink);
                 sidenav.appendChild(sidenavItem);
-            });
+
+                console.log(`Key: ${key}, Text: ${value.TEXT}`);
+            }
         } else {
             console.error('sidenavLinks is not an array:', sidenavLinks);
         }
