@@ -1,3 +1,5 @@
+const iconStyle = "color";
+
 // Function to fetch the configuration
 async function fetchConfig() {
     const response = await fetch('config.json');
@@ -184,7 +186,8 @@ async function getDocuments() {
                     //const previewButton = document.createElement('button');
                     //previewButton.textContent = 'Preview';
                     //previewCell.appendChild(previewButton);
-                    previewCell.innerHTML = `<svg width="24" align="center" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--twemoji" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="#9AAAB4" d="M27.388 24.642L24.56 27.47l-4.95-4.95l2.828-2.828z"></path><path fill="#66757F" d="M34.683 29.11l-5.879-5.879a2 2 0 0 0-2.828 0l-2.828 2.828a2 2 0 0 0 0 2.828l5.879 5.879a4 4 0 1 0 5.656-5.656z"></path><circle fill="#8899A6" cx="13.586" cy="13.669" r="13.5"></circle><circle fill="#BBDDF5" cx="13.586" cy="13.669" r="9.5"></circle></g></svg>`;
+                    const magStyle = iconStyle === 'color' ? `${config.MAGNIFYING_GLASS.COLOR}` : `${config.MAGNIFYING_GLASS.MONOTONE}`;
+                    previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${magStyle}</a>`;
 
                     const statusCell = document.createElement('div');
                     statusCell.className = 'document-cell preview';
@@ -203,15 +206,17 @@ async function getDocuments() {
 
                     let fileTypeFound = false;
                     for (const [key, value] of Object.entries(fileTypes)) {
+                        const svgStyle = iconStyle === 'color' ? `${value.SVG_COLOR}` : `${value.SVG}`;
                         if (value.EXTENSION.some(ext => blobName.toLowerCase().endsWith(ext))) {
-                            contentTypeCell.innerHTML = `${value.SVG_COLOR} ${contentType}`;
+                            contentTypeCell.innerHTML = `${svgStyle} ${contentType}`;
                             fileTypeFound = true;
                             break;
                         }
                     }
 
                     if (!fileTypeFound) {
-                        contentTypeCell.innerHTML = `${fileTypes.TXT.SVG_COLOR} ${contentType}`;
+                        const svgStyle = iconStyle === 'color' ? `${fileTypes.TXT.SVG_COLOR}` : `${fileTypes.TXT.SVG}`;
+                        contentTypeCell.innerHTML = `${svgStyle} ${contentType}`;
                         //contentTypeCell.textContent = contentType;
                     }
 
