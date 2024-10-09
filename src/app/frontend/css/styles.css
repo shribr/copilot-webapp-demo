@@ -552,9 +552,8 @@ label[for="chat-input"] {
 
 #document-list .document-row .content-type svg {
     
-    /*fill: currentColor;  
+    fill: currentColor;  
     stroke: currentColor;
     color: #d3d3d3;
-    */
 
 }
