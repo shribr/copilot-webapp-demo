@@ -46,9 +46,10 @@ a {
 #main-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /*align-items: center;*/
   margin: 20px;
   width: 100%;
+  padding: 10px;
 }
 
 /* Toolbar styles */
@@ -177,6 +178,10 @@ nav ul li a:hover {
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 #chat-display {
@@ -213,6 +218,18 @@ label[for="chat-input"] {
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #f9f9f9;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#chat-info-text-copy {
+  padding: 10px;
+}
+
+#chat-info-text-copy h2 {
+  flex: 1;
 }
 
 #chat-container button {
@@ -555,11 +572,13 @@ label[for="chat-input"] {
   background-color: #87ceeb;
   border-radius: 8px;
   border: 1px solid #ddd;
-  margin: 5px 0;
+  margin: 5px 0px 30px 0px;
   /* Adjusted width */
   white-space: nowrap;
   position: relative;
-  min-height: 300px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-bubble.user {
@@ -584,7 +603,7 @@ label[for="chat-input"] {
 
 .tab {
   cursor: pointer;
-  padding: 10px;
+  padding: 10px 20px 10px 10px;
   /*border-radius: 5px 5px 0 0;*/
   display: flex;
   align-items: center;
@@ -612,20 +631,22 @@ label[for="chat-input"] {
 }
 
 .tab-content {
+  flex: 1;
   display: none;
 }
 
 .tab-content.active {
   display: block;
-  padding: 20px 0px 0px 20px;
+  padding: 20px;
   border-top: 1px solid #d3d3d3;
-
+  background-color: white;
+  height: 100%;
   /*margin-top: 10px; */
   /* Added margin-top for the content */
 }
 
 #chat-input-container {
-  display: flex;
+  /*display: flex;*/
   padding: 10px;
   border-top: 1px solid #ddd;
 }
@@ -638,15 +659,14 @@ label[for="chat-input"] {
   margin-right: 10px;
 }
 
-/*
-#send-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #007bff;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-}*/
+#chat-input-prompt-label {
+  padding: 2px;
+}
+
+#chat-input-prompt-textbox {
+  display: flex;
+  padding-right: 19px;
+}
 
 #send-button:hover {
   background-color: #0056b3;
