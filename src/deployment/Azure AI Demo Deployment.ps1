@@ -48,6 +48,36 @@
     # 15. functionAppName
     # 16. openAIName
     # 17. documentIntelligenceName
+    # 18. virtualNetworkName
+    # 19. subnetName
+    # 20. networkSecurityGroupName
+    # 21. publicIpAddressName
+    # 22. networkInterfaceName
+    # 23. virtualMachineName
+    # 24. virtualMachineSize
+    # 25. adminUsername
+    # 26. adminPassword
+    # 27. osDiskName
+    # 28. osDiskSize
+    # 29. dataDiskName
+    # 30. dataDiskSize
+    # 31. availabilitySetName
+    # 32. loadBalancerName
+    # 33. backendPoolName
+    # 34. healthProbeName
+    # 35. loadBalancingRuleName
+    # 36. inboundNatRuleName
+    # 37. applicationGatewayName
+    # 38. gatewayIpConfigName
+    # 39. frontendIpConfigName
+    # 40. frontendPortName
+    # 41. backendAddressPoolName
+    # 42. httpSettingsName
+    # 43. requestRoutingRuleName
+    # 44. sslCertificateName
+    # 45. autoscaleSettingName
+    # 46. scaleRuleName
+    # 47. actionGroupName
 
 .EXAMPLE
     .\Azure\ AI\ Demo\ Deployment.ps1 -parametersFile "myParameters.json"

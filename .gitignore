@@ -10,6 +10,7 @@
 node_modules
 dist
 app/dist
+.vscode
 node_modules/.package-lock.json
 node_modules/@parcel/core/node_modules/dotenv/CHANGELOG.md
 node_modules/@parcel/core/node_modules/dotenv/config.js
