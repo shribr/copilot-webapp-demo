@@ -166,19 +166,37 @@ $(document).ready(function () {
 async function postQuestion() {
 
     const config = await fetchConfig();
-    const chatInput = document.getElementById('chat-input');
+    let chatInput = document.getElementById('chat-input').value;
     const chatDisplay = document.getElementById('chat-display');
     const dateTimestamp = new Date().toLocaleString();
 
-    // Create a new div for the chat bubble
-    const chatBubble = document.createElement('div');
-    chatBubble.innerHTML = `Question: "${chatInput.value}"<br/><span style="font-size: 10px; padding: 12px 0px 0px 4px; color: black;">${dateTimestamp}</span>`;
+    // Check if chatInput ends with a question mark, if not, add one
+    if (!chatInput.trim().endsWith('?')) {
+        chatInput += '?';
+    }
 
-    // Set styles for the chat bubble
-    chatBubble.setAttribute('class', 'question-Bubble');
+    // Create a new div for the chat bubble
+    const questionBubble = document.createElement('div');
+    questionBubble.setAttribute('class', 'question-bubble');
+
+    const svg = document.createElement("div");
+    svg.className = 'question-bubble-svg';
+    svg.innerHTML = config.ICONS.QUESTION_MARK.SVG;
+
+    const questionText = document.createElement("div");
+    questionText.className = "question-bubble-text";
+    questionText.innerHTML = `Question: "${chatInput}"`;
+
+    const dateText = document.createElement("div");
+    dateText.className = "question-bubble-date";
+    dateText.innerHTML = `Date: ${dateTimestamp}`;
+
+    questionBubble.appendChild(svg);
+    questionBubble.appendChild(questionText);
+    questionBubble.appendChild(dateText);
 
     // Append the chat bubble to the chat-info div
-    chatDisplay.appendChild(chatBubble);
+    chatDisplay.appendChild(questionBubble);
 
     showResponse();
 }

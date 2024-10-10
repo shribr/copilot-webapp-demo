@@ -566,22 +566,43 @@ label[for="chat-input"] {
 
 /* NEW CHAT BUBBLE STYLES */
 
-.question-Bubble {
+.question-bubble {
   display: flex;
   flex-direction: column;
   position: relative;
   top: 10px;
   right: 10px;
-  padding: 10px;
+  padding: 32px;
   margin-bottom: 20px;
   background-color: #ffe699;
   border-radius: 4px;
   font-size: 12px;
-  width: 200px;
+  width: fit-content;
   font-size: 14px;
   font-style: italic;
   border: 1px solid #e0dbcd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.question-bubble-svg {
+  position: relative;
+  top: -20px;
+  right: 20px;
+}
+
+.question-bubble-date {
+  font-size: 12px;
+  font-style: italic;
+  padding: 12px 0px 0px 24px;
+  color: black;
+  width: initial;
+  text-align: right;
+}
+
+.question-bubble-text {
+  font-size: 16px;
+  font-style: italic;
+  color: black;
 }
 
 .chat-bubble {
