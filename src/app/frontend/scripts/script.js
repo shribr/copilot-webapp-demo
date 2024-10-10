@@ -223,6 +223,10 @@ async function postQuestion() {
     // Append the chat bubble to the chat-info div
     chatDisplay.appendChild(questionBubble);
 
+    // Scroll to the position right above the newest questionBubble
+    const questionBubbleTop = questionBubble.offsetTop;
+    chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
     showResponse();
 }
 
@@ -279,8 +283,9 @@ async function showResponse() {
         // Clear the input field
         chatInput.value = '';
 
-        // Scroll to the bottom of the chat display
-        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+        // Scroll to the position right above the newest questionBubble
+        const questionBubbleTop = chatBubble.offsetTop;
+        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
         // Add event listeners to tabs
         const tabElements = tabs.querySelectorAll('.tab');
@@ -297,7 +302,7 @@ async function showResponse() {
         });
 
         // Scroll to the top of the chat display
-        chatDisplay.scrollTop = 0;
+        //chatDisplay.scrollTop = 0;
     }
 }
 
