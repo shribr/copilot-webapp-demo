@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     createSidenavLinks();
 
-    $('#send-button').on('click', submitQuestion);
+    $('#send-button').on('click', postQuestion);
 
     const screen = getQueryParam('screen');
     toggleDisplay(screen);
@@ -163,7 +163,27 @@ $(document).ready(function () {
     });
 });
 
-async function submitQuestion() {
+async function postQuestion() {
+
+    const config = await fetchConfig();
+    const chatInput = document.getElementById('chat-input');
+    const chatDisplay = document.getElementById('chat-display');
+    const dateTimestamp = new Date().toLocaleString();
+
+    // Create a new div for the chat bubble
+    const chatBubble = document.createElement('div');
+    chatBubble.innerHTML = `Question: "${chatInput.value}"<br/><span style="font-size: 10px; padding: 12px 0px 0px 4px; color: black;">${dateTimestamp}</span>`;
+
+    // Set styles for the chat bubble
+    chatBubble.setAttribute('class', 'questionBubble');
+
+    // Append the chat bubble to the chat-info div
+    chatDisplay.appendChild(chatBubble);
+
+    showResponse();
+}
+
+async function showResponse() {
 
     const config = await fetchConfig();
     const chatInput = document.getElementById('chat-input');
@@ -173,6 +193,9 @@ async function submitQuestion() {
     const message = chatInput.value.trim();
 
     if (message) {
+
+        const response = await getAnswer(message);
+
         // Create a new chat bubble element
         const chatBubble = document.createElement('div');
         chatBubble.className = 'chat-bubble user';
@@ -231,6 +254,34 @@ async function submitQuestion() {
             });
         });
     }
+}
+
+//code to send chat message to Azure Copilot
+async function getAnswer() {
+    const userInput = $('#chat-input').val();
+    if (!userInput) return;
+
+    //displayMessage('User', userInput);
+    $('#user-input').val('');
+
+    const apiKey = '';
+    const apiVersion = '2024-02-15-preview';
+    const deploymentId = 'gpt-4o';
+    const region = 'eastus';
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}&api-key=${apiKey}`;
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({ message: userInput })
+    });
+
+    const data = await response.json();
+    return data.reply;
+    //displayMessage('Azure Copilot', data.reply);
 }
 
 async function createSidenavLinks() {
@@ -380,41 +431,6 @@ async function getDocuments() {
                 });
             }
         });
-}
-
-//code to send chat message to Azure Copilot
-async function getAnswer() {
-    const userInput = $('#chat-input').val();
-    if (!userInput) return;
-
-    displayMessage('User', userInput);
-    $('#user-input').val('');
-
-    const apiKey = '';
-    const apiVersion = '2024-02-15-preview';
-    const deploymentId = 'gpt-4o';
-    const region = 'eastus';
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}&api-key=${apiKey}`;
-
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({ message: userInput })
-    });
-
-    const data = await response.json();
-    displayMessage('Azure Copilot', data.reply);
-}
-
-//code to display chat messages
-function displayMessage(sender, message) {
-    const chatDisplay = $('#chat-display');
-    const messageElement = $('<div>').text(`${sender}: ${message}`);
-    chatDisplay.append(messageElement);
-    chatDisplay.scrollTop(chatDisplay[0].scrollHeight);
 }
 
 //code to toggle between chat and document screens

@@ -568,6 +568,23 @@ label[for="chat-input"] {
 
 /* NEW CHAT BUBBLE STYLES */
 
+.questionBubble {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: pink;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 200px;
+  font-size: 14px;
+  font-style: italic;
+  /*white-space: nowrap;*/
+}
+
 .chat-bubble {
   background-color: #87ceeb;
   border-radius: 8px;
