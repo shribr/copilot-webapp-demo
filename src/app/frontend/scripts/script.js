@@ -138,6 +138,24 @@ $(document).ready(function () {
 
     document.getElementById('link-settings').addEventListener('click', function (event) {
         event.preventDefault();
+
+        const settingsDialog = document.getElementById('settings-dialog');
+        if (settingsDialog.style.display === 'none' || settingsDialog.style.display === '') {
+            settingsDialog.style.display = 'block';
+        } else {
+            settingsDialog.style.display = 'none';
+        }
+
+        // Handle settings click
+        console.log('Settings clicked');
+
+
+    });
+
+    document.getElementById('toggle-icons').addEventListener('change', function () {
+        const iconElements = document.getElementsByClassName('iconify');
+        const iconColorElements = document.getElementsByClassName('iconify-color');
+
         iconStyle = iconStyle === 'monotone' ? 'color' : 'monotone';
         const toggleDisplay = (elements) => {
             for (let i = 0; i < elements.length; i++) {
@@ -147,13 +165,8 @@ $(document).ready(function () {
             }
         };
 
-        const iconElements = document.getElementsByClassName('iconify');
-        const iconColorElements = document.getElementsByClassName('iconify-color');
-
         toggleDisplay(iconElements);
         toggleDisplay(iconColorElements);
-        // Handle settings click
-        console.log('Settings clicked');
     });
 
     document.getElementById('link-profile').addEventListener('click', function (event) {
@@ -166,6 +179,22 @@ $(document).ready(function () {
         event.preventDefault();
         // Handle help click
         console.log('Help clicked');
+    });
+
+    document.getElementById('close-settings-dialog').addEventListener('click', function () {
+        document.getElementById('settings-dialog').style.display = 'none';
+    });
+
+    document.getElementById('datasources-header').addEventListener('click', function () {
+        const content = document.getElementById('datasources-content');
+        const arrow = document.querySelector('.accordion-arrow');
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            arrow.innerHTML = '&#9650;'; // Up arrow
+        } else {
+            content.style.display = 'none';
+            arrow.innerHTML = '&#9660;'; // Down arrow
+        }
     });
 });
 

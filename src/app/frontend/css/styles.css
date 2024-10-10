@@ -249,6 +249,105 @@ label[for="chat-input"] {
   background-color: #0056b3;
 }
 
+/* Add this to your CSS file or within a <style> tag in your HTML */
+#settings-dialog {
+  display: none;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 400px; /* Increased width */
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#close-settings-dialog {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input[type="checkbox"],
+.form-group input[type="radio"] {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.form-group label[for="use-semantic-ranker"],
+.form-group label[for="use-query-contextual-summaries"],
+.form-group label[for="retrieval-mode-text"],
+.form-group label[for="retrieval-mode-hybrid"],
+.form-group label[for="retrieval-mode-vector"] {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.form-group-flex {
+  display: flex;
+  align-items: center;
+}
+
+.form-group-flex > div {
+  margin-right: 10px;
+}
+
+#color-palette {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.form-group-flex label {
+  flex: 1;
+}
+
+.accordion {
+  border-top: 1px solid #ccc;
+  margin-top: 20px;
+  padding-top: 10px;
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 10px 0;
+}
+
+.accordion-arrow {
+  transition: transform 0.3s ease;
+}
+
+.accordion-content {
+  display: none;
+  padding: 10px 0;
+}
+
+.accordion-content .form-group {
+  margin-bottom: 10px;
+}
+
+.accordion-content .form-group label {
+  margin-bottom: 0;
+}
 #send-button {
   padding: 10px 20px;
   background-color: #0078d4;
