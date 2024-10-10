@@ -200,6 +200,11 @@ async function postQuestion() {
         chatInput += '?';
     }
 
+    // Capitalize the first letter if it is not already capitalized
+    if (chatInput.length > 0 && chatInput[0] !== chatInput[0].toUpperCase()) {
+        chatInput = chatInput[0].toUpperCase() + chatInput.slice(1);
+    }
+
     // Create a new div for the chat bubble
     const questionBubble = document.createElement('div');
     questionBubble.setAttribute('class', 'question-bubble');
