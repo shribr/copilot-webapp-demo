@@ -51,3 +51,9 @@ node_modules/.package-lock.json
 .parcel-cache/6ed9d37aa0633dad-BundleGraph-0
 .parcel-cache/c6f057f92782afb7-AssetGraph-0
 .parcel-cache/data.mdb
+.DS_Store
+.DS_Store
+src/.DS_Store
+src/app/.DS_Store
+src/app/backend/.DS_Store
+src/app/backend/functions/.DS_Store
