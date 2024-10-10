@@ -210,6 +210,12 @@ label[for="chat-input"] {
   /* Adjust the padding as needed */
 }
 
+#chat-display-container {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
 #chat-info {
   margin-bottom: 20px;
   padding: 10px;
@@ -613,7 +619,6 @@ label[for="chat-input"] {
   border-radius: 4px;
   white-space: nowrap;
   position: relative;
-  height: 100%;
   display: flex;
   flex-direction: column;
 }

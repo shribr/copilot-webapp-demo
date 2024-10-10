@@ -9,6 +9,11 @@ async function fetchConfig() {
 
 $(document).ready(function () {
 
+    setChatDisplayHeight();
+
+    // Add an event listener to adjust the height on window resize
+    window.addEventListener('resize', setChatDisplayHeight);
+
     getDocuments();
 
     createSidenavLinks();
@@ -162,6 +167,19 @@ $(document).ready(function () {
         console.log('Help clicked');
     });
 });
+
+function setChatDisplayHeight() {
+    const chatDisplayContainer = document.getElementById('chat-display-container');
+    const chatInfoTextCopy = document.getElementById('chat-info-text-copy');
+
+    const windowHeight = window.innerHeight - (chatInfoTextCopy.offsetHeight + 200);
+
+    // Calculate the desired height (e.g., 80% of the window height)
+    const desiredHeight = windowHeight * 0.7;
+
+    // Set the height of the chat-display-container
+    chatDisplayContainer.style.height = `${desiredHeight}px`;
+}
 
 async function postQuestion() {
 
