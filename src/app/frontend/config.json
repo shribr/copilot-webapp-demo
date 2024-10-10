@@ -6,6 +6,10 @@
   "AZURE_FUNCTION_APP_URL": "https://func-sastoken-dcdai-prod-poc-001.azurewebsites.net",
   "ACCOUNT_NAME": "stdcdaiprodpoc001",
   "CONTAINER_NAME": "content",
+  "OPEN_AI_KEY": "ea203506bc3a4b0e92ad90cbf0455522",
+  "API_VERSION": "2024-02-15-preview",
+  "DEPLOYMENT_ID": "gpt-4o",
+  "REGION": "eastus",
   "SAS_TOKEN": {
     "SV": "2022-11-02",
     "SS": "bfqt",
@@ -95,5 +99,30 @@
       "SVG": "<svg fill=\"currentColor\" class=\"sidenav link\" focusable=\"false\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M0 0h24v24H0z\" fill=\"none\"></path><path d=\"M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z\"></path></svg>",
       "URL": "?screen=chat"
     }
+  },
+  "AI_REQUEST_BODY": {
+    "messages": [
+      {
+        "role": "system",
+        "content": [
+          {
+            "type": "text",
+            "text": "You are an AI assistant that helps people find information."
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "tell me about cnn"
+          }
+        ]
+      }
+    ],
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "max_tokens": 800
   }
 }

@@ -568,7 +568,7 @@ label[for="chat-input"] {
 
 /* NEW CHAT BUBBLE STYLES */
 
-.questionBubble {
+.question-Bubble {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -576,13 +576,14 @@ label[for="chat-input"] {
   right: 10px;
   padding: 10px;
   margin-bottom: 20px;
-  background-color: pink;
+  background-color: #ffe699;
   border-radius: 4px;
   font-size: 12px;
   width: 200px;
   font-size: 14px;
   font-style: italic;
-  /*white-space: nowrap;*/
+  border: 1px solid #e0dbcd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .chat-bubble {
@@ -590,7 +591,7 @@ label[for="chat-input"] {
   border-radius: 8px;
   border: 1px solid #ddd;
   margin: 5px 0px 30px 0px;
-  /* Adjusted width */
+  border-radius: 4px;
   white-space: nowrap;
   position: relative;
   height: 100%;
@@ -614,7 +615,7 @@ label[for="chat-input"] {
   background-color: #87ceeb;
   padding: 10px 10px 0px 10px;
   /* Same color as chat bubble */
-  /*border-radius: 10px 10px 0 0;*/
+  border-radius: 10px 10px 0 0;
   /* Line between tabs and content */
 }
 

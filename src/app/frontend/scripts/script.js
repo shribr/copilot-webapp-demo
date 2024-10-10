@@ -175,7 +175,7 @@ async function postQuestion() {
     chatBubble.innerHTML = `Question: "${chatInput.value}"<br/><span style="font-size: 10px; padding: 12px 0px 0px 4px; color: black;">${dateTimestamp}</span>`;
 
     // Set styles for the chat bubble
-    chatBubble.setAttribute('class', 'questionBubble');
+    chatBubble.setAttribute('class', 'question-Bubble');
 
     // Append the chat bubble to the chat-info div
     chatDisplay.appendChild(chatBubble);
@@ -186,15 +186,14 @@ async function postQuestion() {
 async function showResponse() {
 
     const config = await fetchConfig();
-    const chatInput = document.getElementById('chat-input');
+    const chatInput = document.getElementById('chat-input').value.trim();
     const chatDisplay = document.getElementById('chat-display');
 
     // Retrieve the text from the input field
-    const message = chatInput.value.trim();
 
-    if (message) {
+    if (chatInput) {
 
-        const response = await getAnswer(message);
+        const response = await getAnswer(chatInput);
 
         // Create a new chat bubble element
         const chatBubble = document.createElement('div');
@@ -215,7 +214,7 @@ async function showResponse() {
         // Create tab contents
         const answerContent = document.createElement('div');
         answerContent.className = 'tab-content active';
-        answerContent.textContent = message;
+        answerContent.textContent = response.choices[0].message.content;
 
         const thoughtProcessContent = document.createElement('div');
         thoughtProcessContent.className = 'tab-content';
@@ -257,30 +256,37 @@ async function showResponse() {
 }
 
 //code to send chat message to Azure Copilot
-async function getAnswer() {
-    const userInput = $('#chat-input').val();
+async function getAnswer(userInput) {
+
     if (!userInput) return;
 
-    //displayMessage('User', userInput);
-    $('#user-input').val('');
+    //$('#user-input').val('');
 
-    const apiKey = '';
-    const apiVersion = '2024-02-15-preview';
-    const deploymentId = 'gpt-4o';
-    const region = 'eastus';
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}&api-key=${apiKey}`;
+    const config = await fetchConfig();
+
+    const apiKey = config.OPEN_AI_KEY;
+    const apiVersion = config.API_VERSION;
+    const deploymentId = config.DEPLOYMENT_ID;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
+
+    const userMessageContent = config.AI_REQUEST_BODY.messages.find(message => message.role === 'user').content[0];
+    userMessageContent.text = userInput;
+
+    const jsonString = JSON.stringify(config.AI_REQUEST_BODY);
 
     const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+            'api-key': `${apiKey}`
         },
-        body: JSON.stringify({ message: userInput })
+        body: jsonString
     });
 
     const data = await response.json();
-    return data.reply;
+
+    return data;
     //displayMessage('Azure Copilot', data.reply);
 }
 
