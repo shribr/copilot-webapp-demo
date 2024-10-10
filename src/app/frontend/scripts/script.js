@@ -19,6 +19,7 @@ $(document).ready(function () {
     createSidenavLinks();
 
     $('#send-button').on('click', postQuestion);
+    $('#clear-button').on('click', clearChatDisplay);
 
     const screen = getQueryParam('screen');
     toggleDisplay(screen);
@@ -168,6 +169,12 @@ $(document).ready(function () {
     });
 });
 
+// Function to clear the chat display
+function clearChatDisplay() {
+    const chatDisplay = document.getElementById('chat-display');
+    chatDisplay.innerHTML = ''; // Clear all content
+}
+
 function setChatDisplayHeight() {
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatInfoTextCopy = document.getElementById('chat-info-text-copy');
@@ -288,6 +295,9 @@ async function showResponse() {
                 tabContents[index].classList.add('active');
             });
         });
+
+        // Scroll to the top of the chat display
+        chatDisplay.scrollTop = 0;
     }
 }
 
