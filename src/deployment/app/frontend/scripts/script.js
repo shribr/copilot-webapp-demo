@@ -287,7 +287,7 @@ async function showResponse() {
 
     if (chatInput) {
 
-        const response = await getAnswer(chatInput);
+        const response = await getAnswers(chatInput);
         //const response = await getAnswersFromAzureSearch(chatInput);
 
         // Create a new chat bubble element
