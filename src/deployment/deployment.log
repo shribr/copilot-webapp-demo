@@ -1,153 +1,30 @@
 *** LOG SEQUENCE: 1 ***
-2024-10-11 02:40:51 - Storage account 'stcopilotdemo001' created.
-2024-10-11 02:41:06 - App Service Plan 'asp-copilot-demo-001' created.
-2024-10-11 02:41:13 - Search Service 'srch-copilot-demo-001' created.
+2024-10-11 17:27:25 - Storage account 'stcopilotdemo001' already exists.
+2024-10-11 17:27:25 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - Search Service 'srch-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - Identity 'id-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-10-11 17:27:25 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-10-11 17:27:34 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-11 17:27:40 - webApp app 'app-copilot-demo-001' deployed successfully.
+2024-10-11 17:27:45 - functionApp app 'func-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-11 17:28:11 - functionApp app 'func-copilot-demo-001' deployed successfully.
 *** LOG SEQUENCE: 2 ***
-2024-10-11 02:45:43 - Storage account 'stcopilotdemo001' created.
-2024-10-11 02:45:57 - App Service Plan 'asp-copilot-demo-001' created.
-2024-10-11 02:46:00 - Search Service 'srch-copilot-demo-001' created.
-2024-10-11 02:47:58 - Search Service datasource 'search-datasource-copilot-demo-001' for 'srch-copilot-demo-001' created.
-2024-10-11 02:48:29 - Search Service index 'searchIndexName' for 'srch-copilot-demo-001' created.
-2024-10-11 02:48:34 - Log Analytics Workspace 'log-copilot-demo-001' created.
-2024-10-11 02:48:38 - Application Insights component 'appi-copilot-demo-001' created.
-2024-10-11 02:48:41 - Cognitive Services account 'cog-copilot-demo-001' created.
-2024-10-11 02:48:44 - User Assigned Identity 'id-copilot-demo-001' created.
-2024-10-11 02:48:47 - User 'id-copilot-demo-001' assigned to role: 'Contributor'.
-2024-10-11 02:48:51 - User 'id-copilot-demo-001' assigned to role: 'Cognitive Services OpenAI User'.
-2024-10-11 02:48:55 - User 'id-copilot-demo-001' assigned to role: 'Search Index Data Reader'.
-2024-10-11 02:48:58 - User 'id-copilot-demo-001' assigned to role: 'Storage Blob Data Reader'.
-2024-10-11 02:49:02 - Key Vault: 'kv-copilot-demo-001' created with Vault Access Policies.
-2024-10-11 02:49:03 - Key Vault 'kv-copilot-demo-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-*** LOG SEQUENCE: 3 ***
-2024-10-11 02:58:36 - Storage account 'stcopilotdemo001' created.
-*** LOG SEQUENCE: 4 ***
-2024-10-11 02:59:13 - Storage account 'stcopilotdemo001' created.
-2024-10-11 02:59:28 - App Service Plan 'asp-copilot-demo-001' created.
-2024-10-11 02:59:34 - Search Service 'srch-copilot-demo-001' created.
-*** LOG SEQUENCE: 5 ***
-2024-10-11 03:03:31 - Storage account 'stcopilotdemo001' created.
-2024-10-11 03:03:47 - App Service Plan 'asp-copilot-demo-001' created.
-2024-10-11 03:03:54 - Search Service 'srch-copilot-demo-001' created.
-2024-10-11 03:05:39 - Search Service datasource 'search-datasource-copilot-demo-001' for 'srch-copilot-demo-001' created.
-2024-10-11 03:05:48 - Search Service index 'searchIndexName' for 'srch-copilot-demo-001' created.
-2024-10-11 03:05:52 - Log Analytics Workspace 'log-copilot-demo-001' created.
-2024-10-11 03:05:58 - Application Insights component 'appi-copilot-demo-001' created.
-2024-10-11 03:06:14 - Cognitive Services account 'cog-copilot-demo-001' created.
-2024-10-11 03:06:30 - User Assigned Identity 'id-copilot-demo-001' created.
-2024-10-11 03:07:13 - User 'id-copilot-demo-001' assigned to role: 'Contributor'.
-2024-10-11 03:07:16 - User 'id-copilot-demo-001' assigned to role: 'Cognitive Services OpenAI User'.
-2024-10-11 03:07:19 - User 'id-copilot-demo-001' assigned to role: 'Search Index Data Reader'.
-2024-10-11 03:07:21 - User 'id-copilot-demo-001' assigned to role: 'Storage Blob Data Reader'.
-2024-10-11 03:07:57 - Key Vault: 'kv-copilot-demo-001' created with Vault Access Policies.
-2024-10-11 03:07:59 - Key Vault 'kv-copilot-demo-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-*** LOG SEQUENCE: 6 ***
-2024-10-11 03:14:36 - Storage account 'stcopilotdemo001' created.
-2024-10-11 03:14:52 - App Service Plan 'asp-copilot-demo-001' created.
-2024-10-11 03:15:00 - Search Service 'srch-copilot-demo-001' created.
-2024-10-11 03:15:05 - Log Analytics Workspace 'log-copilot-demo-001' created.
-2024-10-11 03:15:09 - Application Insights component 'appi-copilot-demo-001' created.
-2024-10-11 03:15:14 - Cognitive Services account 'cog-copilot-demo-001' created.
-2024-10-11 03:15:17 - User Assigned Identity 'id-copilot-demo-001' created.
-2024-10-11 03:15:19 - User 'id-copilot-demo-001' assigned to role: 'Contributor'.
-2024-10-11 03:15:20 - User 'id-copilot-demo-001' assigned to role: 'Cognitive Services OpenAI User'.
-2024-10-11 03:15:23 - User 'id-copilot-demo-001' assigned to role: 'Search Index Data Reader'.
-2024-10-11 03:15:27 - User 'id-copilot-demo-001' assigned to role: 'Storage Blob Data Reader'.
-2024-10-11 03:15:31 - Key Vault: 'kv-copilot-demo-001' created with Vault Access Policies.
-2024-10-11 03:15:32 - Key Vault 'kv-copilot-demo-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-2024-10-11 03:15:33 - Key Vault 'kv-copilot-demo-001' policy permissions set for application: 'id-copilot-demo-001'.
-2024-10-11 03:15:39 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:15:45 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:15:51 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:15:57 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:16:03 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:16:09 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:16:14 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:16:20 - Secret: 'UseAOAI' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:16:26 - Secret: 'UseVision' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 03:17:01 - Azure OpenAI account 'openai-copilot-demo-001' created.
-2024-10-11 03:18:05 - Document Intelligence account 'docintel-copilot-demo-001' created.
-*** LOG SEQUENCE: 7 ***
-*** LOG SEQUENCE: 8 ***
-*** LOG SEQUENCE: 9 ***
-*** LOG SEQUENCE: 10 ***
-*** LOG SEQUENCE: 11 ***
-*** LOG SEQUENCE: 12 ***
-*** LOG SEQUENCE: 13 ***
-*** LOG SEQUENCE: 14 ***
-*** LOG SEQUENCE: 15 ***
-*** LOG SEQUENCE: 16 ***
-*** LOG SEQUENCE: 17 ***
-2024-10-11 04:21:32 - Key Vault: 'kv-copilot-demo-001' created with Vault Access Policies.
-2024-10-11 04:21:39 - Key Vault 'kv-copilot-demo-001' policy permissions set for user: 'amschrei@FedAIRS.onmicrosoft.com'.
-2024-10-11 04:21:44 - Key Vault 'kv-copilot-demo-001' policy permissions set for application: 'id-copilot-demo-001'.
-2024-10-11 04:21:47 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:48 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:50 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:51 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:53 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:54 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:55 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:56 - Secret: 'UseAOAI' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:21:57 - Secret: 'UseVision' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-10-11 04:22:15 - Azure OpenAI account 'openai-copilot-demo-001' created.
-2024-10-11 04:23:26 - Document Intelligence account 'docintel-copilot-demo-001' created.
-*** LOG SEQUENCE: 18 ***
-2024-10-11 04:42:23 - webApp app '.Name' created.
-*** LOG SEQUENCE: 19 ***
-*** LOG SEQUENCE: 20 ***
-2024-10-11 04:48:20 - webApp app '.Name' created.
-*** LOG SEQUENCE: 21 ***
-*** LOG SEQUENCE: 22 ***
-2024-10-11 04:54:38 - webApp app '.Name' created.
-*** LOG SEQUENCE: 23 ***
-2024-10-11 04:59:29 - webApp app '.Name' created.
-*** LOG SEQUENCE: 24 ***
-2024-10-11 05:00:33 - webApp app '.Name' created.
-*** LOG SEQUENCE: 25 ***
-2024-10-11 05:05:29 - webApp app '.Name' created.
-*** LOG SEQUENCE: 26 ***
-2024-10-11 05:06:17 - webApp app '.Name' created.
-*** LOG SEQUENCE: 27 ***
-2024-10-11 05:08:34 - webApp app '.Name' created.
-2024-10-11 05:15:57 - webApp app '.Name' created.
-2024-10-11 05:17:36 - webApp app '.Name' created.
-2024-10-11 05:21:13 - webApp app '.Name' created.
-2024-10-11 05:22:38 - webApp app '.Name' created.
-*** LOG SEQUENCE: 28 ***
-2024-10-11 05:25:42 - webApp app '.Name' created.
-2024-10-11 05:56:36 - AI Hub: 'hub-ai-copilot-demo-001' created.
-2024-10-11 05:56:41 - AI Service: 'aiservice-copilot-demo-001' created.
-2024-10-11 05:56:42 - File 'ai.connection.yaml' created and populated.
-2024-10-11 05:56:48 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
-2024-10-11 05:56:54 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
-2024-10-11 05:56:55 - AI Model deployment: 'aimodel-copilot-demo-001' created.
-2024-10-11 05:57:00 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
-2024-10-11 05:59:27 - AI Hub: 'hub-ai-copilot-demo-001' created.
-2024-10-11 05:59:31 - AI Service: 'aiservice-copilot-demo-001' created.
-2024-10-11 05:59:32 - File 'ai.connection.yaml' created and populated.
-2024-10-11 05:59:39 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
-2024-10-11 05:59:44 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
-2024-10-11 05:59:46 - AI Model deployment: 'aimodel-copilot-demo-001' created.
-2024-10-11 06:00:02 - AI Hub: 'hub-ai-copilot-demo-001' created.
-2024-10-11 06:00:04 - AI Service: 'aiservice-copilot-demo-001' created.
-2024-10-11 06:00:05 - File 'ai.connection.yaml' created and populated.
-2024-10-11 06:00:12 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
-2024-10-11 06:00:17 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
-2024-10-11 06:00:18 - AI Model deployment: 'aimodel-copilot-demo-001' created.
-2024-10-11 06:00:23 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
-2024-10-11 06:01:07 - webApp app '.Name' created.
-2024-10-11 06:11:52 - webApp app '.Name' created.
-*** LOG SEQUENCE: 29 ***
-2024-10-11 06:13:25 - webApp app 'app-copilot-demo-001' created.
-*** LOG SEQUENCE: 30 ***
-2024-10-11 06:23:01 - webApp app 'app-copilot-demo-001' created.
-*** LOG SEQUENCE: 31 ***
-2024-10-11 06:24:17 - webApp app 'app-copilot-demo-001' created.
-*** LOG SEQUENCE: 32 ***
-2024-10-11 06:25:12 - webApp app 'app-copilot-demo-001' created.
-*** LOG SEQUENCE: 33 ***
-2024-10-11 06:26:07 - webApp app 'app-copilot-demo-001' created.
-*** LOG SEQUENCE: 34 ***
-2024-10-11 06:33:58 - webApp app 'app-copilot-demo-001' created.
-*** LOG SEQUENCE: 35 ***
-2024-10-11 06:35:48 - webApp app 'app-copilot-demo-001' created.
+2024-10-11 17:33:49 - Storage account 'stcopilotdemo001' already exists.
+2024-10-11 17:33:49 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - Search Service 'srch-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - Identity 'id-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-10-11 17:33:49 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-10-11 17:33:59 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-11 17:34:05 - webApp app 'app-copilot-demo-001' deployed successfully.
+2024-10-11 17:34:08 - functionApp app 'func-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-11 17:34:29 - functionApp app 'func-copilot-demo-001' deployed successfully.

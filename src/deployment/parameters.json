@@ -54,7 +54,7 @@
     {
       "Name": "func-copilot-demo-001",
       "Type": "functionApp",
-      "Path": "../../functions/search",
+      "Path": "functions/search",
       "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "node",
       "Location": "eastus",

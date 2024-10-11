@@ -545,6 +545,14 @@ function New-AIHubAndModel {
 
     # Create AI Model Deployment
     if ($existingResources -notcontains $aiModelName) {
+
+        $modelList = az cognitiveservices model list `
+            --location $location `
+            --query "[].{ModelName:model.name, Version:model.version, Format:model.format, LifecycleStatus:model.lifecycleStatus, MaxCapacity:model.maxCapacity, SKUName:model.skus[0].name, DefaultCapacity:model.skus[0].capacity.default, MaxCapacitySKU:model.skus[0].capacity.maximum}" `
+            --output table | Out-String
+        
+        Write-Host $modelList
+
         try {
             $ErrorActionPreference = 'Stop'
             az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0"
@@ -555,6 +563,10 @@ function New-AIHubAndModel {
             Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
+    }
+    else {
+        Write-Host "AI Model '$aiModelName' already exists."
+        Write-Log -message "AI Model '$aiModelName' already exists."
     }
 
     # Create AI Project
@@ -570,6 +582,11 @@ function New-AIHubAndModel {
             Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
+    else {
+        Write-Host "AI Project '$aiProjectName' already exists."
+        Write-Log -message "AI Project '$aiProjectName' already exists."
+    }
+
 }
 
 # Function to create and deploy app service (either web app or function app)
@@ -580,12 +597,8 @@ function New-AppService {
         [string]$storageAccountName
     )
 
-    <#
-    # {    if ($appendUniqueSuffix -eq $true) {
-            $appService.Name = "$($appService.Name)-$resourceGuid-$resourceSuffix"
-        }:Enter a comment or description}
-    #>
-
+    Set-DirectoryLocation -expectedDirectory "src/deployment"
+    
     # Navigate to the project directory
     $currentPath = Get-Location
     $currentFolderName = Split-Path -Path $currentPath -Leaf
@@ -650,7 +663,7 @@ function New-AppService {
             }
             else {              
                 Write-Host "$appServiceType app '$appServiceName' already exists. Moving on to deployment."
-                Write-Log -message "$appServiceType app '$appServiceName' already exists." -logFilePath "$currentPath/deployment.log"
+                Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath "$currentPath/deployment.log"
             }
 
             try {
@@ -668,7 +681,7 @@ function New-AppService {
             }
             catch {
                 Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to deploy $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+                Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
             }
         }
         catch {
@@ -774,8 +787,13 @@ function New-Resources {
             Write-Log -message "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
-    $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
-    $storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
+    else {
+        Write-Host "Storage account '$storageAccountName' already exists."
+        Write-Log -message "Storage account '$storageAccountName' already exists."
+    }
+
+    #$storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
+    #$storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
 
     # **********************************************************************************************************************
     # Create an App Service Plan
@@ -791,6 +809,10 @@ function New-Resources {
             Write-Log -message "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
+    else {
+        Write-Host "App Service Plan '$appServicePlanName' already exists."
+        Write-Log -message "App Service Plan '$appServicePlanName' already exists."
+    }
 
     # **********************************************************************************************************************
     # Create a Search Service
@@ -798,7 +820,7 @@ function New-Resources {
     if ($existingResources -notcontains $searchServiceName) {
 
         $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
-        $searchServiceSku = "basic"
+        #$searchServiceSku = "basic"
 
         try {
             az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
@@ -810,50 +832,10 @@ function New-Resources {
             Write-Log -message "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
-
-    <#
- # {    # Try to create a Search Service datasource
-    try {
-        $maxRetries = 5
-        $initialDelay = 2 # in seconds
-        $retryCount = 0
-
-        while ($retryCount -lt $maxRetries) {
-            try {
-                az search datasource create --name $searchDatasourceName --service-name $searchServiceName --resource-group $resourceGroupName --connection-string $storageConnectionString --type azureblob --container name=$blobStorageContainerName --output none
-                Write-Output "Command succeeded."
-                break
-            }
-            catch {
-                Write-Output "Command failed. Attempt $($retryCount + 1) of $maxRetries."
-                Start-Sleep -Seconds ($initialDelay * [math]::Pow(2, $retryCount))
-                $retryCount++
-            }
-        }
-
-        if ($retryCount -eq $maxRetries) {
-            Write-Output "Command failed after $maxRetries attempts."
-        }
-        
-        Write-Host "Search Service datasource '$searchDatasourceName' for '$searchServiceName' created."
-        Write-Log -message "Search Service datasource '$searchDatasourceName' for '$searchServiceName' created."
+    else {
+        Write-Host "Search Service '$searchServiceName' already exists."
+        Write-Log -message "Search Service '$searchServiceName' already exists."
     }
-    catch {
-        Write-Error "Failed to create Search Service datasource '$searchDatasourceName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Search Service datasource '$searchDatasourceName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    # Try to create a Search Service index
-    try {
-        az search index create --name $searchIndexName --service-name $searchServiceName --resource-group $resourceGroupName --fields '[{"name": "id", "type": "Edm.String", "key": true, "searchable": false}, {"name": "content", "type": "Edm.String", "searchable": true}]' --output none
-        Write-Host "Search Service index '$searchIndexName' for '$searchServiceName' created."
-        Write-Log -message "Search Service index '$searchIndexName' for '$searchServiceName' created."
-    }
-    catch {
-        Write-Error "Failed to create Search Service index '$searchIndexName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Search Service index '$searchIndexName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }:Enter a comment or description}
-#>
 
     # **********************************************************************************************************************
     # Create a Log Analytics Workspace
@@ -873,8 +855,8 @@ function New-Resources {
         }
     }
     else {
-        Write-Host "Log Analytics workspace '$logAnalysticsWorkSpaceName' already exists."
-        Write-Log -message "Log Analytics workspace '$logAnalysticsWorkSpaceName' already exists."
+        Write-Host "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
+        Write-Log -message "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
     }
 
     #**********************************************************************************************************************
@@ -1008,37 +990,7 @@ function New-Resources {
         catch {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted") {
-                if ($useRBAC) {
-                    try {
-                        $ErrorActionPreference = 'Stop'
-                        # Attempt to restore the soft-deleted Key Vault
-                        az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
-                        Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-                        Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
-
-                        # Assign RBAC roles to the managed identity
-                        Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
-                    }
-                    catch {
-                        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    }
-                }
-                else {
-                    try {
-                        $ErrorActionPreference = 'Stop'
-                        # Attempt to restore the soft-deleted Key Vault
-                        az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
-                        Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-                        Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
-
-                        Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
-                    }
-                    catch {
-                        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    }
-                }
+                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType $resourceType -"KeyVault" $resourceGroupName -useRBAC -userAssignedIdentityName $userAssignedIdentityName
             }
             else {
                 Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1192,6 +1144,52 @@ function Remove-AzureResourceGroups {
     }
 }
 
+# Function to restore soft-deleted resources
+function Restore-SoftDeletedResource {
+    param(
+        [string]$resourceName,
+        [string]$resourceType,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$useRBAC,
+        [string]$userAssignedIdentityName
+    )
+
+    if ($resourceType -eq "KeyVault") {
+        if ($useRBAC) {
+            try {
+                $ErrorActionPreference = 'Stop'
+                # Attempt to restore the soft-deleted Key Vault
+                az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+                Write-Host "Key Vault: '$resourceName' created with Vault Access Policies."
+                Write-Log -message "Key Vault: '$resourceName' created with Vault Access Policies."
+
+                # Assign RBAC roles to the managed identity
+                Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+            }
+            catch {
+                Write-Error "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+        else {
+            try {
+                $ErrorActionPreference = 'Stop'
+                # Attempt to restore the soft-deleted Key Vault
+                az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+                Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+            }
+            catch {
+                Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+    }
+}
+
 # Function to navigate to the 'deployment' directory
 function Set-DeploymentDirectory {
     while ($true) {
@@ -1205,6 +1203,33 @@ function Set-DeploymentDirectory {
         else {
             Set-Location -Path ".."
         }
+    }
+}
+
+# Function to set the correct directory by traversing up the directory structure
+function Set-DirectoryLocation {
+    param(
+        [string]$expectedDirectory
+    )
+    $currentDir = Get-Location
+
+    try {
+        $deploymentDir = Find-ExpectedDirectory
+        Set-Location $deploymentDir
+        Write-Host "Changed directory to $deploymentDir."
+        
+        while ($currentDir -ne [System.IO.Path]::GetPathRoot($currentDir)) {
+            if (Test-Path (Join-Path $currentDir $expectedDeploymentDir)) {
+                return (Join-Path $currentDir $expectedDeploymentDir)
+            }
+            $currentDir = (Get-Item $currentDir).Parent.FullName
+        }
+
+        Write-Host "Current directory is $deploymentDir"
+        Write-Log -message "Current directory is $deploymentDir" -logFilePath "deployment.log"
+    }
+    catch {
+        Write-Host "Expected directory '$expectedDeploymentDir' not found."
     }
 }
 
@@ -1636,6 +1661,8 @@ $global:existingResources = @()
 
 # Set the user-assigned identity name
 $userPrincipalName = $parameters.userPrincipalName
+
+Set-DirectoryLocation -expectedDirectory "src/deployment"
 
 # Start the deployment
 Start-Deployment
