@@ -1,30 +1,12 @@
 *** LOG SEQUENCE: 1 ***
-2024-10-11 17:27:25 - Storage account 'stcopilotdemo001' already exists.
-2024-10-11 17:27:25 - App Service Plan 'asp-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - Search Service 'srch-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - Log Analytics workspace 'log-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - Application Insights 'appi-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - Cognitive Service 'cog-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - Identity 'id-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - Key Vault 'kv-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - OpenAI Service 'openai-copilot-demo-001' already exists.
-2024-10-11 17:27:25 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
-2024-10-11 17:27:34 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
-2024-10-11 17:27:40 - webApp app 'app-copilot-demo-001' deployed successfully.
-2024-10-11 17:27:45 - functionApp app 'func-copilot-demo-001' already exists. Moving on to deployment.
-2024-10-11 17:28:11 - functionApp app 'func-copilot-demo-001' deployed successfully.
-*** LOG SEQUENCE: 2 ***
-2024-10-11 17:33:49 - Storage account 'stcopilotdemo001' already exists.
-2024-10-11 17:33:49 - App Service Plan 'asp-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - Search Service 'srch-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - Log Analytics workspace 'log-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - Application Insights 'appi-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - Cognitive Service 'cog-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - Identity 'id-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - Key Vault 'kv-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - OpenAI Service 'openai-copilot-demo-001' already exists.
-2024-10-11 17:33:49 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
-2024-10-11 17:33:59 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
-2024-10-11 17:34:05 - webApp app 'app-copilot-demo-001' deployed successfully.
-2024-10-11 17:34:08 - functionApp app 'func-copilot-demo-001' already exists. Moving on to deployment.
-2024-10-11 17:34:29 - functionApp app 'func-copilot-demo-001' deployed successfully.
+2024-10-11 18:35:07 - Storage account 'stcopilotdemo001' already exists.
+2024-10-11 18:35:07 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - Search Service 'srch-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - Identity 'id-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-10-11 18:35:07 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-10-11 18:35:22 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
