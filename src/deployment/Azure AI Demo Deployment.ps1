@@ -590,6 +590,8 @@ function New-AppService {
     $currentPath = Get-Location
     $currentFolderName = Split-Path -Path $currentPath -Leaf
 
+    $appExists = @()
+
     $ErrorActionPreference = 'Stop'
     
     # Making sure we are in the correct folder depending on the app type
@@ -618,48 +620,65 @@ function New-AppService {
         # compress the function app code
         zip -r $zipFilePath * .env
 
+        
         try {
+
             if ($appServiceType -eq "webApp") {
-                # Create a new web app
-                az webapp create --name $appService.Name --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
+
+                $appExists = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "name" --output tsv
+
+                if (-not $webAppExists) {
+                    # Create a new web app
+                    az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
+                }
             }
             else {
 
                 # Check if the Function App exists
-                $functionAppExists = az functionapp show --name $appService.Name --resource-group $resourceGroupName --query "name" --output tsv
+                $appExists = az functionapp show --name $appService.Name --resource-group $resourceGroupName --query "name" --output tsv
 
-                if (-not $functionAppExists) {
+                if (-not $appExists) {
                     # Create a new function app
-                    az functionapp create --name $appService.Name --resource-group $resourceGroupName --storage-account $storageAccountName --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --output none
+                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --output none
                 }
             }
 
-            Write-Host "$appServiceType app '$appServiceName' created."
-            Write-Log -message "$appServiceType app '$appServiceName' created." -logFilePath "$currentPath/deployment.log"
+            if (-not $appExists) {
+
+                Write-Host "$appServiceType app '$appServiceName' created."
+                Write-Log -message "$appServiceType app '$appServiceName' created. Moving on to deployment." -logFilePath "$currentPath/deployment.log"
+            }
+            else {              
+                Write-Host "$appServiceType app '$appServiceName' already exists. Moving on to deployment."
+                Write-Log -message "$appServiceType app '$appServiceName' already exists." -logFilePath "$currentPath/deployment.log"
+            }
 
             try {
                 if ($appService.Type -eq "webApp") {
                     # Deploy the web app
-                    az webapp deployment source config-zip --name $appService.Name --resource-group $resourceGroupName --src $zipFilePath
+                    az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
                 }
                 else {
                     # Deploy the function app
-                    az functionapp deployment source config-zip --name $appService.Name --resource-group $resourceGroupName --src $zipFilePath
+                    az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
                 }
+
+                Write-Host "$appServiceType app '$appServiceName' deployed successfully."
+                Write-Log -message "$appServiceType app '$appServiceName' deployed successfully." -logFilePath "$currentPath/deployment.log"
             }
             catch {
-                Write-Error "Failed to deploy $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 Write-Log -message "Failed to deploy $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
             }
         }
         catch {
-            Write-Error "Failed to create $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            Write-Error "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
         }
     }
     catch {
-        Write-Error "Failed to zip $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to zip $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+        Write-Error "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
     }
 }
 
@@ -843,6 +862,7 @@ function New-Resources {
 
     if ($existingResources -notcontains $logAnalyticsWorkspaceName) {
         try {
+            $ErrorActionPreference = 'Stop'
             az monitor log-analytics workspace create --workspace-name $logAnalyticsWorkspaceName --resource-group $resourceGroupName --location $location --output none
             Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
             Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
@@ -851,6 +871,10 @@ function New-Resources {
             Write-Error "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
+    }
+    else {
+        Write-Host "Log Analytics workspace '$logAnalysticsWorkSpaceName' already exists."
+        Write-Log -message "Log Analytics workspace '$logAnalysticsWorkSpaceName' already exists."
     }
 
     #**********************************************************************************************************************
@@ -863,6 +887,7 @@ function New-Resources {
 
         # Try to create an Application Insights component
         try {
+            $ErrorActionPreference = 'Stop'
             az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
             Write-Host "Application Insights component '$appInsightsName' created."
             Write-Log -message "Application Insights component '$appInsightsName' created."
@@ -872,6 +897,10 @@ function New-Resources {
             Write-Log -message "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
+    else {
+        Write-Host "Application Insights '$appInsightsName' already exists."
+        Write-Log -message "Application Insights '$appInsightsName' already exists."
+    }
 
     #**********************************************************************************************************************
     # Create a Cognitive Services account
@@ -880,6 +909,7 @@ function New-Resources {
 
     if ($existingResources -notcontains $cognitiveServiceName) {
         try {
+            $ErrorActionPreference = 'Stop'
             az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
             Write-Host "Cognitive Services account '$cognitiveServiceName' created."
             Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
@@ -903,6 +933,10 @@ function New-Resources {
                 Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             } 
         }
+    }
+    else {
+        Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
+        Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists."
     }
 
     #**********************************************************************************************************************
@@ -940,16 +974,10 @@ function New-Resources {
             Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
-
-
-    #**********************************************************************************************************************
-    # Create App Services
-
-    <#
-    # {    foreach ($appService in $appServices) {
-            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
-        }:Enter a comment or description}
-    #>
+    else {
+        Write-Host "Identity '$userAssignedIdentityName' already exists."
+        Write-Log -message "Identity '$userAssignedIdentityName' already exists."
+    }
 
     $useRBAC = $false
 
@@ -1027,54 +1055,10 @@ function New-Resources {
         Set-KeyVaultSecrets -keyVaultName $keyVaultName `
             -resourceGroupName $resourceGroupName
     }
-
-    #**********************************************************************************************************************
-    # Create a Function App
-
-    <#
-    # {    try {
-            $ErrorActionPreference = 'Stop'
-            #$consumerPlanLocation = az functionapp list-consumption-locations --query "[?name=='$location'].name" --output tsv
-            $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp" -os "linux" -version "4"
-
-            az appservice plan create --name $functionAppServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --is-linux --output none
-            
-            az functionapp create --name $functionAppName `
-                --consumption-plan-location $($location -replace '\s', '')  `
-                --storage-account $storageAccountName `
-                --resource-group $resourceGroupName `
-                --runtime dotnet `
-                --runtime-version $latestDontNetRuntimeFuncApp `
-                --functions-version 4 `
-                --plan $functionAppServicePlanName `
-                --output none
-                            
-            az functionapp create --name $functionAppName `
-                --consumption-plan-location $($location -replace '\s', '')  `
-                --storage-account $storageAccountName `
-                --resource-group $resourceGroupName `
-                --runtime dotnet `
-                --runtime-version $latestDontNetRuntimeFuncApp `
-                --functions-version 4 `
-                --output none
-
-            Write-Host "Function App '$functionAppName' created."
-            Write-Log -message "Function App '$functionAppName' created."
-        }
-        catch {
-            az functionapp create --name $functionAppName `
-                --consumption-plan-location $($location -replace '\s', '')  `
-                --storage-account $storageAccountName `
-                --resource-group $resourceGroupName `
-                --runtime dotnet `
-                --runtime-version $latestDontNetRuntimeFuncApp `
-                --functions-version 4 `
-                --output none
-
-            Write-Error "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }:Enter a comment or description}
-    #>
+    else {
+        Write-Host "Key Vault '$keyVaultName' already exists."
+        Write-Log -message "Key Vault '$keyVaultName' already exists."
+    }
 
     #**********************************************************************************************************************
     # Create OpenAI account
@@ -1107,6 +1091,10 @@ function New-Resources {
                 Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }   
         }
+    }
+    else {
+        Write-Host "OpenAI Service '$openAIName' already exists."
+        Write-Log -message "OpenAI Service '$openAIName' already exists."
     }
 
     #**********************************************************************************************************************
@@ -1150,6 +1138,10 @@ function New-Resources {
             Write-Error "The desired location '$location' is not available for FormRecognizer."
             Write-Log -message "The desired location '$location' is not available for FormRecognizer."
         }
+    }
+    else {
+        Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists."
+        Write-Log -message "Document Intelligence Service '$documentIntelligenceName' already exists."
     }
 }
 
