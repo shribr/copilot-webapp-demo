@@ -65,3 +65,6 @@ src/.DS_Store
 src/deployment/.DS_Store
 .DS_Store
 .gitignore
+.DS_Store
+src/.DS_Store
+src/deployment/.DS_Store
