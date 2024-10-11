@@ -115,3 +115,39 @@
 2024-10-11 05:22:38 - webApp app '.Name' created.
 *** LOG SEQUENCE: 28 ***
 2024-10-11 05:25:42 - webApp app '.Name' created.
+2024-10-11 05:56:36 - AI Hub: 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:56:41 - AI Service: 'aiservice-copilot-demo-001' created.
+2024-10-11 05:56:42 - File 'ai.connection.yaml' created and populated.
+2024-10-11 05:56:48 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:56:54 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:56:55 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-11 05:57:00 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:59:27 - AI Hub: 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:59:31 - AI Service: 'aiservice-copilot-demo-001' created.
+2024-10-11 05:59:32 - File 'ai.connection.yaml' created and populated.
+2024-10-11 05:59:39 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:59:44 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:59:46 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-11 06:00:02 - AI Hub: 'hub-ai-copilot-demo-001' created.
+2024-10-11 06:00:04 - AI Service: 'aiservice-copilot-demo-001' created.
+2024-10-11 06:00:05 - File 'ai.connection.yaml' created and populated.
+2024-10-11 06:00:12 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
+2024-10-11 06:00:17 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-10-11 06:00:18 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-11 06:00:23 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+2024-10-11 06:01:07 - webApp app '.Name' created.
+2024-10-11 06:11:52 - webApp app '.Name' created.
+*** LOG SEQUENCE: 29 ***
+2024-10-11 06:13:25 - webApp app 'app-copilot-demo-001' created.
+*** LOG SEQUENCE: 30 ***
+2024-10-11 06:23:01 - webApp app 'app-copilot-demo-001' created.
+*** LOG SEQUENCE: 31 ***
+2024-10-11 06:24:17 - webApp app 'app-copilot-demo-001' created.
+*** LOG SEQUENCE: 32 ***
+2024-10-11 06:25:12 - webApp app 'app-copilot-demo-001' created.
+*** LOG SEQUENCE: 33 ***
+2024-10-11 06:26:07 - webApp app 'app-copilot-demo-001' created.
+*** LOG SEQUENCE: 34 ***
+2024-10-11 06:33:58 - webApp app 'app-copilot-demo-001' created.
+*** LOG SEQUENCE: 35 ***
+2024-10-11 06:35:48 - webApp app 'app-copilot-demo-001' created.

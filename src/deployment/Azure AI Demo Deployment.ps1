@@ -464,99 +464,111 @@ function New-AIHubAndModel {
         [string]$aiModelVersion,
         [string]$aiServiceName,
         [string]$resourceGroupName,
-        [string]$location
+        [string]$location,
+        [array]$existingResources
     )
     
     #$aiHubWorkspaceName = "workspace-$aiHubName"
 
     # Create AI Hub
-    try {
-        $ErrorActionPreference = 'Stop'
-        az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
-        #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
-        Write-Host "AI Hub: '$aiHubName' created."
-        Write-Log -message "AI Hub: '$aiHubName' created."
-    }
-    catch {
-        # Check if the error is due to soft deletion
-        if ($_ -match "has been soft-deleted") {
-            try {
-                $ErrorActionPreference = 'Stop'
-                # Attempt to restore the soft-deleted Cognitive Services account
-                az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
-                Write-Host "AI Hub '$aiHubName' restored."
-                Write-Log -message "AI Hub '$aiHubName' restored."
-            }
-            catch {
-                Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
+    if ($existingResources -notcontains $aiHubName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
+            #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
+            Write-Host "AI Hub: '$aiHubName' created."
+            Write-Log -message "AI Hub: '$aiHubName' created."
         }
-        else {
-            Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }    
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted") {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
+                    Write-Host "AI Hub '$aiHubName' restored."
+                    Write-Log -message "AI Hub '$aiHubName' restored."
+                }
+                catch {
+                    Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }    
+        }
     }
 
     # Create AI Service
-    try {
-        $ErrorActionPreference = 'Stop'
-        az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
-        Write-Host "AI Service: '$aiServiceName' created."
-        Write-Log -message "AI Service: '$aiServiceName' created."
+    if ($existingResources -notcontains $aiServiceName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
+            Write-Host "AI Service: '$aiServiceName' created."
+            Write-Log -message "AI Service: '$aiServiceName' created."
+        }
+        catch {
+            Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
-    catch {
-        Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
     Read-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
 
     # Try to create an Azure Machine Learning workspace (AI Hub)
-    try {
-        $ErrorActionPreference = 'Stop'
-        az ml workspace create --kind hub --name $aiHubName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
-        Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
-    }
-    catch {
-        Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    if ($existingResources -notcontains $aiHubName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az ml workspace create --kind hub --name $aiHubName --resource-group $resourceGroupName --location $location --output none
+            Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
+            Write-Log -message "Azure Machine Learning workspace '$aiHubName' created."
+        }
+        catch {
+            Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     # Create AI Hub connection
-    try {
-        az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
-        Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
-        Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created."
-    }
-    catch {
-        Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    if ($existingResources -notcontains $aiHubName) {
+        try {
+            az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
+            Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
+            Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created."
+        }
+        catch {
+            Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     # Create AI Model Deployment
-    try {
-        $ErrorActionPreference = 'Stop'
-        #az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
-        az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "0613" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
-        Write-Host "AI Model deployment: '$aiModelName' created."
-        Write-Log -message "AI Model deployment: '$aiModelName' created."
-    }
-    catch {
-        Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    if ($existingResources -notcontains $aiModelName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0"
+            Write-Host "AI Model deployment: '$aiModelName' created."
+            Write-Log -message "AI Model deployment: '$aiModelName' created."
+        }
+        catch {
+            Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     # Create AI Project
-    try {
-        az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
-        Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
-        Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created."
-    }
-    catch {
-        Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    if ($existingResources -notcontains $aiProjectName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
+            Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
+            Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created."
+        }
+        catch {
+            Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 }
 
@@ -607,7 +619,7 @@ function New-AppService {
         zip -r $zipFilePath * .env
 
         try {
-            if ($appService.Type -eq "webApp") {
+            if ($appServiceType -eq "webApp") {
                 # Create a new web app
                 az webapp create --name $appService.Name --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
             }
@@ -1397,10 +1409,12 @@ function Start-Deployment {
             -existingResources $existingResources
 
         foreach ($appService in $appServices) {
-            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+            if ($existingResources -notcontains $appService) {
+                New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+            }
         }
 
-        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
+        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
     }
     else {
         $userPrincipalName = "$($parameters.userPrincipalName)"
@@ -1426,11 +1440,13 @@ function Start-Deployment {
             -existingResources $existingResources
 
         foreach ($appService in $appServices) {
-            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+            if ($existingResources -notcontains $appService) {
+                New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+            }
         }
 
         # Create a new AI Hub and Model
-        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
+        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
     }
 
     # End the timer

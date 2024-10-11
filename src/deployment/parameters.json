@@ -45,7 +45,7 @@
     {
       "Name": "app-copilot-demo-001",
       "Type": "webApp",
-      "Path": "app/",
+      "Path": "app/frontend",
       "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "NODE:20LTS",
       "Location": "east us",
@@ -54,7 +54,7 @@
     {
       "Name": "func-copilot-demo-001",
       "Type": "functionApp",
-      "Path": "../functions",
+      "Path": "../../functions/search",
       "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "node",
       "Location": "eastus",
