@@ -1,0 +1,30 @@
+2024-10-11 05:30:14 - AI Hub: 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:30:57 - AI Service: 'aiservice-copilot-demo-001' created.
+2024-10-11 05:30:58 - File 'ai.connection.yaml' created and populated.
+2024-10-11 05:31:38 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:31:45 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:31:47 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-11 05:31:51 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 37 SEC : 415 MS ***
+
+2024-10-11 05:33:24 - AI Hub: 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:33:27 - AI Service: 'aiservice-copilot-demo-001' created.
+2024-10-11 05:33:28 - File 'ai.connection.yaml' created and populated.
+2024-10-11 05:33:34 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:33:38 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:33:39 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-11 05:33:44 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:34:09 - AI Hub: 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:34:11 - AI Service: 'aiservice-copilot-demo-001' created.
+2024-10-11 05:34:12 - File 'ai.connection.yaml' created and populated.
+2024-10-11 05:34:18 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:34:22 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:34:24 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-11 05:34:28 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:34:44 - AI Hub: 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:34:48 - AI Service: 'aiservice-copilot-demo-001' created.
+2024-10-11 05:34:49 - File 'ai.connection.yaml' created and populated.
+2024-10-11 05:34:56 - Azure Machine Learning workspace 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:35:01 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-10-11 05:35:03 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-11 05:35:08 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.

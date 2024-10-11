@@ -215,7 +215,7 @@ function Get-UniqueSuffix {
         $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
 
         foreach ($appService in $appServices) {
-            $appService.Name = - "$($appService.Name)-$($resourceGuid)-$($resourceSuffix)"
+            $appService.Name = "$($appService.Name)-$($resourceGuid)-$($resourceSuffix)"
         }
         
         $resourceExists = Test-ResourceExists $storageAccountName "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
@@ -390,19 +390,19 @@ function Initialize-Parameters {
     $global:resourceGuid = Split-Guid
 
 
-    if ($parameters.PSObject.Properties.Name.Contains("objectId")) {
+    if ($parametersObject.PSObject.Properties.Name.Contains("objectId")) {
         $global:objectId = $parametersObject.objectId
     }
     else {
         $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
 
-        $parameters | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
+        $parametersObject | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
     }
     
-    $parameters | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
-    $parameters | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
-    $parameters | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
-    $parameters | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
+    $parametersObject | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
+    $parametersObject | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
+    $parametersObject | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
+    $parametersObject | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
 
     return @{
         aiHubName                    = $aiHubName
@@ -451,7 +451,7 @@ function Initialize-Parameters {
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
         virtualNetworkName           = $virtualNetworkName      
-        parameters                   = $parameters
+        parameters                   = $parametersObject
     }
 }
 
@@ -577,11 +577,11 @@ function New-AppService {
     # Navigate to the project directory
     $currentPath = Get-Location
     $currentFolderName = Split-Path -Path $currentPath -Leaf
-    
+
     $ErrorActionPreference = 'Stop'
     
     # Making sure we are in the correct folder depending on the app type
-    if ($appService.Type -eq "web") {
+    if ($appService.Type -eq "webApp") {
         if ($currentFolderName -ne "app") {
             Set-Location -Path $appService.Path
         }
@@ -592,9 +592,12 @@ function New-AppService {
         }
     }
 
+    $appServiceType = $appService.Type
+    $appServiceName = $appService.Name
+
     try {
         # Compress the function app code
-        $zipFilePath = "$(appService.Type)-app-$(appService.Name).zip"
+        $zipFilePath = "$appServiceType-$appServiceName.zip"
 
         if (Test-Path $zipFilePath) {
             Remove-Item $zipFilePath
@@ -604,9 +607,9 @@ function New-AppService {
         zip -r $zipFilePath * .env
 
         try {
-            if ($appService.Type -eq "web") {
+            if ($appService.Type -eq "webApp") {
                 # Create a new web app
-                az webapp create --name $appService.Name --resource-group $resourceGroupName --plan $appService.Plan --runtime $appService.Runtime --deployment-source-url
+                az webapp create --name $appService.Name --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
             }
             else {
 
@@ -619,11 +622,11 @@ function New-AppService {
                 }
             }
 
-            Write-Host "$appService.Type app '$appService.Name' created."
-            Write-Log -message "$appServiceType app '$appService.Name' created." -logFilePath "$currentPath/deployment.log"
+            Write-Host "$appServiceType app '$appServiceName' created."
+            Write-Log -message "$appServiceType app '$appServiceName' created." -logFilePath "$currentPath/deployment.log"
 
             try {
-                if ($appService.Type -eq "web") {
+                if ($appService.Type -eq "webApp") {
                     # Deploy the web app
                     az webapp deployment source config-zip --name $appService.Name --resource-group $resourceGroupName --src $zipFilePath
                 }
@@ -704,7 +707,8 @@ function New-Resources {
         [string]$userAssignedIdentityName,
         [string]$userPrincipalName,
         [string]$openAIName,
-        [string]$documentIntelligenceName
+        [string]$documentIntelligenceName,
+        [array]$existingResources
     )
 
     # Get the latest API versions
@@ -727,52 +731,79 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create a storage account
 
-    try {
-        az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
-        Write-Host "Storage account '$storageAccountName' created."
-        Write-Log -message "Storage account '$storageAccountName' created."
-    }
-    catch {
-        Write-Error "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
+    if ($existingResources -notcontains $storageAccountName) {
 
+        try {
+            az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
+            Write-Host "Storage account '$storageAccountName' created."
+            Write-Log -message "Storage account '$storageAccountName' created."
+        }
+        catch {
+            Write-Error "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
     $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
     $storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
 
     # **********************************************************************************************************************
     # Create an App Service Plan
 
-    try {
-        az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --output none
-        Write-Host "App Service Plan '$appServicePlanName' created."
-        Write-Log -message "App Service Plan '$appServicePlanName' created."
-    }
-    catch {
-        Write-Error "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    if ($existingResources -notcontains $appServicePlanName) {
+        try {
+            az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --output none
+            Write-Host "App Service Plan '$appServicePlanName' created."
+            Write-Log -message "App Service Plan '$appServicePlanName' created."
+        }
+        catch {
+            Write-Error "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     # **********************************************************************************************************************
     # Create a Search Service
 
-    $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
-    $searchServiceSku = "basic"
+    if ($existingResources -notcontains $searchServiceName) {
 
-    # Try to create a Search Service
-    try {
-        az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku $searchServiceSku --output none
-        Write-Host "Search Service '$searchServiceName' created."
-        Write-Log -message "Search Service '$searchServiceName' created."
-    }
-    catch {
-        Write-Error "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
+        $searchServiceSku = "basic"
+
+        try {
+            az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
+            Write-Host "Search Service '$searchServiceName' created."
+            Write-Log -message "Search Service '$searchServiceName' created."
+        }
+        catch {
+            Write-Error "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
-    # Try to create a Search Service datasource
+    <#
+ # {    # Try to create a Search Service datasource
     try {
-        az search datasource create --name $searchDatasourceName --service-name $searchServiceName --resource-group $resourceGroupName --connection-string $storageConnectionString --type azureblob --container name=$blobStorageContainerName --output none
+        $maxRetries = 5
+        $initialDelay = 2 # in seconds
+        $retryCount = 0
+
+        while ($retryCount -lt $maxRetries) {
+            try {
+                az search datasource create --name $searchDatasourceName --service-name $searchServiceName --resource-group $resourceGroupName --connection-string $storageConnectionString --type azureblob --container name=$blobStorageContainerName --output none
+                Write-Output "Command succeeded."
+                break
+            }
+            catch {
+                Write-Output "Command failed. Attempt $($retryCount + 1) of $maxRetries."
+                Start-Sleep -Seconds ($initialDelay * [math]::Pow(2, $retryCount))
+                $retryCount++
+            }
+        }
+
+        if ($retryCount -eq $maxRetries) {
+            Write-Output "Command failed after $maxRetries attempts."
+        }
+        
         Write-Host "Search Service datasource '$searchDatasourceName' for '$searchServiceName' created."
         Write-Log -message "Search Service datasource '$searchDatasourceName' for '$searchServiceName' created."
     }
@@ -790,38 +821,44 @@ function New-Resources {
     catch {
         Write-Error "Failed to create Search Service index '$searchIndexName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Search Service index '$searchIndexName' for '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
+    }:Enter a comment or description}
+#>
 
     # **********************************************************************************************************************
     # Create a Log Analytics Workspace
 
     $logAnalyticsWorkspaceName = Get-ValidServiceName -serviceName $logAnalyticsWorkspaceName
 
-    # Try to create a Log Analytics Workspace
-    try {
-        az monitor log-analytics workspace create --workspace-name $logAnalyticsWorkspaceName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
-        Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
-    }
-    catch {
-        Write-Error "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    if ($existingResources -notcontains $logAnalyticsWorkspaceName) {
+        try {
+            az monitor log-analytics workspace create --workspace-name $logAnalyticsWorkspaceName --resource-group $resourceGroupName --location $location --output none
+            Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
+            Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
+        }
+        catch {
+            Write-Error "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     #**********************************************************************************************************************
     # Create an Application Insights component
 
-    $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
+    if ($existingResources -notcontains $appInsightsName) {
 
-    # Try to create an Application Insights component
-    try {
-        az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
-        Write-Host "Application Insights component '$appInsightsName' created."
-        Write-Log -message "Application Insights component '$appInsightsName' created."
-    }
-    catch {
-        Write-Error "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+        $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
+
+        # Try to create an Application Insights component
+        try {
+            az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
+            Write-Host "Application Insights component '$appInsightsName' created."
+            Write-Log -message "Application Insights component '$appInsightsName' created."
+        }
+        catch {
+            Write-Error "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     #**********************************************************************************************************************
@@ -829,64 +866,69 @@ function New-Resources {
 
     $cognitiveServiceName = Get-ValidServiceName -serviceName $cognitiveServiceName
 
-    try {
-        $ErrorActionPreference = 'Stop'
-        az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
-        Write-Host "Cognitive Services account '$cognitiveServiceName' created."
-        Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
-    }
-    catch {
-        # Check if the error is due to soft deletion
-        if ($_ -match "has been soft-deleted") {
-            try {
-                # Attempt to restore the soft-deleted Cognitive Services account
-                az cognitiveservices account recover --name $cognitiveServiceName --resource-group $resourceGroupName --location $location
-                Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
-                Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
-            }
-            catch {
-                Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
+    if ($existingResources -notcontains $cognitiveServiceName) {
+        try {
+            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
+            Write-Host "Cognitive Services account '$cognitiveServiceName' created."
+            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
         }
-        else {
-            Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted") {
+                try {
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    az cognitiveservices account recover --name $cognitiveServiceName --resource-group $resourceGroupName --location $location
+                    Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
+                    Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
+                }
+                catch {
+                    Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            } 
         }
     }
 
     #**********************************************************************************************************************
     # Create User Assigned Identity
 
-    try {
-        $ErrorActionPreference = 'Stop'
-        az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
-        Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
-
-        # Construct the fully qualified resource ID for the User Assigned Identity
+    if ($existingResources -notcontains $userAssignedIdentityName) {
         try {
-            #$userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
-            $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
-            $roles = @("Contributor", "Cognitive Services OpenAI User", "Search Index Data Reader", "Storage Blob Data Reader")  # List of roles to assign
-            $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
-            
-            foreach ($role in $roles) {
-                az role assignment create --assignee $assigneePrincipalId --role $role --scope $scope
+            $ErrorActionPreference = 'Stop'
+            az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
+            Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
+            Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
 
-                Write-Host "User '$userAssignedIdentityName' assigned to role: '$role'."
-                Write-Log -message "User '$userAssignedIdentityName' assigned to role: '$role'."
+            # Construct the fully qualified resource ID for the User Assigned Identity
+            try {
+                $ErrorActionPreference = 'Stop'
+                #$userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+                $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
+                $roles = @("Contributor", "Cognitive Services OpenAI User", "Search Index Data Reader", "Storage Blob Data Reader")  # List of roles to assign
+                $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
+            
+                foreach ($role in $roles) {
+                    az role assignment create --assignee $assigneePrincipalId --role $role --scope $scope
+
+                    Write-Host "User '$userAssignedIdentityName' assigned to role: '$role'."
+                    Write-Log -message "User '$userAssignedIdentityName' assigned to role: '$role'."
+                }
+            }
+            catch {
+                Write-Error "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
         catch {
-            Write-Error "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Error "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
-    catch {
-        Write-Error "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
+
 
     #**********************************************************************************************************************
     # Create App Services
@@ -902,74 +944,77 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create Key Vault
 
-    try {
-        $ErrorActionPreference = 'Stop'
-        if ($useRBAC) {
-            az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
-            Write-Host "Key Vault: '$keyVaultName' created with RBAC enabled."
-            Write-Log -message "Key Vault: '$keyVaultName' created with RBAC enabled."
+    if ($existingResources -notcontains $keyVaultName) {
 
-            # Assign RBAC roles to the managed identity
-            Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
-        }
-        else {
-            az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
-            Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-            Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
-
-            # Set vault access policies for user
-            Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
-        }
-    }
-    catch {
-        # Check if the error is due to soft deletion
-        if ($_ -match "has been soft-deleted") {
+        try {
+            $ErrorActionPreference = 'Stop'
             if ($useRBAC) {
-                try {
-                    $ErrorActionPreference = 'Stop'
-                    # Attempt to restore the soft-deleted Key Vault
-                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
-                    Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-                    Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+                Write-Host "Key Vault: '$keyVaultName' created with RBAC enabled."
+                Write-Log -message "Key Vault: '$keyVaultName' created with RBAC enabled."
 
-                    # Assign RBAC roles to the managed identity
-                    Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+                # Assign RBAC roles to the managed identity
+                Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+            }
+            else {
+                az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+                Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                # Set vault access policies for user
+                Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+            }
+        }
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted") {
+                if ($useRBAC) {
+                    try {
+                        $ErrorActionPreference = 'Stop'
+                        # Attempt to restore the soft-deleted Key Vault
+                        az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+                        Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                        Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                        # Assign RBAC roles to the managed identity
+                        Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+                    }
+                    catch {
+                        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
                 }
-                catch {
-                    Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                else {
+                    try {
+                        $ErrorActionPreference = 'Stop'
+                        # Attempt to restore the soft-deleted Key Vault
+                        az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+                        Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                        Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                        Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+                    }
+                    catch {
+                        Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
                 }
             }
             else {
-                try {
-                    $ErrorActionPreference = 'Stop'
-                    # Attempt to restore the soft-deleted Key Vault
-                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
-                    Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-                    Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
-
-                    Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
-                }
-                catch {
-                    Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                }
+                Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
-        else {
-            Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
+
+        Set-KeyVaultRoles -keyVaultName $keyVaultName `
+            -resourceGroupName $resourceGroupName `
+            -userAssignedIdentityName $userAssignedIdentityName `
+            -userPrincipalName $userPrincipalName `
+            -useRBAC $useRBAC
+
+        Set-KeyVaultSecrets -keyVaultName $keyVaultName `
+            -resourceGroupName $resourceGroupName
     }
-
-    New-KeyVaultRoles -keyVaultName $keyVaultName `
-        -resourceGroupName $resourceGroupName `
-        -userAssignedIdentityName $userAssignedIdentityName `
-        -userPrincipalName $userPrincipalName `
-        -useRBAC $useRBAC
-
-    New-Secrets -keyVaultName $keyVaultName `
-        -resourceGroupName $resourceGroupName
 
     #**********************************************************************************************************************
     # Create a Function App
@@ -1022,71 +1067,77 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create OpenAI account
 
-    try {
-        $ErrorActionPreference = 'Stop'
-        az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
-        Write-Host "Azure OpenAI account '$openAIName' created."
-        Write-Log -message "Azure OpenAI account '$openAIName' created."
-    }
-    catch {
-        # Check if the error is due to soft deletion
-        if ($_ -match "has been soft-deleted") {
-            try {
-                $ErrorActionPreference = 'Stop'
-                # Attempt to restore the soft-deleted Cognitive Services account
-                az cognitiveservices account recover --name $openAIName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind OpenAI --sku S0 --output none
-                Write-Host "OpenAI account '$openAIName' restored."
-                Write-Log -message "OpenAI account '$openAIName' restored."
-            }
-            catch {
-                Write-Error "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-        }
-        else {
-            Write-Error "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }   
-    }
+    if ($existingResources -notcontains $openAIName) {
 
-    #**********************************************************************************************************************
-    # Create Document Intelligence account
-
-    $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
-
-    # Check if the desired location is available
-    if ($availableLocations -contains $($location.ToUpper() -replace '\s', '')  ) {
-        # Try to create a Document Intelligence account
         try {
             $ErrorActionPreference = 'Stop'
-            az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
-            Write-Host "Document Intelligence account '$documentIntelligenceName' created."
-            Write-Log -message "Document Intelligence account '$documentIntelligenceName' created."
+            az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
+            Write-Host "Azure OpenAI account '$openAIName' created."
+            Write-Log -message "Azure OpenAI account '$openAIName' created."
         }
-        catch {     
+        catch {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted") {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    az cognitiveservices account recover --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
-                    Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
-                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored."
+                    az cognitiveservices account recover --name $openAIName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind OpenAI --sku S0 --output none
+                    Write-Host "OpenAI account '$openAIName' restored."
+                    Write-Log -message "OpenAI account '$openAIName' restored."
                 }
                 catch {
-                    Write-Error "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
             else {
-                Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }        
+                Write-Error "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }   
         }
     }
-    else {
-        Write-Error "The desired location '$location' is not available for FormRecognizer."
-        Write-Log -message "The desired location '$location' is not available for FormRecognizer."
+
+    #**********************************************************************************************************************
+    # Create Document Intelligence account
+
+    if ($existingResources -notcontains $documentIntelligenceName) {
+
+        $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
+
+        # Check if the desired location is available
+        if ($availableLocations -contains $($location.ToUpper() -replace '\s', '')  ) {
+            # Try to create a Document Intelligence account
+            try {
+                $ErrorActionPreference = 'Stop'
+                az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
+                Write-Host "Document Intelligence account '$documentIntelligenceName' created."
+                Write-Log -message "Document Intelligence account '$documentIntelligenceName' created."
+            }
+            catch {     
+                # Check if the error is due to soft deletion
+                if ($_ -match "has been soft-deleted") {
+                    try {
+                        $ErrorActionPreference = 'Stop'
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        az cognitiveservices account recover --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
+                        Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
+                        Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored."
+                    }
+                    catch {
+                        Write-Error "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
+                }
+                else {
+                    Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }        
+            }
+        }
+        else {
+            Write-Error "The desired location '$location' is not available for FormRecognizer."
+            Write-Log -message "The desired location '$location' is not available for FormRecognizer."
+        }
     }
 }
 
@@ -1131,8 +1182,8 @@ function Remove-AzureResourceGroups {
             Write-Log -message "Resource group '$rg' deleted."
         }
         catch {
-            Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-            Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+            Write-Error "Failed to delete Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+            Write-Log -message "Failed to delete Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
         }
     }
 }
@@ -1282,6 +1333,8 @@ function Start-Deployment {
     # Initialize the sequence number
     $sequenceNumber = 1
 
+    $deleteResourceGroup = $false
+
     # Check if the log file exists
     if (Test-Path $logFilePath) {
         # Read all lines from the log file
@@ -1310,16 +1363,20 @@ function Start-Deployment {
     # Start the timer
     $startTime = Get-Date
 
-    # Delete existing resource groups with the same name
-    Remove-AzureResourceGroups
-
+    if ($deleteResourceGroup -eq $true) {
+        # Delete existing resource groups with the same name
+        Remove-AzureResourceGroups
+    }
+    
     # Check if the resource group exists
-    $resourceGroupName = Test-ResourceGroupExists -resourceSuffix $resourceSuffix
+    $resourceGroupName = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -resourceSuffix $resourceSuffix -deleteResourceGroup $deleteResourceGroup
 
     if ($appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
         $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
+
+        $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv
 
         New-Resources -storageAccountName $storageAccountName `
             -appServicePlanName $appServicePlanName `
@@ -1336,7 +1393,8 @@ function Start-Deployment {
             -userAssignedIdentityName $userAssignedIdentityName `
             -userPrincipalName $userPrincipalName `
             -openAIName $openAIName `
-            -documentIntelligenceName $documentIntelligenceName
+            -documentIntelligenceName $documentIntelligenceName `
+            -existingResources $existingResources
 
         foreach ($appService in $appServices) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
@@ -1347,9 +1405,14 @@ function Start-Deployment {
     else {
         $userPrincipalName = "$($parameters.userPrincipalName)"
 
+        $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv
+
         New-Resources -storageAccountName $storageAccountName `
             -appServicePlanName $appServicePlanName `
             -searchServiceName $searchServiceName `
+            `searchIndexName $searchIndexName `
+            `searchIndexerName $searchIndexerName `
+            -searchDatasourceName $searchDatasourceName `
             -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
             -cognitiveServiceName $cognitiveServiceName `
             -keyVaultName $keyVaultName `
@@ -1359,7 +1422,8 @@ function Start-Deployment {
             -userAssignedIdentityName $userAssignedIdentityName `
             -userPrincipalName $userPrincipalName `
             -openAIName $openAIName `
-            -documentIntelligenceName $documentIntelligenceName
+            -documentIntelligenceName $documentIntelligenceName `
+            -existingResources $existingResources
 
         foreach ($appService in $appServices) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
@@ -1387,30 +1451,41 @@ function Start-Deployment {
 # Function to check if a resource group exists
 function Test-ResourceGroupExists {
     param (
-        [int]$resourceSuffix
+        [int]$resourceSuffix,
+        [string]$resourceGroupName,
+        [bool]$deleteResourceGroup
     )
-    do {
-        $resourceGroupName = "$($parameters.resourceGroupName)-$resourceSuffix"
+
+    if ($deleteResourceGroup -eq $false) {
+        $resourceGroupName = "$($resourceGroupName)-$resourceSuffix"
+
         $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
+    }
+    else {
+        do {
+            $resourceGroupName = "$($resourceGroupName)-$resourceSuffix"
+            $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
 
-        try {
-            if ($resourceGroupExists -eq "true") {
-                Write-Host "Resource group '$resourceGroupName' exists."
-                $resourceSuffix++
-            }
-            else {
-                az group create --name $resourceGroupName --location $location --output none
-                Write-Host "Resource group '$resourceGroupName' created."
-                $resourceGroupExists = $false
+            try {
+                if ($resourceGroupExists -eq "true") {
+                    Write-Host "Resource group '$resourceGroupName' exists."
+                    $resourceSuffix++
+                }
+                else {
+                    az group create --name $resourceGroupName --location $location --output none
+                    Write-Host "Resource group '$resourceGroupName' created."
+                    $resourceGroupExists = $false
                         
+                }
             }
-        }
-        catch {
-            Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-            Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-        }
+            catch {
+                Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+                Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+            }
 
-    } while ($resourceGroupExists)
+        } while ($resourceGroupExists)
+
+    }
 
     return $resourceGroupName
 }
@@ -1548,6 +1623,8 @@ $initParams = Initialize-Parameters -parametersFile $parametersFile
 
 # Alphabetize the parameters object
 $global:parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
+
+$global:existingResources = @()
 
 # Set the user-assigned identity name
 $userPrincipalName = $parameters.userPrincipalName

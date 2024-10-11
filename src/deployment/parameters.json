@@ -18,11 +18,9 @@
   "containerAppsEnvironmentName": "cae-copilot-demo-001",
   "containerRegistryName": "cr-copilot-demo-001",
   "cosmosDbAccountName": "cosmos-copilot-demo-001",
+  "domainName": "azurewebsites.net",
   "documentIntelligenceName": "docintel-copilot-demo-001",
   "eventHubNamespaceName": "eh-copilot-demo-001",
-  "functionAppName": "func-copilot-demo-001",
-  "functionAppPath": "functions/",
-  "functionAppServicePlanName": "asp-func-copilot-demo-001",
   "keyVaultName": "kv-copilot-demo-001",
   "location": "east us",
   "logAnalyticsWorkspaceName": "log-copilot-demo-001",
@@ -43,33 +41,24 @@
   "storageAccountName": "stcopilotdemo001",
   "userAssignedIdentityName": "id-copilot-demo-001",
   "virtualNetworkName": "vnet-copilot-demo-001",
-  "webAppName": "app-copilot-demo-001",
-  "webAppPath": "app/",
-  "webAppServicePlanName": "asp-app-copilot-demo-001",
   "appServices": [
     {
       "Name": "app-copilot-demo-001",
-      "Type": "webapp",
+      "Type": "webApp",
       "Path": "app/",
-      "AppServicePlan": "asp-app-copilot-demo-001",
-      "Runtime": "node|14-lts",
-      "Location": "east us"
+      "AppServicePlan": "asp-copilot-demo-001",
+      "Runtime": "NODE:20LTS",
+      "Location": "east us",
+      "Url": "https://app-copilot-demo-001.azurewebsites.net"
     },
     {
       "Name": "func-copilot-demo-001",
-      "Type": "functionapp",
-      "Path": "functions/",
-      "AppServicePlan": "asp-func-copilot-demo-001",
-      "Runtime": "node|14-lts",
-      "Location": "east us"
-    },
-    {
-      "Name": "ca-copilot-demo-001",
-      "Type": "containerapp",
-      "Path": "app/",
-      "AppServicePlan": "asp-app-copilot-demo-001",
-      "Runtime": "node|14-lts",
-      "Location": "east us"
+      "Type": "functionApp",
+      "Path": "../functions",
+      "AppServicePlan": "asp-copilot-demo-001",
+      "Runtime": "node",
+      "Location": "eastus",
+      "Url": "https://func-copilot-demo-001.azurewebsites.net"
     }
   ]
 }
