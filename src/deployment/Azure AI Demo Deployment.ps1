@@ -548,7 +548,7 @@ function New-AIHubAndModel {
 
         $modelList = az cognitiveservices model list `
             --location $location `
-            --query "[].{ModelName:model.name, Version:model.version, Format:model.format, LifecycleStatus:model.lifecycleStatus, MaxCapacity:model.maxCapacity, SKUName:model.skus[0].name, DefaultCapacity:model.skus[0].capacity.default, MaxCapacitySKU:model.skus[0].capacity.maximum}" `
+            --query "[].{Kind:kind, ModelName:model.name, Version:model.version, Format:model.format, LifecycleStatus:model.lifecycleStatus, MaxCapacity:model.maxCapacity, SKUName:model.skus[0].name, DefaultCapacity:model.skus[0].capacity.default}" `
             --output table | Out-String
         
         Write-Host $modelList
