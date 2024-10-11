@@ -188,12 +188,14 @@ function Get-RandomInt {
     return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 }
 
-# Function to find a unique suffix
+# Function to find a unique suffix and create resources
 function Get-UniqueSuffix {
     param (
         [int]$resourceSuffix,
         [string]$resourceGroupName
     )
+
+    $appResourceExists = $true
 
     do {
         $storageAccountName = "$($parameters.storageAccountName)$resourceGuid$resourceSuffix"
@@ -206,13 +208,15 @@ function Get-UniqueSuffix {
         $portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
         $managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
         $userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
-        $webAppName = "$($parameters.webAppName)-$resourceGuid-$resourceSuffix"
-        $functionAppName = "$($parameters.functionAppName)-$resourceGuid-$resourceSuffix"
         $openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
         $documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
         $aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
         $aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
         $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
+
+        foreach ($appService in $appServices) {
+            $appService.Name = - "$($appService.Name)-$($resourceGuid)-$($resourceSuffix)"
+        }
         
         $resourceExists = Test-ResourceExists $storageAccountName "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists $appServicePlanName "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
@@ -224,36 +228,46 @@ function Get-UniqueSuffix {
         Test-ResourceExists $portalDashboardName "Microsoft.Portal/dashboards" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists $managedEnvironmentName "Microsoft.App/managedEnvironments" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists $userAssignedIdentityName "Microsoft.ManagedIdentity/userAssignedIdentities" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $webAppName "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $functionAppName "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists $openAIName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists $documentIntelligenceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName
+
+        foreach ($appService in $appServices) {
+            $appResourceExists = Test-ResourceExists $appServiceName $appService.Name -resourceGroupName $resourceGroupName -or $resourceExists
+            if ($appResourceExists) {
+                $resourceExists = $true
+                break
+            }
+        }
 
         if ($resourceExists) {
             $resourceSuffix++
         }
     } while ($resourceExists)
 
-    $userPrincipalName = "$($parameters.userPrincipalName)"
+    <#
+    # {    $userPrincipalName = "$($parameters.userPrincipalName)"
 
-    New-Resources -storageAccountName $storageAccountName `
-        -appServicePlanName $appServicePlanName `
-        -searchServiceName $searchServiceName `
-        -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
-        -cognitiveServiceName $cognitiveServiceName `
-        -keyVaultName $keyVaultName `
-        -appInsightsName $appInsightsName `
-        -portalDashboardName $portalDashboardName `
-        -managedEnvironmentName $managedEnvironmentName `
-        -userAssignedIdentityName $userAssignedIdentityName `
-        -userPrincipalName $userPrincipalName `
-        -webAppName $webAppName `
-        -functionAppName $functionAppName `
-        -openAIName $openAIName `
-        -documentIntelligenceName $documentIntelligenceName
+        New-Resources -storageAccountName $storageAccountName `
+            -appServicePlanName $appServicePlanName `
+            -searchServiceName $searchServiceName `
+            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
+            -cognitiveServiceName $cognitiveServiceName `
+            -keyVaultName $keyVaultName `
+            -appInsightsName $appInsightsName `
+            -portalDashboardName $portalDashboardName `
+            -managedEnvironmentName $managedEnvironmentName `
+            -userAssignedIdentityName $userAssignedIdentityName `
+            -userPrincipalName $userPrincipalName `
+            -openAIName $openAIName `
+            -documentIntelligenceName $documentIntelligenceName
 
-    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
+        foreach ($appService in $appServices) {
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+        }
 
+        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
+    :Enter a comment or description}
+    #>
     return $resourceSuffix
 }
 
@@ -316,48 +330,50 @@ function Initialize-Parameters {
     Set-DeploymentDirectory
         
     # Load parameters from the JSON file
-    $parameters = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
-    # Initialize global variables for each item in the parameters_gao.json file
-    $global:aiHubName = $parameters.aiHubName
-    $global:aiModelName = $parameters.aiModelName
-    $global:aiModelType = $parameters.aiModelType
-    $global:aiModelVersion = $parameters.aiModelVersion
-    $global:aiServiceName = $parameters.aiServiceName
-    $global:aiProjectName = $parameters.aiProjectName
-    $global:apiManagementServiceName = $parameters.apiManagementServiceName
-    $global:appendUniqueSuffix = $parameters.appendUniqueSuffix
-    $global:appServicePlanName = $parameters.appServicePlanName
-    $global:appServices = $parameters.appServices
-    $global:appInsightsName = $parameters.appInsightsName
-    $global:blobStorageAccountName = $parameters.blobStorageAccountName
-    $global:blobStorageContainerName = $parameters.blobStorageContainerName
-    $global:cognitiveServiceName = $parameters.cognitiveServiceName
-    $global:containerAppName = $parameters.containerAppName
-    $global:containerAppsEnvironmentName = $parameters.containerAppsEnvironmentName
-    $global:containerRegistryName = $parameters.containerRegistryName
-    $global:cosmosDbAccountName = $parameters.cosmosDbAccountName
-    $global:documentIntelligenceName = $parameters.documentIntelligenceName
-    $global:eventHubNamespaceName = $parameters.eventHubNamespaceName
-    $global:keyVaultName = $parameters.keyVaultName
-    $global:location = $parameters.location
-    $global:logAnalyticsWorkspaceName = $parameters.logAnalyticsWorkspaceName
-    $global:managedIdentityName = $parameters.managedIdentityName
-    $global:openAIName = $parameters.openAIName
-    $global:portalDashboardName = $parameters.portalDashboardName
-    $global:redisCacheName = $parameters.redisCacheName
-    $global:resourceGroupName = $parameters.resourceGroupName
-    $global:resourceSuffix = $parameters.resourceSuffix
-    $global:searchServiceName = $parameters.searchServiceName
-    $global:searchIndexName = $parameters.searchIndexName
-    $global:searchIndexFieldNames = $parameters.searchIndexFieldNames
-    $global:searchIndexerName = $parameters.searchIndexerName
-    $global:serviceBusNamespaceName = $parameters.serviceBusNamespaceName
-    $global:sharedDashboardName = $parameters.sharedDashboardName
-    $global:sqlServerName = $parameters.sqlServerName
-    $global:storageAccountName = $parameters.storageAccountName
-    $global:userAssignedIdentityName = $parameters.userAssignedIdentityName
-    $global:virtualNetworkName = $parameters.virtualNetworkName
+    # Initialize global variables for each item in the parameters.json file
+    $global:aiHubName = $parametersObject.aiHubName
+    $global:aiModelName = $parametersObject.aiModelName
+    $global:aiModelType = $parametersObject.aiModelType
+    $global:aiModelVersion = $parametersObject.aiModelVersion
+    $global:aiServiceName = $parametersObject.aiServiceName
+    $global:aiProjectName = $parametersObject.aiProjectName
+    $global:apiManagementServiceName = $parametersObject.apiManagementServiceName
+    $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
+    $global:appServicePlanName = $parametersObject.appServicePlanName
+    $global:appServices = $parametersObject.appServices
+    $global:appInsightsName = $parametersObject.appInsightsName
+    $global:blobStorageAccountName = $parametersObject.blobStorageAccountName
+    $global:blobStorageContainerName = $parametersObject.blobStorageContainerName
+    $global:cognitiveServiceName = $parametersObject.cognitiveServiceName
+    $global:containerAppName = $parametersObject.containerAppName
+    $global:containerAppsEnvironmentName = $parametersObject.containerAppsEnvironmentName
+    $global:containerRegistryName = $parametersObject.containerRegistryName
+    $global:cosmosDbAccountName = $parametersObject.cosmosDbAccountName
+    $global:documentIntelligenceName = $parametersObject.documentIntelligenceName
+    $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
+    $global:keyVaultName = $parametersObject.keyVaultName
+    $global:location = $parametersObject.location
+    $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
+    $global:managedIdentityName = $parametersObject.managedIdentityName
+    $global:openAIName = $parametersObject.openAIName
+    $global:portalDashboardName = $parametersObject.portalDashboardName
+    $global:redisCacheName = $parametersObject.redisCacheName
+    $global:resourceGroupName = $parametersObject.resourceGroupName
+    $global:resourceSuffix = $parametersObject.resourceSuffix
+    $global:searchDataSourceName = $parametersObject.searchDataSourceName
+    $global:searchServiceName = $parametersObject.searchServiceName
+    $global:searchIndexName = $parametersObject.searchIndexName
+    $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
+    $global:searchIndexerName = $parametersObject.searchIndexerName
+    $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
+    $global:sharedDashboardName = $parametersObject.sharedDashboardName
+    $global:sqlServerName = $parametersObject.sqlServerName
+    $global:storageAccountName = $parametersObject.storageAccountName
+    $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
+    $global:virtualNetworkName = $parametersObject.virtualNetworkName
+    #$global:objectId = $parametersObject.objectId
 
     #**********************************************************************************************************************
     # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
@@ -373,7 +389,16 @@ function Initialize-Parameters {
     # Retrieve the resource GUID
     $global:resourceGuid = Split-Guid
 
-    $parameters | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
+
+    if ($parameters.PSObject.Properties.Name.Contains("objectId")) {
+        $global:objectId = $parametersObject.objectId
+    }
+    else {
+        $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
+
+        $parameters | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
+    }
+    
     $parameters | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
     $parameters | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
     $parameters | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
@@ -405,19 +430,19 @@ function Initialize-Parameters {
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
         managedIdentityName          = $managedIdentityName
         openAIName                   = $openAIName
+        objectId                     = $objectId
         portalDashboardName          = $portalDashboardName
         redisCacheName               = $redisCacheName
         resourceGroupName            = $resourceGroupName
         resourceGuid                 = $resourceGuid
         resourceSuffix               = $resourceSuffix
         result                       = $result
-        sasFunctionAppName           = $sasFunctionAppName
-        sasFunctionAppPath           = $sasFunctionAppPath
         searchServiceName            = $searchServiceName
         searchIndexName              = $searchIndexName
         searchIndexFieldNames        = $searchIndexFieldNames
         searchIndexerName            = $searchIndexerName
         serviceBusNamespaceName      = $serviceBusNamespaceName
+        searchDataSourceName         = $searchDataSourceName
         sharedDashboardName          = $sharedDashboardName
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
@@ -538,15 +563,16 @@ function New-AIHubAndModel {
 # Function to create and deploy app service (either web app or function app)
 function New-AppService {
     param (
-        [string]$appServiceType = "web".
-        [string]$appServiceName,
-        [string]$appServicePlanName,
-        [string]$appServiceRuntime,
-        [string]$appServicePath,
-        [string]$location,
+        [array]$appService,
         [string]$resourceGroupName,
         [string]$storageAccountName
     )
+
+    <#
+    # {    if ($appendUniqueSuffix -eq $true) {
+            $appService.Name = "$($appService.Name)-$resourceGuid-$resourceSuffix"
+        }:Enter a comment or description}
+    #>
 
     # Navigate to the project directory
     $currentPath = Get-Location
@@ -555,21 +581,20 @@ function New-AppService {
     $ErrorActionPreference = 'Stop'
     
     # Making sure we are in the correct folder depending on the app type
-    if ($appServiceType -eq "web") {
+    if ($appService.Type -eq "web") {
         if ($currentFolderName -ne "app") {
-            Set-Location -Path $appServicePath
+            Set-Location -Path $appService.Path
         }
     }
-    else 
-    {
+    else {
         if ($currentFolderName -ne "functions") {
-            Set-Location -Path $appServicePath
+            Set-Location -Path $appService.Path
         }
     }
 
     try {
         # Compress the function app code
-        $zipFilePath = "$appType-app-$appServiceName.zip"
+        $zipFilePath = "$(appService.Type)-app-$(appService.Name).zip"
 
         if (Test-Path $zipFilePath) {
             Remove-Item $zipFilePath
@@ -579,48 +604,47 @@ function New-AppService {
         zip -r $zipFilePath * .env
 
         try {
-            if ($appServiceType -eq "web") {
+            if ($appService.Type -eq "web") {
                 # Create a new web app
-                az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appServicePlanName --runtime $appServiceRuntime --deployment-source-url
+                az webapp create --name $appService.Name --resource-group $resourceGroupName --plan $appService.Plan --runtime $appService.Runtime --deployment-source-url
             }
             else {
 
                 # Check if the Function App exists
-                $functionAppExists = az functionapp show --name $appServiceName --resource-group $resourceGroupName --query "name" --output tsv
+                $functionAppExists = az functionapp show --name $appService.Name --resource-group $resourceGroupName --query "name" --output tsv
 
                 if (-not $functionAppExists) {
                     # Create a new function app
-                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --runtime "node" --os-type "Windows" --consumption-plan-location $location --output none
+                    az functionapp create --name $appService.Name --resource-group $resourceGroupName --storage-account $storageAccountName --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --output none
                 }
             }
 
-            Write-Host "$appServiceType app '$appServiceName' created."
-            Write-Log -message "$appServiceType app '$appServiceName' created." -logFilePath "$currentPath/deployment.log"
+            Write-Host "$appService.Type app '$appService.Name' created."
+            Write-Log -message "$appServiceType app '$appService.Name' created." -logFilePath "$currentPath/deployment.log"
 
             try {
-                if ($appServiceType -eq "web") {
+                if ($appService.Type -eq "web") {
                     # Deploy the web app
-                    az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                    az webapp deployment source config-zip --name $appService.Name --resource-group $resourceGroupName --src $zipFilePath
                 }
                 else {
                     # Deploy the function app
-                    az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                    az functionapp deployment source config-zip --name $appService.Name --resource-group $resourceGroupName --src $zipFilePath
                 }
             }
-            catch 
-            {
-                Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            catch {
+                Write-Error "Failed to deploy $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to deploy $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
             }
         }
         catch {
-            Write-Error "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            Write-Error "Failed to create $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
         }
     }
     catch {
-        Write-Error "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+        Write-Error "Failed to zip $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to zip $appService.Type app '$appService.Name': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
     }
 }
 
@@ -668,6 +692,9 @@ function New-Resources {
         [string]$storageAccountName,
         [string]$appServicePlanName,
         [string]$searchServiceName,
+        [string]$searchIndexName,
+        [string]$searchIndexerName,
+        [string]$searchDatasourceName,
         [string]$logAnalyticsWorkspaceName,
         [string]$cognitiveServiceName,
         [string]$keyVaultName,
@@ -676,9 +703,6 @@ function New-Resources {
         [string]$managedEnvironmentName,
         [string]$userAssignedIdentityName,
         [string]$userPrincipalName,
-        [string]$webAppName,
-        [string]$functionAppName,
-        [string]$functionAppServicePlanName,
         [string]$openAIName,
         [string]$documentIntelligenceName
     )
@@ -865,17 +889,13 @@ function New-Resources {
     }
 
     #**********************************************************************************************************************
-    # Create Web Application
+    # Create App Services
 
-    try {
-        az webapp create --name $webAppName --resource-group $resourceGroupName --plan $appServicePlanName --output none
-        Write-Host "Web App '$webAppName' created."
-        Write-Log -message "Web App '$webAppName' created."
-    }
-    catch {
-        Write-Error "Failed to create Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Web App '$webAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
+    <#
+    # {    foreach ($appService in $appServices) {
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+        }:Enter a comment or description}
+    #>
 
     $useRBAC = $false
 
@@ -953,48 +973,51 @@ function New-Resources {
 
     #**********************************************************************************************************************
     # Create a Function App
-    try {
-        $ErrorActionPreference = 'Stop'
-        #$consumerPlanLocation = az functionapp list-consumption-locations --query "[?name=='$location'].name" --output tsv
-        $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp" -os "linux" -version "4"
 
-        az appservice plan create --name $functionAppServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --is-linux --output none
-        
-        az functionapp create --name $functionAppName `
-            --consumption-plan-location $($location -replace '\s', '')  `
-            --storage-account $storageAccountName `
-            --resource-group $resourceGroupName `
-            --runtime dotnet `
-            --runtime-version $latestDontNetRuntimeFuncApp `
-            --functions-version 4 `
-            --plan $functionAppServicePlanName `
-            --output none
-                          
-        az functionapp create --name $functionAppName `
-            --consumption-plan-location $($location -replace '\s', '')  `
-            --storage-account $storageAccountName `
-            --resource-group $resourceGroupName `
-            --runtime dotnet `
-            --runtime-version $latestDontNetRuntimeFuncApp `
-            --functions-version 4 `
-            --output none
+    <#
+    # {    try {
+            $ErrorActionPreference = 'Stop'
+            #$consumerPlanLocation = az functionapp list-consumption-locations --query "[?name=='$location'].name" --output tsv
+            $latestDontNetRuntimeFuncApp = Get-LatestDotNetRuntime -resourceType "functionapp" -os "linux" -version "4"
 
-        Write-Host "Function App '$functionAppName' created."
-        Write-Log -message "Function App '$functionAppName' created."
-    }
-    catch {
-        az functionapp create --name $functionAppName `
-            --consumption-plan-location $($location -replace '\s', '')  `
-            --storage-account $storageAccountName `
-            --resource-group $resourceGroupName `
-            --runtime dotnet `
-            --runtime-version $latestDontNetRuntimeFuncApp `
-            --functions-version 4 `
-            --output none
+            az appservice plan create --name $functionAppServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --is-linux --output none
+            
+            az functionapp create --name $functionAppName `
+                --consumption-plan-location $($location -replace '\s', '')  `
+                --storage-account $storageAccountName `
+                --resource-group $resourceGroupName `
+                --runtime dotnet `
+                --runtime-version $latestDontNetRuntimeFuncApp `
+                --functions-version 4 `
+                --plan $functionAppServicePlanName `
+                --output none
+                            
+            az functionapp create --name $functionAppName `
+                --consumption-plan-location $($location -replace '\s', '')  `
+                --storage-account $storageAccountName `
+                --resource-group $resourceGroupName `
+                --runtime dotnet `
+                --runtime-version $latestDontNetRuntimeFuncApp `
+                --functions-version 4 `
+                --output none
 
-        Write-Error "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
+            Write-Host "Function App '$functionAppName' created."
+            Write-Log -message "Function App '$functionAppName' created."
+        }
+        catch {
+            az functionapp create --name $functionAppName `
+                --consumption-plan-location $($location -replace '\s', '')  `
+                --storage-account $storageAccountName `
+                --resource-group $resourceGroupName `
+                --runtime dotnet `
+                --runtime-version $latestDontNetRuntimeFuncApp `
+                --functions-version 4 `
+                --output none
+
+            Write-Error "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Function App '$functionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }:Enter a comment or description}
+    #>
 
     #**********************************************************************************************************************
     # Create OpenAI account
@@ -1222,7 +1245,7 @@ function Set-RBACRoles {
 }
 
 # Function to alphabetize the parameters object
-function Sort-Parameters {
+function Get-Parameters-Sorted {
     param (
         [Parameter(Mandatory = $true)]
         [psobject]$Parameters
@@ -1295,10 +1318,31 @@ function Start-Deployment {
 
     if ($appendUniqueSuffix -eq $true) {
 
-        #$resourceGroupName = "$resourceGroupName$resourceSuffix"
-
         # Find a unique suffix
         $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
+
+        New-Resources -storageAccountName $storageAccountName `
+            -appServicePlanName $appServicePlanName `
+            -searchServiceName $searchServiceName `
+            `searchIndexName $searchIndexName `
+            `searchIndexerName $searchIndexerName `
+            -searchDatasourceName $searchDatasourceName `
+            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
+            -cognitiveServiceName $cognitiveServiceName `
+            -keyVaultName $keyVaultName `
+            -appInsightsName $appInsightsName `
+            -portalDashboardName $portalDashboardName `
+            -managedEnvironmentName $managedEnvironmentName `
+            -userAssignedIdentityName $userAssignedIdentityName `
+            -userPrincipalName $userPrincipalName `
+            -openAIName $openAIName `
+            -documentIntelligenceName $documentIntelligenceName
+
+        foreach ($appService in $appServices) {
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+        }
+
+        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     }
     else {
         $userPrincipalName = "$($parameters.userPrincipalName)"
@@ -1314,20 +1358,15 @@ function Start-Deployment {
             -managedEnvironmentName $managedEnvironmentName `
             -userAssignedIdentityName $userAssignedIdentityName `
             -userPrincipalName $userPrincipalName `
-            -webAppName $webAppName `
-            -functionAppName $functionAppName `
-            -functionAppServicePlanName $functionAppServicePlanName `
             -openAIName $openAIName `
             -documentIntelligenceName $documentIntelligenceName
-    }
 
-    # Create a new AI Hub and Model
-    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
-    
-    # Create new app services
+        foreach ($appService in $appServices) {
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
+        }
 
-    foreach ($appService in $appServices) {
-        New-AppService -appServiceType $appService.type -appServiceName $appService.name -resourceGroupName $resourceGroupName -location $appService.location -appServicePlanName $appService.plan -storageAccountName $storageAccountName
+        # Create a new AI Hub and Model
+        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     }
 
     # End the timer
@@ -1508,13 +1547,13 @@ $initParams = Initialize-Parameters -parametersFile $parametersFile
 #Write-Log -message "Parameters initialized."
 
 # Alphabetize the parameters object
-$global:parameters = Sort-Parameters -Parameters $initParams.parameters
+$global:parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
 
-
+# Set the user-assigned identity name
 $userPrincipalName = $parameters.userPrincipalName
 
 # Start the deployment
-StartDeployment
+Start-Deployment
 
 #**********************************************************************************************************************
 # End of script
