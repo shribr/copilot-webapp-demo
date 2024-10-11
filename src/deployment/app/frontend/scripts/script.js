@@ -2,7 +2,7 @@ var iconStyle = "color";
 
 // Function to fetch the configuration
 async function fetchConfig() {
-    const response = await fetch('config.json');
+    const response = await fetch('../config.json');
     const config = await response.json();
     return config;
 }

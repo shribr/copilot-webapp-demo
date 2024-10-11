@@ -95,68 +95,6 @@ param (
     [string]$parametersFile = "parameters.json"
 )
 
-# Function to deploy a Node.js Function App
-function Deploy-NodeJSFunctionApp {
-    param (
-        [string]$sasFunctionAppName,
-        [string]$resourceGroupName,
-        [string]$location,
-        [string]$storageAccountName
-    )
-
-    # Navigate to the project directory
-    $currentPath = Get-Location
-    $currentFolderName = Split-Path -Path $currentPath -Leaf
-
-    # Reference the parent folder
-    #$parentFolderPath = Split-Path -Path $currentPath -Parent
-    
-    try {
-        $ErrorActionPreference = 'Stop'
-        
-        if ($currentFolderName -ne "sasToken") {
-            Set-Location -Path $sasFunctionAppPath
-        }
-        try {
-            # Compress the function app code
-            $zipFilePath = "function-app-sastoken-code.zip"
-            if (Test-Path $zipFilePath) {
-                Remove-Item $zipFilePath
-            }
-    
-            zip -r $zipFilePath * .env ../node_modules
-        }
-        catch {
-            Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
-        }
-
-        # Initialize a git repository if not already done
-        if (-not (Test-Path -Path ".git")) {
-            git init
-            git add .
-            git commit -m "Initial commit"
-        }
-
-        # Set the WEBSITE_RUN_FROM_PACKAGE parameter
-        az functionapp config appsettings set --name $sasFunctionAppName --resource-group $resourceGroupName --settings WEBSITE_RUN_FROM_PACKAGE=1
-
-        # Push code to Azure
-        git push azure master
-
-        az functionapp deployment source config-zip --name $sasFunctionAppName --resource-group $resourceGroupName --src $zipFilePath --output none
-        
-        #az func azure functionapp publish $sasFunctionAppName
-
-        Write-Host "Node.js Function App '$sasFunctionAppName' deployed."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' deployed." -logFilePath "$currentPath/deployment.log"
-    }
-    catch {
-        Write-Error "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to deploy Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
-    }
-}
-
 # Function to get Cognitive Services API key
 function Get-CognitiveServicesApiKey {
     param (
@@ -390,6 +328,7 @@ function Initialize-Parameters {
     $global:apiManagementServiceName = $parameters.apiManagementServiceName
     $global:appendUniqueSuffix = $parameters.appendUniqueSuffix
     $global:appServicePlanName = $parameters.appServicePlanName
+    $global:appServices = $parameters.appServices
     $global:appInsightsName = $parameters.appInsightsName
     $global:blobStorageAccountName = $parameters.blobStorageAccountName
     $global:blobStorageContainerName = $parameters.blobStorageContainerName
@@ -400,8 +339,6 @@ function Initialize-Parameters {
     $global:cosmosDbAccountName = $parameters.cosmosDbAccountName
     $global:documentIntelligenceName = $parameters.documentIntelligenceName
     $global:eventHubNamespaceName = $parameters.eventHubNamespaceName
-    $global:functionAppServicePlanName = $parameters.functionAppServicePlanName
-    $global:functionAppName = $parameters.functionAppName
     $global:keyVaultName = $parameters.keyVaultName
     $global:location = $parameters.location
     $global:logAnalyticsWorkspaceName = $parameters.logAnalyticsWorkspaceName
@@ -411,8 +348,6 @@ function Initialize-Parameters {
     $global:redisCacheName = $parameters.redisCacheName
     $global:resourceGroupName = $parameters.resourceGroupName
     $global:resourceSuffix = $parameters.resourceSuffix
-    $global:sasFunctionAppName = $parameters.sasFunctionAppName
-    $global:sasFunctionAppPath = $parameters.sasFunctionAppPath
     $global:searchServiceName = $parameters.searchServiceName
     $global:searchIndexName = $parameters.searchIndexName
     $global:searchIndexFieldNames = $parameters.searchIndexFieldNames
@@ -423,7 +358,6 @@ function Initialize-Parameters {
     $global:storageAccountName = $parameters.storageAccountName
     $global:userAssignedIdentityName = $parameters.userAssignedIdentityName
     $global:virtualNetworkName = $parameters.virtualNetworkName
-    $global:webAppName = $parameters.webAppName
 
     #**********************************************************************************************************************
     # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
@@ -454,6 +388,7 @@ function Initialize-Parameters {
         aiProjectName                = $aiProjectName
         apiManagementServiceName     = $apiManagementServiceName
         appendUniqueSuffix           = $appendUniqueSuffix
+        appServices                  = $appServices
         appServicePlanName           = $appServicePlanName
         appInsightsName              = $appInsightsName
         blobStorageAccountName       = $blobStorageAccountName
@@ -465,9 +400,6 @@ function Initialize-Parameters {
         cosmosDbAccountName          = $cosmosDbAccountName
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
-        functionAppName              = $functionAppName
-        functionAppPath              = $functionAppPath
-        functionAppServicePlanName   = $functionAppServicePlanName
         keyVaultName                 = $keyVaultName
         location                     = $location
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
@@ -493,8 +425,7 @@ function Initialize-Parameters {
         tenantId                     = $tenantId
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
-        virtualNetworkName           = $virtualNetworkName
-        webAppName                   = $webAppName        
+        virtualNetworkName           = $virtualNetworkName      
         parameters                   = $parameters
     }
 }
@@ -604,33 +535,92 @@ function New-AIHubAndModel {
     }
 }
 
-# Function to create a Node.js Function App
-function New-NodeJSFunctionApp {
+# Function to create and deploy app service (either web app or function app)
+function New-AppService {
     param (
-        [string]$sasFunctionAppName,
-        [string]$resourceGroupName,
+        [string]$appServiceType = "web".
+        [string]$appServiceName,
+        [string]$appServicePlanName,
+        [string]$appServiceRuntime,
+        [string]$appServicePath,
         [string]$location,
+        [string]$resourceGroupName,
         [string]$storageAccountName
     )
-    
+
     # Navigate to the project directory
     $currentPath = Get-Location
-    #$currentFolderName = Split-Path -Path $currentPath -Leaf
-
-    # Reference the parent folder
-    #$parentFolderPath = Split-Path -Path $currentPath -Parent
+    $currentFolderName = Split-Path -Path $currentPath -Leaf
+    
+    $ErrorActionPreference = 'Stop'
+    
+    # Making sure we are in the correct folder depending on the app type
+    if ($appServiceType -eq "web") {
+        if ($currentFolderName -ne "app") {
+            Set-Location -Path $appServicePath
+        }
+    }
+    else 
+    {
+        if ($currentFolderName -ne "functions") {
+            Set-Location -Path $appServicePath
+        }
+    }
 
     try {
-        $ErrorActionPreference = 'Stop'
-        az functionapp create --name $sasFunctionAppName --consumption-plan-location "eastus" --storage-account $storageAccountName --resource-group $resourceGroupName --runtime node --os-type Windows --output none
-        Write-Host "Node.js Function App '$sasFunctionAppName' created."
-        Write-Log -message "Node.js Function App '$sasFunctionAppName' created." -logFilePath $currentPath/deployment.log
+        # Compress the function app code
+        $zipFilePath = "$appType-app-$appServiceName.zip"
 
-        Deploy-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
+        if (Test-Path $zipFilePath) {
+            Remove-Item $zipFilePath
+        }
+        
+        # compress the function app code
+        zip -r $zipFilePath * .env
+
+        try {
+            if ($appServiceType -eq "web") {
+                # Create a new web app
+                az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appServicePlanName --runtime $appServiceRuntime --deployment-source-url
+            }
+            else {
+
+                # Check if the Function App exists
+                $functionAppExists = az functionapp show --name $appServiceName --resource-group $resourceGroupName --query "name" --output tsv
+
+                if (-not $functionAppExists) {
+                    # Create a new function app
+                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --runtime "node" --os-type "Windows" --consumption-plan-location $location --output none
+                }
+            }
+
+            Write-Host "$appServiceType app '$appServiceName' created."
+            Write-Log -message "$appServiceType app '$appServiceName' created." -logFilePath "$currentPath/deployment.log"
+
+            try {
+                if ($appServiceType -eq "web") {
+                    # Deploy the web app
+                    az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                }
+                else {
+                    # Deploy the function app
+                    az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                }
+            }
+            catch 
+            {
+                Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            }
+        }
+        catch {
+            Write-Error "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+        }
     }
     catch {
-        Write-Error "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Node.js Function App '$sasFunctionAppName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $currentPath/deployment.log
+        Write-Error "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
     }
 }
 
@@ -1297,12 +1287,6 @@ function Start-Deployment {
     # Start the timer
     $startTime = Get-Date
 
-    #New-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
-
-    #Deploy-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -location $location -storageAccountName $storageAccountName
-
-    #return
-
     # Delete existing resource groups with the same name
     Remove-AzureResourceGroups
 
@@ -1337,9 +1321,14 @@ function Start-Deployment {
             -documentIntelligenceName $documentIntelligenceName
     }
 
+    # Create a new AI Hub and Model
     New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     
-    New-NodeJSFunctionApp -sasFunctionAppName $sasFunctionAppName -resourceGroupName $resourceGroupName -consumption-plan-location "eastus" -storageAccountName $storageAccountName
+    # Create new app services
+
+    foreach ($appService in $appServices) {
+        New-AppService -appServiceType $appService.type -appServiceName $appService.name -resourceGroupName $resourceGroupName -location $appService.location -appServicePlanName $appService.plan -storageAccountName $storageAccountName
+    }
 
     # End the timer
     $endTime = Get-Date
