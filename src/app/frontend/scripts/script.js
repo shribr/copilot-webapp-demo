@@ -22,6 +22,7 @@ $(document).ready(function () {
     $('#clear-button').on('click', clearChatDisplay);
 
     const screen = getQueryParam('screen');
+
     toggleDisplay(screen);
 
     // Add event listeners to navigation links
@@ -31,6 +32,8 @@ $(document).ready(function () {
         toggleDisplay(screen);
         history.pushState(null, '', this.href);
     });
+
+    document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
 
     // Add event listener to the file input
     document.getElementById('file-input').addEventListener('change', function (event) {
@@ -198,6 +201,16 @@ $(document).ready(function () {
     });
 });
 
+function toggleAllCheckboxes() {
+
+    const allCheckbox = document.getElementById('datasource-all');
+    const datasourceCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="datasource-"]:not(#datasource-all)');
+
+    datasourceCheckboxes.forEach(checkbox => {
+        checkbox.checked = allCheckbox.checked;
+    });
+}
+
 // Function to clear the chat display
 function clearChatDisplay() {
     const chatDisplay = document.getElementById('chat-display');
@@ -274,7 +287,8 @@ async function showResponse() {
 
     if (chatInput) {
 
-        const response = await getAnswer(chatInput);
+        //const response = await getAnswer(chatInput);
+        const response = await getAnswersFromAzureSearch(chatInput);
 
         // Create a new chat bubble element
         const chatBubble = document.createElement('div');
@@ -341,7 +355,7 @@ async function showResponse() {
 }
 
 //code to send chat message to Azure Copilot
-async function getAnswer(userInput) {
+async function getAnswers(userInput) {
 
     if (!userInput) return;
 
@@ -373,6 +387,36 @@ async function getAnswer(userInput) {
 
     return data;
     //displayMessage('Azure Copilot', data.reply);
+}
+
+//code to send message to Azure Search via Azure Function
+async function getAnswersFromAzureSearch(userInput) {
+    if (!userInput) return;
+
+    const config = await fetchConfig();
+
+    const apiKey = config.AZURE_SEARCH_API_KEY;
+    const searchFunctionName = config.AZURE_SEARCH_FUNCTION_NAME;
+    const indexName = config.AZURE_SEARCH_INDEX;
+    const endpoint = `https://${searchFunctionName}.azurewebsites.net/api/${searchFunctionName}?code=${apiKey}`;
+
+    const searchQuery = {
+        search: userInput,
+        top: 5 // Number of results to return
+    };
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': `${apiKey}`
+        },
+        body: JSON.stringify(searchQuery)
+    });
+
+    const data = await response.json();
+
+    return data;
 }
 
 async function createSidenavLinks() {

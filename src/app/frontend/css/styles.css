@@ -294,6 +294,7 @@ label[for="chat-input"] {
 
 .form-group label[for="use-semantic-ranker"],
 .form-group label[for="use-query-contextual-summaries"],
+.form-group label[for="suggestion-followup-questions"],
 .form-group label[for="retrieval-mode-text"],
 .form-group label[for="retrieval-mode-hybrid"],
 .form-group label[for="retrieval-mode-vector"] {

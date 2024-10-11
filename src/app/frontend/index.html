@@ -174,10 +174,6 @@
             <input type="text" id="exclude-category" />
         </div>
         <div class="form-group">
-            <input type="checkbox" id="use-semantic-ranker" />
-            <label for="use-semantic-ranker">Use semantic ranker for retrieval</label>
-        </div>
-        <div class="form-group">
             <label>Retrieval Mode:</label>
             <div>
                 <input type="radio" id="retrieval-mode-text" name="retrieval-mode" value="text" />
@@ -194,11 +190,26 @@
         </div>
         <div class="form-group form-group-flex">
             <div>
+                <input type="checkbox" id="use-semantic-ranker" />
+            </div>
+            <div>
+                <label for="use-semantic-ranker">Use semantic ranker for retrieval</label>
+            </div>
+        </div>
+        <div class="form-group form-group-flex">
+            <div>
                 <input type="checkbox" id="use-query-contextual-summaries" />
             </div>
             <div>
-                <label for="use-query-contextual-summaries">Use query-contextual summaries instead of whole
-                    documents</label>
+                <label for="use-query-contextual-summaries">Use query-contextual summaries</label>
+            </div>
+        </div>
+        <div class="form-group form-group-flex">
+            <div>
+                <input type="checkbox" id="suggest-followup-questions" />
+            </div>
+            <div>
+                <label for="toggle-icons">Suggest followup questions</label>
             </div>
         </div>
         <div class="form-group form-group-flex">
@@ -209,10 +220,6 @@
                 <label for="toggle-icons">Toggle icons</label>
             </div>
         </div>
-        <div class="form-group">
-            <label for="suggest-followup-questions">Suggest followup questions:</label>
-            <input type="text" id="suggest-followup-questions" />
-        </div>
         <div class="accordion">
             <div class="accordion-header" id="datasources-header">
                 <span>Included Datasources</span>
@@ -221,18 +228,10 @@
             <div class="accordion-content" id="datasources-content">
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-database" />
+                        <input type="checkbox" id="datasource-all" />
                     </div>
                     <div>
-                        <label for="datasource-database">Database</label>
-                    </div>
-                </div>
-                <div class="form-group form-group-flex">
-                    <div>
-                        <input type="checkbox" id="datasource-azure-storage" />
-                    </div>
-                    <div>
-                        <label for="datasource-azure-storage">Azure Storage</label>
+                        <label for="datasource-database">All</label>
                     </div>
                 </div>
                 <div class="form-group form-group-flex">
@@ -245,6 +244,22 @@
                 </div>
                 <div class="form-group form-group-flex">
                     <div>
+                        <input type="checkbox" id="datasource-spreadsheet" />
+                    </div>
+                    <div>
+                        <label for="datasource-spreadsheet">Spreadsheet</label>
+                    </div>
+                </div>
+                <div class="form-group form-group-flex">
+                    <div>
+                        <input type="checkbox" id="datasource-azure-storage" />
+                    </div>
+                    <div>
+                        <label for="datasource-azure-storage">Azure Storage</label>
+                    </div>
+                </div>
+                <div class="form-group form-group-flex">
+                    <div>
                         <input type="checkbox" id="datasource-structured-data" />
                     </div>
                     <div>
@@ -253,10 +268,10 @@
                 </div>
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-spreadsheet" />
+                        <input type="checkbox" id="datasource-database" />
                     </div>
                     <div>
-                        <label for="datasource-spreadsheet">Spreadsheet</label>
+                        <label for="datasource-database">Relational Database</label>
                     </div>
                 </div>
             </div>
