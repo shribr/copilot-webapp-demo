@@ -522,7 +522,7 @@ function New-AIHubAndModel {
             az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
             #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
             Write-Host "AI Hub: '$aiHubName' created."
-            Write-Log -message "AI Hub: '$aiHubName' created." logFilePath $global:LogFilePath
+            Write-Log -message "AI Hub: '$aiHubName' created." -logFilePath $global:LogFilePath
         }
         catch {
             # Check if the error is due to soft deletion
@@ -532,18 +532,22 @@ function New-AIHubAndModel {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
                     Write-Host "AI Hub '$aiHubName' restored."
-                    Write-Log -message "AI Hub '$aiHubName' restored." logFilePath $global:LogFilePath
+                    Write-Log -message "AI Hub '$aiHubName' restored." -logFilePath $global:LogFilePath
                 }
                 catch {
                     Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
+                    Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
                 }
             }
             else {
                 Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
+                Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
             }    
         }
+    }
+    else {              
+        Write-Host "AI Hub '$aiHubName' already exists."
+        Write-Log -message "AI Hub '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 
     # Create AI Service
@@ -556,36 +560,26 @@ function New-AIHubAndModel {
         }
         catch {
             Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
     Read-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
-
-    # Try to create an Azure Machine Learning workspace (AI Hub)
-    if ($existingResources -notcontains $aiHubName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-            az ml workspace create --kind hub --name $aiHubName --resource-group $resourceGroupName --location $location --output none
-            Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
-            Write-Log -message "Azure Machine Learning workspace '$aiHubName' created." logFilePath $global:LogFilePath
-        }
-        catch {
-            Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
-        }
-    }
 
     # Create AI Hub connection
     if ($existingResources -notcontains $aiHubName) {
         try {
             az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
             Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
-            Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." logFilePath $global:LogFilePath
+            Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." -logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
+            Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
+    }
+    else {              
+        Write-Host "AI Hub connection for '$aiHubName' already exists."
+        Write-Log -message "AI Hub connection for '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 
     # Create AI Model Deployment
@@ -600,18 +594,28 @@ function New-AIHubAndModel {
 
         try {
             $ErrorActionPreference = 'Stop'
-            az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0"
-            Write-Host "AI Model deployment: '$aiModelName' created."
-            Write-Log -message "AI Model deployment: '$aiModelName' created." logFilePath $global:LogFilePath
+            $jsonOutput = az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0" 2>&1 | Out-String
+            
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+                Write-Host "Failed to create AI Model deployment '$aiModelName'."
+                Write-Log -message "Failed to create AI Model deployment '$aiModelName'." -logFilePath $global:LogFilePath
+            }
+            else {
+                Write-Host "AI Model deployment: '$aiModelName' created."
+                Write-Log -message "AI Model deployment: '$aiModelName' created." -logFilePath $global:LogFilePath
+        }
         }
         catch {
-            Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
+            
+            Write-Host "Failed to create AI Model deployment '$aiModelName'."
+            Write-Log -message "Failed to create AI Model deployment '$aiModelName'." -logFilePath $global:LogFilePath
         }
     }
     else {
         Write-Host "AI Model '$aiModelName' already exists."
-        Write-Log -message "AI Model '$aiModelName' already exists." logFilePath $global:LogFilePath
+        Write-Log -message "AI Model '$aiModelName' already exists." -logFilePath $global:LogFilePath
     }
 
     # Create AI Project
@@ -620,16 +624,16 @@ function New-AIHubAndModel {
             $ErrorActionPreference = 'Stop'
             az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
             Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
-            Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created." logFilePath $global:LogFilePath
+            Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
+            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
     else {
         Write-Host "AI Project '$aiProjectName' already exists."
-        Write-Log -message "AI Project '$aiProjectName' already exists." logFilePath $global:LogFilePath
+        Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 
 }
