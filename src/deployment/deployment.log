@@ -1,12 +1,18 @@
 *** LOG SEQUENCE: 1 ***
-2024-10-11 18:35:07 - Storage account 'stcopilotdemo001' already exists.
-2024-10-11 18:35:07 - App Service Plan 'asp-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - Search Service 'srch-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - Log Analytics workspace 'log-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - Application Insights 'appi-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - Cognitive Service 'cog-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - Identity 'id-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - Key Vault 'kv-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - OpenAI Service 'openai-copilot-demo-001' already exists.
-2024-10-11 18:35:07 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
-2024-10-11 18:35:22 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 02:10:31 - Storage account 'stcopilotdemo001' already exists.
+2024-10-12 02:10:31 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - Search Service 'srch-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - Identity 'id-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-10-12 02:10:31 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-10-12 02:10:36 - webApp 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 02:10:44 - webApp 'app-copilot-demo-001' deployed successfully.
+2024-10-12 02:10:51 - functionApp 'func-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 02:11:12 - functionApp 'func-copilot-demo-001' deployed successfully.
+2024-10-12 02:11:13 - File 'ai.connection.yaml' created and populated.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 00 MIN : 50 SEC : 590 MS ***
+

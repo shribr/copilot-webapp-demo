@@ -1,0 +1,11 @@
+2024-10-12 01:58:58 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 02:02:35 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 02:02:54 - webApp app 'app-copilot-demo-001' deployed successfully.
+2024-10-12 02:03:02 - functionApp app 'func-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 02:03:27 - functionApp app 'func-copilot-demo-001' deployed successfully.
+2024-10-12 02:03:32 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-12 02:03:46 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+2024-10-12 02:04:42 - webApp app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 02:04:59 - webApp app 'app-copilot-demo-001' deployed successfully.
+2024-10-12 02:11:16 - AI Model deployment: 'aimodel-copilot-demo-001' created.
+2024-10-12 02:11:20 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.

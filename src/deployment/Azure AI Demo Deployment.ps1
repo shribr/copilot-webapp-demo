@@ -11,7 +11,7 @@
 .SYNOPSIS
     This script automates the deployment of various Azure resources.
 
-.DESCRIPTION
+.DESCRIPTION˚¡
     This script reads parameters from a JSON file and uses them to create and configure the following list of Azure resources:
     # 1. storage accounts
     # 2. app service plans
@@ -94,6 +94,51 @@
 param (
     [string]$parametersFile = "parameters.json"
 )
+
+# Mapping of global resource types
+$global:ResourceTypes = @(
+    "Microsoft.Storage/storageAccounts",
+    "Microsoft.KeyVault/vaults",
+    "Microsoft.Sql/servers",
+    "Microsoft.DocumentDB/databaseAccounts",
+    "Microsoft.Web/serverFarms",
+    "Microsoft.Web/sites",
+    "Microsoft.DataFactory/factories",
+    "Microsoft.ContainerRegistry/registries",
+    "Microsoft.CognitiveServices/accounts",
+    "Microsoft.Search/searchServices"
+)
+
+# List of all KeyVault secret keys
+$global:KeyVaultSecrets = @(
+    “AzureOpenAiChatGptDeployment”, 
+    “AzureOpenAiEmbeddingDeployment”, 
+    “AzureOpenAiServiceEndpoint”, 
+    “AzureSearchIndex”, 
+    “AzureSearchServiceEndpoint”, 
+    “AzureStorageAccountEndpoint”, 
+    “AzureStorageContainer”, 
+    “UseAOAI”, 
+    “UseVision”
+)
+
+# Initialize the deployment path
+$global:deploymentPath = Get-Location
+
+# Initialize the deployment path
+$currentLocation = Get-Location
+if ($currentLocation.Path -notlike "*src/deployment*") {
+    $global:deploymentPath = Join-Path -Path $currentLocation -ChildPath "src/deployment"
+} else {
+    $global:deploymentPath = $currentLocation
+}
+
+$global:LogFilePath = "$global:deploymentPath/deployment.log"
+
+Set-Location -Path $global:deploymentPath
+
+# Initialize the existing resources array
+$global:existingResources = @()
 
 # Function to get Cognitive Services API key
 function Get-CognitiveServicesApiKey {
@@ -327,7 +372,7 @@ function Initialize-Parameters {
     )
 
     # Navigate to the project directory
-    Set-DeploymentDirectory
+    Set-DirectoryPath -targetDirectory $global:deploymentPath
         
     # Load parameters from the JSON file
     $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
@@ -477,7 +522,7 @@ function New-AIHubAndModel {
             az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
             #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
             Write-Host "AI Hub: '$aiHubName' created."
-            Write-Log -message "AI Hub: '$aiHubName' created." -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "AI Hub: '$aiHubName' created." logFilePath $global:LogFilePath
         }
         catch {
             # Check if the error is due to soft deletion
@@ -487,16 +532,16 @@ function New-AIHubAndModel {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
                     Write-Host "AI Hub '$aiHubName' restored."
-                    Write-Log -message "AI Hub '$aiHubName' restored." -logFilePath "$currentPath/deployment.log"
+                    Write-Log -message "AI Hub '$aiHubName' restored." logFilePath $global:LogFilePath
                 }
                 catch {
                     Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+                    Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
                 }
             }
             else {
                 Write-Error "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+                Write-Log -message "Failed to create AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
             }    
         }
     }
@@ -522,11 +567,11 @@ function New-AIHubAndModel {
             $ErrorActionPreference = 'Stop'
             az ml workspace create --kind hub --name $aiHubName --resource-group $resourceGroupName --location $location --output none
             Write-Host "Azure AI Machine Learning workspace '$aiHubName' created."
-            Write-Log -message "Azure Machine Learning workspace '$aiHubName' created." -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "Azure Machine Learning workspace '$aiHubName' created." logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "Failed to create Azure Machine Learning workspace '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
         }
     }
 
@@ -535,11 +580,11 @@ function New-AIHubAndModel {
         try {
             az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
             Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
-            Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
         }
     }
 
@@ -557,16 +602,16 @@ function New-AIHubAndModel {
             $ErrorActionPreference = 'Stop'
             az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0"
             Write-Host "AI Model deployment: '$aiModelName' created."
-            Write-Log -message "AI Model deployment: '$aiModelName' created." -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "AI Model deployment: '$aiModelName' created." logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
         }
     }
     else {
         Write-Host "AI Model '$aiModelName' already exists."
-        Write-Log -message "AI Model '$aiModelName' already exists." -logFilePath "$currentPath/deployment.log"
+        Write-Log -message "AI Model '$aiModelName' already exists." logFilePath $global:LogFilePath
     }
 
     # Create AI Project
@@ -575,16 +620,16 @@ function New-AIHubAndModel {
             $ErrorActionPreference = 'Stop'
             az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
             Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
-            Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created." -logFilePath "$currentPath/deployment.log"
+            Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created." logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" logFilePath $global:LogFilePath
         }
     }
     else {
         Write-Host "AI Project '$aiProjectName' already exists."
-        Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath "$currentPath/deployment.log"
+        Write-Log -message "AI Project '$aiProjectName' already exists." logFilePath $global:LogFilePath
     }
 
 }
@@ -597,50 +642,30 @@ function New-AppService {
         [string]$storageAccountName
     )
 
-    Set-DirectoryLocation -expectedDirectory "src/deployment"
+    #Set-DirectoryPath -targetDirectory "src/deployment"
     
     # Navigate to the project directory
-    $currentPath = Get-Location
-    $currentFolderName = Split-Path -Path $currentPath -Leaf
+    #$currentPath = Get-Location
+    #$currentFolderName = Split-Path -Path $currentPath -Leaf
 
     $appExists = @()
 
     $ErrorActionPreference = 'Stop'
     
     # Making sure we are in the correct folder depending on the app type
-    if ($appService.Type -eq "webApp") {
-        if ($currentFolderName -ne "app") {
-            Set-Location -Path $appService.Path
-        }
-    }
-    else {
-        if ($currentFolderName -ne "functions") {
-            Set-Location -Path $appService.Path
-        }
-    }
+    Set-DirectoryPath -targetDirectory $appService.Path
 
     $appServiceType = $appService.Type
     $appServiceName = $appService.Name
 
-    try {
-        # Compress the function app code
-        $zipFilePath = "$appServiceType-$appServiceName.zip"
-
-        if (Test-Path $zipFilePath) {
-            Remove-Item $zipFilePath
-        }
-        
-        # compress the function app code
-        zip -r $zipFilePath * .env
-
-        
+    try {       
         try {
 
-            if ($appServiceType -eq "webApp") {
+            if ($appServiceType -eq "Web") {
 
                 $appExists = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "name" --output tsv
 
-                if (-not $webAppExists) {
+                if (-not $appExists) {
                     # Create a new web app
                     az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
                 }
@@ -659,14 +684,25 @@ function New-AppService {
             if (-not $appExists) {
 
                 Write-Host "$appServiceType app '$appServiceName' created."
-                Write-Log -message "$appServiceType app '$appServiceName' created. Moving on to deployment." -logFilePath "$currentPath/deployment.log"
+                Write-Log -message "$appServiceType app '$appServiceName' created. Moving on to deployment." -logFilePath $global:LogFilePath
             }
             else {              
                 Write-Host "$appServiceType app '$appServiceName' already exists. Moving on to deployment."
-                Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath "$currentPath/deployment.log"
+                Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath $global:LogFilePath
             }
 
             try {
+
+                # Compress the function app code
+                $zipFilePath = "$appServiceType-$appServiceName.zip"
+
+                if (Test-Path $zipFilePath) {
+                    Remove-Item $zipFilePath
+                }
+                
+                # compress the function app code
+                zip -r $zipFilePath * .env
+
                 if ($appService.Type -eq "webApp") {
                     # Deploy the web app
                     az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
@@ -677,22 +713,24 @@ function New-AppService {
                 }
 
                 Write-Host "$appServiceType app '$appServiceName' deployed successfully."
-                Write-Log -message "$appServiceType app '$appServiceName' deployed successfully." -logFilePath "$currentPath/deployment.log"
+                Write-Log -message "$appServiceType app '$appServiceName' deployed successfully." -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+                Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
             }
         }
         catch {
             Write-Error "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+            Write-Log -message "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
     catch {
         Write-Error "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath "$currentPath/deployment.log"
+        Write-Log -message "Failed to zip $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
     }
+
+    Set-DirectoryPath -targetDirectory $global:deploymentPath
 }
 
 # Function to get the latest API version
@@ -1190,46 +1228,40 @@ function Restore-SoftDeletedResource {
     }
 }
 
-# Function to navigate to the 'deployment' directory
-function Set-DeploymentDirectory {
-    while ($true) {
-        $currentPath = Get-Location
-        $currentFolderName = Split-Path -Path $currentPath -Leaf
-
-        if ($currentFolderName -eq "deployment") {
-            Write-Host "Reached the 'deployment' directory."
-            break
-        }
-        else {
-            Set-Location -Path ".."
-        }
-    }
-}
-
-# Function to set the correct directory by traversing up the directory structure
-function Set-DirectoryLocation {
-    param(
-        [string]$expectedDirectory
+# Function to set the directory location
+function Set-DirectoryPath {
+    param (
+        [string]$targetDirectory
     )
-    $currentDir = Get-Location
 
-    try {
-        $deploymentDir = Find-ExpectedDirectory
-        Set-Location $deploymentDir
-        Write-Host "Changed directory to $deploymentDir."
-        
-        while ($currentDir -ne [System.IO.Path]::GetPathRoot($currentDir)) {
-            if (Test-Path (Join-Path $currentDir $expectedDeploymentDir)) {
-                return (Join-Path $currentDir $expectedDeploymentDir)
-            }
-            $currentDir = (Get-Item $currentDir).Parent.FullName
+    # Debug output to check the input
+    Write-Host "Target Directory: $targetDirectory"
+
+    # Get the root directory from the global variable
+    #$rootDirectory = $global:deploymentPath
+
+    # Debug output to check the root directory
+    #Write-Host "Root Directory: $rootDirectory"
+
+    # Get the current directory
+    $currentDirectory = Get-Location
+
+    # Debug output to check the current directory
+    Write-Host "Current Directory: $currentDirectory"
+
+    # Check if the current path is already equal to the root directory
+    if ($currentDirectory.Path -notlike $targetDirectory) {
+        # Check if the root directory exists
+        if (Test-Path -Path $targetDirectory) {
+            # Set location to the root directory
+            Set-Location -Path $targetDirectory
+            Write-Host "Changed directory to root: $targetDirectory"
+        } else {
+            throw "Root directory '$targetDirectory' does not exist."
         }
-
-        Write-Host "Current directory is $deploymentDir"
-        Write-Log -message "Current directory is $deploymentDir" -logFilePath "deployment.log"
-    }
-    catch {
-        Write-Host "Expected directory '$expectedDeploymentDir' not found."
+    } else {
+        Write-Host "Already in the root directory: $targetDirectory"
+        return
     }
 }
 
@@ -1283,7 +1315,7 @@ function Set-KeyVaultSecrets {
         [string]$resourceGroupName
     )
     # Loop through the array of secrets and store each one in the Key Vault
-    foreach ($secretName in $globalKeyVaultSecrets) {
+    foreach ($secretName in $global:KeyVaultSecrets) {
         # Generate a random value for the secret
         #$secretValue = New-RandomPassword
         $secretValue = "TESTSECRET"
@@ -1531,7 +1563,7 @@ function Test-ResourceExists {
         [string]$resourceGroupName
     )
 
-    if ($globalResourceTypes -contains $resourceType) {
+    if ($global:ResourceTypes -contains $resourceType) {
         switch ($resourceType) {
             "Microsoft.Storage/storageAccounts" {
                 $nameAvailable = az storage account check-name --name $resourceName --query "nameAvailable" --output tsv
@@ -1607,14 +1639,16 @@ function Write-Log {
         [string]$logFilePath = "deployment.log"
     )
 
-    #$logFilePath = "deployment.log"
+    $currentDirectory = (Get-Location).Path
 
-    Set-DirectoryLocation -expectedDirectory "src/deployment"
+    Set-DirectoryPath -targetDirectory $global:deploymentPath
 
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logMessage = "$timestamp - $message"
 
     Add-Content -Path $logFilePath -Value $logMessage
+
+    Set-DirectoryPath -targetDirectory $currentDirectory
 }
 
 
@@ -1624,47 +1658,18 @@ function Write-Log {
 
 $ErrorActionPreference = 'Stop'
 
-# Mapping of global resource types
-$globalResourceTypes = @(
-    "Microsoft.Storage/storageAccounts",
-    "Microsoft.KeyVault/vaults",
-    "Microsoft.Sql/servers",
-    "Microsoft.DocumentDB/databaseAccounts",
-    "Microsoft.Web/serverFarms",
-    "Microsoft.Web/sites",
-    "Microsoft.DataFactory/factories",
-    "Microsoft.ContainerRegistry/registries",
-    "Microsoft.CognitiveServices/accounts",
-    "Microsoft.Search/searchServices"
-)
-
-# List of all KeyVault secret keys
-$globalKeyVaultSecrets = @(
-    “AzureOpenAiChatGptDeployment”, 
-    “AzureOpenAiEmbeddingDeployment”, 
-    “AzureOpenAiServiceEndpoint”, 
-    “AzureSearchIndex”, 
-    “AzureSearchServiceEndpoint”, 
-    “AzureStorageAccountEndpoint”, 
-    “AzureStorageContainer”, 
-    “UseAOAI”, 
-    “UseVision”
-)
-
 # Initialize parameters
 $initParams = Initialize-Parameters -parametersFile $parametersFile
 #Write-Host "Parameters initialized."
 #Write-Log -message "Parameters initialized."
 
 # Alphabetize the parameters object
-$global:parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
-
-$global:existingResources = @()
+$parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
 
 # Set the user-assigned identity name
 $userPrincipalName = $parameters.userPrincipalName
 
-Set-DirectoryLocation -expectedDirectory "src/deployment"
+Set-DirectoryPath -targetDirectory $global:deploymentPath
 
 # Start the deployment
 Start-Deployment
