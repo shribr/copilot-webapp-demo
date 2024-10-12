@@ -515,6 +515,8 @@ function New-AIHubAndModel {
     
     #$aiHubWorkspaceName = "workspace-$aiHubName"
 
+    Set-DirectoryPath -targetDirectory $global:deploymentPath
+    
     # Create AI Hub
     if ($existingResources -notcontains $aiHubName) {
         try {
