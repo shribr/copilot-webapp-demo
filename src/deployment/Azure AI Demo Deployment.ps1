@@ -233,7 +233,6 @@ function Get-RandomInt {
     return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 }
 
-
 # Function to alphabetize the parameters object
 function Get-Parameters-Sorted {
     param (
@@ -418,7 +417,7 @@ function Initialize-Parameters {
     $global:cosmosDbAccountName = $parametersObject.cosmosDbAccountName
     $global:createResourceGroup = $parametersObject.createResourceGroup
     $global:deleteResourceGroup = $parametersObject.deleteResourceGroup
-    $global:deployZipResources = $parametersObject.deployZipResources,
+    $global:deployZipResources = $parametersObject.deployZipResources
     $global:documentIntelligenceName = $parametersObject.documentIntelligenceName
     $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
     $global:keyVaultName = $parametersObject.keyVaultName
@@ -471,6 +470,9 @@ function Initialize-Parameters {
     $parametersObject | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
     $parametersObject | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
     $parametersObject | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
+
+    Write-Host "Doc Intelligence: $documentIntelligenceName"
+    Write-Host "Search Service Name: $searchServiceName"
 
     return @{
         aiHubName                    = $aiHubName

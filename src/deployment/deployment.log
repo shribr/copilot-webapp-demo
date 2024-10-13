@@ -23,3 +23,7 @@
 2024-10-13 01:54:00 - AI project 'project-ai-copilot-demo-002' in 'hub-ai-copilot-demo-002' created.
 2024-10-13 01:54:00 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 04 MIN : 20 SEC : 009 MS ***
 
+*** LOG SEQUENCE: 2 ***
+*** SCRIPT START TIME: 10/13/2024 01:59:16 ***
+2024-10-13 01:59:17 - Resource group 'RG-COPILOT-DEMO-002' exists.
+2024-10-13 01:59:18 - Resource group 'RG-COPILOT-DEMO-002' exists.
