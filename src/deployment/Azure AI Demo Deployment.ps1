@@ -233,6 +233,26 @@ function Get-RandomInt {
     return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 }
 
+
+# Function to alphabetize the parameters object
+function Get-Parameters-Sorted {
+    param (
+        [Parameter(Mandatory = $true)]
+        [psobject]$Parameters
+    )
+
+    # Convert properties to an array and sort them by name
+    $sortedProperties = $Parameters.PSObject.Properties | Sort-Object Name
+
+    # Create a new sorted parameters object
+    $sortedParametersObject = New-Object PSObject
+    foreach ($property in $sortedProperties) {
+        $sortedParametersObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
+    }
+
+    return $sortedParametersObject
+}
+
 # Function to find a unique suffix and create resources
 function Get-UniqueSuffix {
     param (
@@ -396,6 +416,8 @@ function Initialize-Parameters {
     $global:containerAppsEnvironmentName = $parametersObject.containerAppsEnvironmentName
     $global:containerRegistryName = $parametersObject.containerRegistryName
     $global:cosmosDbAccountName = $parametersObject.cosmosDbAccountName
+    $global:createResourceGroup = $parametersObject.createResourceGroup
+    $global:deleteResourceGroup = $parametersObject.deleteResourceGroup
     $global:deployZipResources = $parametersObject.deployZipResources,
     $global:documentIntelligenceName = $parametersObject.documentIntelligenceName
     $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
@@ -469,6 +491,8 @@ function Initialize-Parameters {
         containerAppsEnvironmentName = $containerAppsEnvironmentName
         containerRegistryName        = $containerRegistryName
         cosmosDbAccountName          = $cosmosDbAccountName
+        createResourceGroup          = $createResourceGroup
+        deleteResourceGroup          = $deleteResourceGroup
         deployZipResources           = $deployZipResources
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
@@ -650,12 +674,6 @@ function New-AppService {
         [string]$storageAccountName
     )
 
-    #Set-DirectoryPath -targetDirectory "src/deployment"
-    
-    # Navigate to the project directory
-    #$currentPath = Get-Location
-    #$currentFolderName = Split-Path -Path $currentPath -Leaf
-
     $appExists = @()
 
     $ErrorActionPreference = 'Stop'
@@ -784,6 +802,38 @@ function New-RandomPassword {
         Write-Log -message "Failed to generate random password: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         return $null
     }
+}
+
+# Function to create a new resource group
+function New-ResourceGroup {
+    param (
+        [string]$resourceGroupName,
+        [string]$location
+    )
+
+    do {
+        $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -location $location
+
+        if ($resourceGroupExists -eq "true") {
+            Write-Host "Resource group '$resourceGroupName' already exists. Trying a new name."
+            Write-Log -message "Resource group '$resourceGroupName' already exists. Trying a new name."
+
+            $resourceSuffix++
+            $resourceGroupName = "$($resourceGroupName)-$resourceSuffix"
+        }
+
+    } while ($resourceGroupExists -eq "true")
+
+    try {
+        az group create --name $resourceGroupName --location $location --output none
+        Write-Host "Resource group '$resourceGroupName' created."
+        $resourceGroupExists = $false
+    }
+    catch {
+        Write-Host "An error occurred while creating the resource group."
+    }
+
+    return $resourceGroupName
 }
 
 # Function to create resources
@@ -1114,9 +1164,20 @@ function New-Resources {
             # Try to create a Document Intelligence account
             try {
                 $ErrorActionPreference = 'Stop'
-                az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
-                Write-Host "Document Intelligence account '$documentIntelligenceName' created."
-                Write-Log -message "Document Intelligence account '$documentIntelligenceName' created."
+                               
+                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
+            
+                # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+    
+                if ($jsonOutput -match "error") {
+                    Write-Host "Failed to create Document Intelligence Service '$documentIntelligenceName'."
+                    Write-Log -message "Failed to create Document Intelligence Service  '$documentIntelligenceName'." -logFilePath $global:LogFilePath
+                }
+                else {
+                    Write-Host "Document Intelligence account '$documentIntelligenceName' created."
+                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' created." -logFilePath $global:LogFilePath
+                }
+                
             }
             catch {     
                 # Check if the error is due to soft deletion
@@ -1181,19 +1242,28 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
 }
 
 # Function to delete Azure resource groups
-function Remove-AzureResourceGroups {
-    $resourceGroups = az group list --query "[?starts_with(name, 'myResourceGroup')].name" --output tsv
+function Remove-AzureResourceGroup {
+    
+    param (
+        [string]$resourceGroupName
+    )
 
-    foreach ($rg in $resourceGroups) {
+    $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -location $location
+
+    if ($resourceGroupExists -eq "true") {
         try {
-            az group delete --name $rg --yes --output none
-            Write-Host "Resource group '$rg' deleted."
-            Write-Log -message "Resource group '$rg' deleted."
+            az group delete --name $resourceGroupName --yes --output none
+            Write-Host "Resource group '$resourceGroupName' deleted."
+            Write-Log -message "Resource group '$resourceGroupName' deleted."
         }
         catch {
-            Write-Error "Failed to delete Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-            Write-Log -message "Failed to delete Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
+            Write-Error "Failed to delete resource group '$resourceGroupName'."
+            Write-Log -message "Failed to delete resource group '$resourceGroupName'."
         }
+    }
+    else {
+        Write-Host "Resource group '$resourceGroupName' does not exist."
+        Write-Log -message "Resource group '$resourceGroupName' does not exist."
     }
 }
 
@@ -1371,25 +1441,6 @@ function Set-RBACRoles {
     }
 }
 
-# Function to alphabetize the parameters object
-function Get-Parameters-Sorted {
-    param (
-        [Parameter(Mandatory = $true)]
-        [psobject]$Parameters
-    )
-
-    # Convert properties to an array and sort them by name
-    $sortedProperties = $Parameters.PSObject.Properties | Sort-Object Name
-
-    # Create a new sorted parameters object
-    $sortedParametersObject = New-Object PSObject
-    foreach ($property in $sortedProperties) {
-        $sortedParametersObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
-    }
-
-    return $sortedParametersObject
-}
-
 # Function to split a GUID and return the first 8 characters
 function Split-Guid {
 
@@ -1404,12 +1455,14 @@ function Split-Guid {
 # Function to start the deployment
 function Start-Deployment {
 
+    az config set extension.use_dynamic_install=yes_without_prompt
+
     $logFilePath = "deployment.log"
 
     # Initialize the sequence number
     $sequenceNumber = 1
 
-    $deleteResourceGroup = $false
+    #$deleteResourceGroup = $false
 
     # Check if the log file exists
     if (Test-Path $logFilePath) {
@@ -1439,14 +1492,40 @@ function Start-Deployment {
     # Start the timer
     $startTime = Get-Date
 
+    $startTimeMessage = "*** SCRIPT START TIME: $startTime ***"
+    Add-Content -Path $logFilePath -Value $startTimeMessage
+
+    $resourceGroupName = $global:resourceGroupName
+
+    if ($appendUniqueSuffix -eq $true) 
+    {
+        $resourceGroupName = "$resourceGroupName$resourceSuffix"
+    }
+
+    $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -location $location
+
     if ($deleteResourceGroup -eq $true) {
         # Delete existing resource groups with the same name
-        Remove-AzureResourceGroups
+        Remove-AzureResourceGroup -resourceGroupName $resourceGroupName
     }
     
-    # Check if the resource group exists
-    $resourceGroupName = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -resourceSuffix $resourceSuffix -deleteResourceGroup $deleteResourceGroup
+    if ($resourceGroupExists -eq $true) {
 
+        if ($createResourceGroup -eq $true)
+        {        
+            New-ResourceGroup -resourceGroupName $resourceGroupName -location $location
+        } 
+        else {
+            Write-Host "Using existing resource group '$resourceGroupName'."
+            Write-Log -message "Using existing resource group '$resourceGroupName'."
+        }  
+    }
+    else {
+        New-ResourceGroup -resourceGroupName $resourceGroupName -location $location
+    }
+
+    #return 
+    
     if ($appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
@@ -1522,52 +1601,35 @@ function Start-Deployment {
 
     # Log the total execution time
     $executionTimeMessage = "*** TOTAL SCRIPT EXECUTION TIME: $executionTimeFormatted ***"
-    Add-Content -Path $logFilePath -Value $executionTimeMessage
+
+    Write-Host $executionTimeMessage
+    Write-Log -message $executionTimeMessage -logFilePath $logFilePath
 
     # Add a line break
     Add-Content -Path $logFilePath -Value ""
 }
 
-# Function to check if a resource group exists
+# The Test-ResourceGroupExists function checks if a specified Azure resource group exists. If it does, the function appends a suffix to the resource group name and checks again. This process continues until a unique resource group name is found.
 function Test-ResourceGroupExists {
     param (
-        [int]$resourceSuffix,
         [string]$resourceGroupName,
-        [bool]$deleteResourceGroup
+        [string]$location
     )
 
-    if ($deleteResourceGroup -eq $false) {
-        $resourceGroupName = "$($resourceGroupName)-$resourceSuffix"
+    $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
 
-        $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
+    if ($resourceGroupExists -eq $true) {
+        Write-Host "Resource group '$resourceGroupName' exists."
+        Write-Log -message "Resource group '$resourceGroupName' exists."
+
+        return true
     }
     else {
-        do {
-            $resourceGroupName = "$($resourceGroupName)-$resourceSuffix"
-            $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
+        Write-Host "Resource group '$resourceGroupName' does not exist."
+        Write-Log -message "Resource group '$resourceGroupName' does not exist."
 
-            try {
-                if ($resourceGroupExists -eq "true") {
-                    Write-Host "Resource group '$resourceGroupName' exists."
-                    $resourceSuffix++
-                }
-                else {
-                    az group create --name $resourceGroupName --location $location --output none
-                    Write-Host "Resource group '$resourceGroupName' created."
-                    $resourceGroupExists = $false
-                        
-                }
-            }
-            catch {
-                Write-Error "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-                Write-Log -message "Failed to create Resource Group: $_ (Line $_.InvocationInfo.ScriptLineNumber)"
-            }
-
-        } while ($resourceGroupExists)
-
+        return false
     }
-
-    return $resourceGroupName
 }
 
 # Function to check if a resource exists
