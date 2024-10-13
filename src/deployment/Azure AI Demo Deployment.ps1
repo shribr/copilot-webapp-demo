@@ -140,6 +140,29 @@ Set-Location -Path $global:deploymentPath
 # Initialize the existing resources array
 $global:existingResources = @()
 
+# function to get the app root directory
+function Find-AppRoot {
+    param (
+        [string]$currentDirectory
+    )
+
+    # Get the directory info
+    $directoryInfo = Get-Item -Path $currentDirectory
+
+    # Check if the current directory is "app"
+    if ($directoryInfo.Name -eq "app") {
+        return $directoryInfo.FullName
+    }
+
+    # If the parent directory is null, we have reached the root of the filesystem
+    if ($directoryInfo.Parent -eq $null) {
+        return $null
+    }
+
+    # Move one level up and call the function recursively
+    return Find-AppRoot -currentDirectory $directoryInfo.Parent.FullName
+}
+
 # Function to get Cognitive Services API key
 function Get-CognitiveServicesApiKey {
     param (
@@ -685,6 +708,7 @@ function New-AppService {
 
     $appServiceType = $appService.Type
     $appServiceName = $appService.Name
+    $deployZipPackage = $appService.DeployZipPackage
 
     try {       
         try {
@@ -719,12 +743,16 @@ function New-AppService {
                 Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath $global:LogFilePath
             }
 
-            if ($deployZipResources -eq $true)
+            if ($deployZipResources -eq $true -or $deployZipPackage -eq $true)
             {
                 try {
 
+                    $appRoot = Find-AppRoot -currentDirectory (Get-Location).Path
+
+                    $tempPath = Join-Path -Path $appRoot -ChildPath "temp"
+
                     # Compress the function app code
-                    $zipFilePath = "$appServiceType-$appServiceName.zip"
+                    $zipFilePath = "$tempPath/$appServiceType-$appServiceName.zip"
 
                     if (Test-Path $zipFilePath) {
                         Remove-Item $zipFilePath
@@ -733,7 +761,7 @@ function New-AppService {
                     # compress the function app code
                     zip -r $zipFilePath * .env
 
-                    if ($appService.Type -eq "webApp") {
+                    if ($appService.Type -eq "Web") {
                         # Deploy the web app
                         az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
                     }

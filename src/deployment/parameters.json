@@ -47,6 +47,8 @@
   "appServices": [
     {
       "Name": "app-copilot-demo-002",
+      "DeployZipPackage": true,
+      "DeletePackageAfterDeploy": true,
       "Type": "Web",
       "Path": "app/frontend",
       "AppServicePlan": "asp-copilot-demo-002",
@@ -56,8 +58,10 @@
     },
     {
       "Name": "func-copilot-demo-002",
+      "DeployZipPackage": false,
+      "DeletePackageAfterDeploy": false,
       "Type": "Function",
-      "Path": "functions/search",
+      "Path": "app/functions/search",
       "AppServicePlan": "asp-copilot-demo-002",
       "Runtime": "node",
       "Location": "eastus",
