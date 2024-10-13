@@ -18,6 +18,7 @@
   "containerAppsEnvironmentName": "cae-copilot-demo-001",
   "containerRegistryName": "cr-copilot-demo-001",
   "cosmosDbAccountName": "cosmos-copilot-demo-001",
+  "deployZipResources": false,
   "domainName": "azurewebsites.net",
   "documentIntelligenceName": "docintel-copilot-demo-001",
   "eventHubNamespaceName": "eh-copilot-demo-001",

@@ -396,6 +396,7 @@ function Initialize-Parameters {
     $global:containerAppsEnvironmentName = $parametersObject.containerAppsEnvironmentName
     $global:containerRegistryName = $parametersObject.containerRegistryName
     $global:cosmosDbAccountName = $parametersObject.cosmosDbAccountName
+    $global:deployZipResources = $parametersObject.deployZipResources,
     $global:documentIntelligenceName = $parametersObject.documentIntelligenceName
     $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
     $global:keyVaultName = $parametersObject.keyVaultName
@@ -468,6 +469,7 @@ function Initialize-Parameters {
         containerAppsEnvironmentName = $containerAppsEnvironmentName
         containerRegistryName        = $containerRegistryName
         cosmosDbAccountName          = $cosmosDbAccountName
+        deployZipResources           = $deployZipResources
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
         keyVaultName                 = $keyVaultName
@@ -697,33 +699,40 @@ function New-AppService {
                 Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath $global:LogFilePath
             }
 
-            try {
+            if ($deployZipResources -eq $true)
+            {
+                try {
 
-                # Compress the function app code
-                $zipFilePath = "$appServiceType-$appServiceName.zip"
+                    # Compress the function app code
+                    $zipFilePath = "$appServiceType-$appServiceName.zip"
 
-                if (Test-Path $zipFilePath) {
-                    Remove-Item $zipFilePath
+                    if (Test-Path $zipFilePath) {
+                        Remove-Item $zipFilePath
+                    }
+                    
+                    # compress the function app code
+                    zip -r $zipFilePath * .env
+
+                    if ($appService.Type -eq "webApp") {
+                        # Deploy the web app
+                        az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                    }
+                    else {
+                        # Deploy the function app
+                        az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                    }
+
+                    Write-Host "$appServiceType app '$appServiceName' deployed successfully."
+                    Write-Log -message "$appServiceType app '$appServiceName' deployed successfully." -logFilePath $global:LogFilePath
                 }
-                
-                # compress the function app code
-                zip -r $zipFilePath * .env
-
-                if ($appService.Type -eq "webApp") {
-                    # Deploy the web app
-                    az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                catch {
+                    Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
                 }
-                else {
-                    # Deploy the function app
-                    az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
-                }
-
-                Write-Host "$appServiceType app '$appServiceName' deployed successfully."
-                Write-Log -message "$appServiceType app '$appServiceName' deployed successfully." -logFilePath $global:LogFilePath
             }
-            catch {
-                Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            else {
+                Write-Host "Skipping deployment for $appServiceType app '$appServiceName'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script."
+                Write-Log -message "Skipping deployment for $appServiceType app '$appServiceName'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script." -logFilePath $global:LogFilePath
             }
         }
         catch {

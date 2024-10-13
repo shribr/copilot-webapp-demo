@@ -1,22 +1,22 @@
 *** LOG SEQUENCE: 1 ***
-2024-10-12 03:00:27 - Storage account 'stcopilotdemo001' already exists.
-2024-10-12 03:00:27 - App Service Plan 'asp-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - Search Service 'srch-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - Log Analytics workspace 'log-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - Application Insights 'appi-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - Cognitive Service 'cog-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - Identity 'id-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - Key Vault 'kv-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - OpenAI Service 'openai-copilot-demo-001' already exists.
-2024-10-12 03:00:27 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
-2024-10-12 03:00:29 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
-2024-10-12 03:00:37 - Web app 'app-copilot-demo-001' deployed successfully.
-2024-10-12 03:00:40 - Function app 'func-copilot-demo-001' already exists. Moving on to deployment.
-2024-10-12 03:00:59 - Function app 'func-copilot-demo-001' deployed successfully.
-2024-10-12 03:00:59 - AI Hub 'hub-ai-copilot-demo-001' already exists.
-2024-10-12 03:01:00 - File 'ai.connection.yaml' created and populated.
-2024-10-12 03:01:00 - AI Hub connection for 'hub-ai-copilot-demo-001' already exists.
-2024-10-12 03:01:05 - Failed to create AI Model deployment 'aimodel-copilot-demo-001'.
-2024-10-12 03:01:55 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
-*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 01 MIN : 41 SEC : 068 MS ***
+2024-10-12 20:48:13 - Storage account 'stcopilotdemo001' already exists.
+2024-10-12 20:48:13 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-12 20:48:13 - Search Service 'srch-copilot-demo-001' already exists.
+2024-10-12 20:48:13 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-10-12 20:48:13 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-10-12 20:48:13 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-10-12 20:48:13 - Identity 'id-copilot-demo-001' already exists.
+2024-10-12 20:48:13 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-10-12 20:48:13 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-10-12 20:48:15 - Document Intelligence account '' created.
+2024-10-12 20:48:18 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 20:48:18 - Skipping deployment for Web app 'app-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-12 20:48:22 - Function app 'func-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-12 20:48:22 - Skipping deployment for Function app 'func-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-12 20:48:22 - AI Hub 'hub-ai-copilot-demo-001' already exists.
+2024-10-12 20:48:23 - File 'ai.connection.yaml' created and populated.
+2024-10-12 20:48:23 - AI Hub connection for 'hub-ai-copilot-demo-001' already exists.
+2024-10-12 20:48:27 - Failed to create AI Model deployment 'aimodel-copilot-demo-001'.
+2024-10-12 20:49:06 - AI project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+*** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 00 MIN : 57 SEC : 554 MS ***
 
