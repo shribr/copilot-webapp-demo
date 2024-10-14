@@ -13,6 +13,12 @@ a {
   color: rgba(13, 12, 52, 1);
 }
 
+#gao_logo {
+  width: 200px;
+  margin-left: -25px;
+  padding-right: 20px;
+}
+
 /* Ensure the body takes the full viewport height and uses Flexbox */
 .flex-container {
   display: flex;
@@ -68,6 +74,14 @@ a {
 #toolbar .title {
   font-size: 1.8em;
   font-weight: bold;
+  text-align: left;
+  width: 100%;
+}
+
+.links {
+  width: 100%;
+  text-align: right;
+  white-space: nowrap;
 }
 
 #toolbar .links a {

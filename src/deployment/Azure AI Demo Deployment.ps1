@@ -543,6 +543,7 @@ function Initialize-Parameters {
     $global:managedIdentityName = $parametersObject.managedIdentityName
     $global:openAIName = $parametersObject.openAIName
     $global:portalDashboardName = $parametersObject.portalDashboardName
+    $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
     $global:resourceGroupName = $parametersObject.resourceGroupName
     $global:resourceSuffix = $parametersObject.resourceSuffix
@@ -555,6 +556,7 @@ function Initialize-Parameters {
     $global:sharedDashboardName = $parametersObject.sharedDashboardName
     $global:sqlServerName = $parametersObject.sqlServerName
     $global:storageAccountName = $parametersObject.storageAccountName
+    $global:subNetName = $parametersObject.subNetName
     $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
     $global:virtualNetworkName = $parametersObject.virtualNetworkName
     #$global:objectId = $parametersObject.objectId
@@ -622,6 +624,7 @@ function Initialize-Parameters {
         openAIName                   = $openAIName
         objectId                     = $objectId
         portalDashboardName          = $portalDashboardName
+        privateEndPointName          = $privateEndPointName
         redisCacheName               = $redisCacheName
         resourceGroupName            = $resourceGroupName
         resourceGuid                 = $resourceGuid
@@ -636,6 +639,7 @@ function Initialize-Parameters {
         sharedDashboardName          = $sharedDashboardName
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
+        subNetName                   = $subNetName
         subscriptionId               = $subscriptionId
         tenantId                     = $tenantId
         userAssignedIdentityName     = $userAssignedIdentityName

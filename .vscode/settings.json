@@ -1,0 +1,10 @@
+{
+    "azureFunctions.deploySubpath": "src/deployment/functions/search",
+    "azureFunctions.postDeployTask": "npm install (functions)",
+    "azureFunctions.projectLanguage": "JavaScript",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.projectSubpath": "src/deployment/functions/search",
+    "azureFunctions.preDeployTask": "npm prune (functions)",
+    "terminal.integrated.cwd": "src/deployment"
+}
