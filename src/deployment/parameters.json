@@ -20,7 +20,7 @@
   "cosmosDbAccountName": "cosmos-copilot-demo-002",
   "createResourceGroup": true,
   "deleteResourceGroup": false,
-  "deployZipResources": false,
+  "deployZipResources": true,
   "domainName": "azurewebsites.net",
   "documentIntelligenceName": "docintel-copilot-demo-002",
   "eventHubNamespaceName": "eh-copilot-demo-002",
@@ -58,7 +58,7 @@
     },
     {
       "Name": "func-copilot-demo-002",
-      "DeployZipPackage": false,
+      "DeployZipPackage": true,
       "DeletePackageAfterDeploy": true,
       "Type": "Function",
       "Path": "app/functions/search",

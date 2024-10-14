@@ -875,6 +875,19 @@ function New-AppService {
                     else {
                         # Deploy the function app
                         az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                        
+                        $searchServiceKeys = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+                        $searchServiceApiKey = $searchServiceKeys
+
+                        $envVariables = @(
+                            @{ name = "AZURE_SEARCH_API_KEY"; value = $searchServiceApiKey },
+                            @{ name = "AZURE_SEARCH_SERVICE_NAME"; value = $searchServiceName },
+                            @{ name = "AZURE_SEARCH_INDEX"; value = $searchIndexerName }
+                            )
+                        
+                            foreach ($envVar in $envVariables) {
+                                az functionapp config appsettings set --name $appServiceName --resource-group $resourceGroupName --settings "$($envVar.name)=$($envVar.value)"
+                            }
                     }
 
                     Write-Host "$appServiceType app '$appServiceName' deployed successfully."
