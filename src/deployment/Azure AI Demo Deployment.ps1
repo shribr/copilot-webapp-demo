@@ -1945,6 +1945,8 @@ function Write-Log {
 
 $ErrorActionPreference = 'Stop'
 
+# az webapp cors add --resource-group rg-copilot-demo-002 --name srch-copilot-demo-002 --allowed-origins '*'    
+
 # Initialize parameters
 $initParams = Initialize-Parameters -parametersFile $parametersFile
 #Write-Host "Parameters initialized."

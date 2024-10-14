@@ -251,7 +251,7 @@ async function postQuestion() {
 
     // Create a new div for the chat bubble
     const questionBubble = document.createElement('div');
-    questionBubble.setAttribute('class', 'question-bubble');
+    questionBubble.setAttribute('class', 'question-bubble fade-in'); // Add fade-in class
 
     const svg = document.createElement("div");
     svg.className = 'question-bubble-svg';
@@ -294,7 +294,7 @@ async function showResponse() {
 
         // Create a new chat bubble element
         const chatBubble = document.createElement('div');
-        chatBubble.className = 'chat-bubble user';
+        chatBubble.setAttribute('class', 'chat-bubble user slide-up'); // Add slide-up class
 
         // Create tabs
         const tabs = document.createElement('div');
