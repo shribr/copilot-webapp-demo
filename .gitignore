@@ -70,3 +70,4 @@ src/.DS_Store
 src/deployment/.DS_Store
 .DS_Store
 src/.DS_Store
+src/deployment/deployment.log

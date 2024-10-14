@@ -129,7 +129,8 @@ $global:deploymentPath = Get-Location
 $currentLocation = Get-Location
 if ($currentLocation.Path -notlike "*src/deployment*") {
     $global:deploymentPath = Join-Path -Path $currentLocation -ChildPath "src/deployment"
-} else {
+}
+else {
     $global:deploymentPath = $currentLocation
 }
 
@@ -139,6 +140,27 @@ Set-Location -Path $global:deploymentPath
 
 # Initialize the existing resources array
 $global:existingResources = @()
+
+# function to convert string to proper case
+function ConvertTo-ProperCase {
+    param (
+        [string]$inputString
+    )
+
+    # Split the input string into words
+    $words = $inputString -split "\s+"
+
+    # Convert each word to proper case
+    $properCaseWords = $words | ForEach-Object {
+        if ($_ -ne "") {
+            $_.Substring(0, 1).ToUpper() + $_.Substring(1).ToLower()
+        }
+    }
+
+    # Join the words back into a single string
+    $properCaseString = $properCaseWords -join " "
+    return $properCaseString
+}
 
 # function to get the app root directory
 function Find-AppRoot {
@@ -155,12 +177,84 @@ function Find-AppRoot {
     }
 
     # If the parent directory is null, we have reached the root of the filesystem
-    if ($directoryInfo.Parent -eq $null) {
+    if ($null -eq $directoryInfo.Parent) {
         return $null
     }
 
     # Move one level up and call the function recursively
     return Find-AppRoot -currentDirectory $directoryInfo.Parent.FullName
+}
+
+# function to format error information from a message
+function Format-ErrorInfo {
+    param (
+        [string]$message,
+        [string]$objectType
+    )
+
+    # Split the message into lines
+    $lines = $message -split "`n"
+
+    # Initialize the hashtable with keys: Error, SKU, and Code
+    $errorInfo = @{
+        Error = $null
+        SKU   = $null
+        Code  = $null
+    }
+
+    # Check if there are at least three lines
+    if ($lines.Length -ge 3) {
+        $errorInfo.Code = $lines[0].Trim()
+        $errorInfo.Error = $lines[1].Trim()
+        $errorInfo.SKU = $lines[2].Trim()
+    }
+    else {
+        Write-Host "Error: The message does not contain enough lines to extract Error, SKU, and Code."
+    }
+
+    # Output the error information
+    Write-Host "Error Information:"
+    $errorInfo | Format-List -Property *
+}
+
+function Format-AIModelErrorInfo {
+    param([array]$jsonOutput
+    )
+
+    $properties = @{}
+
+    # Process each line
+    foreach ($item in $jsonOutput) {
+        # Split the line at the first colon
+        $parts = $item -split ": "
+
+        # Check if the line contains a colon
+        if ($parts.Length -eq 2) {
+            $propertyName = ConvertTo-ProperCase $parts[0]
+            $propertyValue = $parts[1].Trim()
+
+            # Add the property to the hashtable
+            $properties[$propertyName] = $propertyValue
+        }
+    }
+
+    Write-Host "Error Information: $properties"
+
+<#
+ # {    # Convert the hashtable to an array of key-value pairs
+    $array = @()
+    foreach ($entry in $properties.GetEnumerator()) {
+        $array += [PSCustomObject]@{
+            Key   = $entry.Key
+            Value = $entry.Value
+        }
+    }
+
+    # Output the array
+    $array | Format-Table -AutoSize:Enter a comment or description}
+#>
+
+    return $properties
 }
 
 # Function to get Cognitive Services API key
@@ -616,12 +710,13 @@ function New-AIHubAndModel {
             Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
-    Read-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
+
+    $aiConnectionFile = Read-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
 
     # Create AI Hub connection
     if ($existingResources -notcontains $aiHubName) {
         try {
-            az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
+            az ml connection create --file $aiConnectionFile --resource-group $resourceGroupName --workspace-name $aiHubName
             Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
             Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." -logFilePath $global:LogFilePath
         }
@@ -647,18 +742,31 @@ function New-AIHubAndModel {
 
         try {
             $ErrorActionPreference = 'Stop'
-            $jsonOutput = az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0" 2>&1 | Out-String
             
+            $jsonOutput = az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0" 2>&1
+
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
             if ($jsonOutput -match "error") {
-                Write-Host "Failed to create AI Model deployment '$aiModelName'."
-                Write-Log -message "Failed to create AI Model deployment '$aiModelName'." -logFilePath $global:LogFilePath
+
+                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create AI Model deployment '$aiModelName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+
+                Write-Host $errorMessage
+                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
             }
             else {
                 Write-Host "AI Model deployment: '$aiModelName' created."
                 Write-Log -message "AI Model deployment: '$aiModelName' created." -logFilePath $global:LogFilePath
-        }
+            }
         }
         catch {
             
@@ -743,8 +851,7 @@ function New-AppService {
                 Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath $global:LogFilePath
             }
 
-            if ($deployZipResources -eq $true -or $deployZipPackage -eq $true)
-            {
+            if ($deployZipResources -eq $true -and $deployZipPackage -eq $true) {
                 try {
 
                     $appRoot = Find-AppRoot -currentDirectory (Get-Location).Path
@@ -1200,8 +1307,17 @@ function New-Resources {
                 # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
     
                 if ($jsonOutput -match "error") {
-                    Write-Host "Failed to create Document Intelligence Service '$documentIntelligenceName'."
-                    Write-Log -message "Failed to create Document Intelligence Service  '$documentIntelligenceName'." -logFilePath $global:LogFilePath
+
+                    $errorInfo = Format-ErrorInfo -jsonOutput $jsonOutput
+                    
+                    $errorMessage = "Failed to create Document Intelligence Service  '$documentIntelligenceName'. `
+        `Error: $($errorInfo.Code) `
+        `Code: $($errorInfo.Error) `
+        `Details: $($errorInfo.SKU)"
+
+                    Write-Host $errorMessage
+
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
                 }
                 else {
                     Write-Host "Document Intelligence account '$documentIntelligenceName' created."
@@ -1247,8 +1363,11 @@ function Read-AIConnectionFile {
         [string]$resourceGroupName,
         [string]$aiServiceName
     )
+    
+    $rootPath = Get-Item -Path (Get-Location).Path
 
-    $filePath = "ai.connection.yaml"
+    #$rootAppPath = Find-AppRoot -currentDirectory (Get-Location).Path
+    $filePath = "$rootPath/app/ai.connection.yaml"
 
     $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
 
@@ -1269,6 +1388,8 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
         Write-Error "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
+
+    return $filePath
 }
 
 # Function to delete Azure resource groups
@@ -1371,10 +1492,12 @@ function Set-DirectoryPath {
             # Set location to the root directory
             Set-Location -Path $targetDirectory
             Write-Host "Changed directory to root: $targetDirectory"
-        } else {
+        }
+        else {
             throw "Root directory '$targetDirectory' does not exist."
         }
-    } else {
+    }
+    else {
         Write-Host "Already in the root directory: $targetDirectory"
         return
     }
@@ -1527,8 +1650,7 @@ function Start-Deployment {
 
     $resourceGroupName = $global:resourceGroupName
 
-    if ($appendUniqueSuffix -eq $true) 
-    {
+    if ($appendUniqueSuffix -eq $true) {
         $resourceGroupName = "$resourceGroupName$resourceSuffix"
     }
 
@@ -1541,8 +1663,7 @@ function Start-Deployment {
     
     if ($resourceGroupExists -eq $true) {
 
-        if ($createResourceGroup -eq $true)
-        {        
+        if ($createResourceGroup -eq $true) {        
             New-ResourceGroup -resourceGroupName $resourceGroupName -location $location
         } 
         else {
