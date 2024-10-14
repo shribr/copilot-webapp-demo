@@ -1,3 +1,5 @@
+
+
 var iconStyle = "color";
 
 // Function to fetch the configuration
