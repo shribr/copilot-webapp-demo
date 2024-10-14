@@ -240,7 +240,7 @@ function Format-AIModelErrorInfo {
 
     Write-Host "Error Information: $properties"
 
-<#
+    <#
  # {    # Convert the hashtable to an array of key-value pairs
     $array = @()
     foreach ($entry in $properties.GetEnumerator()) {
@@ -883,11 +883,11 @@ function New-AppService {
                             @{ name = "AZURE_SEARCH_API_KEY"; value = $searchServiceApiKey },
                             @{ name = "AZURE_SEARCH_SERVICE_NAME"; value = $searchServiceName },
                             @{ name = "AZURE_SEARCH_INDEX"; value = $searchIndexerName }
-                            )
+                        )
                         
-                            foreach ($envVar in $envVariables) {
-                                az functionapp config appsettings set --name $appServiceName --resource-group $resourceGroupName --settings "$($envVar.name)=$($envVar.value)"
-                            }
+                        foreach ($envVar in $envVariables) {
+                            az functionapp config appsettings set --name $appServiceName --resource-group $resourceGroupName --settings "$($envVar.name)=$($envVar.value)"
+                        }
                     }
 
                     Write-Host "$appServiceType app '$appServiceName' deployed successfully."
@@ -914,6 +914,28 @@ function New-AppService {
     }
 
     Set-DirectoryPath -targetDirectory $global:deploymentPath
+}
+
+# Function to create a new private endpoint
+function New-PrivateEndPoint {
+    param (
+        [string]$privateEndpointName,
+        [string]$privateLinkServiceName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$subnetId,
+        [string]$privateLinkServiceId
+    )
+
+    try {
+        az network private-endpoint create --name $privateEndpointName --resource-group $resourceGroupName --vnet-name $virtualNetworkName --subnet $subnetId --private-connection-resource-id $privateLinkServiceId --group-id "sqlServer" --connection-name $privateLinkServiceName --location $location --output none
+        Write-Host "Private endpoint '$privateEndpointName' created."
+        Write-Log -message "Private endpoint '$privateEndpointName' created."
+    }
+    catch {
+        Write-Error "Failed to create private endpoint '$privateEndpointName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create private endpoint '$privateEndpointName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
 }
 
 # Function to get the latest API version
@@ -1367,6 +1389,26 @@ function New-Resources {
     else {
         Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists."
         Write-Log -message "Document Intelligence Service '$documentIntelligenceName' already exists."
+    }
+}
+
+# Function to create a new subnet
+function New-SubNet {
+    param (
+        [string]$resourceGroupName,
+        [string]$vnetName,
+        [string]$subnetName,
+        [string]$subnetAddressPrefix
+    )
+
+    try {
+        az network vnet subnet create --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --address-prefixes $subnetAddressPrefix --output none
+        Write-Host "Subnet '$subnetName' created."
+        Write-Log -message "Subnet '$subnetName' created."
+    }
+    catch {
+        Write-Error "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 

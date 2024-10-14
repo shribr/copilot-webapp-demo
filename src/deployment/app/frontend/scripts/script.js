@@ -356,6 +356,13 @@ async function showResponse() {
     }
 }
 
+// Function to convert bytes to KB/MB
+function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+    else return (bytes / 1048576).toFixed(2) + ' MB';
+}
+
 //code to send chat message to Azure Copilot
 async function getAnswers(userInput) {
 
@@ -507,6 +514,7 @@ async function getDocuments() {
                     const lastModified = blob.getElementsByTagName("Last-Modified")[0].textContent;
                     const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
                     const blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+                    const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
 
                     // Create the document row
                     const documentRow = document.createElement('div');
@@ -515,10 +523,7 @@ async function getDocuments() {
                     // Create the document cells
                     const previewCell = document.createElement('div');
                     previewCell.className = 'document-cell preview';
-                    //const previewButton = document.createElement('button');
-                    //previewButton.textContent = 'Preview';
-                    //previewCell.appendChild(previewButton);
-                    //const magStyle = iconStyle === 'color' ? `${config.MAGNIFYING_GLASS.COLOR}` : `${config.MAGNIFYING_GLASS.MONOTONE}`;
+
                     previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.MAGNIFYING_GLASS.COLOR}${config.MAGNIFYING_GLASS.MONOTONE}</a>`;
 
                     const statusCell = document.createElement('div');
@@ -552,6 +557,10 @@ async function getDocuments() {
                         //contentTypeCell.textContent = contentType;
                     }
 
+                    const fileSizeCell = document.createElement('div');
+                    fileSizeCell.className = 'document-cell preview';
+                    fileSizeCell.textContent = blobSize;
+
                     const lastModifiedCell = document.createElement('div');
                     lastModifiedCell.className = 'document-cell';
                     lastModifiedCell.textContent = lastModified;
@@ -561,6 +570,7 @@ async function getDocuments() {
                     documentRow.appendChild(statusCell);
                     documentRow.appendChild(nameCell);
                     documentRow.appendChild(contentTypeCell);
+                    documentRow.appendChild(fileSizeCell);
                     documentRow.appendChild(lastModifiedCell);
 
                     // Append the document row to the document list
