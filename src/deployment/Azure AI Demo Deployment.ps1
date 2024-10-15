@@ -106,7 +106,8 @@ $global:ResourceTypes = @(
     "Microsoft.DataFactory/factories",
     "Microsoft.ContainerRegistry/registries",
     "Microsoft.CognitiveServices/accounts",
-    "Microsoft.Search/searchServices"
+    "Microsoft.Search/searchServices",
+    "Microsoft.ApiManagement"
 )
 
 # List of all KeyVault secret keys
@@ -521,6 +522,10 @@ function Initialize-Parameters {
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiProjectName = $parametersObject.aiProjectName
     $global:apiManagementServiceName = $parametersObject.apiManagementServiceName
+    $global:apiManagementSkuName = $parametersObject.apiManagementSkuName
+    $global:apiManagementPublisherEmail = $parametersObject.apiManagementPublisherEmail
+    $global:apiManagementPublisherName = $parametersObject.apiManagementPublisherName
+    $global:apiManagementSkuCapacity = $parametersObject.apiManagementSkuCapacity
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appServicePlanName = $parametersObject.appServicePlanName
     $global:appServices = $parametersObject.appServices
@@ -601,6 +606,10 @@ function Initialize-Parameters {
         aiServiceName                = $aiServiceName
         aiProjectName                = $aiProjectName
         apiManagementServiceName     = $apiManagementServiceName
+        apiManagementSkuName         = $apiManagementSkuName
+        apiManagementPublisherEmail  = $apiManagementPublisherEmail
+        apiManagementPublisherName   = $apiManagementPublisherName
+        apiManagementSkuCapacity     = $apiManagementSkuCapacity
         appendUniqueSuffix           = $appendUniqueSuffix
         appServices                  = $appServices
         appServicePlanName           = $appServicePlanName
@@ -747,7 +756,7 @@ function New-AIHubAndModel {
         try {
             $ErrorActionPreference = 'Stop'
             
-            $jsonOutput = az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "S0" 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "B1" 2>&1
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -801,6 +810,32 @@ function New-AIHubAndModel {
         Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 
+}
+
+function New-ApiManagementService {
+    param (
+        [string]$resourceGroupName,
+        [string]$apiManagementServiceName,
+        [string]$location,
+        [string]$apiManagementSkuName,
+        [string]$apiManagementSkuCapacity,
+        [string]$apiManagementPublisherEmail,
+        [string]$apiManagementPublisherName,
+        [string]$tags
+    )
+
+    if ($existingResources -notcontains $apiManagementServiceName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az apim create --name $apiManagementServiceName --resource-group $resourceGroupName --location $location --publisher-email $apiManagementPublisherEmail --publisher-name $apiManagementPublisherName --sku-name $apiManagementSkuName --sku-capacity $apiManagementSkuCapacity --tags $tags
+            Write-Host "API Management service '$apiManagementServiceName' created."
+            Write-Log -message "API Management service '$apiManagementServiceName' created." -logFilePath $global:LogFilePath
+        }
+        catch {
+            Write-Error "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        }
+    }
 }
 
 # Function to create and deploy app service (either web app or function app)
