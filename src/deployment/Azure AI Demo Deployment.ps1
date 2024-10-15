@@ -521,11 +521,7 @@ function Initialize-Parameters {
     $global:aiModelVersion = $parametersObject.aiModelVersion
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiProjectName = $parametersObject.aiProjectName
-    $global:apiManagementServiceName = $parametersObject.apiManagementServiceName
-    $global:apiManagementSkuName = $parametersObject.apiManagementSkuName
-    $global:apiManagementPublisherEmail = $parametersObject.apiManagementPublisherEmail
-    $global:apiManagementPublisherName = $parametersObject.apiManagementPublisherName
-    $global:apiManagementSkuCapacity = $parametersObject.apiManagementSkuCapacity
+    $global:apiManagementService = $parametersObject.apiManagementService
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appServicePlanName = $parametersObject.appServicePlanName
     $global:appServices = $parametersObject.appServices
@@ -605,11 +601,7 @@ function Initialize-Parameters {
         aiModelVersion               = $aiModelVersion
         aiServiceName                = $aiServiceName
         aiProjectName                = $aiProjectName
-        apiManagementServiceName     = $apiManagementServiceName
-        apiManagementSkuName         = $apiManagementSkuName
-        apiManagementPublisherEmail  = $apiManagementPublisherEmail
-        apiManagementPublisherName   = $apiManagementPublisherName
-        apiManagementSkuCapacity     = $apiManagementSkuCapacity
+        apiManagementService         = $apiManagementService
         appendUniqueSuffix           = $appendUniqueSuffix
         appServices                  = $appServices
         appServicePlanName           = $appServicePlanName
@@ -756,7 +748,7 @@ function New-AIHubAndModel {
         try {
             $ErrorActionPreference = 'Stop'
             
-            $jsonOutput = az cognitiveservices account deployment create --name $cognitiveServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "B1" 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --name $aiServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "Standard" 2>&1
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -812,29 +804,30 @@ function New-AIHubAndModel {
 
 }
 
+# Function to create and deploy API Management service
 function New-ApiManagementService {
     param (
         [string]$resourceGroupName,
-        [string]$apiManagementServiceName,
-        [string]$location,
-        [string]$apiManagementSkuName,
-        [string]$apiManagementSkuCapacity,
-        [string]$apiManagementPublisherEmail,
-        [string]$apiManagementPublisherName,
-        [string]$tags
+        [array]$apiManagementService
     )
 
-    if ($existingResources -notcontains $apiManagementServiceName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-            az apim create --name $apiManagementServiceName --resource-group $resourceGroupName --location $location --publisher-email $apiManagementPublisherEmail --publisher-name $apiManagementPublisherName --sku-name $apiManagementSkuName --sku-capacity $apiManagementSkuCapacity --tags $tags
-            Write-Host "API Management service '$apiManagementServiceName' created."
-            Write-Log -message "API Management service '$apiManagementServiceName' created." -logFilePath $global:LogFilePath
-        }
-        catch {
-            Write-Error "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
-        }
+    $apiManagementServiceName = $apiManagementService.Name
+
+    try {
+        $ErrorActionPreference = 'Stop'
+        #$jsonOutput = az apim api create --api-id $apiManagementService.ApiId --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
+        #$jsonOutput = az apim api create --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
+        $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName
+
+        Write-Host $jsonOutput
+
+        Write-Host "API Management service '$apiManagementServiceName' created."
+        Write-Log -message "API Management service '$apiManagementServiceName' created." -logFilePath $global:LogFilePath
+
+    }
+    catch {
+        Write-Error "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
     }
 }
 
@@ -1066,7 +1059,8 @@ function New-Resources {
         [string]$userPrincipalName,
         [string]$openAIName,
         [string]$documentIntelligenceName,
-        [array]$existingResources
+        [array]$existingResources,
+        [array]$apiManagementService
     )
 
     # Get the latest API versions
@@ -1428,6 +1422,13 @@ function New-Resources {
     else {
         Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists."
         Write-Log -message "Document Intelligence Service '$documentIntelligenceName' already exists."
+    }
+
+    #**********************************************************************************************************************
+    # Create API Management Service
+    
+    if ($existingResources -notcontains $apiManagementService.Name) {
+        New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
     }
 }
 
@@ -1825,7 +1826,8 @@ function Start-Deployment {
             -userPrincipalName $userPrincipalName `
             -openAIName $openAIName `
             -documentIntelligenceName $documentIntelligenceName `
-            -existingResources $existingResources
+            -existingResources $existingResources `
+            -apiManagementService $apiManagementService
 
         foreach ($appService in $appServices) {
             if ($existingResources -notcontains $appService) {
@@ -1926,8 +1928,8 @@ function Test-ResourceExists {
             "Microsoft.CognitiveServices/accounts" {
                 $result = az cognitiveservices account list --query "[?name=='$resourceName'].name" --output tsv
             }
-            "Microsoft.Search/searchServices" {
-                $result = az search service list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
+            "Microsoft.ApiManagement/" {
+                $result = az apim api list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
             }
         }
 

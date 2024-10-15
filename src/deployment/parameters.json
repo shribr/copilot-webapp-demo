@@ -6,11 +6,6 @@
   "aiProjectName": "project-ai-copilot-demo-003",
   "aiServiceName": "aiservice-copilot-demo-003",
   "aiHubProjectName": "project-ai-copilot-demo-003",
-  "apiManagementServiceName": "apim-copilot-demo-003",
-  "apiManagementSkuName": "Standard",
-  "apiManagementPublisherEmail": "amschrei@microsoft.com",
-  "apiManagementPublisherName": "Ami Schreiber",
-  "apiManagementSkuCapacity": 1,
   "appendUniqueSuffix": false,
   "appServicePlanName": "asp-copilot-demo-003",
   "appInsightsName": "appi-copilot-demo-003",
@@ -24,7 +19,7 @@
   "cosmosDbAccountName": "cosmos-copilot-demo-003",
   "createResourceGroup": true,
   "deleteResourceGroup": false,
-  "deployZipResources": true,
+  "deployZipResources": false,
   "domainName": "azurewebsites.net",
   "documentIntelligenceName": "docintel-copilot-demo-003",
   "eventHubNamespaceName": "eh-copilot-demo-003",
@@ -49,6 +44,17 @@
   "subNetName": "subnet-copilot-demo-003",
   "userAssignedIdentityName": "id-copilot-demo-003",
   "virtualNetworkName": "vnet-copilot-demo-003",
+  "apiManagementService": [
+    {
+      "Name": "apim-copilot-demo-003",
+      "Display": "apim-copilot-demo-003",
+      "PublisherEmail": "amschrei@microsoft.com",
+      "PublisherName": "Ami Schreiber",
+      "Location": "east us",
+      "ApiId": "Standard",
+      "Path": "/path"
+    }
+  ],
   "appServices": [
     {
       "Name": "app-copilot-demo-003",
@@ -63,7 +69,7 @@
     },
     {
       "Name": "func-copilot-demo-003",
-      "DeployZipPackage": true,
+      "DeployZipPackage": false,
       "DeletePackageAfterDeploy": true,
       "Type": "Function",
       "Path": "app/functions/search",
