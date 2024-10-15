@@ -661,6 +661,7 @@ function New-AIHubAndModel {
         [string]$aiServiceName,
         [string]$resourceGroupName,
         [string]$location,
+        [string]$appInsightsName,
         [array]$existingResources
     )
 
@@ -788,7 +789,15 @@ function New-AIHubAndModel {
         try {
             $ErrorActionPreference = 'Stop'
             #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
-            $mlWorkspaceFile = Update-MLWorkspaceFile -resourceGroupName $resourceGroupName -aiProjectName $aiProjectName -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -location $location -containerRegistryName $containerRegistryName 2>&1
+            $mlWorkspaceFile = Update-MLWorkspaceFile `
+                -aiProjectName $aiProjectName `
+                -resourceGroupName $resourceGroupName `
+                -appInsightsName $appInsightsName `
+                -keyVaultName $keyVaultName `
+                -location $location `
+                -subscriptionId $subscriptionId `
+                -storageAccountName $storageAccountName `
+                -containerRegistryName $containerRegistryName 2>&1
 
             #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
@@ -1848,7 +1857,7 @@ function Start-Deployment {
         }
 
         # Create a new AI Hub and Model
-        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -appInsightsName $appInsightsName -existingResources $existingResources
     }
 
     # End the timer
@@ -2015,6 +2024,7 @@ function Update-MLWorkspaceFile {
         [string]$location,
         [string]$subscriptionId,
         [string]$storageAccountName,
+        [string]$appInsightsName,
         [string]$keyVaultName
     )
     
@@ -2028,9 +2038,9 @@ location: $location
 display_name: $aiProjectName
 description: This configuration specifies a workspace configuration with existing dependent resources
 storage_account: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName
-container_registry: $containerRegistryName
+container_registry: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName
 key_vault: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName
-application_insights: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$applicationInsightsName
+application_insights: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName
 tags:
   purpose: demonstration
 "@

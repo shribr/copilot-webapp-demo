@@ -1,4 +1,4 @@
-name: cr-copilot-demo-003
+name: crcopilotdemo003
 tags:
   description: Basic registry with one primary region and to additional regions
 location: east us

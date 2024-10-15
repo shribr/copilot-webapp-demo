@@ -15,7 +15,7 @@
   "cognitiveServiceName": "cog-copilot-demo-003",
   "containerAppName": "ca-copilot-demo-003",
   "containerAppsEnvironmentName": "cae-copilot-demo-003",
-  "containerRegistryName": "cr-copilot-demo-003",
+  "containerRegistryName": "crcopilotdemo003",
   "cosmosDbAccountName": "cosmos-copilot-demo-003",
   "createResourceGroup": true,
   "deleteResourceGroup": false,
