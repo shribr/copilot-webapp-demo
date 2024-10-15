@@ -933,7 +933,8 @@ function New-AppService {
 
                     if ($appService.Type -eq "Web") {
                         # Deploy the web app
-                        az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                        #az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                        az webapp deploy --src-path $zipFilePath --name $appServiceName --resource-group $resourceGroupName --type zip
                     }
                     else {
                         # Deploy the function app
@@ -1481,6 +1482,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create API Management Service
     
+
     if ($existingResources -notcontains $apiManagementService.Name) {
         New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
     }

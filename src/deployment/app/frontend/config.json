@@ -1,31 +1,46 @@
 {
   "AZURE_STORAGE_URL": "blob.core.windows.net",
-  "AZURE_ACCOUNT_NAME": "stdcdaiprodpoc001",
-  "AZURE_SAS_TOKEN": "sWuQtbX2LVibdgi%2BCNcEkvfKP9BiskHO2I5OiAc3%2B%2BE%3D",
+  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo003",
+  "AZURE_STORAGE_KEY": "sJ6EjIfrg0Mnzj0W5Y32T7MCbUqaxDLQEjOIdS7jh5G2dmp4wLSQ4W2WGyPod3a8Spum6zezMpV5++AStdmnWKg==",
+  "AZURE_STORAGE_SAS_TOKEN": "gk7SHm9tNpXSb4w4CxNuIqxuOLb53gBAO8rJtE3YWrY%3D",
   "AZURE_CONTAINER_NAME": "content",
-  "AZURE_SEARCH_SERVICE_NAME": "srch-dcdai-prod-poc-001",
-  "AZURE_SEARCH_INDEX": "azureblob-index-2",
-  "AZURE_SEARCH_API_KEY": "7nA67nQqg1uhlYW0pfaOXRa3YrHxNP5ujqhazgwQojAzSeBjIaxl",
-  "AZURE_SEARCH_FUNCTION_APP_NAME": "func-sastoken-dcdai-prod-poc-001",
-  "AZURE_SEARCH_FUNCTION_NAME": "SearchFunction",
-  "AZURE_SEARCH_FUNCTION_APP_URL": "https://func-sastoken-dcdai-prod-poc-001.azurewebsites.net",
+  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-003",
+  "AZURE_SEARCH_INDEX": "azureblob-index",
+  "AZURE_SEARCH_API_KEY": "2W4wqNQV68mFWdNyVQztv2SbcwomN3o9cRuSIyFbELAzSeBtibXM",
+  "AZURE_SEARCH_FUNCTION_APP_NAME": "func-copilot-demo-003",
+  "AZURE_SEARCH_FUNCTION_NAME": "Search",
+  "AZURE_SEARCH_FUNCTION_APP_URL": "func-copilot-demo-003.azurewebsites.net",
   "AZURE_SEARCH_FUNCTION_API_KEY": "80p2YyfZUhCijS3iDitQ6rW_wJgo2iYBHak9wJ2U5bLmAzFuylWOog==",
-  "AZURE_SAS_TOKEN_FUNCTION_URL": "https://func-sastoken-dcdai-prod-poc-001.azurewebsites.net/api/GetSasToken",
-  "ACCOUNT_NAME": "stdcdaiprodpoc001",
   "CONTAINER_NAME": "content",
-  "OPEN_AI_KEY": "ea203506bc3a4b0e92ad90cbf0455522",
-  "API_VERSION": "2024-02-15-preview",
+  "OPEN_AI_KEY": "b33a6efba2764a5aadde32906d44bb9d",
+  "API_VERSION": "2024-05-13",
   "DEPLOYMENT_ID": "gpt-4o",
   "REGION": "eastus",
+  "OPEN_AI_PAYLOAD": {
+    "messages": [
+      {
+        "role": "system",
+        "content": [
+          {
+            "type": "text",
+            "text": "You are an AI assistant that helps people find information."
+          }
+        ]
+      }
+    ],
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "max_tokens": 800
+  },
   "SAS_TOKEN": {
     "SV": "2022-11-02",
     "SS": "bfqt",
     "SRT": "sco",
     "SP": "rwdlacupiytfx",
-    "SE": "2025-10-08T04:00:00Z",
-    "ST": "2024-10-08T04:00:00Z",
+    "SE": "2025-10-15T04:00:00Z",
+    "ST": "2024-10-15T04:00:00Z",
     "SPR": "https",
-    "SIG": "sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D",
+    "SIG": "gk7SHm9tNpXSb4w4CxNuIqxuOLb53gBAO8rJtE3YWrY%3D",
     "COMP": "list",
     "INCLUDE": "metadata",
     "RESTYPE": "container"

@@ -289,7 +289,7 @@ async function showResponse() {
 
     if (chatInput) {
 
-        const response = await getAnswers(chatInput);
+        const response = await getAnswersFromAzureOpenAI(chatInput);
         //const response = await getAnswersFromAzureSearch(chatInput);
 
         // Create a new chat bubble element
@@ -405,13 +405,72 @@ async function getAnswersFromAzureSearch(userInput) {
     const config = await fetchConfig();
 
     const apiKey = config.AZURE_SEARCH_API_KEY;
-    const searchFunctionName = config.AZURE_SEARCH_FUNCTION_NAME;
+    const searchFunctionName = config.AZURE_SEARCH_FUNCTION_APP_NAME;
     const indexName = config.AZURE_SEARCH_INDEX;
-    const endpoint = `https://${searchFunctionName}.azurewebsites.net/api/${searchFunctionName}?code=${apiKey}`;
+    //const endpoint = `https://${searchFunctionName}.azurewebsites.net/api/${searchFunctionName}?code=${apiKey}`;
+    //const endpoint = "https://func-copilot-demo-003.azurewebsites.net/api/SearchTest?code=TewiFybiLLEUIYTRgsht_ZQDNBd6ZLuS7E5mExZtlVHpAzFuElxX5Q%3D%3D";
+    const endpoint = "https://func-copilot-demo-003.azurewebsites.net/api/HttpTriggerTest?code=uHA6ljrTv8xx-cBdBGhBKFQE3bNN0Ufx-fEm31UykdYiAzFu9Ndw9g%3D%3D";
 
+    /*
     const searchQuery = {
         search: userInput,
         top: 5 // Number of results to return
+    };
+    */
+
+    const searchQuery = {
+        "name": "Azure"
+    }
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': `${apiKey}`
+        },
+        body: JSON.stringify(searchQuery)
+    });
+
+    const data = await response.json();
+
+    return data;
+}
+
+//code to send message to Azure OpenAI
+async function getAnswersFromAzureOpenAI(userInput) {
+    if (!userInput) return;
+
+    const config = await fetchConfig();
+
+    const apiKey = config.OPEN_AI_KEY;
+    const searchFunctionName = config.AZURE_SEARCH_FUNCTION_APP_NAME;
+    const indexName = config.AZURE_SEARCH_INDEX;
+    //const endpoint = `https://${searchFunctionName}.azurewebsites.net/api/${searchFunctionName}?code=${apiKey}`;
+    //const endpoint = "https://func-copilot-demo-003.azurewebsites.net/api/SearchTest?code=TewiFybiLLEUIYTRgsht_ZQDNBd6ZLuS7E5mExZtlVHpAzFuElxX5Q%3D%3D";
+    const endpoint = "https://eastus.api.cognitive.microsoft.com/openai/deployments/chat/chat/completions?api-version=2024-08-01-preview";
+
+    /*
+    const searchQuery = {
+        search: userInput,
+        top: 5 // Number of results to return
+    };
+    */
+
+    const searchQuery = {
+        "messages": [
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": userInput
+                    }
+                ]
+            }
+        ],
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "max_tokens": 800
     };
 
     const response = await fetch(endpoint, {
@@ -468,7 +527,7 @@ async function createSidenavLinks() {
 async function getDocuments() {
     const config = await fetchConfig();
 
-    const accountName = config.AZURE_ACCOUNT_NAME;
+    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_CONTAINER_NAME;
     const sasTokenConfig = config.SAS_TOKEN;
@@ -590,16 +649,24 @@ function getQueryParam(param) {
 function toggleDisplay(screen) {
     const $chatContainer = $('#chat-container');
     const $documentContainer = $('#document-container');
+    const $homeContainer = $('#home-container');
 
     if (screen === 'chat') {
         $chatContainer.show();
         $documentContainer.hide();
+        $homeContainer.hide();
     } else if (screen === 'documents') {
         $chatContainer.hide();
+        $homeContainer.hide();
         $documentContainer.show();
+    } else if (screen === 'home') {
+        $chatContainer.hide();
+        $documentContainer.hide();
+        $homeContainer.show();
     } else {
         $chatContainer.hide();
         $documentContainer.hide();
+        $homeContainer.hide();
     }
 }
 
