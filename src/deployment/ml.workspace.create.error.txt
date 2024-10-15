@@ -1,0 +1,98 @@
+ERROR: The command failed with an unexpected error. Here is the traceback:
+ERROR: Validation for WorkspaceSchema failed:
+
+ {
+  "storage_account": [
+    "ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.Storage/storageAccounts/ is not formatted correctly."
+  ],
+  "container_registry": [
+    "ARM string cr-copilot-demo-003 is not formatted correctly."
+  ],
+  "key_vault": [
+    "ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-003 is not formatted correctly."
+  ],
+  "application_insights": [
+    "ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.insights/components/ is not formatted correctly."
+  ]
+} 
+
+ If you are trying to configure a workspace that is not of type default, please specify the correct job type in the 'type' property.
+
+Visit this link to refer to the Workspace schema if needed: https://aka.ms/ml-cli-v2-workspace-yaml-reference.
+The easiest way to author a specification file is using IntelliSense and auto-completion Azure ML VS code extension provides: https://code.visualstudio.com/docs/datascience/azure-machine-learning. To set up: https://docs.microsoft.com/azure/machine-learning/how-to-setup-vs-code
+Traceback (most recent call last):
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/vendored_curated_sdk/azure/ai/ml/entities/_util.py", line 192, in load_from_dict
+    return schema(context=context).load(data, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/marshmallow/schema.py", line 726, in load
+    return self._do_load(
+           ^^^^^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/marshmallow/schema.py", line 913, in _do_load
+    raise exc
+marshmallow.exceptions.ValidationError: {'storage_account': ['ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.Storage/storageAccounts/ is not formatted correctly.'], 'container_registry': ['ARM string cr-copilot-demo-003 is not formatted correctly.'], 'key_vault': ['ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-003 is not formatted correctly.'], 'application_insights': ['ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.insights/components/ is not formatted correctly.']}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/Cellar/azure-cli/2.62.0/libexec/lib/python3.11/site-packages/knack/cli.py", line 233, in invoke
+    cmd_result = self.invocation.execute(args)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/azure-cli/2.62.0/libexec/lib/python3.11/site-packages/azure/cli/core/commands/__init__.py", line 664, in execute
+    raise ex
+  File "/usr/local/Cellar/azure-cli/2.62.0/libexec/lib/python3.11/site-packages/azure/cli/core/commands/__init__.py", line 731, in _run_jobs_serially
+    results.append(self._run_job(expanded_arg, cmd_copy))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/azure-cli/2.62.0/libexec/lib/python3.11/site-packages/azure/cli/core/commands/__init__.py", line 701, in _run_job
+    result = cmd_copy(params)
+             ^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/azure-cli/2.62.0/libexec/lib/python3.11/site-packages/azure/cli/core/commands/__init__.py", line 334, in __call__
+    return self.handler(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/azure-cli/2.62.0/libexec/lib/python3.11/site-packages/azure/cli/core/commands/command_operation.py", line 121, in handler
+    return op(**command_args)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/custom/workspace.py", line 171, in ml_workspace_create
+    log_and_raise_error(err, debug)
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/custom/raise_error.py", line 185, in log_and_raise_error
+    raise cli_error
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/custom/workspace.py", line 158, in ml_workspace_create
+    workspace = load_workspace(source=file, params_override=params_override)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/vendored_curated_sdk/azure/ai/ml/entities/_load_functions.py", line 323, in load_workspace
+    return cast(Workspace, load_common(Workspace, source, relative_origin, params_override, **kwargs))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/vendored_curated_sdk/azure/ai/ml/entities/_load_functions.py", line 131, in load_common
+    raise e
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/vendored_curated_sdk/azure/ai/ml/entities/_load_functions.py", line 105, in load_common
+    return _load_common_raising_marshmallow_error(cls, yaml_dict, relative_origin, params_override, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/vendored_curated_sdk/azure/ai/ml/entities/_load_functions.py", line 165, in _load_common_raising_marshmallow_error
+    res: Resource = cls._load(
+                    ^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/vendored_curated_sdk/azure/ai/ml/entities/_workspace/workspace.py", line 303, in _load
+    loaded_schema = load_from_dict(
+                    ^^^^^^^^^^^^^^^
+  File "/Users/amischreiber/.azure/cliextensions/ml/azext_mlv2/manual/vendored_curated_sdk/azure/ai/ml/entities/_util.py", line 195, in load_from_dict
+    raise ValidationError(decorate_validation_error(schema, pretty_error, additional_message)) from e
+marshmallow.exceptions.ValidationError: Validation for WorkspaceSchema failed:
+
+ {
+  "storage_account": [
+    "ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.Storage/storageAccounts/ is not formatted correctly."
+  ],
+  "container_registry": [
+    "ARM string cr-copilot-demo-003 is not formatted correctly."
+  ],
+  "key_vault": [
+    "ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-003 is not formatted correctly."
+  ],
+  "application_insights": [
+    "ARM string /subscriptions//resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.insights/components/ is not formatted correctly."
+  ]
+} 
+
+ If you are trying to configure a workspace that is not of type default, please specify the correct job type in the 'type' property.
+
+Visit this link to refer to the Workspace schema if needed: https://aka.ms/ml-cli-v2-workspace-yaml-reference.
+The easiest way to author a specification file is using IntelliSense and auto-completion Azure ML VS code extension provides: https://code.visualstudio.com/docs/datascience/azure-machine-learning. To set up: https://docs.microsoft.com/azure/machine-learning/how-to-setup-vs-code
+To check existing issues, please visit: https://github.com/Azure/azure-cli/issues

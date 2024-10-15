@@ -131,3 +131,157 @@
 2024-10-15 01:43:19 - AI Hub connection for 'hub-ai-copilot-demo-003' already exists.
 2024-10-15 01:43:24 - AI Model deployment: 'aimodel-copilot-demo-003' created.
 2024-10-15 01:43:27 - File 'ml.workspace.yaml' created and populated.
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 10/15/2024 01:58:19 ***
+2024-10-15 01:58:20 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 01:58:21 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 01:58:25 - Storage account 'stcopilotdemo003' already exists.
+2024-10-15 01:58:25 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - Identity 'id-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-10-15 01:58:25 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-10-15 01:58:28 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 01:58:28 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 01:58:31 - Function app 'func-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 01:58:31 - Skipping deployment for Function app 'func-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 01:58:31 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 01:58:44 - File 'ai.connection.yaml' created and populated.
+2024-10-15 01:58:44 - AI Hub connection for 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 01:58:48 - AI Model deployment: 'aimodel-copilot-demo-003' created.
+2024-10-15 01:58:48 - File 'ml.workspace.yaml' created and populated.
+2024-10-15 01:59:42 - File 'ml.workspace.yaml' created and populated.
+2024-10-15 02:00:02 - File 'ml.workspace.yaml' created and populated.
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 10/15/2024 02:09:47 ***
+2024-10-15 02:09:48 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:09:49 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:09:53 - Storage account 'stcopilotdemo003' already exists.
+2024-10-15 02:09:53 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-15 02:09:53 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-15 02:09:53 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-15 02:09:53 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-15 02:09:53 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-15 02:09:53 - Identity 'id-copilot-demo-003' already exists.
+2024-10-15 02:09:53 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-15 02:09:53 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-10-15 02:10:03 - Container Registry 'cr-copilot-demo-003' created.
+2024-10-15 02:10:03 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-10-15 02:10:13 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:10:13 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:10:20 - Function app 'func-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:10:20 - Skipping deployment for Function app 'func-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:10:20 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 10/15/2024 02:11:05 ***
+2024-10-15 02:11:06 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:11:07 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:11:11 - Storage account 'stcopilotdemo003' already exists.
+2024-10-15 02:11:11 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-15 02:11:11 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-15 02:11:11 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-15 02:11:11 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-15 02:11:11 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-15 02:11:11 - Identity 'id-copilot-demo-003' already exists.
+2024-10-15 02:11:11 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-15 02:11:11 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-10-15 02:11:15 - Container Registry 'cr-copilot-demo-003' created.
+2024-10-15 02:11:15 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-10-15 02:11:18 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:11:18 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:11:21 - Function app 'func-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:11:21 - Skipping deployment for Function app 'func-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:11:21 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 02:11:22 - File 'ai.connection.yaml' created and populated.
+2024-10-15 02:11:22 - AI Hub connection for 'hub-ai-copilot-demo-003' already exists.
+*** LOG SEQUENCE: 10 ***
+*** SCRIPT START TIME: 10/15/2024 02:11:42 ***
+2024-10-15 02:11:43 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:11:44 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:11:48 - Storage account 'stcopilotdemo003' already exists.
+2024-10-15 02:11:48 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-15 02:11:48 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-15 02:11:48 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-15 02:11:48 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-15 02:11:48 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-15 02:11:48 - Identity 'id-copilot-demo-003' already exists.
+2024-10-15 02:11:48 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-15 02:12:16 - OpenAI Service 'openai-copilot-demo-003' already exists.
+*** LOG SEQUENCE: 11 ***
+*** SCRIPT START TIME: 10/15/2024 02:22:20 ***
+2024-10-15 02:22:21 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:22:22 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:22:26 - Storage account 'stcopilotdemo003' already exists.
+2024-10-15 02:22:26 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-15 02:22:26 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-15 02:22:26 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-15 02:22:26 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-15 02:22:26 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-15 02:22:26 - Identity 'id-copilot-demo-003' already exists.
+2024-10-15 02:22:26 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-15 02:22:26 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-10-15 02:23:03 - File 'container.registry.yaml' created and populated.
+2024-10-15 02:25:30 - Container Registry 'cr-copilot-demo-003' created.
+2024-10-15 02:25:33 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-10-15 02:25:36 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:25:36 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:25:39 - Function app 'func-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:25:39 - Skipping deployment for Function app 'func-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:25:39 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 02:25:39 - AI Hub connection for 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 02:25:43 - AI Model deployment: 'aimodel-copilot-demo-003' created.
+2024-10-15 02:25:43 - File 'ml.workspace.yaml' created and populated.
+*** LOG SEQUENCE: 12 ***
+*** SCRIPT START TIME: 10/15/2024 02:31:49 ***
+2024-10-15 02:31:50 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:31:51 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:31:56 - Storage account 'stcopilotdemo003' already exists.
+2024-10-15 02:31:56 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-15 02:31:56 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-15 02:31:56 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-15 02:31:56 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-15 02:31:56 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-15 02:31:56 - Identity 'id-copilot-demo-003' already exists.
+2024-10-15 02:31:56 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-15 02:31:56 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-10-15 02:32:08 - Container Registry 'cr-copilot-demo-003' already exists.
+2024-10-15 02:32:08 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-10-15 02:32:11 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:32:11 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:32:15 - Function app 'func-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:32:15 - Skipping deployment for Function app 'func-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:32:15 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 02:32:15 - AI Hub connection for 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 02:32:19 - AI Model deployment: 'aimodel-copilot-demo-003' created.
+2024-10-15 02:32:19 - File 'ml.workspace.yaml' created and populated.
+*** LOG SEQUENCE: 13 ***
+*** SCRIPT START TIME: 10/15/2024 02:37:56 ***
+2024-10-15 02:37:58 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:37:59 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-15 02:38:04 - Storage account 'stcopilotdemo003' already exists.
+2024-10-15 02:38:04 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Identity 'id-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Container Registry 'cr-copilot-demo-003' already exists.
+2024-10-15 02:38:04 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-10-15 02:38:07 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:38:07 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:38:10 - Function app 'func-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-15 02:38:10 - Skipping deployment for Function app 'func-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-15 02:38:10 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 02:38:10 - AI Hub connection for 'hub-ai-copilot-demo-003' already exists.
+2024-10-15 02:38:14 - AI Model deployment: 'aimodel-copilot-demo-003' created.
+2024-10-15 02:38:14 - File 'ml.workspace.yaml' created and populated.
+2024-10-15 02:39:24 - Failed to create AI Project 'project-ai-copilot-demo-003'. 
+        Error: Validation for WorkspaceSchema failed: 
+        Code:  
+        Message: 

@@ -1,8 +1,8 @@
-name: RegistryPlaceholder
+name: cr-copilot-demo-003
 tags:
   description: Basic registry with one primary region and to additional regions
-location: eastus
+location: east us
 replication_locations:
-  - location: eastus
+  - location: east us
   - location: eastus2
   - location: westus

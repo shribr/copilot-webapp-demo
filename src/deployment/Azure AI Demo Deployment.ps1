@@ -107,7 +107,8 @@ $global:ResourceTypes = @(
     "Microsoft.ContainerRegistry/registries",
     "Microsoft.CognitiveServices/accounts",
     "Microsoft.Search/searchServices",
-    "Microsoft.ApiManagement"
+    "Microsoft.ApiManagement",
+    "Microsoft.ContainerRegistry"
 )
 
 # List of all KeyVault secret keys
@@ -714,11 +715,11 @@ function New-AIHubAndModel {
         }
     }
 
-    $aiConnectionFile = Update-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
-
     # Create AI Hub connection
     if ($existingResources -notcontains $aiHubName) {
         try {
+            $aiConnectionFile = Update-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
+
             az ml connection create --file $aiConnectionFile --resource-group $resourceGroupName --workspace-name $aiHubName
             Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
             Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." -logFilePath $global:LogFilePath
@@ -787,14 +788,32 @@ function New-AIHubAndModel {
         try {
             $ErrorActionPreference = 'Stop'
             #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
-            $mlWorkspaceFile = Update-MLWorkspaceFile -resourceGroupName $resourceGroupName -aiProjectName $aiProjectName -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -location $location
+            $mlWorkspaceFile = Update-MLWorkspaceFile -resourceGroupName $resourceGroupName -aiProjectName $aiProjectName -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -location $location -containerRegistryName $containerRegistryName 2>&1
 
             #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
-            az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName
+            $jsonOutput = az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName 2>&1
 
-            Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
-            Write-Log -message "AI project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create AI Project '$aiProjectName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+
+                Write-Host $errorMessage
+                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+            }
+            else {
+                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
+                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+            }
         }
         catch {
             Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -951,25 +970,6 @@ function New-AppService {
     Set-DirectoryPath -targetDirectory $global:deploymentPath
 }
 
-function New-ContainerRegistry {
-    param (
-        [string]$containerRegistryName,
-        [string]$resourceGroupName,
-        [string]$location
-    )
-
-    try {
-        az ml registry create --file container.registry.yaml
-        
-        Write-Host "Container Registry '$containerRegistryName' created."
-        Write-Log -message "Container Registry '$containerRegistryName' created."
-    }
-    catch {
-        Write-Error "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-}
-
 # Function to create a new private endpoint
 function New-PrivateEndPoint {
     param (
@@ -1081,6 +1081,7 @@ function New-Resources {
         [string]$userPrincipalName,
         [string]$openAIName,
         [string]$documentIntelligenceName,
+        [string]$containerRegistryName,
         [array]$existingResources,
         [array]$apiManagementService
     )
@@ -1377,6 +1378,28 @@ function New-Resources {
     else {
         Write-Host "OpenAI Service '$openAIName' already exists."
         Write-Log -message "OpenAI Service '$openAIName' already exists."
+    }
+
+    #**********************************************************************************************************************
+    # Create Container Registry
+
+    if ($existingResources -notcontains $containerRegistryName) {
+        $containerRegistryFile = Update-ContainerRegistryFile -resourceGroupName $resourceGroupName -containerRegistryName $containerRegistryName -location $location
+
+        try {
+            az ml registry create --file $containerRegistryFile --resource-group $resourceGroupName
+        
+            Write-Host "Container Registry '$containerRegistryName' created."
+            Write-Log -message "Container Registry '$containerRegistryName' created."
+        }
+        catch {
+            Write-Error "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }   
+    }
+    else {
+        Write-Host "Container Registry '$containerRegistryName' already exists."
+        Write-Log -message "Container Registry '$containerRegistryName' already exists."
     }
 
     #**********************************************************************************************************************
@@ -1782,6 +1805,7 @@ function Start-Deployment {
             -userPrincipalName $userPrincipalName `
             -openAIName $openAIName `
             -documentIntelligenceName $documentIntelligenceName `
+            -containerRegistryName $containerRegistryName `
             -existingResources $existingResources
 
         foreach ($appService in $appServices) {
@@ -1814,7 +1838,8 @@ function Start-Deployment {
             -openAIName $openAIName `
             -documentIntelligenceName $documentIntelligenceName `
             -existingResources $existingResources `
-            -apiManagementService $apiManagementService
+            -apiManagementService $apiManagementService `
+            -containerRegistryName $containerRegistryName
 
         foreach ($appService in $appServices) {
             if ($existingResources -notcontains $appService) {
@@ -1918,6 +1943,9 @@ function Test-ResourceExists {
             "Microsoft.ApiManagement/" {
                 $result = az apim api list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
             }
+            "Microsoft.ContainerRegistry/" {
+                $result = az container list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
+            }
         }
 
         if (-not [string]::IsNullOrEmpty($result)) {
@@ -1982,7 +2010,12 @@ replication_locations:
 function Update-MLWorkspaceFile {
     param (
         [string]$resourceGroupName,
-        [string]$aiProjectName
+        [string]$containerRegistryName,
+        [string]$aiProjectName,
+        [string]$location,
+        [string]$subscriptionId,
+        [string]$storageAccountName,
+        [string]$keyVaultName
     )
     
     $rootPath = Get-Item -Path (Get-Location).Path
@@ -1995,7 +2028,7 @@ location: $location
 display_name: $aiProjectName
 description: This configuration specifies a workspace configuration with existing dependent resources
 storage_account: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName
-container_registry: ""  # Empty string to indicate no value
+container_registry: $containerRegistryName
 key_vault: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName
 application_insights: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$applicationInsightsName
 tags:
