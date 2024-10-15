@@ -662,8 +662,6 @@ function New-AIHubAndModel {
         [string]$location,
         [array]$existingResources
     )
-    
-    #$aiHubWorkspaceName = "workspace-$aiHubName"
 
     Set-DirectoryPath -targetDirectory $global:deploymentPath
     
@@ -716,7 +714,7 @@ function New-AIHubAndModel {
         }
     }
 
-    $aiConnectionFile = Read-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
+    $aiConnectionFile = Update-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
 
     # Create AI Hub connection
     if ($existingResources -notcontains $aiHubName) {
@@ -788,9 +786,15 @@ function New-AIHubAndModel {
     if ($existingResources -notcontains $aiProjectName) {
         try {
             $ErrorActionPreference = 'Stop'
-            az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName
+            #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
+            $mlWorkspaceFile = Update-MLWorkspaceFile -resourceGroupName $resourceGroupName -aiProjectName $aiProjectName -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -location $location
+
+            #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
+
+            az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName
+
             Write-Host "AI project '$aiProjectName' in '$aiHubName' created."
-            Write-Log -message  "AI project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+            Write-Log -message "AI project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -801,7 +805,6 @@ function New-AIHubAndModel {
         Write-Host "AI Project '$aiProjectName' already exists."
         Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
-
 }
 
 # Function to create and deploy API Management service
@@ -946,6 +949,25 @@ function New-AppService {
     }
 
     Set-DirectoryPath -targetDirectory $global:deploymentPath
+}
+
+function New-ContainerRegistry {
+    param (
+        [string]$containerRegistryName,
+        [string]$resourceGroupName,
+        [string]$location
+    )
+
+    try {
+        az ml registry create --file container.registry.yaml
+        
+        Write-Host "Container Registry '$containerRegistryName' created."
+        Write-Log -message "Container Registry '$containerRegistryName' created."
+    }
+    catch {
+        Write-Error "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
 }
 
 # Function to create a new private endpoint
@@ -1452,41 +1474,6 @@ function New-SubNet {
     }
 }
 
-# Function to read AI connection file
-function Read-AIConnectionFile {
-    param (
-        [string]$resourceGroupName,
-        [string]$aiServiceName
-    )
-    
-    $rootPath = Get-Item -Path (Get-Location).Path
-
-    #$rootAppPath = Find-AppRoot -currentDirectory (Get-Location).Path
-    $filePath = "$rootPath/app/ai.connection.yaml"
-
-    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
-
-    $content = @"
-name: $aiServiceName
-type: azure_ai_services
-endpoint: https://eastus.api.cognitive.microsoft.com/
-api_key: $apiKey
-ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$aiServiceName
-"@
-
-    try {
-        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
-        Write-Host "File 'ai.connection.yaml' created and populated."
-        Write-Log -message "File 'ai.connection.yaml' created and populated."
-    }
-    catch {
-        Write-Error "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    return $filePath
-}
-
 # Function to delete Azure resource groups
 function Remove-AzureResourceGroup {
     
@@ -1566,7 +1553,7 @@ function Set-DirectoryPath {
     )
 
     # Debug output to check the input
-    Write-Host "Target Directory: $targetDirectory"
+    #Write-Host "Target Directory: $targetDirectory"
 
     # Get the root directory from the global variable
     #$rootDirectory = $global:deploymentPath
@@ -1578,7 +1565,7 @@ function Set-DirectoryPath {
     $currentDirectory = Get-Location
 
     # Debug output to check the current directory
-    Write-Host "Current Directory: $currentDirectory"
+    #Write-Host "Current Directory: $currentDirectory"
 
     # Check if the current path is already equal to the root directory
     if ($currentDirectory.Path -notlike $targetDirectory) {
@@ -1586,14 +1573,14 @@ function Set-DirectoryPath {
         if (Test-Path -Path $targetDirectory) {
             # Set location to the root directory
             Set-Location -Path $targetDirectory
-            Write-Host "Changed directory to root: $targetDirectory"
+            #Write-Host "Changed directory to root: $targetDirectory"
         }
         else {
             throw "Root directory '$targetDirectory' does not exist."
         }
     }
     else {
-        Write-Host "Already in the root directory: $targetDirectory"
+        #Write-Host "Already in the root directory: $targetDirectory"
         return
     }
 }
@@ -1954,6 +1941,112 @@ function Test-ResourceExists {
             return $false
         }
     }
+}
+
+# Function to update ML workspace connection file
+function Update-ContainerRegistryFile {
+    param (
+        [string]$resourceGroupName,
+        [string]$containerRegistryName,
+        [string]$location
+    )
+    
+    $rootPath = Get-Item -Path (Get-Location).Path
+
+    $filePath = "$rootPath/app/container.registry.yaml"
+
+    $content = @"
+name: $containerRegistryName
+tags:
+  description: Basic registry with one primary region and to additional regions
+location: $location
+replication_locations:
+  - location: $location
+  - location: eastus2
+  - location: westus
+"@
+
+    try {
+        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
+        Write-Host "File 'container.registry.yaml' created and populated."
+        Write-Log -message "File 'container.registry.yaml' created and populated."
+    }
+    catch {
+        Write-Error "Failed to create or write to 'container.registry.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create or write to 'container.registry.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+    return $filePath
+}
+
+# Function to update ML workspace connection file
+function Update-MLWorkspaceFile {
+    param (
+        [string]$resourceGroupName,
+        [string]$aiProjectName
+    )
+    
+    $rootPath = Get-Item -Path (Get-Location).Path
+
+    $filePath = "$rootPath/app/ml.workspace.yaml"
+
+    $content = @"
+name: $aiProjectName
+location: $location
+display_name: $aiProjectName
+description: This configuration specifies a workspace configuration with existing dependent resources
+storage_account: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName
+container_registry: ""  # Empty string to indicate no value
+key_vault: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName
+application_insights: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$applicationInsightsName
+tags:
+  purpose: demonstration
+"@
+
+    try {
+        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
+        Write-Host "File 'ml.workspace.yaml' created and populated."
+        Write-Log -message "File 'ml.workspace.yaml' created and populated."
+    }
+    catch {
+        Write-Error "Failed to create or write to 'ml.workspace.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create or write to 'ml.workspace.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+    return $filePath
+}
+
+# Function to update AI connection file
+function Update-AIConnectionFile {
+    param (
+        [string]$resourceGroupName,
+        [string]$aiServiceName
+    )
+    
+    $rootPath = Get-Item -Path (Get-Location).Path
+
+    #$rootAppPath = Find-AppRoot -currentDirectory (Get-Location).Path
+    $filePath = "$rootPath/app/ai.connection.yaml"
+
+    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
+
+    $content = @"
+name: $aiServiceName
+type: azure_ai_services
+endpoint: https://eastus.api.cognitive.microsoft.com/
+api_key: $apiKey
+ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$aiServiceName
+"@
+
+    try {
+        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
+        Write-Host "File 'ai.connection.yaml' created and populated."
+        Write-Log -message "File 'ai.connection.yaml' created and populated."
+    }
+    catch {
+        Write-Error "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    return $filePath
 }
 
 # Function to write messages to a log file

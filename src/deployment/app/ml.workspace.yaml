@@ -1,0 +1,10 @@
+name: project-ai-copilot-demo-003
+location: east us
+display_name: project-ai-copilot-demo-003
+description: This configuration specifies a workspace configuration with existing dependent resources
+storage_account: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.Storage/storageAccounts/stcopilotdemo003
+container_registry:  # Empty string to indicate no value
+key_vault: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-003
+application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.insights/components/
+tags:
+  purpose: demonstration
