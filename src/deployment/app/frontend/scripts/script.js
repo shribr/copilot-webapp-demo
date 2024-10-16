@@ -23,6 +23,12 @@ $(document).ready(function () {
     $('#send-button').on('click', postQuestion);
     $('#clear-button').on('click', clearChatDisplay);
 
+    $(document).on('keydown', function (event) {
+        if (event.key === 'Enter') {
+            postQuestion();
+        }
+    });
+
     const screen = getQueryParam('screen');
 
     toggleDisplay(screen);
