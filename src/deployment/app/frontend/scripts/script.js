@@ -135,7 +135,7 @@ $(document).ready(function () {
         const files = document.getElementById('file-input').files;
         if (files.length > 0) {
             //uploadFilesToAzure(files);
-            uploadFilesToAzureUsingLibrary(files);
+            uploadFilesToAzure(files);
         } else {
             console.log('No files selected for upload.');
         }
@@ -289,8 +289,8 @@ async function showResponse() {
 
     if (chatInput) {
 
+        //const response = await getAnswers(chatInput);
         const response = await getAnswersFromAzureOpenAI(chatInput);
-        //const response = await getAnswersFromAzureSearch(chatInput);
 
         // Create a new chat bubble element
         const chatBubble = document.createElement('div');
@@ -378,24 +378,36 @@ async function getAnswers(userInput) {
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
 
-    const userMessageContent = config.AI_REQUEST_BODY.messages.find(message => message.role === 'user').content[0];
+    const userMessageContent = config.OPEN_AI_REQUEST_BODY.messages.find(message => message.role === 'user').content[0];
     userMessageContent.text = userInput;
 
-    const jsonString = JSON.stringify(config.AI_REQUEST_BODY);
+    const jsonString = JSON.stringify(config.OPEN_AI_REQUEST_BODY);
 
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'api-key': `${apiKey}`
-        },
-        body: jsonString
-    });
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`
+            },
+            body: jsonString
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    return data;
-    //displayMessage('Azure Copilot', data.reply);
+        return data;
+    }
+    catch (error) {
+        if (error.code == 429) {
+
+            const data = { error: 'Token rate limit exceeded. Please try again later.' };
+            return data;
+        }
+        else {
+            const data = { error: 'An error occurred. Please try again later.' };
+            return data;
+        }
+    }
 }
 
 //code to send message to Azure Search via Azure Function
@@ -436,57 +448,7 @@ async function getAnswersFromAzureSearch(userInput) {
     return data;
 }
 
-//code to send message to Azure OpenAI
-async function getAnswersFromAzureOpenAI(userInput) {
-    if (!userInput) return;
-
-    const config = await fetchConfig();
-
-    const apiKey = config.OPEN_AI_KEY;
-    const searchFunctionName = config.AZURE_SEARCH_FUNCTION_APP_NAME;
-    const indexName = config.AZURE_SEARCH_INDEX;
-    //const endpoint = `https://${searchFunctionName}.azurewebsites.net/api/${searchFunctionName}?code=${apiKey}`;
-    //const endpoint = "https://func-copilot-demo-003.azurewebsites.net/api/SearchTest?code=TewiFybiLLEUIYTRgsht_ZQDNBd6ZLuS7E5mExZtlVHpAzFuElxX5Q%3D%3D";
-    const endpoint = "https://eastus.api.cognitive.microsoft.com/openai/deployments/chat/chat/completions?api-version=2024-08-01-preview";
-
-    /*
-    const searchQuery = {
-        search: userInput,
-        top: 5 // Number of results to return
-    };
-    */
-
-    const searchQuery = {
-        "messages": [
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": userInput
-                    }
-                ]
-            }
-        ],
-        "temperature": 0.7,
-        "top_p": 0.95,
-        "max_tokens": 800
-    };
-
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'api-key': `${apiKey}`
-        },
-        body: JSON.stringify(searchQuery)
-    });
-
-    const data = await response.json();
-
-    return data;
-}
-
+//function to create side navigation links
 async function createSidenavLinks() {
     try {
         const config = await fetchConfig();
@@ -529,8 +491,8 @@ async function getDocuments() {
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
-    const containerName = config.AZURE_CONTAINER_NAME;
-    const sasTokenConfig = config.SAS_TOKEN;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const fileTypes = config.FILE_TYPES;
 
     // Construct the SAS token from the individual components
@@ -556,6 +518,8 @@ async function getDocuments() {
             const docList = document.getElementById('document-list');
             const sampleRows = document.querySelectorAll('.document-row.sample');
 
+            const testUrl = "https://stcopilotdemo003.blob.core.windows.net/content/AI Builder governance whitepaper.pdf?sv=2022-11-02&include=metadata&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-10-16T04:00:00Z&st=2024-10-15T04:00:00Z&spr=https&sig=1R8tRUu0Tloc8nW33zc548rA9fSXXGRMAukfJOOncVc%3D";
+
             // Clear existing document rows except the header
             const existingRows = docList.querySelectorAll('.document-row:not(.header)');
             existingRows.forEach(row => row.style.display = 'none');
@@ -572,7 +536,8 @@ async function getDocuments() {
                     const blobName = blob.getElementsByTagName("Name")[0].textContent;
                     const lastModified = blob.getElementsByTagName("Last-Modified")[0].textContent;
                     const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-                    const blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+                    let blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+                    blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
                     const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
 
                     // Create the document row
@@ -584,6 +549,7 @@ async function getDocuments() {
                     previewCell.className = 'document-cell preview';
 
                     previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.MAGNIFYING_GLASS.COLOR}${config.MAGNIFYING_GLASS.MONOTONE}</a>`;
+
 
                     const statusCell = document.createElement('div');
                     statusCell.className = 'document-cell preview';
@@ -705,64 +671,46 @@ function updatePlaceholder() {
 
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
-    const accountName = "stdcdaiprodpoc001";
-    const azureStorageUrl = "blob.core.windows.net";
-    const containerName = "content";
-    const accessKey = "7";
+    const config = await fetchConfig();
 
-    const sv = "2022-11-02";
-    const ss = "bfqt";
-    const srt = "sco";
-    const sp = "rwdlacupiytfx";
-    const se = "2025-10-08T04:00:00Z";
-    const st = "2024-10-08T04:00:00Z";
-    const spr = "https";
-    const sig = "sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D";
-    const comp = "list";
-    const include = "metadata";
-    const restype = "container";
+    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
+    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const fileTypes = config.FILE_TYPES;
 
-    //https://stdcdaiprodpoc001.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-10-08T04:00:00Z&st=2024-10-08T04:00:00Z&spr=https&sig=sfSvKnCMycPfgT4y%2FpcMSsW3nXsVr8sLCrR7rAgDgZk%3D
     // Construct the SAS token from the individual components
-    const sasToken = `sv=${sv}&comp=${comp}&include=${include}&restype=${restype}&ss=${ss}&srt=${srt}&sp=${sp}&se=${se}&st=${st}&spr=${spr}&sig=${sig}`;
+    const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&st=${sasTokenConfig.ST}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
-    async function uploadFiles(files) {
-        for (const file of files) {
-            const uploadUrl = `${storageUrl}/${file.name}`;
-            const date = new Date().toUTCString();
-            const stringToSign = `PUT\n\n${file.size}\n\n${file.type}\n\n\n\n\n\n\n\nx-ms-blob-type:BlockBlob\nx-ms-date:${date}\nx-ms-version:2020-10-02\n/${accountName}/${containerName}/${file.name}`;
-            const signature = CryptoJS.HmacSHA256(stringToSign, CryptoJS.enc.Base64.parse(accessKey));
-            const authorizationHeader = `SharedKey ${accountName}:${CryptoJS.enc.Base64.stringify(signature)}`;
+    for (const file of files) {
+        const uploadUrl = `${storageUrl}/${file.name}?&${sasToken}`;
+        const date = new Date().toUTCString();
 
-            console.write(`Upload URL: ${uploadUrl}`);
+        try {
+            const response = await fetch(uploadUrl, {
+                method: 'PUT',
+                headers: {
+                    'x-ms-blob-type': 'BlockBlob',
+                    'Content-Type': file.type,
+                    'Content-Length': file.size.toString(),
+                    'x-ms-date': date,
+                    'x-ms-version': '2020-10-02',
+                    'x-ms-blob-content-type': file.type,
+                    'x-ms-blob-type': 'BlockBlob'
+                },
+                body: file
+            });
 
-            //const uploadUrl = `${storageUrl}/${file.name}?${sasToken}`;
-
-            try {
-                const response = await fetch(uploadUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'x-ms-blob-type': 'BlockBlob',
-                        'Content-Type': file.type,
-                        'Content-Length': file.size.toString(),
-                        'x-ms-date': date,
-                        'x-ms-version': '2020-10-02',
-                        'Authorization': authorizationHeader
-                    },
-                    body: file
-                });
-
-                if (response.ok) {
-                    console.log(`Upload successful for ${file.name}.`);
-                } else {
-                    const errorText = await response.text();
-                    console.error(`Error uploading file ${file.name} to Azure Storage:`, errorText);
-                }
-            } catch (error) {
-                console.error(`Error uploading file ${file.name} to Azure Storage:`, error.message);
+            if (response.ok) {
+                console.log(`Upload successful for ${file.name}.`);
+            } else {
+                const errorText = await response.text();
+                console.error(`Error uploading file ${file.name} to Azure Storage:`, errorText);
             }
+        } catch (error) {
+            console.error(`Error uploading file ${file.name} to Azure Storage:`, error.message);
         }
     }
     // Clear the file input after successful upload

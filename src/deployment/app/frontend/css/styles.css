@@ -701,6 +701,7 @@ label[for="chat-input"] {
   display: flex;
   align-items: center;
   margin-left: auto;
+  padding-bottom: 6px;
   /* Push the filter container to the right */
 }
 
@@ -723,7 +724,7 @@ label[for="chat-input"] {
   /* Light gray border */
   background: none;
   /* Ensure no background */
-  padding: 5px;
+  padding: 3px;
   /* Add some padding */
   cursor: pointer;
   /* Change cursor to pointer */
