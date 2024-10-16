@@ -290,7 +290,7 @@ async function showResponse() {
     if (chatInput) {
 
         //const response = await getAnswers(chatInput);
-        const response = await getAnswersFromAzureOpenAI(chatInput);
+        const response = await getAnswers(chatInput);
 
         // Create a new chat bubble element
         const chatBubble = document.createElement('div');
@@ -548,7 +548,7 @@ async function getDocuments() {
                     const previewCell = document.createElement('div');
                     previewCell.className = 'document-cell preview';
 
-                    previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.MAGNIFYING_GLASS.COLOR}${config.MAGNIFYING_GLASS.MONOTONE}</a>`;
+                    previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.COLOR}${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a>`;
 
 
                     const statusCell = document.createElement('div');
@@ -583,12 +583,25 @@ async function getDocuments() {
                     }
 
                     const fileSizeCell = document.createElement('div');
-                    fileSizeCell.className = 'document-cell preview';
+                    fileSizeCell.className = 'document-cell file-size';
                     fileSizeCell.textContent = blobSize;
 
                     const lastModifiedCell = document.createElement('div');
                     lastModifiedCell.className = 'document-cell';
                     lastModifiedCell.textContent = lastModified;
+
+                    const deleteCell = document.createElement('div');
+                    deleteCell.className = 'document-cell action-delete';
+                    deleteCell.innerHTML = `<a href="#" class="delete-button">${config.ICONS.DELETE.COLOR}${config.ICONS.DELETE.MONOTONE}</a>`;
+
+                    const editCell = document.createElement('div');
+                    editCell.className = 'document-cell action-edit';
+                    editCell.innerHTML = `<a href="#" class="edit-button">${config.ICONS.EDIT.COLOR}${config.ICONS.EDIT.MONOTONE}</a>`;
+
+                    const actionCell = document.createElement('div');
+                    actionCell.className = 'document-cell action-container';
+                    actionCell.appendChild(deleteCell);
+                    actionCell.appendChild(editCell);
 
                     // Append cells to the document row
                     documentRow.appendChild(previewCell);
@@ -597,7 +610,7 @@ async function getDocuments() {
                     documentRow.appendChild(contentTypeCell);
                     documentRow.appendChild(fileSizeCell);
                     documentRow.appendChild(lastModifiedCell);
-
+                    documentRow.appendChild(actionCell);
                     // Append the document row to the document list
                     docList.appendChild(documentRow);
                 });

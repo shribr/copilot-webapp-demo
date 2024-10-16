@@ -901,10 +901,26 @@ label[for="chat-input"] {
   width: 20px;
 }
 
-svg {
+.svg-icon {
   overflow: visible;
   width: 28px;
   height: 28px;
+}
+
+.action-container {
+  padding: 10px;
+}
+
+.action-edit {
+  margin-right: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.action-delete {
+  margin-right: 10px;
+  border: none;
+  cursor: pointer;
 }
 
 .tab.active svg {
