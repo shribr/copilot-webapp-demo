@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -33,7 +34,7 @@ public static class ChatOrchestrator
     [FunctionName("ChatActivity")]
     public static async Task<string> ChatActivity([ActivityTrigger] ChatContext chatContext, ILogger log)
     {
-        var chatCompletion = new YourChatCompletionImplementation(); // Replace with your actual implementation
+        var chatCompletion = new AIChatCompletion(); // Replace with your actual implementation
         return await chatCompletion.CompleteAsync(chatContext);
     }
 
