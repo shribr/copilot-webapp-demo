@@ -900,7 +900,7 @@ function New-AppService {
 
                 if (-not $appExists) {
                     # Create a new function app
-                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --output none
+                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --functions-version 4 --output none
                 }
             }
 
