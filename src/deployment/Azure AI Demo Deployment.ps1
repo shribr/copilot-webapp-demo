@@ -671,7 +671,7 @@ function New-AIHubAndModel {
     if ($existingResources -notcontains $aiHubName) {
         try {
             $ErrorActionPreference = 'Stop'
-            az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName
+            az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName --storage-account $storageAccountName
             #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
             Write-Host "AI Hub: '$aiHubName' created."
             Write-Log -message "AI Hub: '$aiHubName' created." -logFilePath $global:LogFilePath
