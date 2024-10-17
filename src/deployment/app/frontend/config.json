@@ -11,7 +11,7 @@
   "AZURE_SEARCH_FUNCTION_APP_URL": "func-copilot-demo-003.azurewebsites.net",
   "AZURE_SEARCH_FUNCTION_API_KEY": "80p2YyfZUhCijS3iDitQ6rW_wJgo2iYBHak9wJ2U5bLmAzFuylWOog==",
   "STORAGE_CONTAINER_NAME": "content",
-  "OPEN_AI_KEY": "b33a6efba2764a5aadde32906d44bb9d",
+  "OPEN_AI_KEY": "81dc1a2623374efeb1708c72ceaa2dd6",
   "API_VERSION": "2024-08-01-preview",
   "DEPLOYMENT_ID": "chat",
   "REGION": "eastus",
