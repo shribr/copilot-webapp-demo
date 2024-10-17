@@ -1,10 +1,10 @@
 {
   "aiHubName": "hub-ai-copilot-demo-003",
-  "aiModelName": "aimodel-copilot-demo-003",
+  "aiModelName": "ai-model-copilot-demo-003",
   "aiModelType": "gpt-4o",
   "aiModelVersion": "v1",
   "aiProjectName": "project-ai-copilot-demo-003",
-  "aiServiceName": "aiservice-copilot-demo-003",
+  "aiServiceName": "ai-service-copilot-demo-003",
   "aiHubProjectName": "project-ai-copilot-demo-003",
   "appendUniqueSuffix": false,
   "appServicePlanName": "asp-copilot-demo-003",
@@ -65,7 +65,7 @@
       "AppServicePlan": "asp-copilot-demo-003",
       "Runtime": "NODE:20LTS",
       "Location": "east us",
-      "Url": "https://app-copilot-demo-00.azurewebsites.net"
+      "Url": "https://app-copilot-demo-003.azurewebsites.net"
     },
     {
       "Name": "func-copilot-demo-003",
@@ -76,7 +76,18 @@
       "AppServicePlan": "asp-copilot-demo-003",
       "Runtime": "node",
       "Location": "eastus",
-      "Url": "https://func-copilot-demo-00.azurewebsites.net"
+      "Url": "https://func-search-copilot-demo-003.azurewebsites.net"
+    },
+    {
+      "Name": "func-chat-copilot-demo-003",
+      "DeployZipPackage": true,
+      "DeletePackageAfterDeploy": true,
+      "Type": "Function",
+      "Path": "app/functions/chat",
+      "AppServicePlan": "asp-copilot-demo-003",
+      "Runtime": "dotnet",
+      "Location": "eastus",
+      "Url": "https://func-chat-copilot-demo-003.azurewebsites.net"
     }
   ]
 }

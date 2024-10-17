@@ -107,3 +107,31 @@
 2024-10-15 13:26:19 - AI Project 'project-ai-copilot-demo-003' already exists.
 2024-10-15 13:26:19 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 01 MIN : 36 SEC : 942 MS ***
 
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 10/16/2024 14:58:35 ***
+2024-10-16 14:58:38 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-16 14:58:40 - Resource group 'RG-COPILOT-DEMO-003' exists.
+2024-10-16 14:58:45 - Storage account 'stcopilotdemo003' already exists.
+2024-10-16 14:58:45 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - Search Service 'srch-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - Identity 'id-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-10-16 14:58:45 - Container Registry 'crcopilotdemo003' already exists.
+2024-10-16 14:58:45 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-10-16 14:58:51 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-16 14:59:14 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-10-16 14:59:17 - Function app 'func-copilot-demo-003' already exists. Moving on to deployment.
+2024-10-16 15:00:08 - Function app 'func-copilot-demo-003' deployed successfully.
+2024-10-16 15:01:07 - Function app 'func-chat-copilot-demo-003' created. Moving on to deployment.
+2024-10-16 15:02:43 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-10-16 15:02:43 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-10-16 15:03:17 - AI Service: 'ai-service-copilot-demo-003' created.
+2024-10-16 15:03:17 - AI Hub connection for 'hub-ai-copilot-demo-003' already exists.
+2024-10-16 15:03:21 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-10-16 15:03:21 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-10-16 15:03:21 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 04 MIN : 46 SEC : 485 MS ***
+

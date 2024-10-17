@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "ChatFunctionApp": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7121",
-      "launchBrowser": false
-    }
-  }
-}
