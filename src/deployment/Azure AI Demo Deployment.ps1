@@ -848,7 +848,7 @@ function New-ApiManagementService {
         $ErrorActionPreference = 'Stop'
         #$jsonOutput = az apim api create --api-id $apiManagementService.ApiId --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
         #$jsonOutput = az apim api create --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
-        $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName
+        $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait $true
 
         Write-Host $jsonOutput
 
@@ -900,7 +900,7 @@ function New-AppService {
 
                 if (-not $appExists) {
                     # Create a new function app
-                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --functions-version 4 --output none
+                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --plan $appService.AppServicePlan --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --functions-version 4 --output none
                 }
             }
 
@@ -1505,6 +1505,25 @@ function New-SubNet {
     catch {
         Write-Error "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Function to create a new virtual network
+function New-VirtualNetwork {
+    param (
+        [string]$resourceGroupName,
+        [string]$vnetName,
+        [string]$vnetAddressPrefix
+    )
+
+    try {
+        az network vnet create --resource-group $resourceGroupName --name $vnetName --address-prefixes $vnetAddressPrefix --output none
+        Write-Host "Virtual Network '$vnetName' created."
+        Write-Log -message "Virtual Network '$vnetName' created."
+    }
+    catch {
+        Write-Error "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 

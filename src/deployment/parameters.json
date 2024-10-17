@@ -1,53 +1,120 @@
 {
-  "aiHubName": "hub-ai-copilot-demo-003",
-  "aiModelName": "ai-model-copilot-demo-003",
+  "aiHubName": "hub-ai-copilot-demo-001",
+  "aiModelName": "ai-model-copilot-demo-001",
   "aiModelType": "gpt-4o",
   "aiModelVersion": "v1",
-  "aiProjectName": "project-ai-copilot-demo-003",
-  "aiServiceName": "ai-service-copilot-demo-003",
-  "aiHubProjectName": "project-ai-copilot-demo-003",
+  "aiProjectName": "project-ai-copilot-demo-001",
+  "aiServiceName": "ai-service-copilot-demo-001",
+  "aiHubProjectName": "project-ai-copilot-demo-001",
   "appendUniqueSuffix": false,
-  "appServicePlanName": "asp-copilot-demo-003",
-  "appInsightsName": "appi-copilot-demo-003",
-  "blobStrorageDatasourceName": "blob-datasource-copilot-demo-003",
-  "blobStorageAccountName": "blob-copilot-demo-003",
+  "appServicePlanName": "asp-copilot-demo-001",
+  "appInsightsName": "appi-copilot-demo-001",
+  "blobStrorageDatasourceName": "blob-datasource-copilot-demo-001",
+  "blobStorageAccountName": "blob-copilot-demo-001",
   "blobStorageContainerName": "content",
-  "cognitiveServiceName": "cog-copilot-demo-003",
-  "containerAppName": "ca-copilot-demo-003",
-  "containerAppsEnvironmentName": "cae-copilot-demo-003",
+  "cognitiveServiceName": "cog-copilot-demo-001",
+  "containerAppName": "ca-copilot-demo-001",
+  "containerAppsEnvironmentName": "cae-copilot-demo-001",
   "containerRegistryName": "crcopilotdemo003",
-  "cosmosDbAccountName": "cosmos-copilot-demo-003",
+  "cosmosDbAccountName": "cosmos-copilot-demo-001",
   "createResourceGroup": true,
   "deleteResourceGroup": false,
   "deployZipResources": true,
   "domainName": "azurewebsites.net",
-  "documentIntelligenceName": "docintel-copilot-demo-003",
-  "eventHubNamespaceName": "eh-copilot-demo-003",
-  "keyVaultName": "kv-copilot-demo-003",
+  "documentIntelligenceName": "docintel-copilot-demo-001",
+  "eventHubNamespaceName": "eh-copilot-demo-001",
+  "keyVaultName": "kv-copilot-demo-001",
   "location": "east us",
-  "logAnalyticsWorkspaceName": "log-copilot-demo-003",
-  "managedIdentityName": "id-copilot-demo-003",
-  "openAIName": "openai-copilot-demo-003",
-  "portalDashboardName": "portaldash-copilot-demo-003",
-  "redisCacheName": "redis-copilot-demo-003",
-  "resourceGroupName": "RG-COPILOT-DEMO-003",
+  "logAnalyticsWorkspaceName": "log-copilot-demo-001",
+  "managedIdentityName": "id-copilot-demo-001",
+  "openAIName": "openai-copilot-demo-001",
+  "portalDashboardName": "portaldash-copilot-demo-001",
+  "redisCacheName": "redis-copilot-demo-001",
+  "resourceGroupName": "RG-COPILOT-DEMO-001",
   "resourceSuffix": 1,
-  "searchServiceName": "srch-copilot-demo-003",
-  "searchIndexName": "srch-index-copilot-demo-003",
+  "searchServiceName": "srch-copilot-demo-001",
+  "searchIndexName": "srch-index-copilot-demo-001",
   "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",
-  "searchIndexerName": "srch-indexer-copilot-demo-003",
-  "serviceBusNamespaceName": "sb-copilot-demo-003",
-  "searchDataSourceName": "search-datasource-copilot-demo-003",
-  "sharedDashboardName": "dash-copilot-demo-003",
-  "sqlServerName": "sql-copilot-demo-003",
-  "storageAccountName": "stcopilotdemo003",
-  "subNetName": "subnet-copilot-demo-003",
-  "userAssignedIdentityName": "id-copilot-demo-003",
-  "virtualNetworkName": "vnet-copilot-demo-003",
+  "searchIndexerName": "srch-indexer-copilot-demo-001",
+  "serviceBusNamespaceName": "sb-copilot-demo-001",
+  "searchDataSourceName": "search-datasource-copilot-demo-001",
+  "sharedDashboardName": "dash-copilot-demo-001",
+  "sqlServerName": "sql-copilot-demo-001",
+  "storageAccountName": "stcopilotdemo001",
+  "userAssignedIdentityName": "id-copilot-demo-001",
+  "subNets": [
+    {
+      "Name": "subnet-copilot-demo-001",
+      "Description": "subnet-copilot-demo-001",
+      "IPV4Enabled": true,
+      "IPV6Enabled": false,
+      "PrivateSubNet": true,
+      "Security":
+      [{
+        "NATGateway": "NAT Gateway",
+        "NetworkSecurityGroup": "NSG",
+        "RouteTable": "Route Table"
+      }],
+      "IPV4":
+      [
+        {
+          "IPV4AddressRange": "",
+          "StartingAddress": "",
+          "Size": "",
+          "AddressRange": ""
+        }
+      ],
+      "IPV6":
+      [
+        {
+          "IPV4AddressRange": "",
+          "StartingAddress": "",
+          "Size": "",
+          "AddressRange": ""
+        }
+      ],
+      "ServiceEndpoints":
+      [
+        {
+          "Service": "Service",
+          "ServiceName": "Service Name",
+          "ServiceType": "Service Type"
+        }
+      ]
+    }
+  ],
+  "virtualNetwork":
+  {
+    "Name": "vnet-copilot-demo-001",
+    "AddressPrefix": "",
+    "Subnets": [
+      {
+        "Name": "subnet-copilot-demo-001",
+        "AddressPrefix": ""
+      }
+    ],"Location": "east us",
+    "ResourceGroup": "RG-COPILOT-DEMO-001"
+  },
+  "PrivateEndpoints": [
+    {
+      "Name": "pe-copilot-demo-001",
+      "Location": "east us",
+      "Subnet": "subnet-copilot-demo-001",
+      "PrivateConnection": {
+        "Name": "pc-copilot-demo-001",
+        "Location": "east us",
+        "ResourceGroup": "RG-COPILOT-DEMO-001",
+        "PrivateConnectionName": "pc-copilot-demo-001",
+        "PrivateConnectionType": "sql",
+        "PrivateConnectionStatus": "Approved",
+        "PrivateConnectionDescription": "Private connection to SQL Server"
+      }
+    }
+  ],
   "apiManagementService": [
     {
-      "Name": "apim-copilot-demo-003",
-      "Display": "apim-copilot-demo-003",
+      "Name": "apim-copilot-demo-001",
+      "Display": "apim-copilot-demo-001",
       "PublisherEmail": "amschrei@microsoft.com",
       "PublisherName": "Ami Schreiber",
       "Location": "east us",
@@ -57,37 +124,37 @@
   ],
   "appServices": [
     {
-      "Name": "app-copilot-demo-003",
+      "Name": "app-copilot-demo-001",
       "DeployZipPackage": true,
       "DeletePackageAfterDeploy": true,
       "Type": "Web",
       "Path": "app/frontend",
-      "AppServicePlan": "asp-copilot-demo-003",
+      "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "NODE:20LTS",
       "Location": "east us",
-      "Url": "https://app-copilot-demo-003.azurewebsites.net"
+      "Url": "https://app-copilot-demo-001.azurewebsites.net"
     },
     {
-      "Name": "func-copilot-demo-003",
+      "Name": "func-copilot-demo-001",
       "DeployZipPackage": true,
       "DeletePackageAfterDeploy": true,
       "Type": "Function",
       "Path": "app/functions/search",
-      "AppServicePlan": "asp-copilot-demo-003",
+      "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "node",
       "Location": "eastus",
-      "Url": "https://func-search-copilot-demo-003.azurewebsites.net"
+      "Url": "https://func-search-copilot-demo-001.azurewebsites.net"
     },
     {
-      "Name": "func-chat-copilot-demo-003",
+      "Name": "func-chat-copilot-demo-001",
       "DeployZipPackage": true,
       "DeletePackageAfterDeploy": true,
       "Type": "Function",
       "Path": "app/functions/chat",
-      "AppServicePlan": "asp-copilot-demo-003",
+      "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "dotnet",
       "Location": "eastus",
-      "Url": "https://func-chat-copilot-demo-003.azurewebsites.net"
+      "Url": "https://func-chat-copilot-demo-001.azurewebsites.net"
     }
   ]
 }
