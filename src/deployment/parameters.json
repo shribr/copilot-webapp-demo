@@ -42,7 +42,18 @@
   "sqlServerName": "sql-copilot-demo-001",
   "storageAccountName": "stcopilotdemo001",
   "userAssignedIdentityName": "id-copilot-demo-001",
-  "subNets": [
+  "virtualNetwork":{
+    "Name": "vnet-copilot-demo-001",
+    "AddressPrefix": "",
+    "AddressSpace": "",
+    "ResourceGroup": "RG-COPILOT-DEMO-001",
+    "Location": "east us",
+    "Subnets": [
+      {
+        "Name": "subnet-copilot-demo-001"
+      }]
+  },
+  "SubNet": [
     {
       "Name": "subnet-copilot-demo-001",
       "Description": "subnet-copilot-demo-001",
@@ -83,27 +94,14 @@
       ]
     }
   ],
-  "virtualNetwork":
-  {
-    "Name": "vnet-copilot-demo-001",
-    "AddressPrefix": "",
-    "Subnets": [
-      {
-        "Name": "subnet-copilot-demo-001",
-        "AddressPrefix": ""
-      }
-    ],"Location": "east us",
-    "ResourceGroup": "RG-COPILOT-DEMO-001"
-  },
   "PrivateEndpoints": [
     {
       "Name": "pe-copilot-demo-001",
       "Location": "east us",
+      "ResourceGroup": "RG-COPILOT-DEMO-001",
       "Subnet": "subnet-copilot-demo-001",
       "PrivateConnection": {
         "Name": "pc-copilot-demo-001",
-        "Location": "east us",
-        "ResourceGroup": "RG-COPILOT-DEMO-001",
         "PrivateConnectionName": "pc-copilot-demo-001",
         "PrivateConnectionType": "sql",
         "PrivateConnectionStatus": "Approved",
@@ -118,6 +116,7 @@
       "PublisherEmail": "amschrei@microsoft.com",
       "PublisherName": "Ami Schreiber",
       "Location": "east us",
+      "ResourceGroup": "RG-COPILOT-DEMO-001",
       "ApiId": "Standard",
       "Path": "/path"
     }
@@ -132,6 +131,7 @@
       "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "NODE:20LTS",
       "Location": "east us",
+      "ResourceGroup": "RG-COPILOT-DEMO-001",
       "Url": "https://app-copilot-demo-001.azurewebsites.net"
     },
     {
@@ -143,6 +143,7 @@
       "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "node",
       "Location": "eastus",
+      "ResourceGroup": "RG-COPILOT-DEMO-001",
       "Url": "https://func-search-copilot-demo-001.azurewebsites.net"
     },
     {
@@ -154,6 +155,7 @@
       "AppServicePlan": "asp-copilot-demo-001",
       "Runtime": "dotnet",
       "Location": "eastus",
+      "ResourceGroup": "RG-COPILOT-DEMO-001",
       "Url": "https://func-chat-copilot-demo-001.azurewebsites.net"
     }
   ]

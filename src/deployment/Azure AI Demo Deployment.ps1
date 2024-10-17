@@ -560,7 +560,7 @@ function Initialize-Parameters {
     $global:storageAccountName = $parametersObject.storageAccountName
     $global:subNetName = $parametersObject.subNetName
     $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
-    $global:virtualNetworkName = $parametersObject.virtualNetworkName
+    $global:virtualNetwork = $parametersObject.virtualNetwork
     #$global:objectId = $parametersObject.objectId
 
     #**********************************************************************************************************************
@@ -646,7 +646,7 @@ function Initialize-Parameters {
         tenantId                     = $tenantId
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
-        virtualNetworkName           = $virtualNetworkName      
+        virtualNetwork               = $virtualNetwork      
         parameters                   = $parametersObject
     }
 }
@@ -1511,13 +1511,13 @@ function New-SubNet {
 # Function to create a new virtual network
 function New-VirtualNetwork {
     param (
-        [string]$resourceGroupName,
-        [string]$vnetName,
-        [string]$vnetAddressPrefix
+        [array]$virtualNetwork
     )
 
+    $vnetName = $virtualNetwork.Name
+
     try {
-        az network vnet create --resource-group $resourceGroupName --name $vnetName --address-prefixes $vnetAddressPrefix --output none
+        az network vnet create --resource-group $virtualNetwork.ResourceGroup --name  $virtualNetwork.Name --output none
         Write-Host "Virtual Network '$vnetName' created."
         Write-Log -message "Virtual Network '$vnetName' created."
     }
