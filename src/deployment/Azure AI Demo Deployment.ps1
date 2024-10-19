@@ -671,8 +671,11 @@ function New-AIHubAndModel {
     if ($existingResources -notcontains $aiHubName) {
         try {
             $ErrorActionPreference = 'Stop'
-            az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName --storage-account $storageAccountName
-            #az ml connection create --file "ai.connection.yaml" --resource-group $resourceGroupName --workspace-name $aiHubName
+            $storageAccountId = az storage account show --resource-group $resourceGroupName --name $storageAccountName --query 'id' --output tsv
+            $keyVaultId = az keyvault show --resource-group $resourceGroupName --name $keyVaultName --query 'id' --output tsv
+        
+            az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName --storage-account $storageAccountId --key-vault $keyVaultId
+            
             Write-Host "AI Hub: '$aiHubName' created."
             Write-Log -message "AI Hub: '$aiHubName' created." -logFilePath $global:LogFilePath
         }
@@ -900,7 +903,7 @@ function New-AppService {
 
                 if (-not $appExists) {
                     # Create a new function app
-                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --plan $appService.AppServicePlan --runtime $appService.Runtime --os-type "Windows" --consumption-plan-location $appService.Location --functions-version 4 --output none
+                    az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --plan $appService.AppServicePlan --app-insights $appInsightsName --runtime $appService.Runtime --os-type "Windows" --functions-version 4 --output none
                 }
             }
 
@@ -1272,14 +1275,26 @@ function New-Resources {
             Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
             Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
 
+            $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
+            
+            try {
+                # Ensure the service principal is created
+                az ad sp create --id $assigneePrincipalId
+                Write-Host "Service principal created for identity '$userAssignedIdentityName'."
+                Write-Log -message "Service principal created for identity '$userAssignedIdentityName'."
+            }
+            catch {
+                Write-Error "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+
             # Construct the fully qualified resource ID for the User Assigned Identity
             try {
                 $ErrorActionPreference = 'Stop'
                 #$userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
                 $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
                 $roles = @("Contributor", "Cognitive Services OpenAI User", "Search Index Data Reader", "Storage Blob Data Reader")  # List of roles to assign
-                $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
-            
+                
                 foreach ($role in $roles) {
                     az role assignment create --assignee $assigneePrincipalId --role $role --scope $scope
 
@@ -1908,14 +1923,14 @@ function Test-ResourceGroupExists {
     $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
 
     if ($resourceGroupExists -eq $true) {
-        Write-Host "Resource group '$resourceGroupName' exists."
-        Write-Log -message "Resource group '$resourceGroupName' exists."
+        #Write-Host "Resource group '$resourceGroupName' exists."
+        #Write-Log -message "Resource group '$resourceGroupName' exists."
 
         return true
     }
     else {
-        Write-Host "Resource group '$resourceGroupName' does not exist."
-        Write-Log -message "Resource group '$resourceGroupName' does not exist."
+        #Write-Host "Resource group '$resourceGroupName' does not exist."
+        #Write-Log -message "Resource group '$resourceGroupName' does not exist."
 
         return false
     }
