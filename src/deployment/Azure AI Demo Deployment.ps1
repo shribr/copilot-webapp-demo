@@ -872,7 +872,8 @@ function New-AppService {
     param (
         [array]$appService,
         [string]$resourceGroupName,
-        [string]$storageAccountName
+        [string]$storageAccountName,
+        [bool]$deployZipResources
     )
 
     $appExists = @()
@@ -884,7 +885,7 @@ function New-AppService {
 
     $appServiceType = $appService.Type
     $appServiceName = $appService.Name
-    $deployZipPackage = $appService.DeployZipPackage
+    #$deployZipPackage = $appService.DeployZipPackage
 
     try {       
         try {
@@ -2041,14 +2042,6 @@ function Start-Deployment {
             -documentIntelligenceName $documentIntelligenceName `
             -containerRegistryName $containerRegistryName `
             -existingResources $existingResources
-
-        foreach ($appService in $appServices) {
-            if ($existingResources -notcontains $appService) {
-                New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
-            }
-        }
-
-        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
     }
     else {
         $userPrincipalName = "$($parameters.userPrincipalName)"
@@ -2074,17 +2067,26 @@ function Start-Deployment {
             -existingResources $existingResources `
             -apiManagementService $apiManagementService `
             -containerRegistryName $containerRegistryName
-
-        foreach ($appService in $appServices) {
-            if ($existingResources -notcontains $appService) {
-                New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName
-            }
-        }
-
-        # Create a new AI Hub and Model
-        New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -appInsightsName $appInsightsName -existingResources $existingResources
     }
 
+    # Create new web app and function app services
+    foreach ($appService in $appServices) {
+        if ($existingResources -notcontains $appService) {
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $false
+        }
+    }
+
+    # Create a new AI Hub and Model
+    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+    
+    # Deploy web app and function app services
+    foreach ($appService in $appServices) {
+        if ($existingResources -notcontains $appService) {
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
+        }
+    }
+
+    # Update configuration file for web frontend
     Update-ConfigFile - configFilePath $logFilePath -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppName
 
     # End the timer
