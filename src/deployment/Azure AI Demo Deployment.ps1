@@ -529,6 +529,7 @@ function Initialize-Parameters {
     $global:appInsightsName = $parametersObject.appInsightsName
     $global:blobStorageAccountName = $parametersObject.blobStorageAccountName
     $global:blobStorageContainerName = $parametersObject.blobStorageContainerName
+    $global:configFilePath = $parametersObject.configFilePath
     $global:cognitiveServiceName = $parametersObject.cognitiveServiceName
     $global:containerAppName = $parametersObject.containerAppName
     $global:containerAppsEnvironmentName = $parametersObject.containerAppsEnvironmentName
@@ -609,6 +610,7 @@ function Initialize-Parameters {
         appInsightsName              = $appInsightsName
         blobStorageAccountName       = $blobStorageAccountName
         blobStorageContainerName     = $blobStorageContainerName
+        configFilePath               = $configFilePath
         cognitiveServiceName         = $cognitiveServiceName
         containerAppName             = $containerAppName
         containerAppsEnvironmentName = $containerAppsEnvironmentName
@@ -1418,6 +1420,37 @@ function New-Resources {
     }
 
     #**********************************************************************************************************************
+    # Deploy Open AI model
+
+    $deploymentName = "chat"
+    $modelName = "gpt-4o"
+    $modelFormat = "OpenAI"
+    $modelVersion = "2024-05-13"
+    $skuName = "Standard"
+    $skuCapacity = "100"
+
+    try {
+        # Check if the deployment already exists
+        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIName --query "[?name=='$deploymentName']" --output tsv
+
+        if ($deploymentExists) {
+            Write-Host "OpenAI model deployment '$deploymentName' already exists."
+            Write-Log -message "OpenAI model deployment '$deploymentName' already exists."
+        }
+        else {
+            # Create the deployment if it does not exist
+            az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIName --deployment-name $deploymentName --model-name $modelName --model-format $modelFormat --model-version $modelVersion --sku-name $skuName --sku-capacity $skuCapacity
+            Write-Host "OpenAI model deployment '$deploymentName' created successfully."
+            Write-Log -message "OpenAI model deployment '$deploymentName' created successfully."
+        }
+    }
+    catch {
+        Write-Error "Failed to create OpenAI model deployment '$deploymentName': $_"
+        Write-Log -message "Failed to create OpenAI model deployment '$deploymentName': $_"
+    }
+    
+    
+     #**********************************************************************************************************************
     # Create Container Registry
 
     if ($existingResources -notcontains $containerRegistryName) {
@@ -2023,6 +2056,11 @@ function Start-Deployment {
         New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -appInsightsName $appInsightsName -existingResources $existingResources
     }
 
+    #New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+    #New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+
+    Update-ConfigFile - configFilePath $logFilePath -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppName
+
     # End the timer
     $endTime = Get-Date
     $executionTime = $endTime - $startTime
@@ -2256,7 +2294,7 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
 }
 
 # Function to update the config file
-function Update-Config
+function Update-ConfigFile
 {
     param (
         [string]$configFilePath = "app/frontend/config.json",
