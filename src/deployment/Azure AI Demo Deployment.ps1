@@ -1184,6 +1184,12 @@ function New-Resources {
             az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
+
+            $searchIndexStatus = New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+            
+            if ($searchIndexStatus -eq "true") {
+                New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+            }
         }
         catch {
             Write-Error "Failed to create Search Service '$searchServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1450,7 +1456,7 @@ function New-Resources {
     }
     
     
-     #**********************************************************************************************************************
+    #**********************************************************************************************************************
     # Create Container Registry
 
     if ($existingResources -notcontains $containerRegistryName) {
@@ -1551,114 +1557,138 @@ function New-Resources {
 # Function to create a new search index
 function New-SearchIndex {
     param(
-        [string]$searchServiceName = "srch-copilot-demo-001",
-        [string]$resourceGroupName = "rg-copilot-demo-001",
-        [string]$searchIndexName = "srch-index2-copilot-demo-001",
-        [string]$searchIndexerName = "srch-indexer2-copilot-demo-001",
-        [string]$searchDatasourceName = "srch-datasource-copilot-demo-001",
-        [string]$searchIndexSchema = "srch-schema-copilot-demo-001",
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$searchIndexName,
+        [string]$searchIndexerName,
+        [string]$searchDatasourceName,
+        [string]$searchIndexSchema,
         [string]$searchIndexerSchedule = "0 0 0 * * *"
     )
 
-    $jsonFilePath = "$PSScriptRoot\search-index-schema.json"
-
-    $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-    #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
-    $searchServiceAPiVersion = "2024-07-01"
-
-    $searchIndexUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
-
-    $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
-
-    $jsonContent.'@odata.context' = $searchIndexUrl
-    $jsonContent.name = $searchIndexName
-
-    if ($jsonContent.PSObject.Properties.Match('semantic')) {
-        $jsonContent.PSObject.Properties.Remove('semantic')
-    }
-
-    if ($jsonContent.PSObject.Properties.Match('vectorSearch')) {
-        $jsonContent.PSObject.Properties.Remove('vectorSearch')
-    }
-
-    if ($jsonContent.PSObject.Properties.Match('normalizer')) {
-        $jsonContent.PSObject.Properties.Remove('normalizer')
-    }
-
-    $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
-
-    $updatedJsonContent | Set-Content -Path $jsonFilePath
-
-    # Construct the REST API URL
-    $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
-
-    # Create the index
     try {
-        Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-        Write-Host "Index '$searchIndexName' created successfully."
-        Write-Log -message "Index '$searchIndexName' created successfully."
+        $jsonFilePath = "search-index-schema.json"
+    
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
+        $searchServiceAPiVersion = "2024-07-01"
+    
+        $searchIndexUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
+    
+        $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+    
+        $jsonContent.'@odata.context' = $searchIndexUrl
+        $jsonContent.name = $searchIndexName
+    
+        if ($jsonContent.PSObject.Properties.Match('semantic')) {
+            $jsonContent.PSObject.Properties.Remove('semantic')
+        }
+    
+        if ($jsonContent.PSObject.Properties.Match('vectorSearch')) {
+            $jsonContent.PSObject.Properties.Remove('vectorSearch')
+        }
+    
+        if ($jsonContent.PSObject.Properties.Match('normalizer')) {
+            $jsonContent.PSObject.Properties.Remove('normalizer')
+        }
+    
+        $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
+    
+        $updatedJsonContent | Set-Content -Path $jsonFilePath
+    
+        # Construct the REST API URL
+        $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
+    
+        # Create the index
+        try {
+            Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+            Write-Host "Index '$searchIndexName' created successfully."
+            Write-Log -message "Index '$searchIndexName' created successfully."
+
+            return true
+        }
+        catch {
+            Write-Error "Failed to create index '$searchIndexName': $_"
+            Write-Log -message "Failed to create index '$searchIndexName': $_"
+
+            return false
+        }
     }
     catch {
         Write-Error "Failed to create index '$searchIndexName': $_"
         Write-Log -message "Failed to create index '$searchIndexName': $_"
+
+        return false
     }
 }
 
 # Function to create a new search indexer
 function New-SearchIndexer {
     param(
-        [string]$searchServiceName = "srch-copilot-demo-001",
-        [string]$resourceGroupName = "rg-copilot-demo-001",
-        [string]$searchIndexName = "srch-index2-copilot-demo-001",
-        [string]$searchIndexerName = "srch-indexer2-copilot-demo-001",
-        [string]$searchDatasourceName = "srch-datasource-copilot-demo-001",
-        [string]$searchIndexSchema = "srch-schema-copilot-demo-001",
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$searchIndexName,
+        [string]$searchIndexerName,
+        [string]$searchDatasourceName,
+        [string]$searchIndexSchema,
         [string]$searchIndexerSchedule = "0 0 0 * * *"
     )
 
-    $jsonFilePath = "$PSScriptRoot\search-indexer-schema.json"
-
-    $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-    #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
-    $searchServiceAPiVersion = "2024-07-01"
-
-    $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
-
-    $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
-
-    $jsonContent.'@odata.context' = $searchIndexerUrl
-    $jsonContent.name = $searchIndexName
-    $jsonContent.dataSourceName = $searchDatasourceName
-    $jsonContent.targetIndexName = $searchIndexName
-
-    if ($jsonContent.PSObject.Properties.Match('cache')) {
-        $jsonContent.PSObject.Properties.Remove('cache')
-    }
-
-    if ($jsonContent.PSObject.Properties.Match('vectorSearch')) {
-        $jsonContent.PSObject.Properties.Remove('vectorSearch')
-    }
-
-    if ($jsonContent.PSObject.Properties.Match('normalizer')) {
-        $jsonContent.PSObject.Properties.Remove('normalizer')
-    }
-
-    $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
-
-    $updatedJsonContent | Set-Content -Path $jsonFilePath
-
-    # Construct the REST API URL
-    $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
-
-    # Create the index
     try {
-        Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-        Write-Host "Index '$searchIndexName' created successfully."
-        Write-Log -message "Index '$searchIndexName' created successfully."
+        $jsonFilePath = "search-indexer-schema.json"
+    
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
+        $searchServiceAPiVersion = "2024-07-01"
+    
+        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
+    
+        $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+    
+        $jsonContent.'@odata.context' = $searchIndexerUrl
+        $jsonContent.name = $searchIndexName
+        $jsonContent.dataSourceName = $searchDatasourceName
+        $jsonContent.targetIndexName = $searchIndexName
+    
+        if ($jsonContent.PSObject.Properties.Match('cache')) {
+            $jsonContent.PSObject.Properties.Remove('cache')
+        }
+    
+        if ($jsonContent.PSObject.Properties.Match('vectorSearch')) {
+            $jsonContent.PSObject.Properties.Remove('vectorSearch')
+        }
+    
+        if ($jsonContent.PSObject.Properties.Match('normalizer')) {
+            $jsonContent.PSObject.Properties.Remove('normalizer')
+        }
+    
+        $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
+    
+        $updatedJsonContent | Set-Content -Path $jsonFilePath
+    
+        # Construct the REST API URL
+        $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
+    
+        # Create the index
+        try {
+            Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+            Write-Host "Index '$searchIndexName' created successfully."
+            Write-Log -message "Index '$searchIndexName' created successfully."
+
+            return true
+        }
+        catch {
+            Write-Error "Failed to create index '$searchIndexName': $_"
+            Write-Log -message "Failed to create index '$searchIndexName': $_"
+
+            return false
+        }
     }
     catch {
         Write-Error "Failed to create index '$searchIndexName': $_"
         Write-Log -message "Failed to create index '$searchIndexName': $_"
+
+        return false
     }
 }
 
@@ -1924,7 +1954,6 @@ function Start-Deployment {
     # Initialize the sequence number
     $sequenceNumber = 1
 
-    return 
     #$deleteResourceGroup = $false
 
     # Check if the log file exists
@@ -2055,9 +2084,6 @@ function Start-Deployment {
         # Create a new AI Hub and Model
         New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -appInsightsName $appInsightsName -existingResources $existingResources
     }
-
-    #New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
-    #New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
 
     Update-ConfigFile - configFilePath $logFilePath -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppName
 
@@ -2294,8 +2320,7 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
 }
 
 # Function to update the config file
-function Update-ConfigFile
-{
+function Update-ConfigFile {
     param (
         [string]$configFilePath = "app/frontend/config.json",
         [string]$resourceGroupName = "rg-copilot-demo-001",
@@ -2305,47 +2330,53 @@ function Update-ConfigFile
         [string]$functionAppName = "func-copilot-demo-001"
     )
 
-    # Get the storage account key
-    $storageKey = az storage account keys list --resource-group $resourceGroupName --account-name $storageAccountName --query "[0].value" --output tsv
-    $effectiveDate = Get-Date
-    $expirationDate = (Get-Date).AddYears(1).ToString("yyyy-MM-ddTHH:mm:ssZ")
-    $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+    try {
+        $storageKey = az storage account keys list --resource-group $resourceGroupName --account-name $storageAccountName --query "[0].value" --output tsv
+        $effectiveDate = Get-Date
+        $expirationDate = (Get-Date).AddYears(1).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
     
-    #$functionAppList = az functionapp list --resource-group $resourceGroupName  --query "[].{hostName: defaultHostName, state: state}"
-    #$functionsList = az functionapp function list --resource-group $resourceGroupName --name $functionAppName --query "[].name" --output tsv
-
-    $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
-    $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
+        $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        
+        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services b --permissions rwdl --expiry $expirationDate --https-only --output tsv
     
-    $storageSAS= az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services b --permissions rwdl --expiry $expirationDate --https-only --output tsv
+        # Extract the 'sig' parameter value from the SAS token
+        if ($storageSAS -match "sig=([^&]+)") {
+            $storageSASKey = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'sig' parameter from SAS token."
+            return
+        }
+    
+        # Read the config file
+        $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
+    
+        # Update the config with the new key-value pair
+        $config.AZURE_STORAGE_KEY = $storageKey
+        $config.AZURE_SEARCH_API_KEY = $searchApiKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
+        $config.AZURE_STORAGE_SAS_TOKEN.ST = $effectiveDate
+        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
+        $config.AZURE_SEARCH_FUNCTION_API_KEY = $functionAppKey
+        $config.AZURE_SEARCH_FUNCTION_APP_URL = "https://$functionAppUrl"
+    
+        $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+    
+        # Convert the updated object back to JSON format
+        $updatedConfig = $config | ConvertTo-Json -Depth 10
+    
+        # Write the updated JSON back to the file
+        $updatedConfig | Set-Content -Path $configFilePath
 
-    # Extract the 'sig' parameter value from the SAS token
-    if ($storageSAS -match "sig=([^&]+)") {
-        $storageSASKey = $matches[1]
-    } else {
-        Write-Error "Failed to extract 'sig' parameter from SAS token."
-        return
+        Write-Host "Config file updated successfully."
+        Write-Log -message "Config file updated successfully."
     }
-
-    # Read the config file
-    $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
-
-    # Update the config with the new key-value pair
-    $config.AZURE_STORAGE_KEY = $storageKey
-    $config.AZURE_SEARCH_API_KEY = $searchApiKey
-    $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
-    $config.AZURE_STORAGE_SAS_TOKEN.ST = $effectiveDate
-    $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
-    $config.AZURE_SEARCH_FUNCTION_API_KEY = $functionAppKey
-    $config.AZURE_SEARCH_FUNCTION_APP_URL = "https://$functionAppUrl"
-
-    $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
-
-    # Convert the updated object back to JSON format
-    $updatedConfig = $config | ConvertTo-Json -Depth 10
-
-    # Write the updated JSON back to the file
-    $updatedConfig | Set-Content -Path $configFilePath
+    catch {
+        Write-Host "Failed to update the config file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to update the config file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
 }
 
 # Function to write messages to a log file
