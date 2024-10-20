@@ -137,6 +137,7 @@ else {
 }
 
 $global:LogFilePath = "$global:deploymentPath/deployment.log"
+$global:ConfigFilePath = "$global:deploymentPath/app/frontend/config.json"
 
 Set-Location -Path $global:deploymentPath
 
@@ -1086,6 +1087,7 @@ function New-ResourceGroup {
 function New-Resources {
     param (
         [string]$storageAccountName,
+        [string]$blobStorageContainerName,
         [string]$appServicePlanName,
         [string]$searchServiceName,
         [string]$searchIndexName,
@@ -1114,7 +1116,7 @@ function New-Resources {
     #$cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
     #$keyVaultApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.KeyVault" -resourceType "vaults"
     #$appInsightsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Insights" -resourceType "components"
-   
+
     # Debug statements to print variable values
     Write-Host "subscriptionId: $subscriptionId"
     Write-Host "resourceGroupName: $resourceGroupName"
@@ -1122,6 +1124,7 @@ function New-Resources {
     Write-Host "appServicePlanName: $appServicePlanName"
     Write-Host "location: $location"
     Write-Host "userPrincipalName: $userPrincipalName"
+    Write-Host "searchIndexName: $searchIndexName"
 
     # **********************************************************************************************************************
     # Create a storage account
@@ -1139,7 +1142,8 @@ function New-Resources {
         
             # Enable CORS
             az storage cors add --methods GET POST PUT --origins '*' --services b --account-name $storageAccountName --account-key $storageAccessKey
-       
+            
+            az storage container create --name $blobStorageContainerName --account-name $storageAccountName --account-key $storageAccessKey --output none
         }
         catch {
             Write-Error "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1186,10 +1190,14 @@ function New-Resources {
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
 
-            $searchIndexStatus = New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+            $searchDatasourceCreated = New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
+
+            if ($searchDatasourceCreated -eq "true") {
+                $searchIndexCreated =New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
             
-            if ($searchIndexStatus -eq "true") {
-                New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+                if ($searchIndexCreated -eq "true") {
+                    New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+                }
             }
         }
         catch {
@@ -1555,12 +1563,74 @@ function New-Resources {
     }
 }
 
+# Function to create a new search datasource
+function New-SearchDataSource{
+    param(
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$searchDatasourceName,
+        [string]$searchDatasourceType = "azureblob",
+        [string]$searchDatasourceContainerName = "content",
+        [string]$searchDatasourceQuery = "*",
+        [string]$searchDatasourceDataChangeDetectionPolicy = "HighWaterMark",
+        [string]$searchDatasourceDataDeletionDetectionPolicy = "SoftDeleteColumn"
+    )
+
+    try {
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        $searchServiceAPiVersion = "2024-07-01"
+
+        $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
+
+        $searchDatasourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
+
+        $searchDatasourceUrl = "https://$searchServiceName.search.windows.net/datasources?api-version=$searchServiceAPiVersion"
+    
+        Write-Host "searchDatasourceUrl: $searchDatasourceUrl"
+
+        $body = @{
+            name = $searchDatasourceName
+            type = $searchDatasourceType
+            credentials = @{
+                connectionString = $searchDatasourceConnectionString
+            }
+            container = @{
+                name = $searchDatasourceContainerName
+                query = $searchDatasourceQuery
+            }
+        }
+
+        # Convert the body hashtable to JSON
+        $jsonBody = $body | ConvertTo-Json -Depth 10
+
+        try {
+            Invoke-RestMethod -Uri $searchDatasourceUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+            
+            Write-Host "Datasource '$searchDatasourceName' created successfully."
+            Write-Log -message "Datasource '$searchDatasourceName' created successfully."
+
+            return true
+        }
+        catch {
+            Write-Error "Failed to create datasource '$searchDatasourceName': $_"
+            Write-Log -message "Failed to create datasource '$searchDatasourceName': $_"
+
+            return false
+        }
+    }
+    catch {
+        Write-Error "Failed to create datasource '$searchDatasourceName': $_"
+        Write-Log -message "Failed to create datasource '$searchDatasourceName': $_"
+
+        return false
+    }
+}
 # Function to create a new search index
 function New-SearchIndex {
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
-        [string]$searchIndexName,
+        [string]$searchIndexName = "srch-index-copilot-demo-002",
         [string]$searchIndexerName,
         [string]$searchDatasourceName,
         [string]$searchIndexSchema,
@@ -1606,20 +1676,20 @@ function New-SearchIndex {
             Write-Host "Index '$searchIndexName' created successfully."
             Write-Log -message "Index '$searchIndexName' created successfully."
 
-            return $true
+            return true
         }
         catch {
             Write-Error "Failed to create index '$searchIndexName': $_"
             Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-            return $false
+            return false
         }
     }
     catch {
         Write-Error "Failed to create index '$searchIndexName': $_"
         Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-        return $false
+        return false
     }
 }
 
@@ -1628,14 +1698,18 @@ function New-SearchIndexer {
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
-        [string]$searchIndexName,
-        [string]$searchIndexerName,
+        [string]$searchIndexName = "srch-index-copilot-demo-002",
+        [string]$searchIndexerName = "srch-indexer-copilot-demo-002",
         [string]$searchDatasourceName,
         [string]$searchIndexSchema,
         [string]$searchIndexerSchedule = "0 0 0 * * *"
     )
 
     try {
+
+        $searchIndexerName = "srch-indexer-copilot-demo-002"
+        $searchIndexName = "srch-index-copilot-demo-002"
+
         $jsonFilePath = "search-indexer-schema.json"
     
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
@@ -1647,7 +1721,7 @@ function New-SearchIndexer {
         $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
     
         $jsonContent.'@odata.context' = $searchIndexerUrl
-        $jsonContent.name = $searchIndexName
+        $jsonContent.name = $searchIndexerName
         $jsonContent.dataSourceName = $searchDatasourceName
         $jsonContent.targetIndexName = $searchIndexName
     
@@ -1676,20 +1750,20 @@ function New-SearchIndexer {
             Write-Host "Index '$searchIndexName' created successfully."
             Write-Log -message "Index '$searchIndexName' created successfully."
 
-            return $true
+            return true
         }
         catch {
             Write-Error "Failed to create index '$searchIndexName': $_"
             Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-            return $false
+            return false
         }
     }
     catch {
         Write-Error "Failed to create index '$searchIndexName': $_"
         Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-        return $false
+        return false
     }
 }
 
@@ -2025,6 +2099,7 @@ function Start-Deployment {
         $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv
 
         New-Resources -storageAccountName $storageAccountName `
+            -blobStorageContainerName $blobStorageContainerName `
             -appServicePlanName $appServicePlanName `
             -searchServiceName $searchServiceName `
             `searchIndexName $searchIndexName `
@@ -2049,6 +2124,7 @@ function Start-Deployment {
         $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv
 
         New-Resources -storageAccountName $storageAccountName `
+            -blobStorageContainerName $blobStorageContainerName `
             -appServicePlanName $appServicePlanName `
             -searchServiceName $searchServiceName `
             `searchIndexName $searchIndexName `
@@ -2079,15 +2155,15 @@ function Start-Deployment {
     # Create a new AI Hub and Model
     New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
     
+    # Update configuration file for web frontend
+    Update-ConfigFile - configFilePath $global:ConfigFilePath -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppName
+
     # Deploy web app and function app services
     foreach ($appService in $appServices) {
         if ($existingResources -notcontains $appService) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
         }
     }
-
-    # Update configuration file for web frontend
-    Update-ConfigFile - configFilePath $logFilePath -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppName
 
     # End the timer
     $endTime = Get-Date
@@ -2119,13 +2195,13 @@ function Test-ResourceGroupExists {
         #Write-Host "Resource group '$resourceGroupName' exists."
         #Write-Log -message "Resource group '$resourceGroupName' exists."
 
-        return $true
+        return true
     }
     else {
         #Write-Host "Resource group '$resourceGroupName' does not exist."
         #Write-Log -message "Resource group '$resourceGroupName' does not exist."
 
-        return $false
+        return false
     }
 }
 
@@ -2324,12 +2400,12 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
 # Function to update the config file
 function Update-ConfigFile {
     param (
-        [string]$configFilePath = "app/frontend/config.json",
-        [string]$resourceGroupName = "rg-copilot-demo-001",
-        [string]$storageAccountName = "stcopilotdemo001",
-        [string]$searchServiceName = "srch-copilot-demo-001",
-        [string]$openAIName = "openai-copilot-demo-001",
-        [string]$functionAppName = "func-copilot-demo-001"
+        [string]$configFilePath,
+        [string]$resourceGroupName,
+        [string]$storageAccountName,
+        [string]$searchServiceName,
+        [string]$openAIName,
+        [string]$functionAppName
     )
 
     try {
