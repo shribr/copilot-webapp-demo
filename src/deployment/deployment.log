@@ -372,3 +372,71 @@
 2024-10-20 01:35:32 - Function app 'func-chat-copilot-demo-002' deployed successfully.
 2024-10-20 01:35:32 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 23 SEC : 217 MS ***
 
+*** LOG SEQUENCE: 25 ***
+*** SCRIPT START TIME: 10/20/2024 01:39:29 ***
+2024-10-20 01:39:35 - Storage account 'stcopilotdemo002' already exists.
+2024-10-20 01:39:35 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-10-20 01:39:35 - Search Service 'srch-copilot-demo-002' already exists.
+2024-10-20 01:39:36 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-10-20 01:39:36 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-10-20 01:39:36 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-10-20 01:39:36 - Identity 'id-copilot-demo-002' already exists.
+2024-10-20 01:39:36 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-10-20 01:39:36 - OpenAI Service 'openai-copilot-demo-002' already exists.
+2024-10-20 01:39:37 - OpenAI model deployment 'chat' already exists.
+2024-10-20 01:39:37 - Container Registry 'cr-copilot-demo-002' already exists.
+2024-10-20 01:39:37 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-10-20 01:39:38 - API Management service 'apim-copilot-demo-002' created.
+2024-10-20 01:39:41 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:39:41 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-20 01:39:44 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:39:44 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-20 01:39:44 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-10-20 01:39:44 - AI Hub connection for 'hub-ai-copilot-demo-002' already exists.
+2024-10-20 01:39:48 - AI Model deployment: 'ai-model-copilot-demo-002' created.
+2024-10-20 01:39:48 - File 'ml.workspace.yaml' created and populated.
+2024-10-20 01:39:53 - Failed to create AI Project 'project-ai-copilot-demo-002'. 
+        Error:  
+        Code: InvalidTemplate 
+        Message: 
+2024-10-20 01:40:13 - Config file updated successfully.
+2024-10-20 01:40:16 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:40:59 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-10-20 01:41:06 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:42:03 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-10-20 01:42:03 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 34 SEC : 176 MS ***
+
+*** LOG SEQUENCE: 26 ***
+*** SCRIPT START TIME: 10/20/2024 01:46:35 ***
+2024-10-20 01:46:41 - Storage account 'stcopilotdemo002' already exists.
+2024-10-20 01:46:41 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-10-20 01:46:41 - Search Service 'srch-copilot-demo-002' already exists.
+2024-10-20 01:46:41 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-10-20 01:46:41 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-10-20 01:46:41 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-10-20 01:46:41 - Identity 'id-copilot-demo-002' already exists.
+2024-10-20 01:46:41 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-10-20 01:46:41 - OpenAI Service 'openai-copilot-demo-002' already exists.
+2024-10-20 01:46:42 - OpenAI model deployment 'chat' already exists.
+2024-10-20 01:46:42 - Container Registry 'cr-copilot-demo-002' already exists.
+2024-10-20 01:46:42 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-10-20 01:46:44 - API Management service 'apim-copilot-demo-002' created.
+2024-10-20 01:46:47 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:46:47 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-20 01:46:50 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:46:50 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-20 01:46:50 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-10-20 01:46:50 - AI Hub connection for 'hub-ai-copilot-demo-002' already exists.
+2024-10-20 01:46:53 - AI Model deployment: 'ai-model-copilot-demo-002' created.
+2024-10-20 01:46:53 - File 'ml.workspace.yaml' created and populated.
+2024-10-20 01:47:09 - Failed to create AI Project 'project-ai-copilot-demo-002'. 
+        Error:  
+        Code: InvalidTemplate 
+        Message: 
+2024-10-20 01:47:20 - Config file updated successfully.
+2024-10-20 01:47:23 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:47:58 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-10-20 01:48:02 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-10-20 01:48:56 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-10-20 01:48:56 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 21 SEC : 613 MS ***
+

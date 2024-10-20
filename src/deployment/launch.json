@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Open Deployment Directory",
-            "type": "node",
+            "type": "dotnet",
             "request": "launch",
             "program": "${workspaceFolder}/src/deployment",
             "console": "integratedTerminal"

@@ -2429,7 +2429,7 @@ function Update-ConfigFile {
         $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
         # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
-        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services b --permissions rwdl --expiry $expirationDate --https-only --output tsv
+        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services b --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
         Write-Output "Generated SAS Token: $storageSAS"
 
         # Extract the 'sig' parameter value from the SAS token
