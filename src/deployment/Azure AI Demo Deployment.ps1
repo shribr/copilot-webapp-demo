@@ -886,7 +886,7 @@ function New-AppService {
 
     $appServiceType = $appService.Type
     $appServiceName = $appService.Name
-    #$deployZipPackage = $appService.DeployZipPackage
+    $deployZipPackage = $appService.DeployZipPackage
 
     try {       
         try {
@@ -2152,12 +2152,20 @@ function Start-Deployment {
         }
     }
 
+    # Filter appService nodes with type equal to 'function'
+    $functionAppServices = $appServices | Where-Object { $_.type -eq 'Function' }
+
+    # Return the first instance of the filtered appService nodes
+    $functionAppService = $functionAppServices | Select-Object -First 1
+
+    $functionAppServiceName = $functionAppService.Name
+
     # Create a new AI Hub and Model
     New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
     
     # Update configuration file for web frontend
-    Update-ConfigFile - configFilePath $global:ConfigFilePath -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppName
-
+    Update-ConfigFile - configFilePath "app/frontend/config.json" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppServiceName -searchIndexerName $searchIndexerName -searchIndexName $searchIndexName
+    
     # Deploy web app and function app services
     foreach ($appService in $appServices) {
         if ($existingResources -notcontains $appService) {
@@ -2404,6 +2412,8 @@ function Update-ConfigFile {
         [string]$resourceGroupName,
         [string]$storageAccountName,
         [string]$searchServiceName,
+        [string]$searchIndexName,
+        [string]$searchIndexerName,
         [string]$openAIName,
         [string]$functionAppName
     )
@@ -2427,18 +2437,25 @@ function Update-ConfigFile {
             Write-Error "Failed to extract 'sig' parameter from SAS token."
             return
         }
-    
+        
+        $configFilePath = "app/frontend/config.json"
+
         # Read the config file
         $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
     
         # Update the config with the new key-value pair
         $config.AZURE_STORAGE_KEY = $storageKey
+        $config.AZURE_STORAGE_ACCOUNT_NAME = $storageAccountName
+        $config.AZURE_SEARCH_SERVICE_NAME = $searchServiceName
         $config.AZURE_SEARCH_API_KEY = $searchApiKey
+        $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
+        $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $effectiveDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
-        $config.AZURE_SEARCH_FUNCTION_API_KEY = $functionAppKey
-        $config.AZURE_SEARCH_FUNCTION_APP_URL = "https://$functionAppUrl"
+        $config.AZURE_FUNCTION_APP_NAME = $functionAppName
+        $config.AZURE_FUNCTION_API_KEY = $functionAppKey
+        $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
     
         $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
     

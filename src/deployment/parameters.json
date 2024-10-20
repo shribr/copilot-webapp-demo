@@ -137,18 +137,6 @@
       "Url": "https://app-copilot-demo-002.azurewebsites.net"
     },
     {
-      "Name": "func-copilot-demo-002",
-      "DeployZipPackage": true,
-      "DeletePackageAfterDeploy": true,
-      "Type": "Function",
-      "Path": "app/functions/search",
-      "AppServicePlan": "asp-copilot-demo-002",
-      "Runtime": "node",
-      "Location": "eastus",
-      "ResourceGroup": "RG-COPILOT-DEMO-002",
-      "Url": "https://func-search-copilot-demo-002.azurewebsites.net"
-    },
-    {
       "Name": "func-chat-copilot-demo-002",
       "DeployZipPackage": true,
       "DeletePackageAfterDeploy": true,
