@@ -1606,20 +1606,20 @@ function New-SearchIndex {
             Write-Host "Index '$searchIndexName' created successfully."
             Write-Log -message "Index '$searchIndexName' created successfully."
 
-            return true
+            return $true
         }
         catch {
             Write-Error "Failed to create index '$searchIndexName': $_"
             Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-            return false
+            return $false
         }
     }
     catch {
         Write-Error "Failed to create index '$searchIndexName': $_"
         Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-        return false
+        return $false
     }
 }
 
@@ -1676,20 +1676,20 @@ function New-SearchIndexer {
             Write-Host "Index '$searchIndexName' created successfully."
             Write-Log -message "Index '$searchIndexName' created successfully."
 
-            return true
+            return $true
         }
         catch {
             Write-Error "Failed to create index '$searchIndexName': $_"
             Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-            return false
+            return $false
         }
     }
     catch {
         Write-Error "Failed to create index '$searchIndexName': $_"
         Write-Log -message "Failed to create index '$searchIndexName': $_"
 
-        return false
+        return $false
     }
 }
 
@@ -2119,13 +2119,13 @@ function Test-ResourceGroupExists {
         #Write-Host "Resource group '$resourceGroupName' exists."
         #Write-Log -message "Resource group '$resourceGroupName' exists."
 
-        return true
+        return $true
     }
     else {
         #Write-Host "Resource group '$resourceGroupName' does not exist."
         #Write-Log -message "Resource group '$resourceGroupName' does not exist."
 
-        return false
+        return $false
     }
 }
 
