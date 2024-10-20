@@ -77,3 +77,31 @@
 2024-10-19 00:59:57 - AI Project 'project-ai-copilot-demo-001' already exists.
 2024-10-19 00:59:57 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 09 SEC : 132 MS ***
 
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 10/19/2024 01:03:03 ***
+2024-10-19 01:03:09 - Storage account 'stcopilotdemo001' already exists.
+2024-10-19 01:03:09 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Search Service 'srch-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Identity 'id-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Container Registry 'cr-copilot-demo-001' already exists.
+2024-10-19 01:03:09 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-10-19 01:03:10 - API Management service 'apim-copilot-demo-001' created.
+2024-10-19 01:03:13 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-19 01:03:27 - Web app 'app-copilot-demo-001' deployed successfully.
+2024-10-19 01:03:30 - Function app 'func-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-19 01:04:23 - Function app 'func-copilot-demo-001' deployed successfully.
+2024-10-19 01:04:27 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-19 01:05:19 - Function app 'func-chat-copilot-demo-001' deployed successfully.
+2024-10-19 01:05:19 - AI Hub 'hub-ai-copilot-demo-001' already exists.
+2024-10-19 01:05:19 - AI Hub connection for 'hub-ai-copilot-demo-001' already exists.
+2024-10-19 01:05:23 - AI Model deployment: 'ai-model-copilot-demo-001' created.
+2024-10-19 01:05:23 - AI Project 'project-ai-copilot-demo-001' already exists.
+2024-10-19 01:05:23 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 20 SEC : 745 MS ***
+
+2024-10-19 20:04:17 - Index 'srch-index2-copilot-demo-001' created successfully.
+2024-10-19 20:16:58 - Index 'srch-index2-copilot-demo-001' created successfully.

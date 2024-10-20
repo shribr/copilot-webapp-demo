@@ -587,7 +587,7 @@ function Initialize-Parameters {
         $parametersObject | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
     }
     
-    $parametersObject | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
+    #$parametersObject | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
     $parametersObject | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
     $parametersObject | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
     $parametersObject | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
@@ -894,6 +894,7 @@ function New-AppService {
                 if (-not $appExists) {
                     # Create a new web app
                     az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
+                    #az webapp cors add --methods GET POST PUT --origins '*' --services b --account-name $appServiceName --account-key $storageAccessKey
                 }
             }
             else {
@@ -904,6 +905,9 @@ function New-AppService {
                 if (-not $appExists) {
                     # Create a new function app
                     az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageAccountName --plan $appService.AppServicePlan --app-insights $appInsightsName --runtime $appService.Runtime --os-type "Windows" --functions-version 4 --output none
+                    
+                    $functionAppKey = az functionapp keys list --name $appServiceName --resource-group $resourceGroupName --query "functionKeys.default" --output tsv
+                    az functionapp cors add --methods GET POST PUT --origins '*' --services b --account-name $appServiceName --account-key $functionAppKey
                 }
             }
 
@@ -1123,8 +1127,16 @@ function New-Resources {
 
         try {
             az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
+            
             Write-Host "Storage account '$storageAccountName' created."
             Write-Log -message "Storage account '$storageAccountName' created."
+
+            # Retrieve the storage account key
+            $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
+        
+            # Enable CORS
+            az storage cors add --methods GET POST PUT --origins '*' --services b --account-name $storageAccountName --account-key $storageAccessKey
+       
         }
         catch {
             Write-Error "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1503,6 +1515,120 @@ function New-Resources {
     }
 }
 
+# Function to create a new search index
+function New-SearchIndex {
+    param(
+        [string]$searchServiceName = "srch-copilot-demo-001",
+        [string]$resourceGroupName = "rg-copilot-demo-001",
+        [string]$searchIndexName = "srch-index2-copilot-demo-001",
+        [string]$searchIndexerName = "srch-indexer2-copilot-demo-001",
+        [string]$searchDatasourceName = "srch-datasource-copilot-demo-001",
+        [string]$searchIndexSchema = "srch-schema-copilot-demo-001",
+        [string]$searchIndexerSchedule = "0 0 0 * * *"
+    )
+
+    $jsonFilePath = "$PSScriptRoot\search-index-schema.json"
+
+    $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+    #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
+    $searchServiceAPiVersion = "2024-07-01"
+
+    $searchIndexUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
+
+    $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+
+    $jsonContent.'@odata.context' = $searchIndexUrl
+    $jsonContent.name = $searchIndexName
+
+    if ($jsonContent.PSObject.Properties.Match('semantic')) {
+        $jsonContent.PSObject.Properties.Remove('semantic')
+    }
+
+    if ($jsonContent.PSObject.Properties.Match('vectorSearch')) {
+        $jsonContent.PSObject.Properties.Remove('vectorSearch')
+    }
+
+    if ($jsonContent.PSObject.Properties.Match('normalizer')) {
+        $jsonContent.PSObject.Properties.Remove('normalizer')
+    }
+
+    $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
+
+    $updatedJsonContent | Set-Content -Path $jsonFilePath
+
+    # Construct the REST API URL
+    $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
+
+    # Create the index
+    try {
+        Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+        Write-Host "Index '$searchIndexName' created successfully."
+        Write-Log -message "Index '$searchIndexName' created successfully."
+    }
+    catch {
+        Write-Error "Failed to create index '$searchIndexName': $_"
+        Write-Log -message "Failed to create index '$searchIndexName': $_"
+    }
+}
+
+# Function to create a new search indexer
+function New-SearchIndexer {
+    param(
+        [string]$searchServiceName = "srch-copilot-demo-001",
+        [string]$resourceGroupName = "rg-copilot-demo-001",
+        [string]$searchIndexName = "srch-index2-copilot-demo-001",
+        [string]$searchIndexerName = "srch-indexer2-copilot-demo-001",
+        [string]$searchDatasourceName = "srch-datasource-copilot-demo-001",
+        [string]$searchIndexSchema = "srch-schema-copilot-demo-001",
+        [string]$searchIndexerSchedule = "0 0 0 * * *"
+    )
+
+    $jsonFilePath = "$PSScriptRoot\search-indexer-schema.json"
+
+    $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+    #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
+    $searchServiceAPiVersion = "2024-07-01"
+
+    $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
+
+    $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+
+    $jsonContent.'@odata.context' = $searchIndexerUrl
+    $jsonContent.name = $searchIndexName
+    $jsonContent.dataSourceName = $searchDatasourceName
+    $jsonContent.targetIndexName = $searchIndexName
+
+    if ($jsonContent.PSObject.Properties.Match('cache')) {
+        $jsonContent.PSObject.Properties.Remove('cache')
+    }
+
+    if ($jsonContent.PSObject.Properties.Match('vectorSearch')) {
+        $jsonContent.PSObject.Properties.Remove('vectorSearch')
+    }
+
+    if ($jsonContent.PSObject.Properties.Match('normalizer')) {
+        $jsonContent.PSObject.Properties.Remove('normalizer')
+    }
+
+    $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
+
+    $updatedJsonContent | Set-Content -Path $jsonFilePath
+
+    # Construct the REST API URL
+    $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
+
+    # Create the index
+    try {
+        Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+        Write-Host "Index '$searchIndexName' created successfully."
+        Write-Log -message "Index '$searchIndexName' created successfully."
+    }
+    catch {
+        Write-Error "Failed to create index '$searchIndexName': $_"
+        Write-Log -message "Failed to create index '$searchIndexName': $_"
+    }
+}
+
 # Function to create a new subnet
 function New-SubNet {
     param (
@@ -1765,6 +1891,7 @@ function Start-Deployment {
     # Initialize the sequence number
     $sequenceNumber = 1
 
+    return 
     #$deleteResourceGroup = $false
 
     # Check if the log file exists
@@ -2128,6 +2255,61 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
     return $filePath
 }
 
+# Function to update the config file
+function Update-Config
+{
+    param (
+        [string]$configFilePath = "app/frontend/config.json",
+        [string]$resourceGroupName = "rg-copilot-demo-001",
+        [string]$storageAccountName = "stcopilotdemo001",
+        [string]$searchServiceName = "srch-copilot-demo-001",
+        [string]$openAIName = "openai-copilot-demo-001",
+        [string]$functionAppName = "func-copilot-demo-001"
+    )
+
+    # Get the storage account key
+    $storageKey = az storage account keys list --resource-group $resourceGroupName --account-name $storageAccountName --query "[0].value" --output tsv
+    $effectiveDate = Get-Date
+    $expirationDate = (Get-Date).AddYears(1).ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+    
+    #$functionAppList = az functionapp list --resource-group $resourceGroupName  --query "[].{hostName: defaultHostName, state: state}"
+    #$functionsList = az functionapp function list --resource-group $resourceGroupName --name $functionAppName --query "[].name" --output tsv
+
+    $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
+    $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+    
+    $storageSAS= az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services b --permissions rwdl --expiry $expirationDate --https-only --output tsv
+
+    # Extract the 'sig' parameter value from the SAS token
+    if ($storageSAS -match "sig=([^&]+)") {
+        $storageSASKey = $matches[1]
+    } else {
+        Write-Error "Failed to extract 'sig' parameter from SAS token."
+        return
+    }
+
+    # Read the config file
+    $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
+
+    # Update the config with the new key-value pair
+    $config.AZURE_STORAGE_KEY = $storageKey
+    $config.AZURE_SEARCH_API_KEY = $searchApiKey
+    $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
+    $config.AZURE_STORAGE_SAS_TOKEN.ST = $effectiveDate
+    $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
+    $config.AZURE_SEARCH_FUNCTION_API_KEY = $functionAppKey
+    $config.AZURE_SEARCH_FUNCTION_APP_URL = "https://$functionAppUrl"
+
+    $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+
+    # Convert the updated object back to JSON format
+    $updatedConfig = $config | ConvertTo-Json -Depth 10
+
+    # Write the updated JSON back to the file
+    $updatedConfig | Set-Content -Path $configFilePath
+}
+
 # Function to write messages to a log file
 function Write-Log {
     param (
@@ -2155,6 +2337,8 @@ function Write-Log {
 $ErrorActionPreference = 'Stop'
 
 # az webapp cors add --resource-group rg-copilot-demo-002 --name srch-copilot-demo-002 --allowed-origins '*'    
+
+#$global:subscriptionId = az account show --query "{Id:id}" --output tsv
 
 # Initialize parameters
 $initParams = Initialize-Parameters -parametersFile $parametersFile

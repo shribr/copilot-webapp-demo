@@ -41,6 +41,7 @@
   "sharedDashboardName": "dash-copilot-demo-001",
   "sqlServerName": "sql-copilot-demo-001",
   "storageAccountName": "stcopilotdemo001",
+  "subscriptionId": "00000000-0000-0000-0000-000000000000",
   "userAssignedIdentityName": "id-copilot-demo-001",
   "virtualNetwork":{
     "Name": "vnet-copilot-demo-001",
