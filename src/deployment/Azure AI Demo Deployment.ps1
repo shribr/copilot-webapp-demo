@@ -1141,7 +1141,8 @@ function New-Resources {
             $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
         
             # Enable CORS
-            az storage cors add --methods GET POST PUT --origins '*' --services b --account-name $storageAccountName --account-key $storageAccessKey
+            az storage cors clear --account-name $storageAccountName --services bfqt
+            az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageAccountName --account-key $storageAccessKey
             
             az storage container create --name $blobStorageContainerName --account-name $storageAccountName --account-key $storageAccessKey --output none
         }
