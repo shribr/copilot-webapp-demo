@@ -372,6 +372,34 @@ function Get-Parameters-Sorted {
     return $sortedParametersObject
 }
 
+# Function to check if a search index exists
+function Get-SearchIndexes {
+    param (
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$subscriptionId
+    )
+
+    $subscriptionId = $global:subscriptionId
+    $resourceGroupName = $global:resourceGroupName
+
+    #$accessToken = az search query-key list --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
+    #$accessToken = az account get-access-token --query accessToken --output tsv
+    $accessToken = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
+   
+    $uri = $uri = "https://$searchServiceName.search.windows.net/indexes?api-version=2024-07-01"
+    
+    try {
+        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "api-key" = "$accessToken" }
+        $indexes = $response.value | Select-Object -ExpandProperty name
+        return $indexes
+    }
+    catch {
+        Write-Error "Failed to query search indexes: $_"
+        return $false
+    }
+}
+
 # Function to find a unique suffix and create resources
 function Get-UniqueSuffix {
     param (
@@ -596,6 +624,10 @@ function Initialize-Parameters {
 
     Write-Host "Doc Intelligence: $documentIntelligenceName"
     Write-Host "Search Service Name: $searchServiceName"
+
+    # Debugging output
+    Write-Host "searchIndexName from parametersObject: $($parametersObject.searchIndexName)"
+    Write-Host "searchIndexName from global: $($global:searchIndexName)"
 
     return @{
         aiHubName                    = $aiHubName
@@ -1067,7 +1099,7 @@ function New-ManagedIdentity {
         Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
 
         Start-Sleep -Seconds 15
-        
+
         $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
         
         try {
@@ -1300,13 +1332,18 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create a Search Service
 
-    if ($existingResources -notcontains $searchServiceName) {
+    az provider show --namespace Microsoft.Search --query "resourceTypes[?resourceType=='searchServices'].apiVersions"
+    
+    $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 
+    $searchIndexExists = $searchIndexes -contains $global:searchIndexName
+
+    if ($existingResources -notcontains $searchServiceName || $searchIndexExists -eq $false) {
         $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
         #$searchServiceSku = "basic"
 
         try {
-            $ErrorActionPreference = 'Stop'
+            $ErrorActionPreference = 'Continue'
 
             az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
             Write-Host "Search Service '$searchServiceName' created."
@@ -1314,10 +1351,10 @@ function New-Resources {
 
             $searchDatasourceCreated = New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
 
-            if ($searchDatasourceCreated -eq "true") {
+            if ($searchDatasourceCreated -eq "true" || $searchIndexExists -eq $false) {
                 $searchIndexCreated = New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
             
-                if ($searchIndexCreated -eq "true") {
+                if ($searchIndexCreated -eq "true" || $searchIndexExists -eq $false) {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
                 }
             }
@@ -1598,6 +1635,8 @@ function New-SearchDataSource {
     )
 
     try {
+        $ErrorActionPreference = 'Continue'
+
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         $searchServiceAPiVersion = "2024-07-01"
 
@@ -1625,6 +1664,8 @@ function New-SearchDataSource {
         $jsonBody = $body | ConvertTo-Json -Depth 10
 
         try {
+            $ErrorActionPreference = 'Continue'
+
             Invoke-RestMethod -Uri $searchDatasourceUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
             
             Write-Host "Datasource '$searchDatasourceName' created successfully."
@@ -1670,7 +1711,7 @@ function New-SearchIndex {
         $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
     
         $jsonContent.'@odata.context' = $searchIndexUrl
-        $jsonContent.name = $searchIndexName
+        $jsonContent.name = $global:searchIndexName
     
         if ($jsonContent.PSObject.Properties.Match('semantic')) {
             $jsonContent.PSObject.Properties.Remove('semantic')
@@ -1694,21 +1735,21 @@ function New-SearchIndex {
         # Create the index
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-            Write-Host "Index '$searchIndexName' created successfully."
-            Write-Log -message "Index '$searchIndexName' created successfully."
+            Write-Host "Index '$global:searchIndexName' created successfully."
+            Write-Log -message "Index '$global:searchIndexName' created successfully."
 
             return true
         }
         catch {
-            Write-Error "Failed to create index '$searchIndexName': $_"
-            Write-Log -message "Failed to create index '$searchIndexName': $_"
+            Write-Error "Failed to create index '$global:searchIndexName': $_"
+            Write-Log -message "Failed to create index '$global:searchIndexName': $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create index '$searchIndexName': $_"
-        Write-Log -message "Failed to create index '$searchIndexName': $_"
+        Write-Error "Failed to create index '$global:searchIndexName': $_"
+        Write-Log -message "Failed to create index '$global:searchIndexName': $_"
 
         return false
     }
@@ -1739,9 +1780,9 @@ function New-SearchIndexer {
         $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
     
         $jsonContent.'@odata.context' = $searchIndexerUrl
-        $jsonContent.name = $searchIndexerName
+        $jsonContent.name = ç
         $jsonContent.dataSourceName = $searchDatasourceName
-        $jsonContent.targetIndexName = $searchIndexName
+        $jsonContent.targetIndexName = $global:searchIndexName
     
         if ($jsonContent.PSObject.Properties.Match('cache')) {
             $jsonContent.PSObject.Properties.Remove('cache')
@@ -1765,21 +1806,21 @@ function New-SearchIndexer {
         # Create the index
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-            Write-Host "Index '$searchIndexName' created successfully."
-            Write-Log -message "Index '$searchIndexName' created successfully."
+            Write-Host "Index '$global:searchIndexName' created successfully."
+            Write-Log -message "Index '$global:searchIndexName' created successfully."
 
             return true
         }
         catch {
-            Write-Error "Failed to create index '$searchIndexName': $_"
-            Write-Log -message "Failed to create index '$searchIndexName': $_"
+            Write-Error "Failed to create index '$global:searchIndexName': $_"
+            Write-Log -message "Failed to create index '$global:searchIndexName': $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create index '$searchIndexName': $_"
-        Write-Log -message "Failed to create index '$searchIndexName': $_"
+        Write-Error "Failed to create index '$global:searchIndexName': $_"
+        Write-Log -message "Failed to create index '$global:searchIndexName': $_"
 
         return false
     }
