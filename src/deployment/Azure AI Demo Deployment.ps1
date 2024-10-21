@@ -993,8 +993,7 @@ function New-AppService {
 }
 
 # Function to create key vault
-function New-KeyVault
-{
+function New-KeyVault {
     param (
         [string]$keyVaultName,
         [string]$resourceGroupName,
@@ -1067,9 +1066,13 @@ function New-ManagedIdentity {
         Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
         Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
 
+        Start-Sleep -Seconds 15
+        
         $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
         
         try {
+            $ErrorActionPreference = 'Stop'
+
             # Ensure the service principal is created
             az ad sp create --id $assigneePrincipalId
             Write-Host "Service principal created for identity '$userAssignedIdentityName'."
@@ -1087,6 +1090,8 @@ function New-ManagedIdentity {
             $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
             $roles = @("Contributor", "Cognitive Services OpenAI User", "Search Index Data Reader", "Storage Blob Data Reader")  # List of roles to assign
             
+            Start-Sleep -Seconds 15
+
             foreach ($role in $roles) {
                 az role assignment create --assignee $assigneePrincipalId --role $role --scope $scope
 
@@ -1301,6 +1306,8 @@ function New-Resources {
         #$searchServiceSku = "basic"
 
         try {
+            $ErrorActionPreference = 'Stop'
+
             az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
@@ -2469,7 +2476,7 @@ function Update-ConfigFile {
         #Write-Output "Generated SAS Token: $storageSAS"
 
         # URL-decode the SAS token
-        $decodedSAS = [System.Web.HttpUtility]::UrlDecode($storageSAS)
+        #$decodedSAS = [System.Web.HttpUtility]::UrlDecode($storageSAS)
         #Write-Output "Decoded SAS Token: $decodedSAS"
 
         # Extract and decode 'se' and 'st' parameters
