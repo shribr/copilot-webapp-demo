@@ -792,66 +792,55 @@ function New-AIHubAndModel {
 
     # Create AI Project
 
-    # Check for soft-deleted ML workspace
-    $deletedWorkspaces = az ml workspace list-deleted --resource-group $resourceGroupName --subscription $subscriptionId | ConvertFrom-Json
-    $deletedWorkspace = $deletedWorkspaces | Where-Object { $_.name -eq $aiProjectName }
+    if ($existingResources -notcontains $aiProjectName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
+            $mlWorkspaceFile = Update-MLWorkspaceFile `
+                -aiProjectName $aiProjectName `
+                -resourceGroupName $resourceGroupName `
+                -appInsightsName $appInsightsName `
+                -keyVaultName $keyVaultName `
+                -location $location `
+                -subscriptionId $subscriptionId `
+                -storageAccountName $storageAccountName `
+                -containerRegistryName $containerRegistryName 2>&1
 
-    if ($deletedWorkspace) {
-        Write-Host "Restoring soft-deleted AI Project '$aiProjectName'."
-        Write-Log -message "Restoring soft-deleted AI Project '$aiProjectName'." -logFilePath $global:LogFilePath
-        az ml workspace recover --name $aiProjectName --resource-group $resourceGroupName --subscription $subscriptionId
-    }
-    else {
-        if ($existingResources -notcontains $aiProjectName) {
-            try {
-                $ErrorActionPreference = 'Stop'
-                #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
-                $mlWorkspaceFile = Update-MLWorkspaceFile `
-                    -aiProjectName $aiProjectName `
-                    -resourceGroupName $resourceGroupName `
-                    -appInsightsName $appInsightsName `
-                    -keyVaultName $keyVaultName `
-                    -location $location `
-                    -subscriptionId $subscriptionId `
-                    -storageAccountName $storageAccountName `
-                    -containerRegistryName $containerRegistryName 2>&1
+            #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
-                #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
+            $jsonOutput = az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName 2>&1
 
-                $jsonOutput = az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName 2>&1
+            if ($jsonOutput -match "error") {
 
-                if ($jsonOutput -match "error") {
+                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
 
-                    $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
 
-                    $errorName = $errorInfo["Error"]
-                    $errorCode = $errorInfo["Code"]
-                    $errorDetails = $errorInfo["Message"]
-
-                    $errorMessage = "Failed to create AI Project '$aiProjectName'. `
+                $errorMessage = "Failed to create AI Project '$aiProjectName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
 
-                    #throw $errorMessage
+                #throw $errorMessage
 
-                    Write-Host $errorMessage
-                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
-                }
-                else {
-                    Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
-                    Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
-                }
+                Write-Host $errorMessage
+                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
             }
-            catch {
-                Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            else {
+                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
+                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
             }
         }
-        else {
-            Write-Host "AI Project '$aiProjectName' already exists."
-            Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
+        catch {
+            Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
+    }
+    else {
+        Write-Host "AI Project '$aiProjectName' already exists."
+        Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 }
 
@@ -866,8 +855,6 @@ function New-ApiManagementService {
 
     try {
         $ErrorActionPreference = 'Stop'
-        #$jsonOutput = az apim api create --api-id $apiManagementService.ApiId --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
-        #$jsonOutput = az apim api create --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
         $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait
 
         Write-Host $jsonOutput
@@ -1572,10 +1559,12 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create API Management Service
     
+    <#
+    # {    if ($existingResources -notcontains $apiManagementService.Name) {
+            New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
+        }:Enter a comment or description}
+    #>
 
-    if ($existingResources -notcontains $apiManagementService.Name) {
-        New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
-    }
 }
 
 # Function to create a new search datasource
@@ -2463,7 +2452,7 @@ function Update-ConfigFile {
 
         #Write-Output "Modified SAS Token: $storageSAS"
 
-        $fulllUrl = "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
+        $fulllUrl = "https://$storageAccountName.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
 
         # Extract the 'sig' parameter value from the SAS token
         if ($storageSAS -match "sig=([^&]+)") {

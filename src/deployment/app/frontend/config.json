@@ -7,7 +7,7 @@
   "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-004",
   "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-004",
   "AZURE_SEARCH_API_KEY": "iaPpQCIIPYuRHCbuOP5fkzKb2Nvj4XNiyQHp5YksdUAzSeBTtwep",
-  "AZURE_SEARCH_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-10-18T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbtq&srt=co&sig=fHQq3uonEATBD8BArdYnHEj92y5yYj2YxWABnW3oqLg%3D",
+  "AZURE_SEARCH_FULL_URL": "https://stcopilotdemo004.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-10-18T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbtq&srt=co&sig=fHQq3uonEATBD8BArdYnHEj92y5yYj2YxWABnW3oqLg%3D",
   "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-004",
   "AZURE_FUNCTION_NAME": "Chat",
   "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-004.azurewebsites.net",
