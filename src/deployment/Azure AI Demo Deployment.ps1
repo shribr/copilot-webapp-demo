@@ -992,6 +992,119 @@ function New-AppService {
     Set-DirectoryPath -targetDirectory $global:deploymentPath
 }
 
+# Function to create key vault
+function New-KeyVault
+{
+    param (
+        [string]$keyVaultName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$userPrincipalName,
+        [string]$userAssignedIdentityName,
+        [bool]$useRBAC,
+        [array]$existingResources
+    )
+
+    if ($existingResources -notcontains $keyVaultName) {
+
+        try {
+            $ErrorActionPreference = 'Stop'
+            if ($useRBAC) {
+                az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+                Write-Host "Key Vault: '$keyVaultName' created with RBAC enabled."
+                Write-Log -message "Key Vault: '$keyVaultName' created with RBAC enabled."
+
+                # Assign RBAC roles to the managed identity
+                Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+            }
+            else {
+                az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+                Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                # Set vault access policies for user
+                Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+            }
+        }
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted") {
+                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType $resourceType -"KeyVault" $resourceGroupName -useRBAC -userAssignedIdentityName $userAssignedIdentityName
+            }
+            else {
+                Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+
+        Set-KeyVaultRoles -keyVaultName $keyVaultName `
+            -resourceGroupName $resourceGroupName `
+            -userAssignedIdentityName $userAssignedIdentityName `
+            -userPrincipalName $userPrincipalName `
+            -useRBAC $useRBAC
+
+        Set-KeyVaultSecrets -keyVaultName $keyVaultName `
+            -resourceGroupName $resourceGroupName
+    }
+    else {
+        Write-Host "Key Vault '$keyVaultName' already exists."
+        Write-Log -message "Key Vault '$keyVaultName' already exists."
+    }
+}
+
+# Function to create a new managed identity
+function New-ManagedIdentity {
+    param (
+        [string]$userAssignedIdentityName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$subscriptionId
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+        az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
+        Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
+        Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
+
+        $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
+        
+        try {
+            # Ensure the service principal is created
+            az ad sp create --id $assigneePrincipalId
+            Write-Host "Service principal created for identity '$userAssignedIdentityName'."
+            Write-Log -message "Service principal created for identity '$userAssignedIdentityName'."
+        }
+        catch {
+            Write-Error "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+
+        # Construct the fully qualified resource ID for the User Assigned Identity
+        try {
+            $ErrorActionPreference = 'Stop'
+            #$userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+            $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
+            $roles = @("Contributor", "Cognitive Services OpenAI User", "Search Index Data Reader", "Storage Blob Data Reader")  # List of roles to assign
+            
+            foreach ($role in $roles) {
+                az role assignment create --assignee $assigneePrincipalId --role $role --scope $scope
+
+                Write-Host "User '$userAssignedIdentityName' assigned to role: '$role'."
+                Write-Log -message "User '$userAssignedIdentityName' assigned to role: '$role'."
+            }
+        }
+        catch {
+            Write-Error "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    catch {
+        Write-Error "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
 # Function to create a new private endpoint
 function New-PrivateEndPoint {
     param (
@@ -1294,109 +1407,6 @@ function New-Resources {
     else {
         Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
         Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists."
-    }
-
-    #**********************************************************************************************************************
-    # Create User Assigned Identity
-
-    if ($existingResources -notcontains $userAssignedIdentityName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-            az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
-            Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
-            Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
-
-            $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
-            
-            try {
-                # Ensure the service principal is created
-                az ad sp create --id $assigneePrincipalId
-                Write-Host "Service principal created for identity '$userAssignedIdentityName'."
-                Write-Log -message "Service principal created for identity '$userAssignedIdentityName'."
-            }
-            catch {
-                Write-Error "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-
-            # Construct the fully qualified resource ID for the User Assigned Identity
-            try {
-                $ErrorActionPreference = 'Stop'
-                #$userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
-                $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
-                $roles = @("Contributor", "Cognitive Services OpenAI User", "Search Index Data Reader", "Storage Blob Data Reader")  # List of roles to assign
-                
-                foreach ($role in $roles) {
-                    az role assignment create --assignee $assigneePrincipalId --role $role --scope $scope
-
-                    Write-Host "User '$userAssignedIdentityName' assigned to role: '$role'."
-                    Write-Log -message "User '$userAssignedIdentityName' assigned to role: '$role'."
-                }
-            }
-            catch {
-                Write-Error "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to assign role for Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-        }
-        catch {
-            Write-Error "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-    else {
-        Write-Host "Identity '$userAssignedIdentityName' already exists."
-        Write-Log -message "Identity '$userAssignedIdentityName' already exists."
-    }
-
-    $useRBAC = $false
-
-    #**********************************************************************************************************************
-    # Create Key Vault
-
-    if ($existingResources -notcontains $keyVaultName) {
-
-        try {
-            $ErrorActionPreference = 'Stop'
-            if ($useRBAC) {
-                az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
-                Write-Host "Key Vault: '$keyVaultName' created with RBAC enabled."
-                Write-Log -message "Key Vault: '$keyVaultName' created with RBAC enabled."
-
-                # Assign RBAC roles to the managed identity
-                Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
-            }
-            else {
-                az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
-                Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-                Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
-
-                # Set vault access policies for user
-                Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
-            }
-        }
-        catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted") {
-                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType $resourceType -"KeyVault" $resourceGroupName -useRBAC -userAssignedIdentityName $userAssignedIdentityName
-            }
-            else {
-                Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-        }
-
-        Set-KeyVaultRoles -keyVaultName $keyVaultName `
-            -resourceGroupName $resourceGroupName `
-            -userAssignedIdentityName $userAssignedIdentityName `
-            -userPrincipalName $userPrincipalName `
-            -useRBAC $useRBAC
-
-        Set-KeyVaultSecrets -keyVaultName $keyVaultName `
-            -resourceGroupName $resourceGroupName
-    }
-    else {
-        Write-Host "Key Vault '$keyVaultName' already exists."
-        Write-Log -message "Key Vault '$keyVaultName' already exists."
     }
 
     #**********************************************************************************************************************
@@ -2153,6 +2163,30 @@ function Start-Deployment {
         }
     }
 
+    #**********************************************************************************************************************
+    # Create User Assigned Identity
+
+    if ($existingResources -notcontains $userAssignedIdentityName) {
+        New-ManagedIdentity -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -subscriptionId $subscriptionId
+    }
+    else {
+        Write-Host "Identity '$userAssignedIdentityName' already exists."
+        Write-Log -message "Identity '$userAssignedIdentityName' already exists."
+    }
+
+    $useRBAC = $false
+
+    #**********************************************************************************************************************
+    # Create Key Vault
+
+    if ($existingResources -notcontains $keyVaultName) {
+        New-KeyVault -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -location $location -useRBAC $useRBAC -userAssignedIdentityName $userAssignedIdentityName
+    }
+    else {
+        Write-Host "Key Vault '$keyVaultName' already exists."
+        Write-Log -message "Key Vault '$keyVaultName' already exists."
+    }
+
     # Filter appService nodes with type equal to 'function'
     $functionAppServices = $appServices | Where-Object { $_.type -eq 'Function' }
 
@@ -2471,6 +2505,22 @@ function Update-ConfigFile {
             return
         }
 
+        if ($storageSAS -match "sp=([^&]+)") {
+            $storageSP = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'ss' parameter from SAS token."
+            return
+        }
+
+        if ($storageSAS -match "srt=([^&]+)") {
+            $storageSRT = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'ss' parameter from SAS token."
+            return
+        }
+
         $configFilePath = "app/frontend/config.json"
 
         # Read the config file
@@ -2488,6 +2538,8 @@ function Update-ConfigFile {
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
         $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
+        $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
+        $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
