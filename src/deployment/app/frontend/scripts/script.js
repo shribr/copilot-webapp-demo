@@ -502,10 +502,11 @@ async function getDocuments() {
     const fileTypes = config.FILE_TYPES;
 
     // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&comp=${sasTokenConfig.COMP}&include=${sasTokenConfig.INCLUDE}&restype=${sasTokenConfig.RESTYPE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&st=${sasTokenConfig.ST}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    //const sasToken = `sv=${sasTokenConfig.SV}&comp=${sasTokenConfig.COMP}&include=${sasTokenConfig.INCLUDE}&restype=${sasTokenConfig.RESTYPE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&st=${sasTokenConfig.ST}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
-
+    //const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+    const storageUrl = config.AZURE_SEARCH_FULL_URL;
+    
     fetch(`${storageUrl}`, {
         method: 'GET',
         headers: {

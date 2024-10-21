@@ -822,6 +822,8 @@ function New-AIHubAndModel {
         Code: $errorCode `
         Message: $errorDetails"
 
+                throw $errorMessage
+
                 Write-Host $errorMessage
                 Write-Log -message $errorMessage -logFilePath $global:LogFilePath
             }
@@ -1631,7 +1633,7 @@ function New-SearchIndex {
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
-        [string]$searchIndexName = "srch-index-copilot-demo-002",
+        [string]$searchIndexName,
         [string]$searchIndexerName,
         [string]$searchDatasourceName,
         [string]$searchIndexSchema,
@@ -1699,17 +1701,14 @@ function New-SearchIndexer {
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
-        [string]$searchIndexName = "srch-index-copilot-demo-002",
-        [string]$searchIndexerName = "srch-indexer-copilot-demo-002",
+        [string]$searchIndexName,
+        [string]$searchIndexerName,
         [string]$searchDatasourceName,
         [string]$searchIndexSchema,
         [string]$searchIndexerSchedule = "0 0 0 * * *"
     )
 
     try {
-
-        $searchIndexerName = "srch-indexer-copilot-demo-002"
-        $searchIndexName = "srch-index-copilot-demo-002"
 
         $jsonFilePath = "search-indexer-schema.json"
     
@@ -2421,7 +2420,7 @@ function Update-ConfigFile {
 
     try {
         $storageKey = az storage account keys list --resource-group $resourceGroupName --account-name $storageAccountName --query "[0].value" --output tsv
-        $effectiveDate = Get-Date
+        $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
     
@@ -2429,7 +2428,7 @@ function Update-ConfigFile {
         $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
         # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
-        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services bfqt --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
+        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services btfq --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
         #Write-Output "Generated SAS Token: $storageSAS"
 
         # URL-decode the SAS token
@@ -2461,6 +2460,14 @@ function Update-ConfigFile {
             return
         }
         
+        if ($storageSAS -match "ss=([^&]+)") {
+            $storageSS = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'ss' parameter from SAS token."
+            return
+        }
+
         $configFilePath = "app/frontend/config.json"
 
         # Read the config file
@@ -2474,9 +2481,10 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_FULL_URL = $fulllUrl
         $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
         $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
-        $config.AZURE_STORAGE_SAS_TOKEN.SE = $decodedSe
-        $config.AZURE_STORAGE_SAS_TOKEN.ST = $decodedSt
+        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
+        $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
@@ -2523,8 +2531,6 @@ function Write-Log {
 #**********************************************************************************************************************
 
 $ErrorActionPreference = 'Stop'
-
-# az webapp cors add --resource-group rg-copilot-demo-002 --name srch-copilot-demo-002 --allowed-origins '*'    
 
 #$global:subscriptionId = az account show --query "{Id:id}" --output tsv
 
