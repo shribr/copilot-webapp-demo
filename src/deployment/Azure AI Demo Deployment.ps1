@@ -791,55 +791,67 @@ function New-AIHubAndModel {
     }
 
     # Create AI Project
-    if ($existingResources -notcontains $aiProjectName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-            #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
-            $mlWorkspaceFile = Update-MLWorkspaceFile `
-                -aiProjectName $aiProjectName `
-                -resourceGroupName $resourceGroupName `
-                -appInsightsName $appInsightsName `
-                -keyVaultName $keyVaultName `
-                -location $location `
-                -subscriptionId $subscriptionId `
-                -storageAccountName $storageAccountName `
-                -containerRegistryName $containerRegistryName 2>&1
 
-            #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
+    # Check for soft-deleted ML workspace
+    $deletedWorkspaces = az ml workspace list-deleted --resource-group $resourceGroupName --subscription $subscriptionId | ConvertFrom-Json
+    $deletedWorkspace = $deletedWorkspaces | Where-Object { $_.name -eq $aiProjectName }
 
-            $jsonOutput = az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName 2>&1
+    if ($deletedWorkspace) {
+        Write-Host "Restoring soft-deleted AI Project '$aiProjectName'."
+        Write-Log -message "Restoring soft-deleted AI Project '$aiProjectName'." -logFilePath $global:LogFilePath
+        az ml workspace recover --name $aiProjectName --resource-group $resourceGroupName --subscription $subscriptionId
+    }
+    else {
+        if ($existingResources -notcontains $aiProjectName) {
+            try {
+                $ErrorActionPreference = 'Stop'
+                #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
+                $mlWorkspaceFile = Update-MLWorkspaceFile `
+                    -aiProjectName $aiProjectName `
+                    -resourceGroupName $resourceGroupName `
+                    -appInsightsName $appInsightsName `
+                    -keyVaultName $keyVaultName `
+                    -location $location `
+                    -subscriptionId $subscriptionId `
+                    -storageAccountName $storageAccountName `
+                    -containerRegistryName $containerRegistryName 2>&1
 
-            if ($jsonOutput -match "error") {
+                #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
-                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+                $jsonOutput = az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName 2>&1
 
-                $errorName = $errorInfo["Error"]
-                $errorCode = $errorInfo["Code"]
-                $errorDetails = $errorInfo["Message"]
+                if ($jsonOutput -match "error") {
 
-                $errorMessage = "Failed to create AI Project '$aiProjectName'. `
+                    $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+
+                    $errorName = $errorInfo["Error"]
+                    $errorCode = $errorInfo["Code"]
+                    $errorDetails = $errorInfo["Message"]
+
+                    $errorMessage = "Failed to create AI Project '$aiProjectName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
 
-                #throw $errorMessage
+                    #throw $errorMessage
 
-                Write-Host $errorMessage
-                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                }
+                else {
+                    Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
+                    Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+                }
             }
-            else {
-                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
-                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+            catch {
+                Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
             }
         }
-        catch {
-            Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        else {
+            Write-Host "AI Project '$aiProjectName' already exists."
+            Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
         }
-    }
-    else {
-        Write-Host "AI Project '$aiProjectName' already exists."
-        Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 }
 
@@ -1196,7 +1208,7 @@ function New-Resources {
             $searchDatasourceCreated = New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
 
             if ($searchDatasourceCreated -eq "true") {
-                $searchIndexCreated =New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
+                $searchIndexCreated = New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
             
                 if ($searchIndexCreated -eq "true") {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
@@ -1567,7 +1579,7 @@ function New-Resources {
 }
 
 # Function to create a new search datasource
-function New-SearchDataSource{
+function New-SearchDataSource {
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
@@ -1592,13 +1604,13 @@ function New-SearchDataSource{
         Write-Host "searchDatasourceUrl: $searchDatasourceUrl"
 
         $body = @{
-            name = $searchDatasourceName
-            type = $searchDatasourceType
+            name        = $searchDatasourceName
+            type        = $searchDatasourceType
             credentials = @{
                 connectionString = $searchDatasourceConnectionString
             }
-            container = @{
-                name = $searchDatasourceContainerName
+            container   = @{
+                name  = $searchDatasourceContainerName
                 query = $searchDatasourceQuery
             }
         }
@@ -2305,13 +2317,15 @@ function Update-ContainerRegistryFile {
 
     $filePath = "$rootPath/app/container.registry.yaml"
 
+    $locationNoSpaces = $location.ToLower() -replace " ", ""
+
     $content = @"
 name: $containerRegistryName
 tags:
   description: Basic registry with one primary region and to additional regions
-location: $location
+location: $locationNoSpaces
 replication_locations:
-  - location: $location
+  - location: $locationNoSpaces
   - location: eastus2
   - location: westus
 "@

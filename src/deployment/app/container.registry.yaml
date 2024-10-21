@@ -1,8 +1,8 @@
-name: crcopilotdemo002
+name: crcopilotdemo004
 tags:
   description: Basic registry with one primary region and to additional regions
-location: east us
+location: eastus
 replication_locations:
-  - location: east us
+  - location: eastus
   - location: eastus2
   - location: westus
