@@ -822,7 +822,7 @@ function New-AIHubAndModel {
         Code: $errorCode `
         Message: $errorDetails"
 
-                throw $errorMessage
+                #throw $errorMessage
 
                 Write-Host $errorMessage
                 Write-Log -message $errorMessage -logFilePath $global:LogFilePath
@@ -2161,7 +2161,7 @@ function Start-Deployment {
     $functionAppServiceName = $functionAppService.Name
 
     # Create a new AI Hub and Model
-    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
     
     # Update configuration file for web frontend
     Update-ConfigFile - configFilePath "app/frontend/config.json" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppServiceName -searchIndexerName $searchIndexerName -searchIndexName $searchIndexName
