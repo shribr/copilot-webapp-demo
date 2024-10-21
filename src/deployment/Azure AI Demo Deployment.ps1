@@ -856,7 +856,7 @@ function New-ApiManagementService {
         $ErrorActionPreference = 'Stop'
         #$jsonOutput = az apim api create --api-id $apiManagementService.ApiId --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
         #$jsonOutput = az apim api create --service-name $apiManagementServiceName --display-name $apiManagementService.Display --resource-group $resourceGroupName --path $apiManagementService.Path
-        $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait $true
+        $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait
 
         Write-Host $jsonOutput
 
