@@ -7,6 +7,7 @@
   "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-002",
   "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-002",
   "AZURE_SEARCH_API_KEY": "iP80i1GcqEofnwL98ULMkMVwwLycniVcdXqptctoAaAzSeAZNuKq",
+  "AZURE_SEARCH_FULL_URL": "",
   "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-002",
   "AZURE_FUNCTION_NAME": "Chat",
   "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-002.azurewebsites.net",

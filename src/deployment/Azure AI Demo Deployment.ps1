@@ -2422,15 +2422,35 @@ function Update-ConfigFile {
     try {
         $storageKey = az storage account keys list --resource-group $resourceGroupName --account-name $storageAccountName --query "[0].value" --output tsv
         $effectiveDate = Get-Date
-        $expirationDate = (Get-Date).AddYears(1).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
     
         $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
         $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
         # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
-        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services b --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
-        Write-Output "Generated SAS Token: $storageSAS"
+        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services bfqt --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
+        #Write-Output "Generated SAS Token: $storageSAS"
+
+        # URL-decode the SAS token
+        $decodedSAS = [System.Web.HttpUtility]::UrlDecode($storageSAS)
+        #Write-Output "Decoded SAS Token: $decodedSAS"
+
+        # Extract and decode 'se' and 'st' parameters
+        if ($storageSAS -match "se=([^&]+)") {
+            $encodedSe = $matches[1]
+            $decodedSe = [System.Web.HttpUtility]::UrlDecode($encodedSe)
+            $storageSAS = $storageSAS -replace "se=$encodedSe", "se=$decodedSe"
+        }
+        if ($storageSAS -match "st=([^&]+)") {
+            $encodedSt = $matches[1]
+            $decodedSt = [System.Web.HttpUtility]::UrlDecode($encodedSt)
+            $storageSAS = $storageSAS -replace "st=$encodedSt", "st=$decodedSt"
+        }
+
+        #Write-Output "Modified SAS Token: $storageSAS"
+
+        $fulllUrl = "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
 
         # Extract the 'sig' parameter value from the SAS token
         if ($storageSAS -match "sig=([^&]+)") {
@@ -2451,10 +2471,11 @@ function Update-ConfigFile {
         $config.AZURE_STORAGE_ACCOUNT_NAME = $storageAccountName
         $config.AZURE_SEARCH_SERVICE_NAME = $searchServiceName
         $config.AZURE_SEARCH_API_KEY = $searchApiKey
+        $config.AZURE_SEARCH_FULL_URL = $fulllUrl
         $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
         $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
-        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
-        $config.AZURE_STORAGE_SAS_TOKEN.ST = $effectiveDate
+        $config.AZURE_STORAGE_SAS_TOKEN.SE = $decodedSe
+        $config.AZURE_STORAGE_SAS_TOKEN.ST = $decodedSt
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey

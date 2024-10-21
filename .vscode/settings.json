@@ -1,10 +1,10 @@
 {
-    "azureFunctions.deploySubpath": "src/deployment/app/functions/bin/Release/net8.0/publish",
+    "azureFunctions.deploySubpath": "src/deployment/app/functions/chat/bin/Release/net6.0/publish",
     "azureFunctions.postDeployTask": "npm install (functions)",
     "azureFunctions.projectLanguage": "C#",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
-    "azureFunctions.projectSubpath": "src/deployment/app/functions",
+    "azureFunctions.projectSubpath": "src/deployment/app/functions/chat",
     "azureFunctions.preDeployTask": "publish (functions)",
     "terminal.integrated.cwd": "src/deployment"
 }

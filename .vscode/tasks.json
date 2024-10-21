@@ -2,23 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "shell",
-      "label": "npm install (functions)",
-      "command": "npm install",
-      "options": {
-        "cwd": "${workspaceFolder}/src/deployment/app/functions"
-      }
-    },
-    {
-      "type": "shell",
-      "label": "npm prune (functions)",
-      "command": "npm prune --production",
-      "problemMatcher": [],
-      "options": {
-        "cwd": "${workspaceFolder}/src/deployment/app/functions"
-      }
-    },
-    {
       "label": "clean (functions)",
       "command": "dotnet",
       "args": [
@@ -29,7 +12,7 @@
       "type": "process",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/src/deployment/app/functions"
+        "cwd": "${workspaceFolder}/src/deployment/app/functions/chat"
       }
     },
     {
@@ -48,7 +31,7 @@
       },
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/src/deployment/app/functions"
+        "cwd": "${workspaceFolder}/src/deployment/app/functions/chat"
       }
     },
     {
@@ -64,7 +47,7 @@
       "type": "process",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/src/deployment/app/functions"
+        "cwd": "${workspaceFolder}/src/deployment/app/functions/chat"
       }
     },
     {
@@ -81,14 +64,14 @@
       "dependsOn": "clean release (functions)",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/src/deployment/app/functions"
+        "cwd": "${workspaceFolder}/src/deployment/app/functions/chat"
       }
     },
     {
       "type": "func",
       "dependsOn": "build (functions)",
       "options": {
-        "cwd": "${workspaceFolder}/src/deployment/app/functions/bin/Debug/net8.0"
+        "cwd": "${workspaceFolder}/src/deployment/app/functions/chat/bin/Debug/net6.0"
       },
       "command": "host start",
       "isBackground": true,
