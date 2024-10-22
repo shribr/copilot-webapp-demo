@@ -786,7 +786,7 @@ function New-AIHubAndModel {
         try {
             $ErrorActionPreference = 'Stop'
             
-            $jsonOutput = az cognitiveservices account deployment create --name $aiServiceName --resource-group $resourceGroupName --deployment-name chat --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "Standard" 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --name $aiServiceName --resource-group $resourceGroupName --deployment-name ai --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "Standard" 2>&1
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
