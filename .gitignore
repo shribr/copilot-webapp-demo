@@ -7,3 +7,4 @@ src/deployment/.DS_Store
 src/.DS_Store
 src/deployment/deployment.log
 src/deployment/app/container.registry.yaml
+src/deployment/.DS_Store

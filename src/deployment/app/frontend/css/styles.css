@@ -549,7 +549,7 @@ label[for="chat-input"] {
 
 /* File upload styles */
 
-#upload-documents-copy {
+.upload-documents-copy {
   display: flex;
   align-items: center;
   justify-content: space-between;

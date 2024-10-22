@@ -58,11 +58,11 @@
             <div id="document-container">
                 <div id="upload-info">
                     <h2>Upload Documents</h2>
-                    <p id="upload-documents-copy">Select up to ten documents to upload, or explore the existing
+                    <p class="upload-documents-copy">Select up to ten documents to upload, or explore the existing
                         documents that have already been
                         processed.
                     </p>
-                    <p style="padding-left: 12px">Azure Copilot Chat currently supports the following file types:
+                    <p class="upload-documents-copy">Azure Copilot Chat currently supports the following file types:
                     <ul id="file_types">
                         <li>.pdf</li>
                         <li>.md</li>
@@ -189,7 +189,7 @@
     </div>
 
     <!-- Settings Dialog HTML -->
-    <div id="settings-dialog" style="display: none">
+    <div id="settings-dialog">
         <!-- Close Button SVG -->
         <div id="close-settings-dialog">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -243,7 +243,7 @@
         </div>
         <div class="form-group form-group-flex">
             <div>
-                <input type="checkbox" id="suggest-followup-questions" />
+                <input type="checkbox" id="suggest-followup-questions" title="Suggest Followup Questions" />
             </div>
             <div>
                 <label for="toggle-icons">Suggest followup questions</label>
@@ -265,7 +265,7 @@
             <div class="accordion-content" id="datasources-content">
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-all" />
+                        <input type="checkbox" id="datasource-all" title="Select all datasources" />
                     </div>
                     <div>
                         <label for="datasource-database">All</label>
@@ -273,7 +273,7 @@
                 </div>
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-file-share" />
+                        <input type="checkbox" id="datasource-file-share" title="File share" />
                     </div>
                     <div>
                         <label for="datasource-file-share">File Share</label>
@@ -281,7 +281,7 @@
                 </div>
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-spreadsheet" />
+                        <input type="checkbox" id="datasource-spreadsheet" title="Spreadsheet" />
                     </div>
                     <div>
                         <label for="datasource-spreadsheet">Spreadsheet</label>
@@ -289,7 +289,7 @@
                 </div>
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-azure-storage" />
+                        <input type="checkbox" id="datasource-azure-storage" title="Azure Storage" />
                     </div>
                     <div>
                         <label for="datasource-azure-storage">Azure Storage</label>
@@ -297,7 +297,7 @@
                 </div>
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-structured-data" />
+                        <input type="checkbox" id="datasource-structured-data" title="Structured data" />
                     </div>
                     <div>
                         <label for="datasource-structured-data">Structured Data</label>
@@ -305,7 +305,7 @@
                 </div>
                 <div class="form-group form-group-flex">
                     <div>
-                        <input type="checkbox" id="datasource-database" />
+                        <input type="checkbox" id="datasource-database" title="Relational databases" />
                     </div>
                     <div>
                         <label for="datasource-database">Relational Database</label>
