@@ -506,7 +506,7 @@ async function getDocuments() {
 
     //const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
     const storageUrl = config.AZURE_SEARCH_FULL_URL;
-    
+
     fetch(`${storageUrl}`, {
         method: 'GET',
         headers: {
@@ -652,7 +652,7 @@ function toggleDisplay(screen) {
     } else {
         $chatContainer.hide();
         $documentContainer.hide();
-        $homeContainer.hide();
+        $homeContainer.show();
     }
 }
 
@@ -724,6 +724,7 @@ async function uploadFilesToAzure(files) {
             });
 
             if (response.ok) {
+                showNotification('File uploaded successfully!');
                 console.log(`Upload successful for ${file.name}.`);
             } else {
                 const errorText = await response.text();
@@ -756,4 +757,19 @@ async function getSasToken() {
     }
     const data = await response.json();
     return data.sasToken;
+}
+
+// Function to show a toast notification
+function showNotification(message) {
+    if (!("Notification" in window)) {
+        console.error("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+        new Notification(message);
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification(message);
+            }
+        });
+    }
 }
