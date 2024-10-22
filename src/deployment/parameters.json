@@ -33,7 +33,7 @@
   "redisCacheName": "redis-copilot-demo-004",
   "resourceGroupName": "RG-COPILOT-DEMO-004",
   "resourceSuffix": 1,
-  "restoreSoftDeletedResources": false,
+  "restoreSoftDeletedResources": true,
   "searchServiceName": "srch-copilot-demo-004",
   "searchIndexName": "srch-index-copilot-demo-004",
   "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",
