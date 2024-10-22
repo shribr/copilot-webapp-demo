@@ -391,7 +391,7 @@ async function getAnswers(userInput) {
     const apiVersion = config.API_VERSION;
     const deploymentId = config.DEPLOYMENT_ID;
     const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/completions?api-version=${apiVersion}`;
 
     const userMessageContent = config.OPEN_AI_REQUEST_BODY.messages.find(message => message.role === 'user').content[0];
     userMessageContent.text = userInput;

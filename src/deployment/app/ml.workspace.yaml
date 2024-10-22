@@ -1,10 +1,10 @@
-name: project-ai-copilot-demo-004
+name: project-ai-copilot-demo-005
 location: east us
-display_name: project-ai-copilot-demo-004
+display_name: project-ai-copilot-demo-005
 description: This configuration specifies a workspace configuration with existing dependent resources
-storage_account: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-004/providers/Microsoft.Storage/storageAccounts/stcopilotdemo004
-container_registry: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-004/providers/Microsoft.ContainerRegistry/registries/crcopilotdemo004
-key_vault: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-004/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-004
-application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-004/providers/Microsoft.insights/components/appi-copilot-demo-004
+storage_account: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-005/providers/Microsoft.Storage/storageAccounts/stcopilotdemo005
+container_registry: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-005/providers/Microsoft.ContainerRegistry/registries/crcopilotdemo005
+key_vault: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-005/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-005
+application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-005/providers/Microsoft.insights/components/appi-copilot-demo-005
 tags:
   purpose: demonstration
