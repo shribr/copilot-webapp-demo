@@ -579,6 +579,7 @@ function Initialize-Parameters {
     $global:redisCacheName = $parametersObject.redisCacheName
     $global:resourceGroupName = $parametersObject.resourceGroupName
     $global:resourceSuffix = $parametersObject.resourceSuffix
+    $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
     $global:searchDataSourceName = $parametersObject.searchDataSourceName
     $global:searchServiceName = $parametersObject.searchServiceName
     $global:searchIndexName = $parametersObject.searchIndexName
@@ -666,6 +667,7 @@ function Initialize-Parameters {
         resourceGroupName            = $resourceGroupName
         resourceGuid                 = $resourceGuid
         resourceSuffix               = $resourceSuffix
+        restoreSoftDeletedResource   = $restoreSoftDeletedResource
         result                       = $result
         searchServiceName            = $searchServiceName
         searchIndexName              = $searchIndexName
@@ -716,13 +718,9 @@ function New-AIHubAndModel {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted") {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
-                    $ErrorActionPreference = 'Stop'
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
-                    Write-Host "AI Hub '$aiHubName' restored."
-                    Write-Log -message "AI Hub '$aiHubName' restored." -logFilePath $global:LogFilePath
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -resourceType "Microsoft.MachineLearningServices/workspaces"
                 }
                 catch {
                     Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -749,8 +747,20 @@ function New-AIHubAndModel {
             Write-Log -message "AI Service: '$aiServiceName' created."
         }
         catch {
-            Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+                try {
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -resourceType "Microsoft.CognitiveServices/accounts"    
+                }
+                catch {
+                    Write-Error "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+                }
+            }
+            else {
+                Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            }    
         }
     }
 
@@ -764,8 +774,20 @@ function New-AIHubAndModel {
             Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." -logFilePath $global:LogFilePath
         }
         catch {
-            Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+                try {
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -resourceType "Microsoft.MachineLearningServices/workspaces"    
+                }
+                catch {
+                    Write-Error "Failed to restore soft-deleted AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore soft-deleted AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+                }
+            }
+            else {
+                Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            }    
         }
     }
     else {              
@@ -1063,12 +1085,12 @@ function New-KeyVault {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted") {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType $resourceType -"KeyVault" $resourceGroupName -useRBAC -userAssignedIdentityName $userAssignedIdentityName
             }
             else {
-                Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to restore soft-deleted Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore soft-deleted Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
 
@@ -1436,7 +1458,7 @@ function New-Resources {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted") {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     az cognitiveservices account recover --name $cognitiveServiceName --resource-group $resourceGroupName --location $location
@@ -1472,7 +1494,7 @@ function New-Resources {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted") {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services account
@@ -1499,8 +1521,8 @@ function New-Resources {
     #**********************************************************************************************************************
     # Deploy Open AI model
 
-    $deploymentName = "chat"
-    $modelName = "gpt-4o"
+    $deploymentName = "ai"
+    $modelName = $aiModelType
     $modelFormat = "OpenAI"
     $modelVersion = "2024-05-13"
     $skuName = "Standard"
@@ -1908,55 +1930,99 @@ function Restore-SoftDeletedResource {
         [string]$userAssignedIdentityName
     )
 
-    if ($resourceType -eq "KeyVault") {
-        if ($useRBAC) {
-            try {
-                $ErrorActionPreference = 'Stop'
-                # Attempt to restore the soft-deleted Key Vault
-                az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
-                Write-Host "Key Vault: '$resourceName' created with Vault Access Policies."
-                Write-Log -message "Key Vault: '$resourceName' created with Vault Access Policies."
+    switch ($resourceType) {
+        "KeyVault" {
+            # Code to restore Key Vault
+            Write-Output "Restoring Key Vault: $resourceName"
+            if ($useRBAC) {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Key Vault
+                    az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+                    Write-Host "Key Vault: '$resourceName' created with Vault Access Policies."
+                    Write-Log -message "Key Vault: '$resourceName' created with Vault Access Policies."
 
-                # Assign RBAC roles to the managed identity
-                Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+                    # Assign RBAC roles to the managed identity
+                    Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+                }
+                catch {
+                    Write-Error "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
             }
-            catch {
-                Write-Error "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            else {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Key Vault
+                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+                    Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                    Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+
+                    Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+                }
+                catch {
+                    Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
             }
         }
-        else {
-            try {
-                $ErrorActionPreference = 'Stop'
-                # Attempt to restore the soft-deleted Key Vault
-                az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
-                Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-                Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+        "StorageAccount" {
+            # Code to restore Storage Account
+            Write-Output "Restoring Storage Account: $resourceName"
 
-                Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
-            }
-            catch {
-                Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
+        }
+        "AppService" {
+            # Code to restore App Service
+            Write-Output "Restoring App Service: $resourceName"
+
+        }
+        "CognitiveService" {
+            # Code to restore Cognitive Service
+            Write-Output "Restoring Cognitive Service: $resourceName"
+            az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
+            Write-Host "AI Hub '$aiHubName' restored."
+            Write-Log -message "AI Hub '$aiHubName' restored." -logFilePath $global:LogFilePath
+        }
+        "OpenAI" {
+            # Code to restore OpenAI
+            Write-Output "Restoring OpenAI: $resourceName"
+            az cognitiveservices account recover --name $openAIName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind OpenAI --sku S0 --output none
+            Write-Host "OpenAI account '$openAIName' restored."
+            Write-Log -message "OpenAI account '$openAIName' restored." -logFilePath $global:LogFilePath
+        }
+        "ContainerRegistry" {
+            # Code to restore Container Registry
+            Write-Output "Restoring Container Registry: $resourceName"
+            az ml registry recover --name $containerRegistryName --resource-group $resourceGroupName --output none
+            Write-Host "Container Registry '$containerRegistryName' restored."
+            Write-Log -message "Container Registry '$containerRegistryName' restored." -logFilePath $global:LogFilePath
+        }
+        "DocumentIntelligence" {
+            # Code to restore Document Intelligence
+            Write-Output "Restoring Document Intelligence: $resourceName"
+            az cognitiveservices account recover --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
+            Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
+            Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored." -logFilePath $global:LogFilePath
+        }
+        "Microsoft.MachineLearningServices/workspaces" {
+            # Code to restore Machine Learning Workspace
+            Write-Output "Restoring Machine Learning Workspace: $resourceName"
+            az ml workspace recover --name $resourceName --resource-group $resourceGroupName --output none
+            Write-Host "Machine Learning Workspace '$resourceName' restored."
+            Write-Log -message "Machine Learning Workspace '$resourceName' restored." -logFilePath $global:LogFilePath
+        }
+        default {
+            Write-Output "Resource type $resourceType is not supported for restoration."
         }
     }
 }
 
 # Function to set the directory location
+
 function Set-DirectoryPath {
     param (
         [string]$targetDirectory
     )
-
-    # Debug output to check the input
-    #Write-Host "Target Directory: $targetDirectory"
-
-    # Get the root directory from the global variable
-    #$rootDirectory = $global:deploymentPath
-
-    # Debug output to check the root directory
-    #Write-Host "Root Directory: $rootDirectory"
 
     # Get the current directory
     $currentDirectory = Get-Location
