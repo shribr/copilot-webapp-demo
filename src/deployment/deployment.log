@@ -125,3 +125,57 @@
 2024-10-21 20:46:16 - Function app 'func-chat-copilot-demo-004' deployed successfully.
 2024-10-21 20:46:16 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 50 SEC : 921 MS ***
 
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 10/21/2024 20:57:44 ***
+2024-10-21 20:58:14 - Storage account 'stcopilotdemo004' created.
+2024-10-21 20:58:34 - App Service Plan 'asp-copilot-demo-004' created.
+2024-10-21 21:04:35 - Search Service 'srch-copilot-demo-004' created.
+2024-10-21 21:04:40 - Datasource 'srch-datasource-copilot-demo-004' created successfully.
+2024-10-21 21:04:44 - Index 'srch-index-copilot-demo-004' created successfully.
+2024-10-21 21:04:51 - Log Analytics Workspace 'log-copilot-demo-004' created.
+2024-10-21 21:04:56 - Application Insights component 'appi-copilot-demo-004' created.
+2024-10-21 21:05:00 - Cognitive Services account 'cog-copilot-demo-004' created.
+2024-10-21 21:05:36 - Azure OpenAI account 'openai-copilot-demo-004' created.
+2024-10-21 21:05:38 - OpenAI model deployment 'chat' created successfully.
+2024-10-21 21:05:38 - File 'container.registry.yaml' created and populated.
+2024-10-21 21:07:29 - Container Registry 'crcopilotdemo004' created.
+2024-10-21 21:08:33 - Document Intelligence account 'docintel-copilot-demo-004' created.
+2024-10-21 21:10:52 - Web app 'app-copilot-demo-004' created. Moving on to deployment.
+2024-10-21 21:10:52 - Skipping deployment for Web app 'app-copilot-demo-004'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-21 21:11:51 - Function app 'func-chat-copilot-demo-004' created. Moving on to deployment.
+2024-10-21 21:11:51 - Skipping deployment for Function app 'func-chat-copilot-demo-004'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-21 21:11:54 - User Assigned Identity 'id-copilot-demo-004' created.
+2024-10-21 21:12:11 - Service principal created for identity 'id-copilot-demo-004'.
+2024-10-21 21:12:28 - User 'id-copilot-demo-004' assigned to role: 'Contributor'.
+2024-10-21 21:12:30 - User 'id-copilot-demo-004' assigned to role: 'Cognitive Services OpenAI User'.
+2024-10-21 21:12:33 - User 'id-copilot-demo-004' assigned to role: 'Search Index Data Reader'.
+2024-10-21 21:12:35 - User 'id-copilot-demo-004' assigned to role: 'Storage Blob Data Reader'.
+2024-10-21 21:13:10 - Key Vault: 'kv-copilot-demo-004' created with Vault Access Policies.
+2024-10-21 21:13:11 - Key Vault 'kv-copilot-demo-004' policy permissions set for user: ''.
+2024-10-21 21:13:13 - Key Vault 'kv-copilot-demo-004' policy permissions set for application: 'id-copilot-demo-004'.
+2024-10-21 21:13:14 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:15 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:16 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:17 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:18 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:19 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:20 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:22 - Secret: 'UseAOAI' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:13:23 - Secret: 'UseVision' stored in Key Vault: 'kv-copilot-demo-004'.
+2024-10-21 21:14:00 - AI Hub: 'hub-ai-copilot-demo-004' created.
+2024-10-21 21:14:34 - AI Service: 'ai-service-copilot-demo-004' created.
+2024-10-21 21:14:35 - File 'ai.connection.yaml' created and populated.
+2024-10-21 21:14:43 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-004' created.
+2024-10-21 21:14:47 - AI Model deployment: 'ai-model-copilot-demo-004' created.
+2024-10-21 21:14:47 - File 'ml.workspace.yaml' created and populated.
+2024-10-21 21:15:12 - Failed to create AI Project 'project-ai-copilot-demo-004'. 
+        Error:  
+        Code: BadRequest 
+        Message: Soft-deleted workspace exists. Please purge or recover it. https://aka.ms/wsoftdelete
+2024-10-21 21:15:24 - Config file updated successfully.
+2024-10-21 21:15:27 - Web app 'app-copilot-demo-004' already exists. Moving on to deployment.
+2024-10-21 21:16:02 - Web app 'app-copilot-demo-004' deployed successfully.
+2024-10-21 21:16:07 - Function app 'func-chat-copilot-demo-004' already exists. Moving on to deployment.
+2024-10-21 21:17:36 - Function app 'func-chat-copilot-demo-004' deployed successfully.
+2024-10-21 21:17:36 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 19 MIN : 52 SEC : 654 MS ***
+
