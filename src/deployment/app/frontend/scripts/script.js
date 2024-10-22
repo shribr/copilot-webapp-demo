@@ -2,6 +2,8 @@
 
 var iconStyle = "color";
 let blobs = [];
+let currentSortColumn = '';
+let currentSortDirection = 'asc';
 
 // Function to fetch the configuration
 async function fetchConfig() {
@@ -45,9 +47,10 @@ $(document).ready(function () {
     document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
 
     // Add event listeners to column headers for sorting
-    document.getElementById('header-content-type').addEventListener('click', () => sortDocuments(blobs, 'Content-Type'));
-    document.getElementById('header-name').addEventListener('click', () => sortDocuments(blobs, 'Name'));
-    document.getElementById('header-date').addEventListener('click', () => sortDocuments(blobs, 'Last-Modified'));
+    document.getElementById('header-content-type').addEventListener('click', () => sortDocuments('Size'));
+    document.getElementById('header-name').addEventListener('click', () => sortDocuments('Name'));
+    document.getElementById('header-date').addEventListener('click', () => sortDocuments('Last-Modified'));
+    document.getElementById('header-status').addEventListener('click', () => sortDocuments('Content-Type'));
 
     // Add event listener to the file input
     document.getElementById('file-input').addEventListener('change', function (event) {
@@ -675,14 +678,27 @@ async function renderDocuments(blobs) {
 }
 
 // Function to sort documents
-function sortDocuments(blobs, criteria) {
+function sortDocuments(criteria) {
+    const sortDirection = currentSortColumn === criteria && currentSortDirection === 'asc' ? 'desc' : 'asc';
+    currentSortColumn = criteria;
+    currentSortDirection = sortDirection;
+
     const sortedBlobs = Array.from(blobs).sort((a, b) => {
         const aValue = a.getElementsByTagName(criteria)[0].textContent.toLowerCase();
         const bValue = b.getElementsByTagName(criteria)[0].textContent.toLowerCase();
-        if (aValue < bValue) return -1;
-        if (aValue > bValue) return 1;
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
         return 0;
     });
+
+    // Update sort arrows
+    document.querySelectorAll('.sort-arrow').forEach(arrow => arrow.classList.remove('active'));
+    const arrow = document.getElementById(`${criteria}-arrow`);
+    if (arrow) {
+        arrow.classList.add('active');
+        arrow.innerHTML = sortDirection === 'asc' ? '&#9650;' : '&#9660;';
+    }
+
     renderDocuments(sortedBlobs);
 }
 

@@ -971,3 +971,15 @@ label[for="chat-input"] {
     opacity: 1;
   }
 }
+
+.sort-arrow {
+  display: inline;
+  margin-left: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  visibility: hidden; /* Hide by default */
+}
+
+.sort-arrow.active {
+  visibility: visible; /* Show when active */
+}
