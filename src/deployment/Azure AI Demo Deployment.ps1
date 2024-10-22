@@ -965,6 +965,10 @@ function New-AppService {
 
                     $tempPath = Join-Path -Path $appRoot -ChildPath "temp"
 
+                    if (-not (Test-Path $tempPath)) {
+                        New-Item -Path $tempPath -ItemType Directory
+                    }
+
                     # Compress the function app code
                     $zipFilePath = "$tempPath/$appServiceType-$appServiceName.zip"
 
@@ -1333,12 +1337,8 @@ function New-Resources {
     # Create a Search Service
 
     az provider show --namespace Microsoft.Search --query "resourceTypes[?resourceType=='searchServices'].apiVersions"
-    
-    $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 
-    $searchIndexExists = $searchIndexes -contains $global:searchIndexName
-
-    if ($existingResources -notcontains $searchServiceName || $searchIndexExists -eq $false) {
+    if ($existingResources -notcontains $searchServiceName) {
         $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
         #$searchServiceSku = "basic"
 
@@ -1351,9 +1351,15 @@ function New-Resources {
 
             $searchDatasourceCreated = New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
 
-            if ($searchDatasourceCreated -eq "true" || $searchIndexExists -eq $false) {
+            $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+
+            $searchIndexExists = $searchIndexes -contains $global:searchIndexName
+
+            if ($searchIndexExists -eq $false) {
                 $searchIndexCreated = New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
-            
+            }
+                
+            if ($searchDatasourceCreated -eq "true" || $searchIndexExists -eq $false) {
                 if ($searchIndexCreated -eq "true" || $searchIndexExists -eq $false) {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
                 }
@@ -1780,7 +1786,7 @@ function New-SearchIndexer {
         $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
     
         $jsonContent.'@odata.context' = $searchIndexerUrl
-        $jsonContent.name = ç
+        $jsonContent.name = $searchIndexerName
         $jsonContent.dataSourceName = $searchDatasourceName
         $jsonContent.targetIndexName = $global:searchIndexName
     
@@ -2271,6 +2277,16 @@ function Start-Deployment {
 
     # Add a line break
     Add-Content -Path $logFilePath -Value ""
+}
+
+# Function to check if directory exists and create it if not
+function Test-DirectoryExists {
+    param (
+        [string]$directoryPath
+    )
+    if (-not (Test-Path -Path $directoryPath -PathType Container)) {
+        New-Item -ItemType Directory -Path $directoryPath
+    }
 }
 
 # The Test-ResourceGroupExists function checks if a specified Azure resource group exists. If it does, the function appends a suffix to the resource group name and checks again. This process continues until a unique resource group name is found.
