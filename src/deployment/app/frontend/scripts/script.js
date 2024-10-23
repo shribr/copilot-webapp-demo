@@ -840,10 +840,14 @@ async function getSasToken() {
 
 // Function to show a toast notification
 function showToastNotification(message, isSuccess) {
+    // Remove existing toast notifications
+    const existingToasts = document.querySelectorAll('.toast-notification');
+    existingToasts.forEach(toast => toast.remove());
+
     // Create a new div for the toast notification
     const toastNotification = document.createElement('div');
     toastNotification.setAttribute('class', 'toast-notification fade-in');
-    toastNotification.style.backgroundColor = isSuccess ? 'green' : 'red';
+    toastNotification.style.backgroundColor = isSuccess ? 'rgba(34, 139, 34, 0.9)' : 'rgb(205, 92, 92, 0.9)';
 
     // Create a close button
     const closeButton = document.createElement('span');
@@ -859,8 +863,9 @@ function showToastNotification(message, isSuccess) {
     messageText.innerHTML = message;
 
     // Append the close button and message text to the toast notification
-    toastNotification.appendChild(closeButton);
+
     toastNotification.appendChild(messageText);
+    toastNotification.appendChild(closeButton);
 
     // Append the toast notification to the body
     document.body.appendChild(toastNotification);

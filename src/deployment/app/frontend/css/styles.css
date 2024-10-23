@@ -937,9 +937,10 @@ label[for="chat-input"] {
 
 .toast-notification {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 15px;
+  bottom: 30px;
+  background-color: rgba(34, 139, 34, 0.9);
+  right: 10px;
+  padding: 40px;
   border-radius: 5px;
   color: white;
   z-index: 1000;
@@ -947,20 +948,25 @@ label[for="chat-input"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  opacity: 1;
+  margin-right: 70px;
 }
 
 .toast-notification .close-button {
-  margin-left: 10px;
+  position: absolute; /* Positioning */
+  top: 5px; /* Top right corner */
+  right: 10px; /* Top right corner */
   cursor: pointer;
   font-weight: bold;
 }
 
 .toast-notification .toast-message {
   flex-grow: 1;
+  margin-right: 20px;
 }
 
 .fade-in {
-  animation: fadeIn 0.5s;
+  animation: fadeIn 3s;
 }
 
 @keyframes fadeIn {
