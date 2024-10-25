@@ -1,6 +1,9 @@
 
 
 var iconStyle = "color";
+let blobs = [];
+let currentSortColumn = '';
+let currentSortDirection = 'asc';
 
 // Function to fetch the configuration
 async function fetchConfig() {
@@ -42,6 +45,12 @@ $(document).ready(function () {
     });
 
     document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
+
+    // Add event listeners to column headers for sorting
+    document.getElementById('header-content-type').addEventListener('click', () => sortDocuments('Size'));
+    document.getElementById('header-name').addEventListener('click', () => sortDocuments('Name'));
+    document.getElementById('header-date').addEventListener('click', () => sortDocuments('Last-Modified'));
+    document.getElementById('header-status').addEventListener('click', () => sortDocuments('Content-Type'));
 
     // Add event listener to the file input
     document.getElementById('file-input').addEventListener('change', function (event) {
@@ -506,123 +515,191 @@ async function getDocuments() {
 
     //const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
     const storageUrl = config.AZURE_SEARCH_FULL_URL;
-    
-    fetch(`${storageUrl}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'text/xml',
-            'Cache-Control': 'no-cache'
-        }
-    })
-        .then(response => response.text())
-        .then(data => {
+
+    try {
+        const response = await fetch(`${storageUrl}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/xml',
+                'Cache-Control': 'no-cache'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.text();
             // Parse the XML response
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(data, "text/xml");
-            const blobs = xmlDoc.getElementsByTagName("Blob");
+            blobs = xmlDoc.getElementsByTagName("Blob");
 
-            // Get the document list and sample rows
-            const docList = document.getElementById('document-list');
-            const sampleRows = document.querySelectorAll('.document-row.sample');
+            // Render documents
+            renderDocuments(blobs);
+        } else {
+            console.error('Failed to fetch documents:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error fetching documents:', error);
+    }
+}
 
-            const testUrl = "https://stcopilotdemo003.blob.core.windows.net/content/AI Builder governance whitepaper.pdf?sv=2022-11-02&include=metadata&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-10-16T04:00:00Z&st=2024-10-15T04:00:00Z&spr=https&sig=1R8tRUu0Tloc8nW33zc548rA9fSXXGRMAukfJOOncVc%3D";
+// Function to render documents
+async function renderDocuments(blobs) {
+    const config = await fetchConfig();
 
-            // Clear existing document rows except the header
-            const existingRows = docList.querySelectorAll('.document-row:not(.header)');
-            existingRows.forEach(row => row.style.display = 'none');
+    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
+    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const fileTypes = config.FILE_TYPES;
 
-            if (blobs.length === 0) {
-                // Show sample rows if no results
-                sampleRows.forEach(row => row.style.display = '');
-            } else {
-                // Hide sample rows if there are results
-                sampleRows.forEach(row => row.style.display = 'none');
+    const docList = document.getElementById('document-list');
+    const sampleRows = document.querySelectorAll('.document-row.sample');
 
-                // Iterate over the blobs and process them
-                Array.from(blobs).forEach(blob => {
-                    const blobName = blob.getElementsByTagName("Name")[0].textContent;
-                    const lastModified = blob.getElementsByTagName("Last-Modified")[0].textContent;
-                    const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-                    let blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
-                    blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
-                    const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
-                    // Create the document row
-                    const documentRow = document.createElement('div');
-                    documentRow.className = 'document-row';
+    //const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
+    const storageUrl = config.AZURE_SEARCH_FULL_URL;
 
-                    // Create the document cells
-                    const previewCell = document.createElement('div');
-                    previewCell.className = 'document-cell preview';
+    // Clear existing document rows except the header
+    const existingRows = docList.querySelectorAll('.document-row:not(.header)');
+    existingRows.forEach(row => row.style.display = 'none');
 
-                    previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.COLOR}${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a>`;
+    if (blobs.length === 0) {
+        // Show sample rows if no results
+        sampleRows.forEach(row => row.style.display = '');
+    } else {
+        // Hide sample rows if there are results
+        sampleRows.forEach(row => row.style.display = 'none');
 
-
-                    const statusCell = document.createElement('div');
-                    statusCell.className = 'document-cell preview';
-                    statusCell.textContent = 'Active';
-
-                    const nameCell = document.createElement('div');
-                    nameCell.className = 'document-cell';
-                    const nameLink = document.createElement('a');
-                    nameLink.href = blobUrl;
-                    nameLink.textContent = blobName;
-                    nameLink.target = '_blank'; // Open link in a new tab
-                    nameCell.appendChild(nameLink);
-
-                    const contentTypeCell = document.createElement('div');
-                    contentTypeCell.className = 'document-cell content-type';
-
-                    let fileTypeFound = false;
-                    for (const [key, value] of Object.entries(fileTypes)) {
-                        const svgStyle = iconStyle === 'color' ? `${value.SVG_COLOR}` : `${value.SVG}`;
-                        if (value.EXTENSION.some(ext => blobName.toLowerCase().endsWith(ext))) {
-                            contentTypeCell.innerHTML = `${value.SVG}${value.SVG_COLOR} ${contentType}`;
-                            fileTypeFound = true;
-                            break;
-                        }
-                    }
-
-                    if (!fileTypeFound) {
-                        const svgStyle = iconStyle === 'color' ? `${fileTypes.TXT.SVG_COLOR}` : `${fileTypes.TXT.SVG}`;
-                        contentTypeCell.innerHTML = `${fileTypes.TXT.SVG}${fileTypes.TXT.SVG_COLOR} ${contentType}`;
-                        //contentTypeCell.textContent = contentType;
-                    }
-
-                    const fileSizeCell = document.createElement('div');
-                    fileSizeCell.className = 'document-cell file-size';
-                    fileSizeCell.textContent = blobSize;
-
-                    const lastModifiedCell = document.createElement('div');
-                    lastModifiedCell.className = 'document-cell';
-                    lastModifiedCell.textContent = lastModified;
-
-                    const deleteCell = document.createElement('div');
-                    deleteCell.className = 'document-cell action-delete';
-                    deleteCell.innerHTML = `<a href="#" class="delete-button">${config.ICONS.DELETE.COLOR}${config.ICONS.DELETE.MONOTONE}</a>`;
-
-                    const editCell = document.createElement('div');
-                    editCell.className = 'document-cell action-edit';
-                    editCell.innerHTML = `<a href="#" class="edit-button">${config.ICONS.EDIT.COLOR}${config.ICONS.EDIT.MONOTONE}</a>`;
-
-                    const actionCell = document.createElement('div');
-                    actionCell.className = 'document-cell action-container';
-                    actionCell.appendChild(deleteCell);
-                    actionCell.appendChild(editCell);
-
-                    // Append cells to the document row
-                    documentRow.appendChild(previewCell);
-                    documentRow.appendChild(statusCell);
-                    documentRow.appendChild(nameCell);
-                    documentRow.appendChild(contentTypeCell);
-                    documentRow.appendChild(fileSizeCell);
-                    documentRow.appendChild(lastModifiedCell);
-                    documentRow.appendChild(actionCell);
-                    // Append the document row to the document list
-                    docList.appendChild(documentRow);
-                });
-            }
+        // Extract blob data into an array of objects
+        const blobData = Array.from(blobs).map(blob => {
+            const blobName = blob.getElementsByTagName("Name")[0].textContent;
+            const lastModified = new Date(blob.getElementsByTagName("Last-Modified")[0].textContent).toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
+            let blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+            blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
+            const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
+            return { blobName, lastModified, contentType, blobUrl, blobSize };
         });
+
+        // Iterate over the sorted blob data and create document rows
+        blobData.forEach(blob => {
+            // Create the document row
+            const documentRow = document.createElement('div');
+            documentRow.className = 'document-row';
+
+            const blobName = blob.blobName;
+            const lastModified = blob.lastModified;
+            const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
+            let blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+            //blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
+            const blobSize = blob.blobSize;
+
+            // Create the document cells
+            const previewCell = document.createElement('div');
+            previewCell.className = 'document-cell preview';
+
+            previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.COLOR}${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a>`;
+
+
+            const statusCell = document.createElement('div');
+            statusCell.className = 'document-cell preview';
+            statusCell.textContent = 'Active';
+
+            const nameCell = document.createElement('div');
+            nameCell.className = 'document-cell';
+            const nameLink = document.createElement('a');
+            nameLink.href = blobUrl;
+            nameLink.textContent = blobName;
+            nameLink.target = '_blank'; // Open link in a new tab
+            nameCell.appendChild(nameLink);
+
+            const contentTypeCell = document.createElement('div');
+            contentTypeCell.className = 'document-cell content-type';
+
+            let fileTypeFound = false;
+            for (const [key, value] of Object.entries(fileTypes)) {
+                const svgStyle = iconStyle === 'color' ? `${value.SVG_COLOR}` : `${value.SVG}`;
+                if (value.EXTENSION.some(ext => blobName.toLowerCase().endsWith(ext))) {
+                    contentTypeCell.innerHTML = `${value.SVG}${value.SVG_COLOR} ${contentType}`;
+                    fileTypeFound = true;
+                    break;
+                }
+            }
+
+            if (!fileTypeFound) {
+                const svgStyle = iconStyle === 'color' ? `${fileTypes.TXT.SVG_COLOR}` : `${fileTypes.TXT.SVG}`;
+                contentTypeCell.innerHTML = `${fileTypes.TXT.SVG}${fileTypes.TXT.SVG_COLOR} ${contentType}`;
+                //contentTypeCell.textContent = contentType;
+            }
+
+            const fileSizeCell = document.createElement('div');
+            fileSizeCell.className = 'document-cell file-size';
+            fileSizeCell.textContent = blobSize;
+
+            const lastModifiedCell = document.createElement('div');
+            lastModifiedCell.className = 'document-cell';
+            lastModifiedCell.textContent = lastModified;
+
+            const deleteCell = document.createElement('div');
+            deleteCell.className = 'document-cell action-delete';
+            deleteCell.innerHTML = `<a href="#" class="delete-button">${config.ICONS.DELETE.COLOR}${config.ICONS.DELETE.MONOTONE}</a>`;
+
+            const editCell = document.createElement('div');
+            editCell.className = 'document-cell action-edit';
+            editCell.innerHTML = `<a href="#" class="edit-button">${config.ICONS.EDIT.COLOR}${config.ICONS.EDIT.MONOTONE}</a>`;
+
+            const actionCell = document.createElement('div');
+            actionCell.className = 'document-cell action-container';
+            actionCell.appendChild(deleteCell);
+            actionCell.appendChild(editCell);
+
+            // Append cells to the document row
+            documentRow.appendChild(previewCell);
+            documentRow.appendChild(statusCell);
+            documentRow.appendChild(nameCell);
+            documentRow.appendChild(contentTypeCell);
+            documentRow.appendChild(fileSizeCell);
+            documentRow.appendChild(lastModifiedCell);
+            documentRow.appendChild(actionCell);
+            // Append the document row to the document list
+            docList.appendChild(documentRow);
+        });
+    }
+}
+
+// Function to sort documents
+function sortDocuments(criteria) {
+    const sortDirection = currentSortColumn === criteria && currentSortDirection === 'asc' ? 'desc' : 'asc';
+    currentSortColumn = criteria;
+    currentSortDirection = sortDirection;
+
+    const sortedBlobs = Array.from(blobs).sort((a, b) => {
+        const aValue = a.getElementsByTagName(criteria)[0].textContent.toLowerCase();
+        const bValue = b.getElementsByTagName(criteria)[0].textContent.toLowerCase();
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    // Update sort arrows
+    document.querySelectorAll('.sort-arrow').forEach(arrow => arrow.classList.remove('active'));
+    const arrow = document.getElementById(`${criteria}-arrow`);
+    if (arrow) {
+        arrow.classList.add('active');
+        arrow.innerHTML = sortDirection === 'asc' ? '&#9650;' : '&#9660;';
+    }
+
+    renderDocuments(sortedBlobs);
 }
 
 //code to toggle between chat and document screens
@@ -652,7 +729,7 @@ function toggleDisplay(screen) {
     } else {
         $chatContainer.hide();
         $documentContainer.hide();
-        $homeContainer.hide();
+        $homeContainer.show();
     }
 }
 
@@ -724,9 +801,12 @@ async function uploadFilesToAzure(files) {
             });
 
             if (response.ok) {
+                showToastNotification(`Upload successful for ${file.name}.`, true);
                 console.log(`Upload successful for ${file.name}.`);
+                getDocuments(); // Refresh the document list after successful upload
             } else {
                 const errorText = await response.text();
+                showToastNotification(`Error uploading file ${file.name} to Azure Storage: ${errorText}`, false);
                 console.error(`Error uploading file ${file.name} to Azure Storage:`, errorText);
             }
         } catch (error) {
@@ -756,4 +836,42 @@ async function getSasToken() {
     }
     const data = await response.json();
     return data.sasToken;
+}
+
+// Function to show a toast notification
+function showToastNotification(message, isSuccess) {
+    // Remove existing toast notifications
+    const existingToasts = document.querySelectorAll('.toast-notification');
+    existingToasts.forEach(toast => toast.remove());
+
+    // Create a new div for the toast notification
+    const toastNotification = document.createElement('div');
+    toastNotification.setAttribute('class', 'toast-notification fade-in');
+    toastNotification.style.backgroundColor = isSuccess ? 'rgba(34, 139, 34, 0.9)' : 'rgb(205, 92, 92, 0.9)';
+
+    // Create a close button
+    const closeButton = document.createElement('span');
+    closeButton.setAttribute('class', 'close-button');
+    closeButton.innerHTML = '&times;';
+    closeButton.onclick = function () {
+        toastNotification.style.display = 'none';
+    };
+
+    // Create the message text
+    const messageText = document.createElement('div');
+    messageText.setAttribute('class', 'toast-message');
+    messageText.innerHTML = message;
+
+    // Append the close button and message text to the toast notification
+
+    toastNotification.appendChild(messageText);
+    toastNotification.appendChild(closeButton);
+
+    // Append the toast notification to the body
+    document.body.appendChild(toastNotification);
+
+    // Automatically remove the toast notification after 5 seconds
+    setTimeout(() => {
+        toastNotification.style.display = 'none';
+    }, 5000);
 }
