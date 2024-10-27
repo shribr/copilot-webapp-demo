@@ -126,7 +126,7 @@ Once the deployment script completes the deployed Azure resources should look li
 
 ![Azure-AI-Demo-Azure-Resource-Visualizer](https://github.com/user-attachments/assets/3ef373f7-e394-4040-b805-3e0031818153)
 
-### Deployment Section Breakdown
+### Deployment Script Breakdown
 
 #### 1. **Initialization and Configuration**
 - **Script Metadata**: Provides metadata about the script, including prerequisites and usage instructions.
