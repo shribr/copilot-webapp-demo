@@ -7,7 +7,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (version 14 or higher recommended)
-- [npm](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com/)
+- [npm](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com/) (package managers)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for deploying to Azure)
 - [PowerShell Core](https://github.com/PowerShell/PowerShell) (for running the deployment script)
 - [azps-tools.azps-tools](https://marketplace.visualstudio.com/items?itemName=azps-tools.azps-tools)
