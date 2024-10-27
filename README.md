@@ -342,10 +342,15 @@ npm run build / yarn build - Build the project for production
 
 ### HTML Structure
 
-The index.html file includes the following sections:
+The index.html file includes the following screens:
 
-- Toolbar: Contains the title and navigation links (Settings, Profile, Help).
-- Content Container: Contains the navigation menu with links to different screens (Home, Documents).
+
+
+<img width="1892" alt="Screenshot 2024-10-27 at 2 36 14 PM" src="https://github.com/user-attachments/assets/106b3cc5-8a20-44a1-9ea3-264390a55739">
+<img width="1644" alt="Screenshot 2024-10-27 at 2 36 30 PM" src="https://github.com/user-attachments/assets/86e77641-63e3-4bac-9a43-a09ccc87bf2d">
+<img width="1620" alt="Screenshot 2024-10-27 at 2 37 05 PM" src="https://github.com/user-attachments/assets/63a8f5df-79f0-4f0f-8dd6-695872394000">
+
+
 
 ### Contributing
 
