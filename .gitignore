@@ -8,3 +8,7 @@ src/.DS_Store
 src/deployment/deployment.log
 src/deployment/app/container.registry.yaml
 src/deployment/.DS_Store
+src/deployment/app/frontend/css/styles_alphabetized.css
+src/deployment/app/temp/Web-app-copilot-demo-001.zip
+src/deployment/app/frontend/css/css from chat.md
+src/deployment/app/frontend/css/css2 from chat.md

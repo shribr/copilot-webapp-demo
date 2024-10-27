@@ -1086,7 +1086,7 @@ function New-KeyVault {
         catch {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
-                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType $resourceType -"KeyVault" $resourceGroupName -useRBAC -userAssignedIdentityName $userAssignedIdentityName
+                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType $resourceType $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
             }
             else {
                 Write-Error "Failed to restore soft-deleted Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1461,7 +1461,7 @@ function New-Resources {
             if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    az cognitiveservices account recover --name $cognitiveServiceName --resource-group $resourceGroupName --location $location
+                    Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
                     Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
                     Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
                 }
@@ -1498,7 +1498,7 @@ function New-Resources {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    az cognitiveservices account recover --name $openAIName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind OpenAI --sku S0 --output none
+                    Restore-SoftDeletedResource -resourceName $openAIName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
                     Write-Host "OpenAI account '$openAIName' restored."
                     Write-Log -message "OpenAI account '$openAIName' restored."
                 }
@@ -1584,12 +1584,14 @@ function New-Resources {
             try {
                 $ErrorActionPreference = 'Stop'
                                
-                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
-            
+                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --restore $true --kind FormRecognizer --sku S0 --output none
                 # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
     
                 if ($jsonOutput -match "error") {
 
+                    $jsonProperties = '{"restore": true}'
+                    $jsonOutput = az resource create --subscription $subscriptionId -g $resourceGroupName -n $documentIntelligenceName --location $location --namespace Microsoft.CognitiveServices --resource-type accounts --properties $jsonProperties
+                
                     $errorInfo = Format-ErrorInfo -jsonOutput $jsonOutput
                     
                     $errorMessage = "Failed to create Document Intelligence Service  '$documentIntelligenceName'. `
@@ -1613,7 +1615,7 @@ function New-Resources {
                     try {
                         $ErrorActionPreference = 'Stop'
                         # Attempt to restore the soft-deleted Cognitive Services account
-                        az cognitiveservices account recover --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
+                        Recover-SoftDeletedResource -resourceName $documentIntelligenceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
                         Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
                         Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored."
                     }
