@@ -101,8 +101,6 @@ yarn start
 
 ```
 
-This will start the Parcel development server and open your application in the default web browser.
-
 ### Building for Production
 
 To build the project for production, run:
@@ -120,16 +118,220 @@ This will create a dist directory with the bundled files.
 
 ### Deployment
 
-You can deploy the contents of the dist directory to your web server or hosting service.
+### Overview
+
+This PowerShell script automates the deployment of various Azure resources for an Azure AI demo. It is divided into several sections, each responsible for different aspects of the deployment process.
+
+### Sections Breakdown
+
+#### 1. **Initialization and Configuration**
+- **Script Metadata**: Provides metadata about the script, including prerequisites and usage instructions.
+- **Parameter Initialization**: Sets default parameters and reads parameters from a JSON file.
+- **Global Variables**: Defines global variables for resource types, KeyVault secrets, and paths.
+
+#### 2. **Helper Functions**
+- **ConvertTo-ProperCase**: Converts a string to proper case.
+- **Find-AppRoot**: Finds the root directory of the application.
+- **Format-ErrorInfo**: Formats error information from a message.
+- **Get-CognitiveServicesApiKey**: Retrieves the API key for Cognitive Services.
+- **Get-LatestApiVersion**: Gets the latest API version for a resource type.
+- **Get-LatestDotNetRuntime**: Gets the latest .NET runtime version.
+- **Get-RandomInt**: Generates a random integer.
+- **Get-Parameters-Sorted**: Alphabetizes the parameters object.
+- **Get-SearchIndexes**: Checks if a search index exists.
+- **Get-UniqueSuffix**: Finds a unique suffix for resource names.
+- **Get-ValidServiceName**: Ensures the service name is valid.
+- **Invoke-AzureRestMethod**: Invokes an Azure REST API method.
+- **Split-Guid**: Splits a GUID and returns the first 8 characters.
+- **Test-DirectoryExists**: Checks if a directory exists and creates it if not.
+- **Test-ResourceGroupExists**: Checks if a resource group exists.
+- **Test-ResourceExists**: Checks if a resource exists.
+
+#### 3. **Resource Creation Functions**
+- **New-AIHubAndModel**: Creates AI Hub and AI Model.
+- **New-ApiManagementService**: Creates and deploys API Management service.
+- **New-AppService**: Creates and deploys app services (web app or function app).
+- **New-KeyVault**: Creates a Key Vault.
+- **New-ManagedIdentity**: Creates a new managed identity.
+- **New-PrivateEndPoint**: Creates a new private endpoint.
+- **New-RandomPassword**: Generates a random password.
+- **New-ResourceGroup**: Creates a new resource group.
+- **New-Resources**: Creates various Azure resources.
+- **New-SearchDataSource**: Creates a new search datasource.
+- **New-SearchIndex**: Creates a new search index.
+- **New-SearchIndexer**: Creates a new search indexer.
+- **New-SubNet**: Creates a new subnet.
+- **New-VirtualNetwork**: Creates a new virtual network.
+- **Remove-AzureResourceGroup**: Deletes Azure resource groups.
+- **Restore-SoftDeletedResource**: Restores soft-deleted resources.
+- **Set-DirectoryPath**: Sets the directory location.
+- **Set-KeyVaultAccessPolicies**: Sets Key Vault access policies.
+- **Set-KeyVaultRoles**: Creates Key Vault roles.
+- **Set-KeyVaultSecrets**: Creates secrets in Key Vault.
+- **Set-RBACRoles**: Assigns RBAC roles to a managed identity.
+
+#### 4. **Update Functions**
+- **Update-ContainerRegistryFile**: Updates the container registry file.
+- **Update-MLWorkspaceFile**: Updates the ML workspace connection file.
+- **Update-AIConnectionFile**: Updates the AI connection file.
+- **Update-ConfigFile**: Updates the configuration file.
+
+#### 5. **Logging Functions**
+- **Write-Log**: Writes messages to a log file.
+
+#### 6. **Main Script Execution**
+- **Initialize Parameters**: Calls the [`Initialize-Parameters`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A535%2C%22character%22%3A9%7D%7D%5D%2C%226c3e5ad1-bfff-42bb-b65b-373e7ed359b5%22%5D "Go to definition") function to set up parameters.
+- **Alphabetize Parameters**: Calls the [`Get-Parameters-Sorted`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A356%2C%22character%22%3A9%7D%7D%5D%2C%226c3e5ad1-bfff-42bb-b65b-373e7ed359b5%22%5D "Go to definition") function to sort parameters.
+- **Set Directory Path**: Sets the directory path for deployment.
+- **Start Deployment**: Calls the [`Start-Deployment`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A2155%2C%22character%22%3A9%7D%7D%5D%2C%226c3e5ad1-bfff-42bb-b65b-373e7ed359b5%22%5D "Go to definition") function to begin the deployment process.
+
+### Summary
+
+This script is a comprehensive tool for deploying a variety of Azure resources required for an Azure AI demo. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
 ### Project Structure
 
-- index.html - Main HTML file for the application
-- css/styles.css - CSS styles for the application
-- src/ - Source files for your application
-- dist/ - Bundled output files (generated after running the build script)
-- package.json - Project configuration and dependencies
-- deploy.ps1 - PowerShell script for deployment
+- **Azure AI Demo Deployment.ps1**: Main deployment script.
+- **CognitiveServices.json**: Configuration file for Cognitive Services.
+- **app/**: Directory for application-specific files.
+  - **ai.connection.yaml**: AI connection configuration file.
+  - **container.registry.yaml**: Container registry configuration file.
+  - **frontend/**: Contains frontend application files.
+    - **config.blank.json**: Blank configuration file for the frontend.
+    - **config.json**: Configuration file for the frontend.
+    - **css/**: Directory for CSS files.
+      - **css from chat.md**: CSS file from chat.
+      - **css2 from chat.md**: Another CSS file from chat.
+      - **styles.css**: Main stylesheet.
+      - **styles_alphabetized.css**: Alphabetized stylesheet.
+    - **favicon.ico**: Favicon for the frontend.
+    - **images/**: Directory for image files.
+      - **Screenshot 2024-10-09 at 11.41.55 AM.png**: Screenshot image.
+      - **favicon.png**: Favicon image.
+      - **technology-background-with-a-ai-concept-vector.jpg**: Background image.
+    - **index.html**: Main HTML file for the frontend.
+    - **scripts/**: Directory for JavaScript files.
+      - **script.js**: Main JavaScript file.
+    - **web.config**: Web configuration file.
+  - **functions/**: Directory for Azure Functions.
+    - **chat/**: Directory for chat-related functions.
+      - **AIChatCompletion.cs**: AI chat completion function.
+      - **ChatCompletion.cs**: Chat completion function.
+      - **ChatCompletion.csproj**: Project file for chat completion.
+      - **ChatCompletion.sln**: Solution file for chat completion.
+      - **ChatContext.cs**: Chat context class.
+      - **ChatHistory.cs**: Chat history class.
+      - **ChatOrchestrator.cs**: Chat orchestrator class.
+      - **IChatCompletion.cs**: Interface for chat completion.
+      - **Properties/**: Directory for project properties.
+        - **launchSettings.json**: Launch settings for the project.
+      - **bin/**: Directory for compiled binaries.
+        - **Debug/**: Debug build directory.
+          - **net6.0/**: .NET 6.0 build directory.
+      - **host.json**: Host configuration file for Azure Functions.
+      - **obj/**: Directory for build artifacts.
+        - **ChatCompletion.csproj.nuget.dgspec.json**: NuGet specification file.
+        - **ChatCompletion.csproj.nuget.g.props**: NuGet properties file.
+        - **ChatCompletion.csproj.nuget.g.targets**: NuGet targets file.
+        - **Debug/**: Debug build directory.
+          - **net6.0/**: .NET 6.0 build directory.
+            - **ChatCompletion.AssemblyInfo.cs**: Assembly info file.
+            - **ChatCompletion.AssemblyInfoInputs.cache**: Assembly info inputs cache.
+            - **ChatCompletion.GeneratedMSBuildEditorConfig.editorconfig**: MSBuild editor config.
+            - **ChatCompletion.assets.cache**: Assets cache.
+            - **ChatCompletion.csproj.AssemblyReference.cache**: Assembly reference cache.
+            - **ref/**: Reference directory.
+            - **refint/**: Reference intermediate directory.
+        - **project.assets.json**: Project assets file.
+        - **project.nuget.cache**: NuGet cache file.
+  - **ml.workspace.yaml**: Machine learning workspace configuration file.
+  - **package-lock.json**: NPM package lock file.
+  - **package.json**: NPM package file.
+  - **temp/**: Temporary files directory.
+- **deployment.log**: Log file for the deployment process.
+- **directory_structure.txt**: File containing the directory structure.
+- **launch.json**: Launch configuration file.
+- **parameters backup.json**: Backup of parameters file.
+- **parameters.json**: Parameters file for the deployment.
+- **search-index-schema.json**: Search index schema file.
+- **search-indexer-schema.json**: Search indexer schema file.
+- **server.js**: Server-side JavaScript file.
+- **settings.json**: Settings file.
+.
+### Directory Structure
+
+```plaintext
+.
+├── Azure AI Demo Deployment.ps1
+├── CognitiveServices.json
+├── app
+│   ├── ai.connection.yaml
+│   ├── container.registry.yaml
+│   ├── frontend
+│   │   ├── config.blank.json
+│   │   ├── config.json
+│   │   ├── css
+│   │   │   ├── css from chat.md
+│   │   │   ├── css2 from chat.md
+│   │   │   ├── styles.css
+│   │   │   └── styles_alphabetized.css
+│   │   ├── favicon.ico
+│   │   ├── images
+│   │   │   ├── Screenshot 2024-10-09 at 11.41.55 AM.png
+│   │   │   ├── favicon.png
+│   │   │   └── technology-background-with-a-ai-concept-vector.jpg
+│   │   ├── index.html
+│   │   ├── scripts
+│   │   │   └── script.js
+│   │   └── web.config
+│   ├── functions
+│   │   └── chat
+│   │       ├── AIChatCompletion.cs
+│   │       ├── ChatCompletion.cs
+│   │       ├── ChatCompletion.csproj
+│   │       ├── ChatCompletion.sln
+│   │       ├── ChatContext.cs
+│   │       ├── ChatHistory.cs
+│   │       ├── ChatOrchestrator.cs
+│   │       ├── IChatCompletion.cs
+│   │       ├── Properties
+│   │       │   └── launchSettings.json
+│   │       ├── bin
+│   │       │   └── Debug
+│   │       │       └── net6.0
+│   │       ├── host.json
+│   │       └── obj
+│   │           ├── ChatCompletion.csproj.nuget.dgspec.json
+│   │           ├── ChatCompletion.csproj.nuget.g.props
+│   │           ├── ChatCompletion.csproj.nuget.g.targets
+│   │           ├── Debug
+│   │           │   └── net6.0
+│   │           │       ├── ChatCompletion.AssemblyInfo.cs
+│   │           │       ├── ChatCompletion.AssemblyInfoInputs.cache
+│   │           │       ├── ChatCompletion.GeneratedMSBuildEditorConfig.editorconfig
+│   │           │       ├── ChatCompletion.assets.cache
+│   │           │       ├── ChatCompletion.csproj.AssemblyReference.cache
+│   │           │       ├── ref
+│   │           │       └── refint
+│   │           ├── project.assets.json
+│   │           └── project.nuget.cache
+│   ├── ml.workspace.yaml
+│   ├── package-lock.json
+│   ├── package.json
+│   └── temp
+├── deployment.log
+├── directory_structure.txt
+├── launch.json
+├── parameters backup.json
+├── parameters.json
+├── search-index-schema.json
+├── search-indexer-schema.json
+├── server.js
+└── settings.json
+
+18 directories, 49 files
+```
+
 
 ### Scripts
 
@@ -144,44 +346,6 @@ The index.html file includes the following sections:
 
 - Toolbar: Contains the title and navigation links (Settings, Profile, Help).
 - Content Container: Contains the navigation menu with links to different screens (Home, Documents).
-
-Excerpt from index.html
-
-```
-<body class="flex-container">
-    <div id="toolbar">
-        <div class="title">Chat with Azure Copilot</div>
-        <div class="links">
-            <a href="#settings">Settings</a>
-            <a href="#profile">Profile</a>
-            <a href="#help">Help</a>
-        </div>
-    </div>
-    <div id="content-container">
-        <div id="nav-container">
-            <nav>
-                <ul>
-                    <li>
-                        <a href="?screen=home" class="nav-item">
-                            <svg width="28" height="28" fill="currentColor" class="bi bi-house" focusable="false"
-                                viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
-                            </svg>
-                            Home
-                        </a>
-                    </li>
-                    <li>
-                        <a href="?screen=documents" class="nav-item">
-                            Documents
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</body>
-```
 
 ### Contributing
 
