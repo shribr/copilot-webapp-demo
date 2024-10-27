@@ -120,9 +120,13 @@ This will create a dist directory with the bundled files.
 
 ### Overview
 
-This PowerShell script automates the deployment of various Azure resources for an Azure AI demo. It is divided into several sections, each responsible for different aspects of the deployment process.
+This PowerShell script automates the deployment of various Azure resources for an Azure AI demo. There is a template titled "parameters.json" which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
-### Sections Breakdown
+Once the deployment script completes the deployed Azure resources should look like this:
+
+![Azure-AI-Demo-Azure-Resource-Visualizer](https://github.com/user-attachments/assets/3ef373f7-e394-4040-b805-3e0031818153)
+
+### Deployment Section Breakdown
 
 #### 1. **Initialization and Configuration**
 - **Script Metadata**: Provides metadata about the script, including prerequisites and usage instructions.
@@ -187,7 +191,7 @@ This PowerShell script automates the deployment of various Azure resources for a
 
 ### Summary
 
-This script is a comprehensive tool for deploying a variety of Azure resources required for an Azure AI demo. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
+
 
 ### Project Structure
 
