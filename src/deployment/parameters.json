@@ -148,5 +148,29 @@
       "ResourceGroup": "RG-COPILOT-DEMO-001",
       "Url": "https://func-chat-copilot-demo-001.azurewebsites.net"
     }
-  ]
+  ],
+  "organizationInfo": {
+    "Name": "Contoso",
+    "Description": "Contoso is a software company that specializes in AI and ML solutions.",
+    "Website": "https://www.contoso.com",
+    "Contact": {
+      "Name": "Ami Schreiber",
+      "Email": "",
+      "Phone": ""
+    },
+    "Location": {
+      "Address": "One Microsoft Way",
+      "City": "Redmond",
+      "State": "WA",
+      "Zip": "98052",
+      "Country": "USA"
+    },
+    "Social": {
+      "Twitter": "https://twitter.com/amschrei",
+      "LinkedIn": "https://www.linkedin.com/in/amischreiber/",
+      "GitHub": "",
+      "Facebook": "",
+      "Instagram": ""
+    }
+}
 }
