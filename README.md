@@ -251,15 +251,12 @@ Once the deployment script completes the deployed Azure resources should look li
 │   │   ├── config.blank.json
 │   │   ├── config.json
 │   │   ├── css
-│   │   │   ├── css from chat.md
-│   │   │   ├── css2 from chat.md
 │   │   │   ├── styles.css
-│   │   │   └── styles_alphabetized.css
 │   │   ├── favicon.ico
 │   │   ├── images
-│   │   │   ├── Screenshot 2024-10-09 at 11.41.55 AM.png
+│   │   │   ├── building.png
 │   │   │   ├── favicon.png
-│   │   │   └── technology-background-with-a-ai-concept-vector.jpg
+│   │   │   └── tech_ai_background.jpg
 │   │   ├── index.html
 │   │   ├── scripts
 │   │   │   └── script.js
@@ -274,42 +271,19 @@ Once the deployment script completes the deployed Azure resources should look li
 │   │       ├── ChatHistory.cs
 │   │       ├── ChatOrchestrator.cs
 │   │       ├── IChatCompletion.cs
-│   │       ├── Properties
-│   │       │   └── launchSettings.json
-│   │       ├── bin
-│   │       │   └── Debug
-│   │       │       └── net6.0
 │   │       ├── host.json
-│   │       └── obj
-│   │           ├── ChatCompletion.csproj.nuget.dgspec.json
-│   │           ├── ChatCompletion.csproj.nuget.g.props
-│   │           ├── ChatCompletion.csproj.nuget.g.targets
-│   │           ├── Debug
-│   │           │   └── net6.0
-│   │           │       ├── ChatCompletion.AssemblyInfo.cs
-│   │           │       ├── ChatCompletion.AssemblyInfoInputs.cache
-│   │           │       ├── ChatCompletion.GeneratedMSBuildEditorConfig.editorconfig
-│   │           │       ├── ChatCompletion.assets.cache
-│   │           │       ├── ChatCompletion.csproj.AssemblyReference.cache
-│   │           │       ├── ref
-│   │           │       └── refint
-│   │           ├── project.assets.json
-│   │           └── project.nuget.cache
 │   ├── ml.workspace.yaml
 │   ├── package-lock.json
 │   ├── package.json
 │   └── temp
 ├── deployment.log
-├── directory_structure.txt
 ├── launch.json
-├── parameters backup.json
 ├── parameters.json
 ├── search-index-schema.json
 ├── search-indexer-schema.json
 ├── server.js
 └── settings.json
 
-18 directories, 49 files
 ```
 
 
