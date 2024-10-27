@@ -204,10 +204,7 @@ Once the deployment script completes the deployed Azure resources should look li
     - **config.blank.json**: Blank configuration file for the frontend.
     - **config.json**: Configuration file for the frontend.
     - **css/**: Directory for CSS files.
-      - **css from chat.md**: CSS file from chat.
-      - **css2 from chat.md**: Another CSS file from chat.
       - **styles.css**: Main stylesheet.
-      - **styles_alphabetized.css**: Alphabetized stylesheet.
     - **favicon.ico**: Favicon for the frontend.
     - **images/**: Directory for image files.
       - **Screenshot 2024-10-09 at 11.41.55 AM.png**: Screenshot image.
@@ -229,25 +226,6 @@ Once the deployment script completes the deployed Azure resources should look li
       - **IChatCompletion.cs**: Interface for chat completion.
       - **Properties/**: Directory for project properties.
         - **launchSettings.json**: Launch settings for the project.
-      - **bin/**: Directory for compiled binaries.
-        - **Debug/**: Debug build directory.
-          - **net6.0/**: .NET 6.0 build directory.
-      - **host.json**: Host configuration file for Azure Functions.
-      - **obj/**: Directory for build artifacts.
-        - **ChatCompletion.csproj.nuget.dgspec.json**: NuGet specification file.
-        - **ChatCompletion.csproj.nuget.g.props**: NuGet properties file.
-        - **ChatCompletion.csproj.nuget.g.targets**: NuGet targets file.
-        - **Debug/**: Debug build directory.
-          - **net6.0/**: .NET 6.0 build directory.
-            - **ChatCompletion.AssemblyInfo.cs**: Assembly info file.
-            - **ChatCompletion.AssemblyInfoInputs.cache**: Assembly info inputs cache.
-            - **ChatCompletion.GeneratedMSBuildEditorConfig.editorconfig**: MSBuild editor config.
-            - **ChatCompletion.assets.cache**: Assets cache.
-            - **ChatCompletion.csproj.AssemblyReference.cache**: Assembly reference cache.
-            - **ref/**: Reference directory.
-            - **refint/**: Reference intermediate directory.
-        - **project.assets.json**: Project assets file.
-        - **project.nuget.cache**: NuGet cache file.
   - **ml.workspace.yaml**: Machine learning workspace configuration file.
   - **package-lock.json**: NPM package lock file.
   - **package.json**: NPM package file.
@@ -259,7 +237,7 @@ Once the deployment script completes the deployed Azure resources should look li
 - **parameters.json**: Parameters file for the deployment.
 - **search-index-schema.json**: Search index schema file.
 - **search-indexer-schema.json**: Search indexer schema file.
-- **server.js**: Server-side JavaScript file.
+- **server.js**: Server-side JavaScript file for local http server.
 - **settings.json**: Settings file.
 .
 ### Directory Structure
