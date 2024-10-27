@@ -261,7 +261,7 @@ This script is a comprehensive tool for deploying a variety of Azure resources r
 ### Directory Structure
 
 ```plaintext
-.
+
 ├── Azure AI Demo Deployment.ps1
 ├── CognitiveServices.json
 ├── app
