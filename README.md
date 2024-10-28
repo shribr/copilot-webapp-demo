@@ -304,10 +304,18 @@ npm run build / yarn build - Build the project for production
 
 The index.html file includes the following screens:
 
-<img width="1423" alt="azure-ai-demo-chat" src="https://github.com/user-attachments/assets/ac13468a-43dd-4a4f-aaff-7b4b1611fe60">
+<img width="1423" alt="azure-ai-demo-home" src="https://github.com/user-attachments/assets/c7ccef22-db76-4307-8728-160ba7a9a1b1">
+
 <img width="1423" alt="azure-ai-demo-upload-docs" src="https://github.com/user-attachments/assets/fdb09be6-1a4c-4e22-a0c8-c8ebd9927a35">
+
 <img width="1153" alt="azure-ai-demo-selected-docs" src="https://github.com/user-attachments/assets/e4fc88ab-ed5e-48a4-80c2-62e21db868e0">
+
 <img width="1164" alt="azure-ai-demo-existing-docs" src="https://github.com/user-attachments/assets/cfdcf09f-e508-49c1-8f8a-c698ac54feae">
+
+<img width="1410" alt="azure-ai-demo-chat" src="https://github.com/user-attachments/assets/63398052-61e4-42e7-a2eb-c7bbbfb23952">
+
+<img width="1409" alt="azure-ai-demo-response" src="https://github.com/user-attachments/assets/c85dfacd-76e4-45c7-827d-4cceaf808a9b">
+
 
 ### Chat Workflow
 
