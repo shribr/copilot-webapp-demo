@@ -294,7 +294,7 @@ npm start / yarn start - Start the development server
 npm run build / yarn build - Build the project for production
 ```
 
-### HTML Structure
+### Web Application Screens
 
 The index.html file includes the following screens:
 
