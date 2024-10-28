@@ -4,6 +4,8 @@
 
 This project is a web application that allows users to chat with Azure Copilot. It includes a simple HTML interface and a PowerShell script for deployment.
 
+<img width="1423" alt="azure-ai-demo-home" src="https://github.com/user-attachments/assets/c7ccef22-db76-4307-8728-160ba7a9a1b1">
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (version 14 or higher recommended)
@@ -208,12 +210,12 @@ Once the deployment script completes the deployed Azure resources should look li
       - **Azure-AI-Demo-Azure-Resource-Visualizer.png**: Screenshot image.
       - **favicon.png**: Favicon image.
       - **azure-ai-demo-chat.png**: Chat screenshot.
-      - **azure-ai-demo-existing-docs**: Existing documents screenshot.
+      - **azure-ai-demo-existing-docs.png**: Existing documents screenshot.
       - **azure-ai-demo-selected-docs.png**: Documents selected for upload.
-      - **azure-ai-demo-upload-docs**: Upload documents interface. 
+      - **azure-ai-demo-upload-docs.png**: Upload documents interface. 
       - **tech_ai_background.jpg**: Background image.
       - **site-logo-custom.png**: Custom site logo used for branding.
-      - **site-logo-default**: Default site logo (generic office building).
+      - **site-logo-default.png**: Default site logo (generic office building).
     - **index.html**: Main HTML file for the frontend.
     - **scripts/**: Directory for JavaScript files.
       - **script.js**: Main JavaScript file.
@@ -260,8 +262,14 @@ Once the deployment script completes the deployed Azure resources should look li
 │   │   │   ├── styles.css
 │   │   ├── favicon.ico
 │   │   ├── images
+│   │   │   ├── azure-ai-demo-chat.png
+│   │   │   ├── azure-ai-demo-existing-docs.png
+│   │   │   ├── azure-ai-demo-selected-docs.png
+│   │   │   ├── azure-ai-demo-upload-docs.png
 │   │   │   ├── building.png
 │   │   │   ├── favicon.png
+│   │   │   ├── site-logo-custom.png
+│   │   │   ├── site-logo-default.png
 │   │   │   └── tech_ai_background.jpg
 │   │   ├── index.html
 │   │   ├── scripts
