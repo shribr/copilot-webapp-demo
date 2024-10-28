@@ -4,6 +4,8 @@
 
 This project is a web application that allows users to chat with Azure Copilot. It includes a simple HTML interface and a PowerShell script for deployment.
 
+<img width="1423" alt="azure-ai-demo-home" src="https://github.com/user-attachments/assets/c7ccef22-db76-4307-8728-160ba7a9a1b1">
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (version 14 or higher recommended)
