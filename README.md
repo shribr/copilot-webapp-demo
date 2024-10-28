@@ -205,9 +205,15 @@ Once the deployment script completes the deployed Azure resources should look li
       - **styles.css**: Main stylesheet.
     - **favicon.ico**: Favicon for the frontend.
     - **images/**: Directory for image files.
-      - **Screenshot 2024-10-09 at 11.41.55 AM.png**: Screenshot image.
+      - **Azure-AI-Demo-Azure-Resource-Visualizer.png**: Screenshot image.
       - **favicon.png**: Favicon image.
-      - **technology-background-with-a-ai-concept-vector.jpg**: Background image.
+      - **azure-ai-demo-chat.png**: Chat screenshot.
+      - **azure-ai-demo-existing-docs**: Existing documents screenshot.
+      - **azure-ai-demo-selected-docs.png**: Documents selected for upload.
+      - **azure-ai-demo-upload-docs**: Upload documents interface. 
+      - **tech_ai_background.jpg**: Background image.
+      - **site-logo-custom.png**: Custom site logo used for branding.
+      - **site-logo-default**: Default site logo (generic office building).
     - **index.html**: Main HTML file for the frontend.
     - **scripts/**: Directory for JavaScript files.
       - **script.js**: Main JavaScript file.
