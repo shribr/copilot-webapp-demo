@@ -298,13 +298,10 @@ npm run build / yarn build - Build the project for production
 
 The index.html file includes the following screens:
 
-
-<img width="1894" alt="Screenshot 2024-10-27 at 2 33 57 PM" src="https://github.com/user-attachments/assets/5df4d85e-6408-414d-9ab8-2dfbac96a9bd">
-
-<img width="1892" alt="Screenshot 2024-10-27 at 2 36 14 PM" src="https://github.com/user-attachments/assets/106b3cc5-8a20-44a1-9ea3-264390a55739">
-<img width="1620" alt="Screenshot 2024-10-27 at 2 37 05 PM" src="https://github.com/user-attachments/assets/63a8f5df-79f0-4f0f-8dd6-695872394000">
-
-<img width="1889" alt="Screenshot 2024-10-27 at 2 35 21 PM" src="https://github.com/user-attachments/assets/ea438baf-13d8-4807-8024-3662dea4080c">
+<img width="1423" alt="azure-ai-demo-chat" src="https://github.com/user-attachments/assets/ac13468a-43dd-4a4f-aaff-7b4b1611fe60">
+<img width="1423" alt="azure-ai-demo-upload-docs" src="https://github.com/user-attachments/assets/fdb09be6-1a4c-4e22-a0c8-c8ebd9927a35">
+<img width="1153" alt="azure-ai-demo-selected-docs" src="https://github.com/user-attachments/assets/e4fc88ab-ed5e-48a4-80c2-62e21db868e0">
+<img width="1164" alt="azure-ai-demo-existing-docs" src="https://github.com/user-attachments/assets/cfdcf09f-e508-49c1-8f8a-c698ac54feae">
 
 
 ### Contributing
