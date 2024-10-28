@@ -503,6 +503,20 @@ function Get-ValidServiceName {
     return $serviceName
 }
 
+# Function to install Visual Studio Code extensions
+function Install-extensions {
+    # Define the path to the text file
+    $filePath = "extensions.txt"
+
+    # Read all lines from the file
+    $extensions = Get-Content -Path $filePath
+
+    # Loop through each extension and install it using the `code` command
+    foreach ($extension in $extensions) {
+        code --install-extension $extension
+    }
+}
+
 # Function to invoke an Azure REST API method
 function Invoke-AzureRestMethod {
     param (
