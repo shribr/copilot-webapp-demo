@@ -587,6 +587,7 @@ function Initialize-Parameters {
     $global:searchIndexerName = $parametersObject.searchIndexerName
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
     $global:sharedDashboardName = $parametersObject.sharedDashboardName
+    $global:siteLogo = $parametersObject.siteLogo
     $global:sqlServerName = $parametersObject.sqlServerName
     $global:storageAccountName = $parametersObject.storageAccountName
     $global:subNetName = $parametersObject.subNetName
@@ -676,6 +677,7 @@ function Initialize-Parameters {
         serviceBusNamespaceName      = $serviceBusNamespaceName
         searchDataSourceName         = $searchDataSourceName
         sharedDashboardName          = $sharedDashboardName
+        siteLogo                     = $siteLogo
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
         subNetName                   = $subNetName
@@ -1086,7 +1088,7 @@ function New-KeyVault {
         catch {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
-                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType $resourceType $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
+                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "KeyVault" -resourceGroupName $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
             }
             else {
                 Write-Error "Failed to restore soft-deleted Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1380,7 +1382,9 @@ function New-Resources {
             if ($searchIndexExists -eq $false) {
                 $searchIndexCreated = New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
             }
-                
+            
+            Start-Sleep -Seconds 15
+
             if ($searchDatasourceCreated -eq "true" || $searchIndexExists -eq $false) {
                 if ($searchIndexCreated -eq "true" || $searchIndexExists -eq $false) {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
@@ -1584,7 +1588,7 @@ function New-Resources {
             try {
                 $ErrorActionPreference = 'Stop'
                                
-                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --restore $true --kind FormRecognizer --sku S0 --output none
+                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --sku S0 --output none
                 # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
     
                 if ($jsonOutput -match "error") {
@@ -1940,7 +1944,7 @@ function Restore-SoftDeletedResource {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Key Vault
-                    az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $true --output none
+                    az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --output none
                     Write-Host "Key Vault: '$resourceName' created with Vault Access Policies."
                     Write-Log -message "Key Vault: '$resourceName' created with Vault Access Policies."
 
@@ -1956,7 +1960,7 @@ function Restore-SoftDeletedResource {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Key Vault
-                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $false --output none
+                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --output none
                     Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
                     Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
 
@@ -2120,17 +2124,20 @@ function Set-KeyVaultSecrets {
 
 # Function to assign RBAC roles to a managed identity
 function Set-RBACRoles {
-    params(
+    param (
         [string]$userAssignedIdentityName
     )
     try {
         $ErrorActionPreference = 'Stop'
         $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
-                
-        az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityName --scope $scope
-        az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityName --scope $scope
-        az role assignment create --role "Key Vault Certificates User" --assignee $userAssignedIdentityName --scope $scope
-        az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityName --scope $scope
+        
+        # Retrieve the Object ID of the user-assigned managed identity
+        $userAssignedIdentityObjectId = az identity show --name $userAssignedIdentityName --resource-group $resourceGroupName --query 'principalId' --output tsv
+
+        az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityObjectId --scope $scope
+        az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityObjectId --scope $scope
+        az role assignment create --role "Key Vault Certificate User" --assignee $userAssignedIdentityObjectId --scope $scope
+        az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityObjectId --scope $scope
 
         Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
         Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
@@ -2309,6 +2316,8 @@ function Start-Deployment {
         Write-Log -message "Key Vault '$keyVaultName' already exists."
     }
 
+    #Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+
     # Filter appService nodes with type equal to 'function'
     $functionAppServices = $appServices | Where-Object { $_.type -eq 'Function' }
 
@@ -2321,7 +2330,7 @@ function Start-Deployment {
     New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
     
     # Update configuration file for web frontend
-    Update-ConfigFile - configFilePath "app/frontend/config.json" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppServiceName -searchIndexerName $searchIndexerName -searchIndexName $searchIndexName
+    Update-ConfigFile - configFilePath "app/frontend/config.json" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppServiceName -searchIndexerName $searchIndexerName -searchIndexName $searchIndexName -siteLogo $global:siteLogo
     
     # Deploy web app and function app services
     foreach ($appService in $appServices) {
@@ -2584,7 +2593,8 @@ function Update-ConfigFile {
         [string]$searchIndexName,
         [string]$searchIndexerName,
         [string]$openAIName,
-        [string]$functionAppName
+        [string]$functionAppName,
+        [string]$siteLogo
     )
 
     try {
@@ -2675,7 +2685,8 @@ function Update-ConfigFile {
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
-    
+        $config.SITE_LOGO = $global:siteLogo
+
         $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
     
         # Convert the updated object back to JSON format

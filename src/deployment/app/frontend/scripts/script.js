@@ -16,6 +16,8 @@ $(document).ready(function () {
 
     setChatDisplayHeight();
 
+    setSiteLogo();
+
     // Add an event listener to adjust the height on window resize
     window.addEventListener('resize', setChatDisplayHeight);
 
@@ -217,6 +219,25 @@ $(document).ready(function () {
         }
     });
 });
+
+async function setSiteLogo() {
+    const siteLogo = document.getElementById('site-logo');
+    const siteLogoText = document.getElementById('site-logo-text');
+    const siteLogoTextCopy = document.getElementById('site-logo-text-copy');
+
+    const config = await fetchConfig();
+
+    if (config.SITE_LOGO == "default" || getQueryParam('siteLogo') == "default") {
+        siteLogo.src = "images/site-logo-default.png";
+        siteLogo.classList.remove('site-logo-custom');
+        siteLogo.classList.add('site-logo-default');
+    }
+    else {
+        siteLogo.src = "images/site-logo-custom.png";
+        siteLogo.classList.remove('site-logo-default');
+        siteLogo.classList.add('site-logo-custom');
+    }
+}
 
 function toggleAllCheckboxes() {
 
@@ -682,6 +703,8 @@ function sortDocuments(criteria) {
     const sortDirection = currentSortColumn === criteria && currentSortDirection === 'asc' ? 'desc' : 'asc';
     currentSortColumn = criteria;
     currentSortDirection = sortDirection;
+
+    criteria = criteria.toLowerCase();
 
     const sortedBlobs = Array.from(blobs).sort((a, b) => {
         const aValue = a.getElementsByTagName(criteria)[0].textContent.toLowerCase();

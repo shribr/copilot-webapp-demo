@@ -100,6 +100,19 @@ a {
   /* Take remaining space */
 }
 
+.site-logo-custom {
+  width: 200px;
+  margin-left: -25px;
+  padding-right: 20px;
+}
+
+.site-logo-default {
+  width: 80px;
+  margin-left: -5px;
+  margin-right: 100px;
+  padding-right: 20px;
+}
+
 #main-content {
   display: flex;
   flex-direction: column;
@@ -484,6 +497,7 @@ label[for="chat-input"] {
   display: table;
   border-collapse: collapse;
   margin-bottom: 20px;
+  font-size: 14px;
 }
 
 .document-row {
@@ -983,7 +997,6 @@ label[for="chat-input"] {
   margin-left: 5px;
   font-size: 12px;
   cursor: pointer;
-  visibility: hidden; /* Hide by default */
 }
 
 .sort-arrow.active {
