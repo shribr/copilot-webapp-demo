@@ -309,6 +309,9 @@ The index.html file includes the following screens:
 <img width="1153" alt="azure-ai-demo-selected-docs" src="https://github.com/user-attachments/assets/e4fc88ab-ed5e-48a4-80c2-62e21db868e0">
 <img width="1164" alt="azure-ai-demo-existing-docs" src="https://github.com/user-attachments/assets/cfdcf09f-e508-49c1-8f8a-c698ac54feae">
 
+### Chat Workflow
+
+For a more in-depth understanding of the chat workflow click [here](./README_CHATWORKFLOW.md)
 
 ### Contributing
 
