@@ -205,9 +205,15 @@ Once the deployment script completes the deployed Azure resources should look li
       - **styles.css**: Main stylesheet.
     - **favicon.ico**: Favicon for the frontend.
     - **images/**: Directory for image files.
-      - **Screenshot 2024-10-09 at 11.41.55 AM.png**: Screenshot image.
+      - **Azure-AI-Demo-Azure-Resource-Visualizer.png**: Screenshot image.
       - **favicon.png**: Favicon image.
-      - **technology-background-with-a-ai-concept-vector.jpg**: Background image.
+      - **azure-ai-demo-chat.png**: Chat screenshot.
+      - **azure-ai-demo-existing-docs**: Existing documents screenshot.
+      - **azure-ai-demo-selected-docs.png**: Documents selected for upload.
+      - **azure-ai-demo-upload-docs**: Upload documents interface. 
+      - **tech_ai_background.jpg**: Background image.
+      - **site-logo-custom.png**: Custom site logo used for branding.
+      - **site-logo-default**: Default site logo (generic office building).
     - **index.html**: Main HTML file for the frontend.
     - **scripts/**: Directory for JavaScript files.
       - **script.js**: Main JavaScript file.
@@ -303,6 +309,9 @@ The index.html file includes the following screens:
 <img width="1153" alt="azure-ai-demo-selected-docs" src="https://github.com/user-attachments/assets/e4fc88ab-ed5e-48a4-80c2-62e21db868e0">
 <img width="1164" alt="azure-ai-demo-existing-docs" src="https://github.com/user-attachments/assets/cfdcf09f-e508-49c1-8f8a-c698ac54feae">
 
+### Chat Workflow
+
+For a more in-depth understanding of the chat workflow click [here](./README_CHATWORKFLOW.md)
 
 ### Contributing
 
