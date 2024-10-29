@@ -80,7 +80,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
    ```
 
-2. Install [Node](https://nodejs.org/) and then install the required VS Code extensions (full list is in the [extensions.txt](./src/deployment/extensions.txt) file) using the following script (make sure you are in the `src/deployment directory`):
+2. Install [Node](https://nodejs.org/) and then install the required VS Code extensions ([extensions.txt](./src/deployment/extensions.txt)) using the following script (make sure you are in the `src/deployment directory`):
 
    ```
    function Install-Extensions {
@@ -97,16 +97,6 @@ This project is a web application that allows users to chat with Azure Copilot. 
    }
 
    ```
-
-### Development Server
-
-To start the development server, navigate to the `src/deployment` directory and run the following command:
-
-```
-
-node server.js
-
-```
 
 ### Deployment
 
@@ -235,7 +225,7 @@ Once the deployment script completes the deployed Azure resources should look li
 - **search-indexer-schema.json**: Search indexer schema file.
 - **server.js**: Local http server JavaScript file.
 - **settings.json**: Settings file.
-.
+
 ### Directory Structure
 
 ```plaintext
@@ -290,13 +280,17 @@ Once the deployment script completes the deployed Azure resources should look li
 
 ```
 
+### Development Server
 
-### Scripts
+To start the development server, navigate to the `src/deployment` directory and run the following command:
 
 ```
-npm start / yarn start - Start the development server
-npm run build / yarn build - Build the project for production
+
+node server.js
+
 ```
+
+This should initialize a local http instance of the solution on port 3000.
 
 ### Web Application Screens
 
