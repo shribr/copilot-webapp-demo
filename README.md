@@ -100,7 +100,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
 ### Deployment
 
-This PowerShell script automates the deployment of various Azure resources for an Azure AI demo. There is a template titled ` parameters.json ` which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
+This PowerShell script automates the deployment of various Azure resources for an Azure AI demo. There is a template titled [parameters.json](./src/deployment/parameters.json) which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
 Once the deployment script completes the deployed Azure resources should look like this:
 
