@@ -113,7 +113,27 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
 The main PowerShell script [Azure AI Demo Deployment.ps1](./src/deployment/Azure%20AI%20Demo%20Deployment.ps1) automates the deployment of various Azure resources for an Azure AI demo. There is a template titled [parameters.json](./src/deployment/parameters.json) which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
-Once the deployment script completes the deployed Azure resources should look like this:
+Once the deployment script completes the following resources should have been created in the resource group:
+
+- App Service
+- App Service Plan
+- Application Insights
+- Azure AI Hub
+- Azure AI Services
+- Azure AI Services Multi-Service Account
+- Azure Machine Learning Registry
+- Azure Machine Learning Workspace
+- Azure OpenAI
+- Document Intelligence
+- Function App
+- Key Vault
+- Log Analytics Workspace
+- Managed Identity
+- Search Service
+- Smart Detector Alert Rule
+- Storage Account
+
+The image below shows a diagram of the deployed resources:
 
 ![Azure-AI-Demo-Azure-Resource-Visualizer](https://github.com/user-attachments/assets/3ef373f7-e394-4040-b805-3e0031818153)
 
