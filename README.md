@@ -9,6 +9,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 ## Prerequisites
 
 ### Core Tools (Required)
+
 - [Node.js](https://nodejs.org/) (version 20 or higher recommended)
 - [npm](https://www.npmjs.com/) (package management)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for deploying to Azure)
@@ -17,6 +18,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 - [PowerShell Core](https://github.com/PowerShell/PowerShell) (for running the deployment script)
 
 ### .NET Development (Required)
+
 - [ms-dotnettools.csharp](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) - C# language support
 - [ms-dotnettools.dotnet-interactive-vscode](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode) - .NET Interactive Notebooks
 - [ms-dotnettools.vscode-dotnet-pack](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscode-dotnet-pack) - .NET Pack support
@@ -24,9 +26,11 @@ This project is a web application that allows users to chat with Azure Copilot. 
 - [ms-dotnettools.vscode-dotnet-sdk](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscode-dotnet-sdk) - .NET SDK support
 
 ### GitHub Integration (Required)
+
 - [github.vscode-github-actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions) - GitHub Actions support
 
 ### Azure Development Tools (Optional)
+
 - [azps-tools.azps-tools](https://marketplace.visualstudio.com/items?itemName=azps-tools.azps-tools) - Azure PowerShell tools
 - [azurite.azurite](https://marketplace.visualstudio.com/items?itemName=Azurite.azurite) - Azure Storage emulator
 - [ms-azure-devops.azure-pipelines](https://marketplace.visualstudio.com/items?itemName=ms-azure-devops.azure-pipelines) - Azure Pipelines support
@@ -42,18 +46,21 @@ This project is a web application that allows users to chat with Azure Copilot. 
 - [ms-azuretools.vscode-bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) - Bicep language support
 
 ### GitHub Integration (Optional)
+
 - [github.codespaces](https://marketplace.visualstudio.com/items?itemName=GitHub.codespaces) - GitHub Codespaces support
 - [github.github-vscode-theme](https://marketplace.visualstudio.com/items?itemName=GitHub.github-vscode-theme) - GitHub theme for VS Code
 - [github.remotehub](https://marketplace.visualstudio.com/items?itemName=GitHub.remotehub) - GitHub integration for remote repositories
 - [github.vscode-pull-request-github](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) - GitHub Pull Requests and Issues
 
 ### AI Tools (Optional)
+
 - [ms-toolsai.vscode-ai](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.vscode-ai) - AI tools for VS Code
 - [ms-toolsai.vscode-ai-inference](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.vscode-ai-inference) - AI Inference tools
 - [ms-toolsai.vscode-ai-remote](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.vscode-ai-remote) - AI Remote tools
 - [ms-toolsai.vscode-ai-remote-web](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.vscode-ai-remote-web) - AI Remote Web tools
 
 ### Remote Development (Optional)
+
 - [ms-vscode-remote.remote-containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) - Remote Containers support
 - [ms-vscode-remote.remote-wsl](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) - Remote WSL support
 - [ms-vscode.remote-explorer](https://marketplace.visualstudio.com/items?itemName=ms-vscode.remote-explorer) - Remote Explorer
@@ -61,6 +68,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 - [ms-vscode.remote-server](https://marketplace.visualstudio.com/items?itemName=ms-vscode.remote-server) - Remote Server
 
 ### Miscellaneous Tools (Optional)
+
 - [esbenp.prettier-vscode](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatter
 - [ms-vscode.azure-account](https://marketplace.visualstudio.com/items?itemName=ms-vscode.azure-account) - Azure Account management
 - [ms-vscode.azure-repos](https://marketplace.visualstudio.com/items?itemName=ms-vscode.azure-repos) - Azure Repos support
@@ -112,19 +120,22 @@ Once the deployment script completes the deployed Azure resources should look li
 ### Workflow of the Script
 
 1. **Initialization and Setup:**
+
    - The script begins by setting the default parameters file (`parameters.json`).
    - It defines global variables for resource types and KeyVault secrets.
    - It sets the deployment path based on the current location.
 
 2. **Parameter Initialization:**
-   - The [`Initialize-Parameters`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A535%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition") function reads parameters from the specified JSON file.
+
+   - The [`Initialize-Parameters`] function reads parameters from the specified JSON file.
    - It sets global variables for various Azure resources and configurations.
    - It retrieves the subscription ID, tenant ID, object ID, and user principal name using Azure CLI commands.
 
 3. **Resource Creation Functions:**
+
    - The script defines multiple functions to create various Azure resources, such as:
-     - [`New-ResourceGroup`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A1231%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Creates a new resource group.
-     - [`New-Resources`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A461%2C%22character%22%3A8%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Creates multiple Azure resources like storage accounts, app service plans, search services, etc.
+     - [`New-ResourceGroup`]: Creates a new resource group.
+     - [`New-Resources`]: Creates multiple Azure resources like storage accounts, app service plans, search services, etc.
      - [`New-AppService`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A476%2C%22character%22%3A12%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Creates and deploys app services (web apps or function apps).
      - [`New-KeyVault`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A1053%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Creates a Key Vault and sets access policies.
      - [`New-ManagedIdentity`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A1112%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Creates a new managed identity.
@@ -135,6 +146,7 @@ Once the deployment script completes the deployed Azure resources should look li
      - [`New-ApiManagementService`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A901%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Creates and deploys API Management service.
 
 4. **Helper Functions:**
+
    - The script includes several helper functions for various tasks, such as:
      - [`ConvertTo-ProperCase`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A147%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Converts a string to proper case.
      - [`Find-AppRoot`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A168%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Finds the app root directory.
@@ -160,6 +172,7 @@ Once the deployment script completes the deployed Azure resources should look li
      - [`Write-Log`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A716%2C%22character%22%3A12%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition"): Writes messages to a log file.
 
 5. **Deployment Process:**
+
    - The [`Start-Deployment`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A2155%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition") function orchestrates the deployment process:
      - It initializes the sequence number and checks if the log file exists.
      - It logs the start time and sequence number.
@@ -168,7 +181,7 @@ Once the deployment script completes the deployed Azure resources should look li
      - It logs the total execution time and writes it to the log file.
 
 6. **Main Script Execution:**
-   - It initializes parameters by calling [`Initialize-Parameters`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A535%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition").
+   - It initializes parameters by calling [`Initialize-Parameters`].
    - It sets the user-assigned identity name.
    - It sets the directory path to the deployment path.
    - It starts the deployment by calling [`Start-Deployment`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A2155%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition").
@@ -192,7 +205,7 @@ Once the deployment script completes the deployed Azure resources should look li
       - **azure-ai-demo-chat.png**: Chat screenshot.
       - **azure-ai-demo-existing-docs.png**: Existing documents screenshot.
       - **azure-ai-demo-selected-docs.png**: Documents selected for upload.
-      - **azure-ai-demo-upload-docs.png**: Upload documents interface. 
+      - **azure-ai-demo-upload-docs.png**: Upload documents interface.
       - **tech_ai_background.jpg**: Background image.
       - **site-logo-custom.png**: Custom site logo used for branding.
       - **site-logo-default.png**: Default site logo (generic office building).
@@ -307,7 +320,6 @@ The index.html file includes the following screens:
 <img width="1410" alt="azure-ai-demo-chat" src="https://github.com/user-attachments/assets/63398052-61e4-42e7-a2eb-c7bbbfb23952">
 
 <img width="1409" alt="azure-ai-demo-response" src="https://github.com/user-attachments/assets/c85dfacd-76e4-45c7-827d-4cceaf808a9b">
-
 
 ### Chat Workflow
 
