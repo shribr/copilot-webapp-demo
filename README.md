@@ -127,7 +127,7 @@ Once the deployment script completes the deployed Azure resources should look li
 
 2. **Parameter Initialization:**
 
-   - The [`Initialize-Parameters`] function reads parameters from the specified JSON file.
+   - The `Initialize-Parameters` function reads parameters from the specified JSON file.
    - It sets global variables for various Azure resources and configurations.
    - It retrieves the subscription ID, tenant ID, object ID, and user principal name using Azure CLI commands.
 
