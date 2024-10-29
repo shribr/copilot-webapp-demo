@@ -184,7 +184,7 @@ Once the deployment script completes the deployed Azure resources should look li
    - It initializes parameters by calling [`Initialize-Parameters`].
    - It sets the user-assigned identity name.
    - It sets the directory path to the deployment path.
-   - It starts the deployment by calling [`Start-Deployment`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Famischreiber%2Fsource%2Frepos%2Fazure-ai-demo%2Fsrc%2Fdeployment%2FAzure%20AI%20Demo%20Deployment.ps1%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A2155%2C%22character%22%3A9%7D%7D%5D%2C%22842234b1-bc4e-4ae5-b33b-53fd77feca09%22%5D "Go to definition").
+   - It starts the deployment by calling `Start-Deployment`.
 
 ### Project Structure
 
