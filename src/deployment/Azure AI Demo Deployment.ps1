@@ -2698,8 +2698,8 @@ function Update-ConfigFile {
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
+        $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
         $config.SITE_LOGO = $global:siteLogo
-        $config.KEY_VAULT_NAME = $global:keyVaultName
 
         $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
     

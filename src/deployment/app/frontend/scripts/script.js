@@ -5,8 +5,8 @@ let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
 
-const { DefaultAzureCredential } = require('@azure/identity');
-const { SecretClient } = require('@azure/keyvault-secrets');
+//const { DefaultAzureCredential } = require('@azure/identity');
+//const { SecretClient } = require('@azure/keyvault-secrets');
 
 // Function to fetch the configuration
 async function fetchConfig() {
@@ -28,7 +28,7 @@ $(document).ready(function () {
 
     createSidenavLinks();
 
-    getSasToken();
+    //getSasToken();
 
     $('#send-button').on('click', postQuestion);
     $('#clear-button').on('click', clearChatDisplay);
