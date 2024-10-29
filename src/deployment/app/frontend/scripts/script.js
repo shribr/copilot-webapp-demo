@@ -232,7 +232,7 @@ async function setSiteLogo() {
 
     const config = await fetchConfig();
 
-    if (config.SITE_LOGO == "default" || getQueryParam('siteLogo') == "default") {
+    if (config.SITE_LOGO == "default" || getQueryParam('sitelogo') == "default") {
         siteLogo.src = "images/site-logo-default.png";
         siteLogo.classList.remove('site-logo-custom');
         siteLogo.classList.add('site-logo-default');
