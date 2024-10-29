@@ -2038,7 +2038,6 @@ function Restore-SoftDeletedResource {
 }
 
 # Function to set the directory location
-
 function Set-DirectoryPath {
     param (
         [string]$targetDirectory

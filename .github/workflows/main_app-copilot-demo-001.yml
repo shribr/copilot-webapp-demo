@@ -78,3 +78,6 @@ jobs:
             src/deployment/app/functions
             package.json
             package-lock.json
+
+      - name: Verify Deployment
+        run: curl -I ${{ steps.deploy-to-webapp.outputs.webapp-url }}
