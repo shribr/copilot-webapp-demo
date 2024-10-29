@@ -181,7 +181,7 @@ Once the deployment script completes the deployed Azure resources should look li
      - It logs the total execution time and writes it to the log file.
 
 6. **Main Script Execution:**
-   - It initializes parameters by calling [`Initialize-Parameters`].
+   - It initializes parameters by calling `Initialize-Parameters`.
    - It sets the user-assigned identity name.
    - It sets the directory path to the deployment path.
    - It starts the deployment by calling `Start-Deployment`.
