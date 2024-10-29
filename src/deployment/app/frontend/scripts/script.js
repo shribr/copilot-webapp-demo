@@ -5,6 +5,9 @@ let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
 
+const { DefaultAzureCredential } = require('@azure/identity');
+const { SecretClient } = require('@azure/keyvault-secrets');
+
 // Function to fetch the configuration
 async function fetchConfig() {
     const response = await fetch('../config.json');
@@ -24,6 +27,8 @@ $(document).ready(function () {
     getDocuments();
 
     createSidenavLinks();
+
+    getSasToken();
 
     $('#send-button').on('click', postQuestion);
     $('#clear-button').on('click', clearChatDisplay);
@@ -851,7 +856,10 @@ function clearFileInput() {
 }
 
 //code to upload files to Azure Storage using Azure Storage JavaScript library
-async function getSasToken() {
+async function getSasTokenOld() {
+
+    const config = await fetchConfig();
+
     const sasFunctionAppUrl = config.AZURE_FUNCTION_APP_URL;
     const response = await fetch(`${sasFunctionAppUrl}`); // Assuming the Azure Function App endpoint is /api/getSasToken
     if (!response.ok) {
@@ -859,6 +867,27 @@ async function getSasToken() {
     }
     const data = await response.json();
     return data.sasToken;
+}
+
+
+async function getSasToken() {
+
+    const config = await fetchConfig();
+
+    const credential = new DefaultAzureCredential();
+    const vaultName = config.KEY_VAULT_NAME;
+    const url = `https://${vaultName}.vault.azure.net`;
+    const client = new SecretClient(url, credential);
+
+    const sasTokenConfig = {};
+    const secretNames = ['SV', 'INCLUDE', 'SS', 'SRT', 'SP', 'SE', 'SPR', 'SIG'];
+
+    for (const name of secretNames) {
+        const secret = await client.getSecret(`AZURE_STORAGE_SAS_TOKEN_${name}`);
+        sasTokenConfig[name] = secret.value;
+    }
+
+    return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 }
 
 // Function to show a toast notification

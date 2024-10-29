@@ -504,7 +504,7 @@ function Get-ValidServiceName {
 }
 
 # Function to install Visual Studio Code extensions
-function Install-extensions {
+function Install-Extensions {
     # Define the path to the text file
     $filePath = "extensions.txt"
 
@@ -2699,6 +2699,7 @@ function Update-ConfigFile {
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.SITE_LOGO = $global:siteLogo
+        $config.KEY_VAULT_NAME = $global:keyVaultName
 
         $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
     
