@@ -75,52 +75,42 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
    ```
    git clone https://github.com/your-username/azure-ai-demo.git
+
    cd azure-ai-demo
 
    ```
 
-2. Install the dependencies:
+2. Install [Node](https://nodejs.org/) and then install the required VS Code extensions using the following script (make sure you are in the `src/deployment directory`):
 
    ```
-   npm install
+   function Install-Extensions {
+    # Define the path to the text file
+    $filePath = "extensions.txt"
 
-   or
+    # Read all lines from the file
+    $extensions = Get-Content -Path $filePath
 
-   yarn install
+    # Loop through each extension and install it using the `code` command
+    foreach ($extension in $extensions) {
+        code --install-extension $extension
+    }
+   }
 
    ```
 
-### Development
+### Development Server
 
-To start the development server, run:
-
-```
-npm start
-
-or
-
-yarn start
+To start the development server, navigate to the `src/deployment` directory and run the following command:
 
 ```
 
-### Building for Production
-
-To build the project for production, run:
+node server.js
 
 ```
-npm run build
-
-or
-
-yarn build
-
-```
-
-This will create a dist directory with the bundled files.
 
 ### Deployment
 
-This PowerShell script automates the deployment of various Azure resources for an Azure AI demo. There is a template titled "parameters.json" which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
+This PowerShell script automates the deployment of various Azure resources for an Azure AI demo. There is a template titled ` parameters.json ` which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
 Once the deployment script completes the deployed Azure resources should look like this:
 
