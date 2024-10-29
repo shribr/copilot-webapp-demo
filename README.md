@@ -80,7 +80,7 @@ This project is a web application that allows users to chat with Azure Copilot. 
 
    ```
 
-2. Install [Node](https://nodejs.org/) and then install the required VS Code extensions using the following script (make sure you are in the `src/deployment directory`):
+2. Install [Node](https://nodejs.org/) and then install the required VS Code extensions (full list is in the [extensions.txt](./src/deployment/extensions.txt) file) using the following script (make sure you are in the `src/deployment directory`):
 
    ```
    function Install-Extensions {
