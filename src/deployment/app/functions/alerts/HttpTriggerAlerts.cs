@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Azure.Ai.Demo.Functions
+namespace AzureAiDemo.Functions
 {
     public class HttpTriggerAlerts
     {
