@@ -4,7 +4,7 @@
 
 This project is a web application that allows users to chat with Azure Copilot. It includes a simple HTML interface and a PowerShell script for deployment.
 
-<img width="1423" alt="azure-ai-demo-home" src="https://github.com/user-attachments/assets/c7ccef22-db76-4307-8728-160ba7a9a1b1">
+<img width="1423" alt="azure-ai-demo-home" src="src/deployment/app/frontend/images/azure-ai-demo-home.png">
 
 ## Prerequisites
 
@@ -135,11 +135,7 @@ Once the deployment script completes the following resources should have been cr
 
 The image below shows a diagram of the deployed resources:
 
-![Azure-AI-Demo-Azure-Resource-Visualizer](https://github.com/user-attachments/assets/3ef373f7-e394-4040-b805-3e0031818153)
-
-This is what the basic architecture of the solution looks like:
-
-![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
+<img width="1423" alt="azure-ai-demo-resource-visualizer" src="src/deployment/app/frontend/images/azure-ai-demo-resource-visualizer.png">
 
 ### Workflow of the Script
 
@@ -195,21 +191,20 @@ This is what the basic architecture of the solution looks like:
      - `Update-ContainerRegistryFile`, `Update-MLWorkspaceFile`, `Update-AIConnectionFile`, `Update-ConfigFile`: Update configuration files to be used by front-end JavaScript code. This includes all of the service names, urls and any newly generated API keys.
      - `Write-Log`: Writes messages to a log file.
 
-   5. **Main Script Execution:**
-
+5. **Main Script Execution:**
    - Initialize parameters by calling `Initialize-Parameters`.
    - Sets the user-assigned identity name.
    - Sets the directory path to the deployment path.
    - Starts the deployment by calling `Start-Deployment`.
 
-   6. **Deployment Process:**
+6. **Deployment Process:**
 
    - The `Start-Deployment` function orchestrates the deployment process:
-     - Initializes the sequence number and check if the log file exists.
-     - Logs the start time and sequence number.
-     - Checks if the resource group exists and create it if necessary.
-     - Creates various Azure resources by calling the respective functions.
-     - Logs the total execution time and write it to the log file.
+   - Initializes the sequence number and check if the log file exists.
+   - Logs the start time and sequence number.
+   - Checks if the resource group exists and create it if necessary.
+   - Creates various Azure resources by calling the respective functions.
+   - Logs the total execution time and write it to the log file.
 
 ### Project Structure
 
@@ -327,24 +322,35 @@ For testing you can use the built-in VS Code Live Server (uses port 5500 by defa
 node server.js
 
 ```
+### Solution Architecture
+
+The web application is structured to leverage various Azure services for a seamless and scalable deployment. The architecture includes:
+
+- **Frontend**: The frontend is built using HTML, CSS, and JavaScript, located in the frontend directory. It includes configuration files, stylesheets, images, and scripts necessary for the user interface.
+
+- **Backend**: The backend consists of Azure Functions, specifically designed for chat-related functionalities. These functions are located in the chat directory and include classes like `ChatCompletion`, `ChatContext`, `ChatHistory`, and `ChatOrchestrator`.
+
+This architecture ensures a robust, scalable, and maintainable web application leveraging Azure's cloud capabilities.
+
+![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
 
 ### Web Application Screens
 
 The index.html file includes the following screens:
 
-<img width="1423" alt="azure-ai-demo-home" src="https://github.com/user-attachments/assets/c7ccef22-db76-4307-8728-160ba7a9a1b1">
+<img width="1423" alt="azure-ai-demo-home" src="src/deployment/app/frontend/images/azure-ai-demo-home.png">
 
-<img width="1423" alt="azure-ai-demo-upload-docs" src="https://github.com/user-attachments/assets/fdb09be6-1a4c-4e22-a0c8-c8ebd9927a35">
+<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/app/frontend/images/azure-ai-demo-upload-docs.png">
 
-<img width="1410" alt="azure-ai-demo-chat" src="https://github.com/user-attachments/assets/63398052-61e4-42e7-a2eb-c7bbbfb23952">
+<img width="1410" alt="azure-ai-demo-chat" src="src/deployment/app/frontend/images/azure-ai-demo-chat.png">
 
-<img width="1409" alt="azure-ai-demo-response" src="https://github.com/user-attachments/assets/c85dfacd-76e4-45c7-827d-4cceaf808a9b">
+<img width="1409" alt="azure-ai-demo-response" src="src/deployment/app/frontend/images/azure-ai-demo-response.png">
 
-<img width="1879" alt="azure-ai-demo-settings" src="https://github.com/user-attachments/assets/4921ff1b-8070-4507-a712-1ea9db7c4274">
+<img width="1879" alt="azure-ai-demo-settings" src="src/deployment/app/frontend/images/azure-ai-demo-settings.png">
 
-<img width="1153" alt="azure-ai-demo-selected-docs" src="https://github.com/user-attachments/assets/e4fc88ab-ed5e-48a4-80c2-62e21db868e0">
+<img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/app/frontend/images/azure-ai-demo-selected-docs.png">
 
-<img width="1164" alt="azure-ai-demo-existing-docs" src="https://github.com/user-attachments/assets/cfdcf09f-e508-49c1-8f8a-c698ac54feae">
+<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/app/frontend/images/azure-ai-demo-existing-docs.png">
 
 ### Chat Workflow
 
