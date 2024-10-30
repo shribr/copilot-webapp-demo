@@ -137,10 +137,6 @@ The image below shows a diagram of the deployed resources:
 
 ![Azure-AI-Demo-Azure-Resource-Visualizer](https://github.com/user-attachments/assets/3ef373f7-e394-4040-b805-3e0031818153)
 
-This is what the basic architecture of the solution looks like:
-
-![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
-
 ### Workflow of the Script
 
 1. **Initialization and Setup:**
@@ -326,6 +322,17 @@ For testing you can use the built-in VS Code Live Server (uses port 5500 by defa
 node server.js
 
 ```
+### Solution Architecture
+
+The web application is structured to leverage various Azure services for a seamless and scalable deployment. The architecture includes:
+
+- **Frontend**: The frontend is built using HTML, CSS, and JavaScript, located in the frontend directory. It includes configuration files, stylesheets, images, and scripts necessary for the user interface.
+
+- **Backend**: The backend consists of Azure Functions, specifically designed for chat-related functionalities. These functions are located in the chat directory and include classes like `ChatCompletion`, `ChatContext`, `ChatHistory`, and `ChatOrchestrator`.
+
+This architecture ensures a robust, scalable, and maintainable web application leveraging Azure's cloud capabilities.
+
+![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
 
 ### Web Application Screens
 
