@@ -137,6 +137,10 @@ The image below shows a diagram of the deployed resources:
 
 ![Azure-AI-Demo-Azure-Resource-Visualizer](https://github.com/user-attachments/assets/3ef373f7-e394-4040-b805-3e0031818153)
 
+This is what the basic architecture of the solution looks like:
+
+![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
+
 ### Workflow of the Script
 
 1. **Initialization and Setup:**
@@ -315,15 +319,13 @@ The image below shows a diagram of the deployed resources:
 
 ### Development Server
 
-To start the development server, navigate to the `src/deployment` directory and run the following command:
+For testing you can use the built-in VS Code Live Server (uses port 5500 by default) or use the local Node server (uses port 3000 by default) by navigating to the `src/deployment` directory and running the following command:
 
 ```
 
 node server.js
 
 ```
-
-This should initialize a local http instance of the solution on port 3000.
 
 ### Web Application Screens
 
