@@ -310,6 +310,16 @@ label[for="chat-input"] {
   padding: 10px;
 }
 
+#chat-info-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+#chat-info-text-copy,
+#chat-info-current-question-container {
+  margin: 25px;
+}
+
 #chat-info-text-copy h2 {
   flex: 1;
 }
@@ -803,7 +813,7 @@ label[for="chat-input"] {
   color: black;
 }
 
-.chat-bubble {
+.chat-response {
   background-color: #87ceeb;
   border-radius: 8px;
   border: 1px solid #ddd;
@@ -815,11 +825,11 @@ label[for="chat-input"] {
   flex-direction: column;
 }
 
-.chat-bubble.user {
+.chat-response.user {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.chat-bubble.bot {
+.chat-response.bot {
   align-self: flex-start;
   background-color: #f08080;
   /* Light coral color */

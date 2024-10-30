@@ -259,6 +259,9 @@ function toggleAllCheckboxes() {
 function clearChatDisplay() {
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.innerHTML = ''; // Clear all content
+
+    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
+    chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
 }
 
 function setChatDisplayHeight() {
@@ -268,7 +271,7 @@ function setChatDisplayHeight() {
     const windowHeight = window.innerHeight - (chatInfoTextCopy.offsetHeight + 200);
 
     // Calculate the desired height (e.g., 80% of the window height)
-    const desiredHeight = windowHeight * 0.7;
+    const desiredHeight = windowHeight * 0.65;
 
     // Set the height of the chat-display-container
     chatDisplayContainer.style.height = `${desiredHeight}px`;
@@ -279,6 +282,7 @@ async function postQuestion() {
     const config = await fetchConfig();
     let chatInput = document.getElementById('chat-input').value;
     const chatDisplay = document.getElementById('chat-display');
+    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
     const dateTimestamp = new Date().toLocaleString();
 
     // Check if chatInput ends with a question mark, if not, add one
@@ -311,17 +315,25 @@ async function postQuestion() {
     questionBubble.appendChild(questionText);
     questionBubble.appendChild(dateText);
 
+    questionBubble.style.display = 'none'; // Hide the question bubble initially
+
     // Append the chat bubble to the chat-info div
     chatDisplay.appendChild(questionBubble);
+
+    const chatCurrentQuestionBubble = questionBubble.cloneNode(true);
+    chatCurrentQuestionBubble.style.display = 'block'; // Show the current question bubble
+
+    chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
+    chatCurrentQuestionContainer.appendChild(chatCurrentQuestionBubble);
 
     // Scroll to the position right above the newest questionBubble
     const questionBubbleTop = questionBubble.offsetTop;
     chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
-    showResponse();
+    showResponse(questionBubble);
 }
 
-async function showResponse() {
+async function showResponse(questionBubble) {
 
     const config = await fetchConfig();
     const chatInput = document.getElementById('chat-input').value.trim();
@@ -335,15 +347,15 @@ async function showResponse() {
         const response = await getAnswers(chatInput);
 
         // Create a new chat bubble element
-        const chatBubble = document.createElement('div');
-        chatBubble.setAttribute('class', 'chat-bubble user slide-up'); // Add slide-up class
+        const chatResponse = document.createElement('div');
+        chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
 
         // Create tabs
         const tabs = document.createElement('div');
         tabs.className = 'tabs';
 
         // Loop through CHAT_TABS to create tabs dynamically
-        Object.entries(config.CHAT_TABS).forEach(([key, value], index) => {
+        Object.entries(config.RESPONSE_TABS).forEach(([key, value], index) => {
             const tab = document.createElement('div');
             tab.className = `tab ${index === 0 ? 'active' : ''}`;
             tab.innerHTML = `${value.SVG} ${value.TEXT}`;
@@ -364,24 +376,24 @@ async function showResponse() {
         supportingContentContent.textContent = 'Supporting content goes here.';
 
         // Append tabs and contents to chat bubble
-        chatBubble.appendChild(tabs);
-        chatBubble.appendChild(answerContent);
-        chatBubble.appendChild(thoughtProcessContent);
-        chatBubble.appendChild(supportingContentContent);
+        chatResponse.appendChild(tabs);
+        chatResponse.appendChild(answerContent);
+        chatResponse.appendChild(thoughtProcessContent);
+        chatResponse.appendChild(supportingContentContent);
 
         // Append the chat bubble to the chat-display div
-        chatDisplay.appendChild(chatBubble);
+        chatDisplay.appendChild(chatResponse);
 
         // Clear the input field
         chatInput.value = '';
 
         // Scroll to the position right above the newest questionBubble
-        const questionBubbleTop = chatBubble.offsetTop;
+        const questionBubbleTop = chatResponse.offsetTop;
         chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
         // Add event listeners to tabs
         const tabElements = tabs.querySelectorAll('.tab');
-        const tabContents = chatBubble.querySelectorAll('.tab-content');
+        const tabContents = chatResponse.querySelectorAll('.tab-content');
 
         tabElements.forEach((tab, index) => {
             tab.addEventListener('click', () => {
@@ -393,8 +405,16 @@ async function showResponse() {
             });
         });
 
+        questionBubble.style.display = 'block'; // Show the question bubble
+
+        // Scroll to the position right above the newest questionBubble
+        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+        let chatDisplayHeight = chatDisplay.scrollHeight;
+        let questionBubbleHeight = questionBubble.clientHeight;
+
         // Scroll to the top of the chat display
-        //chatDisplay.scrollTop = 0;
+        //chatDisplay.scrollTop = questionBubbleHeight + 63
     }
 }
 
