@@ -1,0 +1,29 @@
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 10/30/2024 16:37:12 ***
+2024-10-30 16:37:18 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 16:37:18 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-30 16:37:19 - Search Service 'srch-copilot-demo-001' already exists.
+2024-10-30 16:37:19 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-10-30 16:37:19 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-10-30 16:37:19 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-10-30 16:37:19 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-10-30 16:37:20 - OpenAI model deployment 'ai' already exists.
+2024-10-30 16:37:20 - Container Registry 'crcopilotdemo001' already exists.
+2024-10-30 16:37:20 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-10-30 16:37:23 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-30 16:37:23 - Skipping deployment for Web app 'app-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-30 16:37:26 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-30 16:37:26 - Skipping deployment for Function app 'func-chat-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-10-30 16:37:26 - Identity 'id-copilot-demo-001' already exists.
+2024-10-30 16:37:26 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-10-30 16:37:26 - AI Hub 'hub-ai-copilot-demo-001' already exists.
+2024-10-30 16:37:26 - AI Hub connection for 'hub-ai-copilot-demo-001' already exists.
+2024-10-30 16:37:30 - AI Model deployment: 'ai-model-copilot-demo-001' created.
+2024-10-30 16:37:30 - AI Project 'project-ai-copilot-demo-001' already exists.
+2024-10-30 16:37:46 - Config file updated successfully.
+2024-10-30 16:37:49 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-30 16:38:16 - Web app 'app-copilot-demo-001' deployed successfully.
+2024-10-30 16:38:19 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
+2024-10-30 16:39:24 - Function app 'func-chat-copilot-demo-001' deployed successfully.
+2024-10-30 16:39:24 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 11 SEC : 937 MS ***
+
