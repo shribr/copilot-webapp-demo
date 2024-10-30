@@ -195,21 +195,20 @@ This is what the basic architecture of the solution looks like:
      - `Update-ContainerRegistryFile`, `Update-MLWorkspaceFile`, `Update-AIConnectionFile`, `Update-ConfigFile`: Update configuration files to be used by front-end JavaScript code. This includes all of the service names, urls and any newly generated API keys.
      - `Write-Log`: Writes messages to a log file.
 
-   5. **Main Script Execution:**
-
+5. **Main Script Execution:**
    - Initialize parameters by calling `Initialize-Parameters`.
    - Sets the user-assigned identity name.
    - Sets the directory path to the deployment path.
    - Starts the deployment by calling `Start-Deployment`.
 
-   6. **Deployment Process:**
+6. **Deployment Process:**
 
    - The `Start-Deployment` function orchestrates the deployment process:
-     - Initializes the sequence number and check if the log file exists.
-     - Logs the start time and sequence number.
-     - Checks if the resource group exists and create it if necessary.
-     - Creates various Azure resources by calling the respective functions.
-     - Logs the total execution time and write it to the log file.
+   - Initializes the sequence number and check if the log file exists.
+   - Logs the start time and sequence number.
+   - Checks if the resource group exists and create it if necessary.
+   - Creates various Azure resources by calling the respective functions.
+   - Logs the total execution time and write it to the log file.
 
 ### Project Structure
 
