@@ -337,6 +337,8 @@ The index.html file includes the following screens:
 
 <img width="1409" alt="azure-ai-demo-response" src="https://github.com/user-attachments/assets/c85dfacd-76e4-45c7-827d-4cceaf808a9b">
 
+<img width="1879" alt="azure-ai-demo-settings" src="https://github.com/user-attachments/assets/4921ff1b-8070-4507-a712-1ea9db7c4274">
+
 <img width="1153" alt="azure-ai-demo-selected-docs" src="https://github.com/user-attachments/assets/e4fc88ab-ed5e-48a4-80c2-62e21db868e0">
 
 <img width="1164" alt="azure-ai-demo-existing-docs" src="https://github.com/user-attachments/assets/cfdcf09f-e508-49c1-8f8a-c698ac54feae">
