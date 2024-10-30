@@ -338,19 +338,19 @@ This architecture ensures a robust, scalable, and maintainable web application l
 
 The index.html file includes the following screens:
 
-<img width="1423" alt="azure-ai-demo-home" src="https://github.com/user-attachments/assets/c7ccef22-db76-4307-8728-160ba7a9a1b1">
+<img width="1423" alt="azure-ai-demo-home" src="src/deployment/app/frontend/images/azure-ai-demo-home.png">
 
-<img width="1423" alt="azure-ai-demo-upload-docs" src="https://github.com/user-attachments/assets/fdb09be6-1a4c-4e22-a0c8-c8ebd9927a35">
+<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/app/frontend/images/azure-ai-demo-upload-docs.png">
 
-<img width="1410" alt="azure-ai-demo-chat" src="https://github.com/user-attachments/assets/63398052-61e4-42e7-a2eb-c7bbbfb23952">
+<img width="1410" alt="azure-ai-demo-chat" src="src/deployment/app/frontend/images/azure-ai-demo-chat.png">
 
-<img width="1409" alt="azure-ai-demo-response" src="https://github.com/user-attachments/assets/c85dfacd-76e4-45c7-827d-4cceaf808a9b">
+<img width="1409" alt="azure-ai-demo-response" src="src/deployment/app/frontend/images/azure-ai-demo-response.png">
 
-<img width="1879" alt="azure-ai-demo-settings" src="https://github.com/user-attachments/assets/4921ff1b-8070-4507-a712-1ea9db7c4274">
+<img width="1879" alt="azure-ai-demo-settings" src="src/deployment/app/frontend/images/azure-ai-demo-settings.png">
 
-<img width="1153" alt="azure-ai-demo-selected-docs" src="https://github.com/user-attachments/assets/e4fc88ab-ed5e-48a4-80c2-62e21db868e0">
+<img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/app/frontend/images/azure-ai-demo-selected-docs.png">
 
-<img width="1164" alt="azure-ai-demo-existing-docs" src="https://github.com/user-attachments/assets/cfdcf09f-e508-49c1-8f8a-c698ac54feae">
+<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/app/frontend/images/azure-ai-demo-existing-docs.png">
 
 ### Chat Workflow
 
