@@ -173,5 +173,21 @@
       "Facebook": "",
       "Instagram": ""
     }
-}
+  },
+  "answerGenerationConfig": {
+    "OverridePromptTemplate": "false",
+    "NumDocsToRetrieve": 5,
+    "ExcludeCategories": "[]",
+    "RetrievalModel": ["text", "hybrid", "vector"],
+    "UseSemanticRankerForRetrieval": "true",
+    "UseQueryContextualSummaries": "true",
+    "SuggestFollowupQuestions": "true",
+    "IncludedDataSources": {
+      "FileShare": false,
+      "Spreadsheet": false,
+      "AzureStorage": false,
+      "StructuredData": false,
+      "RelationalDatabase": false
+    }
+  }
 }

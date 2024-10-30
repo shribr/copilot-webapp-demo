@@ -10,6 +10,7 @@ let currentSortDirection = 'asc';
 
 // Function to fetch the configuration
 async function fetchConfig() {
+
     const response = await fetch('../config.json');
     const config = await response.json();
     return config;
