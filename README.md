@@ -4,7 +4,7 @@
 
 This project is a web application that allows users to chat with Azure Copilot. It includes a simple HTML interface and a PowerShell script for deployment.
 
-<img width="1423" alt="azure-ai-demo-home" src="https://github.com/user-attachments/assets/c7ccef22-db76-4307-8728-160ba7a9a1b1">
+<img width="1423" alt="azure-ai-demo-home" src="src/deployment/app/frontend/images/azure-ai-demo-home.png">
 
 ## Prerequisites
 
@@ -135,7 +135,7 @@ Once the deployment script completes the following resources should have been cr
 
 The image below shows a diagram of the deployed resources:
 
-![Azure-AI-Demo-Azure-Resource-Visualizer](https://github.com/user-attachments/assets/3ef373f7-e394-4040-b805-3e0031818153)
+<img width="1423" alt="azure-ai-demo-resource-visualizer" src="src/deployment/app/frontend/images/azure-ai-demo-resource-visualizer.png">
 
 ### Workflow of the Script
 
