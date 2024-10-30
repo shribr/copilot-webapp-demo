@@ -146,14 +146,14 @@ This is what the basic architecture of the solution looks like:
 1. **Initialization and Setup:**
 
    - The script begins by setting the default parameters file (`parameters.json`).
-   - It defines global variables for resource types and KeyVault secrets.
-   - It sets the deployment path based on the current location.
+   - Defines global variables for resource types and KeyVault secrets.
+   - Sets the deployment path based on the current location.
 
 2. **Parameter Initialization:**
 
    - The `Initialize-Parameters` function reads parameters from the specified JSON file.
-   - It sets global variables for various Azure resources and configurations.
-   - It retrieves the subscription ID, tenant ID, object ID, and user principal name using Azure CLI commands.
+   - Sets global variables for various Azure resources and configurations.
+   - Retrieves the subscription ID, tenant ID, object ID, and user principal name using Azure CLI commands.
 
 3. **Resource Creation Functions:**
 
@@ -195,20 +195,21 @@ This is what the basic architecture of the solution looks like:
      - `Update-ContainerRegistryFile`, `Update-MLWorkspaceFile`, `Update-AIConnectionFile`, `Update-ConfigFile`: Update configuration files to be used by front-end JavaScript code. This includes all of the service names, urls and any newly generated API keys.
      - `Write-Log`: Writes messages to a log file.
 
-5. **Deployment Process:**
+   5. **Main Script Execution:**
+
+   - Initialize parameters by calling `Initialize-Parameters`.
+   - Sets the user-assigned identity name.
+   - Sets the directory path to the deployment path.
+   - Starts the deployment by calling `Start-Deployment`.
+
+   6. **Deployment Process:**
 
    - The `Start-Deployment` function orchestrates the deployment process:
-     - It initializes the sequence number and checks if the log file exists.
-     - It logs the start time and sequence number.
-     - It checks if the resource group exists and creates it if necessary.
-     - It creates various Azure resources by calling the respective functions.
-     - It logs the total execution time and writes it to the log file.
-
-6. **Main Script Execution:**
-   - It initializes parameters by calling `Initialize-Parameters`.
-   - It sets the user-assigned identity name.
-   - It sets the directory path to the deployment path.
-   - It starts the deployment by calling `Start-Deployment`.
+     - Initializes the sequence number and check if the log file exists.
+     - Logs the start time and sequence number.
+     - Checks if the resource group exists and create it if necessary.
+     - Creates various Azure resources by calling the respective functions.
+     - Logs the total execution time and write it to the log file.
 
 ### Project Structure
 
