@@ -14,6 +14,7 @@
   "blobStorageContainerName": "content",
   "configFilePath": "app/frontend/config.json",
   "cognitiveServiceName": "cog-copilot-demo-001",
+  "computerVisionName": "cv-copilot-demo-001",
   "containerAppName": "ca-copilot-demo-001",
   "containerAppsEnvironmentName": "cae-copilot-demo-001",
   "containerRegistryName": "crcopilotdemo001",

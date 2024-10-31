@@ -289,6 +289,52 @@ function Get-CognitiveServicesApiKey {
     }
 }
 
+# Function to test if datasource exists 
+function Get-DataSources {
+    param(
+        [string]$dataSourceName,
+        [string]$resourceGroupName,
+        [string]$searchServiceName
+    )
+
+    # Get the admin key for the search service
+    #
+    $apiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
+
+    $uri = "https://$searchServiceName.search.windows.net/datasources?api-version=2024-07-01"
+
+    try {
+        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "api-key" = "$apiKey" }
+        $datasources = $response.value | Select-Object -ExpandProperty name
+        return $datasources
+    }
+    catch {
+        Write-Error "Failed to query search indexes: $_"
+        return $false
+    }
+   
+    <#
+ # {    try {
+        # List data sources in the search service
+        $dataSources = az rest --method get --url "https://$searchServiceName.search.windows.net/datasources?api-version=2024-07-01" --headers "apikey=$apiKey"  --output tsv
+        $dataSources = az rest --method get --uri "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName/datasources/?api-version=2024-07-01" --headers "apikey=$apiKey" --output tsv
+    
+        # Check if the data source exists
+        if ($dataSources -contains $dataSourceName) {
+            return $true
+        }
+        else {
+            return $false
+        }
+    }
+    catch {
+        Write-Error "Failed to query search data sources: $_"
+        return $false
+    }:Enter a comment or description}
+#>
+    
+}
+
 # Function to get the latest API version for a resource type
 function Get-LatestApiVersion {
     param (
@@ -383,11 +429,9 @@ function Get-SearchIndexes {
     $subscriptionId = $global:subscriptionId
     $resourceGroupName = $global:resourceGroupName
 
-    #$accessToken = az search query-key list --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
-    #$accessToken = az account get-access-token --query accessToken --output tsv
     $accessToken = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
    
-    $uri = $uri = "https://$searchServiceName.search.windows.net/indexes?api-version=2024-07-01"
+    $uri = "https://$searchServiceName.search.windows.net/indexes?api-version=2024-07-01"
     
     try {
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "api-key" = "$accessToken" }
@@ -1318,6 +1362,7 @@ function New-Resources {
     Write-Host "location: $location"
     Write-Host "userPrincipalName: $userPrincipalName"
     Write-Host "searchIndexName: $searchIndexName"
+    Write-Host "searchIndexerName: $searchIndexerName"
 
     # **********************************************************************************************************************
     # Create a storage account
@@ -1387,20 +1432,34 @@ function New-Resources {
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
 
-            $searchDatasourceCreated = New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
+            $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+
+            if ($dataSourceExists -eq $false) {
+                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
+            }
+            else {
+                Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+            }
+
+            $dataSourceExists = az search datasource show --name $searchDataSourceName --resource-group $resourceGroupName --service-name $searchServiceName --query "name" --output tsv
 
             $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 
             $searchIndexExists = $searchIndexes -contains $global:searchIndexName
 
             if ($searchIndexExists -eq $false) {
-                $searchIndexCreated = New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
+                New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
             }
             
+            $searchIndexExists = $searchIndexes -contains $global:searchIndexName
+
             Start-Sleep -Seconds 15
 
-            if ($searchDatasourceCreated -eq "true" || $searchIndexExists -eq $false) {
-                if ($searchIndexCreated -eq "true" || $searchIndexExists -eq $false) {
+            if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
+                $searchIndexerExists = az search indexer show --name $searchIndexerName --resource-group $resourceGroupName --service-name $searchServiceName --query "name" --output tsv
+
+                if ($searchIndexerExists -eq $false) {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
                 }
             }
@@ -1411,8 +1470,63 @@ function New-Resources {
         }
     }
     else {
+           
         Write-Host "Search Service '$searchServiceName' already exists."
         Write-Log -message "Search Service '$searchServiceName' already exists."
+
+        try {
+            $ErrorActionPreference = 'Continue'
+
+            $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+
+            if ($dataSourceExists -eq $false) {
+                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
+            }
+            else {
+                Write-Host "Search Data Source '$searchDataSourceName' already exists."
+                Write-Log -message "Search Data Source '$searchDataSourceName' already exists."
+            }
+
+            $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+
+            $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+
+            $searchIndexExists = $searchIndexes -contains $global:searchIndexName
+
+            if ($searchIndexExists -eq $false) {
+                New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
+            }
+            else {
+                Write-Host "Search Index '$searchIndexName' already exists."
+                Write-Log -message "Search Index '$searchIndexName' already exists."
+            }
+
+            $searchIndexExists = $searchIndexes -contains $global:searchIndexName
+
+            Start-Sleep -Seconds 15
+
+            try {
+                if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
+                    $searchIndexerExists = az search indexer show --name $searchIndexerName --resource-group $resourceGroupName --service-name $searchServiceName --query "name" --output tsv
+
+                    if ($searchIndexerExists -eq $false) {
+                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+                    }
+                    else {
+                        Write-Host "Search Indexer '$searchIndexerName' already exists."
+                        Write-Log -message "Search Indexer '$searchIndexerName' already exists."
+                    }
+                }
+            }
+            catch {
+                Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+        catch {
+            Write-Error "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Search Service '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 
     # **********************************************************************************************************************
@@ -1828,7 +1942,7 @@ function New-SearchIndexer {
         $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
     
         $jsonContent.'@odata.context' = $searchIndexerUrl
-        $jsonContent.name = $searchIndexerName
+        $jsonContent.name = $global:searchIndexerName
         $jsonContent.dataSourceName = $searchDatasourceName
         $jsonContent.targetIndexName = $global:searchIndexName
     
@@ -1854,21 +1968,21 @@ function New-SearchIndexer {
         # Create the index
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-            Write-Host "Index '$global:searchIndexName' created successfully."
-            Write-Log -message "Index '$global:searchIndexName' created successfully."
+            Write-Host "Index '$global:searchIndexerName' created successfully."
+            Write-Log -message "Index '$global:searchIndexerName' created successfully."
 
             return true
         }
         catch {
-            Write-Error "Failed to create index '$global:searchIndexName': $_"
-            Write-Log -message "Failed to create index '$global:searchIndexName': $_"
+            Write-Error "Failed to create index '$global:searchIndexerName': $_"
+            Write-Log -message "Failed to create index '$global:searchIndexerName': $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create index '$global:searchIndexName': $_"
-        Write-Log -message "Failed to create index '$global:searchIndexName': $_"
+        Write-Error "Failed to create index '$global:searchIndexerName': $_"
+        Write-Log -message "Failed to create index '$global:searchIndexerName': $_"
 
         return false
     }

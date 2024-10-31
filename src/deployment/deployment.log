@@ -27,3 +27,32 @@
 2024-10-30 16:39:24 - Function app 'func-chat-copilot-demo-001' deployed successfully.
 2024-10-30 16:39:24 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 11 SEC : 937 MS ***
 
+*** LOG SEQUENCE: 2 ***
+*** SCRIPT START TIME: 10/30/2024 20:12:39 ***
+2024-10-30 20:12:46 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 20:12:46 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-10-30 20:16:50 - Index 'srch-index-copilot-demo-001' created successfully.
+*** LOG SEQUENCE: 3 ***
+*** SCRIPT START TIME: 10/30/2024 20:19:41 ***
+2024-10-30 20:19:48 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 20:19:48 - App Service Plan 'asp-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 10/30/2024 20:21:05 ***
+2024-10-30 20:21:11 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 20:21:11 - App Service Plan 'asp-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 10/30/2024 20:22:10 ***
+2024-10-30 20:23:49 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 20:23:49 - App Service Plan 'asp-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 10/30/2024 20:25:27 ***
+2024-10-30 20:25:42 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 20:25:42 - App Service Plan 'asp-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 10/30/2024 20:27:21 ***
+2024-10-30 20:27:27 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 20:27:27 - App Service Plan 'asp-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 10/30/2024 20:57:06 ***
+2024-10-30 20:57:13 - Storage account 'stcopilotdemo001' already exists.
+2024-10-30 20:57:13 - App Service Plan 'asp-copilot-demo-001' already exists.
