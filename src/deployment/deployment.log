@@ -1,0 +1,23 @@
+2024-11-01 05:09:17 - Failed to restore soft-deleted AI Machine Learning Hub connection 'hub-ai-copilot-demo-001': (Line 49) : The term 'Restore-SoftDeletedResource' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+2024-11-01 05:11:18 - Failed to restore soft-deleted AI Machine Learning Hub connection 'hub-ai-copilot-demo-001': (Line 49) : The term 'Restore-SoftDeletedResource' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+2024-11-01 05:12:41 - File '.YamlFileName' created and populated.
+2024-11-01 05:13:09 - File '.YamlFileName' created and populated.
+2024-11-01 05:25:18 - File '.YamlFileName' created and populated.
+2024-11-01 05:25:23 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-11-01 05:27:23 - File '.YamlFileName' created and populated.
+2024-11-01 05:27:28 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-11-01 05:29:49 - File '.YamlFileName' created and populated.
+2024-11-01 05:29:53 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-11-01 05:31:44 - Failed to create or write to '': (Line 70) : Access to the path '/Users/amischreiber/source/repos/azure-ai-demo/src/deployment/' is denied.
+2024-11-01 05:31:49 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-11-01 05:32:45 - Failed to create or write to '': (Line 70) : Access to the path '/Users/amischreiber/source/repos/azure-ai-demo/src/deployment/' is denied.
+2024-11-01 05:33:34 - Failed to create or write to '': (Line 70) : Access to the path '/Users/amischreiber/source/repos/azure-ai-demo/src/deployment/' is denied.
+2024-11-01 05:33:38 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-11-01 05:34:36 - Failed to create or write to '': (Line 70) : Access to the path '/Users/amischreiber/source/repos/azure-ai-demo/src/deployment/' is denied.
+2024-11-01 05:34:40 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-11-01 05:36:12 - Failed to create or write to '': (Line 70) : Cannot bind argument to parameter 'FilePath' because it is null.
+2024-11-01 05:36:17 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.
+2024-11-01 05:39:22 - Failed to create or write to '': (Line 70) : Cannot bind argument to parameter 'FilePath' because it is null.
+2024-11-01 05:39:26 - Azure AI Machine Learning Hub connection 'hub-ai-copilot-demo-001' created.

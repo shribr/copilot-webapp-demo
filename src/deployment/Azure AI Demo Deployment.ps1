@@ -975,10 +975,10 @@ function New-AIHubAndModel {
     }
 
     # Add storage account connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "Storage" -serviceName $storageAccountName -connectionProperties $storageConnectionYamlProperties
+    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "StorageService" -serviceName $storageAccountName -serviceProperties $storageServiceProperties
         
     # Add search service connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "Search" -serviceName $searchServiceName -connectionProperties $searchConnectionYamlProperties
+    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $searchServiceName -serviceProperties $searchServiceProperties
 
 }
 
@@ -2867,11 +2867,11 @@ function Update-AIConnectionFile {
 
     #$rootAppPath = Find-AppRoot -currentDirectory (Get-Location).Path
     #$filePath = "$rootPath/app/ai.connection.yaml"
-    $yamlFileName = "$serviceProperties.YamlFileName"
+    $yamlFileName = $serviceProperties.YamlFileName
 
-    $filePath = "$rootPath/$yamlFileName"
+    $filePath = "$rootPath/app/$yamlFileName"
 
-    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
+    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
     
     $storageAccountKey = az storage account keys list `
         --resource-group $resourceGroupName `
@@ -2923,7 +2923,7 @@ credentials:
     }
 
     try {
-        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
+        $content | Out-File -FilePath $yamlFileName -Encoding utf8 -Force
         Write-Host "File '$yamlFileName' created and populated."
         Write-Log -message "File '$yamlFileName' created and populated."
     }
