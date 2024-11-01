@@ -47,7 +47,7 @@
   "storageAccountName": "stcopilotdemo001",
   "subscriptionId": "00000000-0000-0000-0000-000000000000",
   "userAssignedIdentityName": "id-copilot-demo-001",
-  "containerRegistryConnectionYamlProperties": {
+  "containerRegistryProperties": {
     "Name": "",
     "Description": "",
     "Location": "",
@@ -58,9 +58,10 @@
       "Location1": "",
       "Location2": "",
       "Location3": ""
-    }
+    },
+    "YamlFileName": "container-registry.yaml"
   },
-  "machineLearningConnectionYamlProperties": {
+  "machineLearningProperties": {
     "Name": "",
     "DisplayName": "",
     "Description": "",
@@ -71,22 +72,25 @@
     "ApplicationInsightsName": "",
     "Tags": {
       "Purpose": ""
-    }
+    },
+    "YamlFileName": "ml.workspace.yaml"
   },
-  "aiConnectionYamlProperties": {
-    "Name": "",
-    "Type": "",
-    "Endpoint": "",
-    "Key": ""
+  "aiServiceProperties": {
+    "Name": "ai-service-copilot-demo-001",
+    "Type": "azure_ai_search",
+    "Endpoint": "https://srch-copilot-demo-001.cognitiveservices.azure.com/",
+    "Key": "",
+    "YamlFileName": "ai.connection.yaml"
   },
-  "searchConnectionYamlProperties": {
-    "Name": "",
+  "searchServiceProperties": {
+    "Name": "srch-copilot-demo-001",
     "Type": "",
     "Api-Key": "",
     "Endpoint": "",
-    "AIServicesResourceID": ""
+    "AIServicesResourceID": "",
+    "YamlFileName": "search,connection.yaml"
   },
-  "storageConnectionYamlProperties": {
+  "storageServiceProperties": {
     "Name": "",
     "Type": "",
     "Url": "",
@@ -95,7 +99,8 @@
     "Credentials": {
       "SasToken": "",
       "AccountKey": ""
-    }
+    },
+    "YamlFileName": "storage.connection.yaml"
   },
   "virtualNetwork": {
     "Name": "vnet-copilot-demo-001",

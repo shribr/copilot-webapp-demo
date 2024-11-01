@@ -683,11 +683,11 @@ function Initialize-Parameters {
     $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
     $global:virtualNetwork = $parametersObject.virtualNetwork
 
-    $global:aiConnectionYamlProperties = $parametersObject.aiConnectionYamlProperties
-    $global:containerRegistryConnectionYamlProperties = $parametersObject.containerRegistryConnectionYamlProperties
-    $global:machineLearningConnectionYamlProperties = $parametersObject.machineLearningConnectionYamlProperties
-    $global:searchConnectionYamlProperties = $parametersObject.searchConnectionYamlProperties
-    $global:storageConnectionYamlProperties = $parametersObject.storageConnectionYamlProperties
+    $global:aiServiceProperties = $parametersObject.aiServiceProperties
+    $global:containerRegistryProperties = $parametersObject.containerRegistryProperties
+    $global:machineLearningProperties = $parametersObject.machineLearningProperties
+    $global:searchServiceProperties = $parametersObject.searchServiceProperties
+    $global:storageServiceProperties = $parametersObject.storageServiceProperties
 
     #$global:objectId = $parametersObject.objectId
 
@@ -728,67 +728,67 @@ function Initialize-Parameters {
     Write-Host "searchIndexName from global: $($global:searchIndexName)"
 
     return @{
-        aiHubName                                 = $aiHubName
-        aiModelName                               = $aiModelName
-        aiModelType                               = $aiModelType
-        aiModelVersion                            = $aiModelVersion
-        aiServiceName                             = $aiServiceName
-        aiProjectName                             = $aiProjectName
-        apiManagementService                      = $apiManagementService
-        appendUniqueSuffix                        = $appendUniqueSuffix
-        appServices                               = $appServices
-        appServicePlanName                        = $appServicePlanName
-        appInsightsName                           = $appInsightsName
-        blobStorageAccountName                    = $blobStorageAccountName
-        blobStorageContainerName                  = $blobStorageContainerName
-        computerVisionName                        = $computerVisionName
-        configFilePath                            = $configFilePath
-        cognitiveServiceName                      = $cognitiveServiceName
-        containerAppName                          = $containerAppName
-        containerAppsEnvironmentName              = $containerAppsEnvironmentName
-        containerRegistryName                     = $containerRegistryName
-        cosmosDbAccountName                       = $cosmosDbAccountName
-        createResourceGroup                       = $createResourceGroup
-        deleteResourceGroup                       = $deleteResourceGroup
-        deployZipResources                        = $deployZipResources
-        documentIntelligenceName                  = $documentIntelligenceName
-        eventHubNamespaceName                     = $eventHubNamespaceName
-        keyVaultName                              = $keyVaultName
-        location                                  = $location
-        logAnalyticsWorkspaceName                 = $logAnalyticsWorkspaceName
-        managedIdentityName                       = $managedIdentityName
-        openAIName                                = $openAIName
-        objectId                                  = $objectId
-        portalDashboardName                       = $portalDashboardName
-        privateEndPointName                       = $privateEndPointName
-        redisCacheName                            = $redisCacheName
-        resourceGroupName                         = $resourceGroupName
-        resourceGuid                              = $resourceGuid
-        resourceSuffix                            = $resourceSuffix
-        restoreSoftDeletedResource                = $restoreSoftDeletedResource
-        result                                    = $result
-        searchServiceName                         = $searchServiceName
-        searchIndexName                           = $searchIndexName
-        searchIndexFieldNames                     = $searchIndexFieldNames
-        searchIndexerName                         = $searchIndexerName
-        serviceBusNamespaceName                   = $serviceBusNamespaceName
-        searchDataSourceName                      = $searchDataSourceName
-        sharedDashboardName                       = $sharedDashboardName
-        siteLogo                                  = $siteLogo
-        sqlServerName                             = $sqlServerName
-        storageAccountName                        = $storageAccountName
-        subNetName                                = $subNetName
-        subscriptionId                            = $subscriptionId
-        tenantId                                  = $tenantId
-        userAssignedIdentityName                  = $userAssignedIdentityName
-        userPrincipalName                         = $userPrincipalName
-        virtualNetwork                            = $virtualNetwork
-        aiConnectionYamlProperties                = $aiConnectionYamlProperties
-        containerRegistryConnectionYamlProperties = $containerRegistryConnectionYamlProperties
-        machineLearningConnectionYamlProperties   = $machineLearningConnectionYamlProperties
-        searchConnectionYamlProperties            = $searchConnectionYamlProperties
-        storageConnectionYamlProperties           = $storageConnectionYamlProperties
-        parameters                                = $parametersObject
+        aiHubName                    = $aiHubName
+        aiModelName                  = $aiModelName
+        aiModelType                  = $aiModelType
+        aiModelVersion               = $aiModelVersion
+        aiServiceName                = $aiServiceName
+        aiProjectName                = $aiProjectName
+        apiManagementService         = $apiManagementService
+        appendUniqueSuffix           = $appendUniqueSuffix
+        appServices                  = $appServices
+        appServicePlanName           = $appServicePlanName
+        appInsightsName              = $appInsightsName
+        blobStorageAccountName       = $blobStorageAccountName
+        blobStorageContainerName     = $blobStorageContainerName
+        computerVisionName           = $computerVisionName
+        configFilePath               = $configFilePath
+        cognitiveServiceName         = $cognitiveServiceName
+        containerAppName             = $containerAppName
+        containerAppsEnvironmentName = $containerAppsEnvironmentName
+        containerRegistryName        = $containerRegistryName
+        cosmosDbAccountName          = $cosmosDbAccountName
+        createResourceGroup          = $createResourceGroup
+        deleteResourceGroup          = $deleteResourceGroup
+        deployZipResources           = $deployZipResources
+        documentIntelligenceName     = $documentIntelligenceName
+        eventHubNamespaceName        = $eventHubNamespaceName
+        keyVaultName                 = $keyVaultName
+        location                     = $location
+        logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
+        managedIdentityName          = $managedIdentityName
+        openAIName                   = $openAIName
+        objectId                     = $objectId
+        portalDashboardName          = $portalDashboardName
+        privateEndPointName          = $privateEndPointName
+        redisCacheName               = $redisCacheName
+        resourceGroupName            = $resourceGroupName
+        resourceGuid                 = $resourceGuid
+        resourceSuffix               = $resourceSuffix
+        restoreSoftDeletedResource   = $restoreSoftDeletedResource
+        result                       = $result
+        searchServiceName            = $searchServiceName
+        searchIndexName              = $searchIndexName
+        searchIndexFieldNames        = $searchIndexFieldNames
+        searchIndexerName            = $searchIndexerName
+        serviceBusNamespaceName      = $serviceBusNamespaceName
+        searchDataSourceName         = $searchDataSourceName
+        sharedDashboardName          = $sharedDashboardName
+        siteLogo                     = $siteLogo
+        sqlServerName                = $sqlServerName
+        storageAccountName           = $storageAccountName
+        subNetName                   = $subNetName
+        subscriptionId               = $subscriptionId
+        tenantId                     = $tenantId
+        userAssignedIdentityName     = $userAssignedIdentityName
+        userPrincipalName            = $userPrincipalName
+        virtualNetwork               = $virtualNetwork
+        aiServiceProperties          = $aiServiceProperties
+        containerRegistryProperties  = $containerRegistryProperties
+        machineLearningProperties    = $machineLearningProperties
+        searchServiceProperties      = $searchServiceProperties
+        storageServiceProperties     = $storageServiceProperties
+        parameters                   = $parametersObject
     }
 }
 
@@ -846,7 +846,9 @@ function New-AIHubAndModel {
     if ($existingResources -notcontains $aiServiceName) {
         try {
             $ErrorActionPreference = 'Stop'
-            az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
+            
+            az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --custom-domain --output none
+            
             Write-Host "AI Service: '$aiServiceName' created."
             Write-Log -message "AI Service: '$aiServiceName' created."
         }
@@ -917,12 +919,14 @@ function New-AIHubAndModel {
         Write-Log -message "AI Model '$aiModelName' already exists." -logFilePath $global:LogFilePath
     }
 
-    # Create AI Project
-
+    # Create AI Project / ML Studio Workspace
     if ($existingResources -notcontains $aiProjectName) {
         try {
             $ErrorActionPreference = 'Stop'
-            #az ml workspace create --kind project --hub-id $aiHubName --resource-group $resourceGroupName --name $aiProjectName --application-insights $appInsightsName --key-vault "$keyVaultName" --location $location
+            
+            # https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-openai?view=azureml-api-2
+            # "While the az ml connection commands can be used to manage both Azure Machine Learning and Azure AI Studio connections, the OpenAI connection is specific to Azure AI Studio."
+
             $mlWorkspaceFile = Update-MLWorkspaceFile `
                 -aiProjectName $aiProjectName `
                 -resourceGroupName $resourceGroupName `
@@ -932,7 +936,7 @@ function New-AIHubAndModel {
                 -subscriptionId $subscriptionId `
                 -storageAccountName $storageAccountName `
                 -containerRegistryName $containerRegistryName 2>&1
-
+            
             #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
             $jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
@@ -970,23 +974,54 @@ function New-AIHubAndModel {
         Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 
-    # Create AI Hub connection
-    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "Microsoft.MachineLearningServices/workspaces" -aiServiceName $aiServiceName
+    # Add storage account connection to AI Hub
+    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "Storage" -serviceName $storageAccountName -connectionProperties $storageConnectionYamlProperties
+        
+    # Add search service connection to AI Hub
+    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "Search" -serviceName $searchServiceName -connectionProperties $searchConnectionYamlProperties
+
 }
 
 function New-AIHubConnection {
     param (
         [string]$aiHubName,
+        [string]$aiProjectName,
         [string]$resourceGroupName,
         [string]$resourceType,
-        [string]$aiServiceName
+        [string]$serviceName,
+        [string]$serviceProperties
     )
 
-    if ($existingResources -notcontains $aiHubName) {
+    #https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-blob?view=azureml-api-2
+
+    $existingConnections = az ml connection list --workspace-name $aiProjectName --resource-group $resourceGroupName --query "[?name=='$serviceName'].name" --output tsv
+
+    <#
+        # {    # Define the AI services and their new endpoints
+            $aiServices = @{
+                "aiService1" = "https://new-endpoint-1.api.cognitive.microsoft.com"
+                "aiService2" = "https://new-endpoint-2.api.cognitive.microsoft.com"
+                "aiService3" = "https://new-endpoint-3.api.cognitive.microsoft.com"
+            }
+
+            # Loop through each AI service and update the endpoint
+            foreach ($aiServiceName in $aiServices.Keys) {
+                $newEndpoint = $aiServices[$aiServiceName]
+            
+                az cognitiveservices account update `
+                    --name $aiServiceName `
+                    --resource-group $resourceGroupName `
+                    --custom-domain $newEndpoint
+            
+                Write-Host "Updated endpoint for $aiServiceName to $newEndpoint"
+            }:Enter a comment or description}
+        #>
+    
+    if ($existingConnections -notcontains $serviceName) {
         try {
             $aiConnectionFile = Update-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
 
-            az ml connection create --file $aiConnectionFile --resource-group $resourceGroupName --workspace-name $aiHubName
+            az ml connection create --file $aiConnectionFile --resource-group $resourceGroupName --workspace-name $aiProjectName
             
             Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
             Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." -logFilePath $global:LogFilePath
@@ -1440,6 +1475,7 @@ function New-Resources {
             az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageAccountName --account-key $storageAccessKey
             
             az storage container create --name $blobStorageContainerName --account-name $storageAccountName --account-key $storageAccessKey --output none
+
         }
         catch {
             Write-Error "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1450,9 +1486,6 @@ function New-Resources {
         Write-Host "Storage account '$storageAccountName' already exists."
         Write-Log -message "Storage account '$storageAccountName' already exists."
     }
-
-    $storageConnectionYamlProperties.Name = $storageAccountName
-    $storageConnectionYamlProperties = $storageConnectionYamlProperties | ConvertTo-Yaml
 
     #$storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
     #$storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
@@ -1489,6 +1522,7 @@ function New-Resources {
             $ErrorActionPreference = 'Continue'
 
             az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
+            
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
 
@@ -1645,8 +1679,9 @@ function New-Resources {
         try {
             $ErrorActionPreference = 'Stop'
             az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
+            
             Write-Host "Cognitive Services account '$cognitiveServiceName' created."
-            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."
+            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."       
         }
         catch {
             # Check if the error is due to soft deletion
@@ -2766,7 +2801,7 @@ container_registry: /subscriptions/$subscriptionId/resourceGroups/$resourceGroup
 key_vault: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName
 application_insights: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName
 tags:
-  purpose: demonstration
+  purpose: Azure AI Hub Project
 "@
 
     try {
@@ -2782,15 +2817,12 @@ tags:
 }
 
 # Function to update AI connection file
-function Update-AIConnectionFile {
+function Update-AIConnectionFileOld {
     param (
         [string]$resourceGroupName,
         [string]$resourceType,
         [string]$serviceName,
-        [string]$subscriptionId,
-        [string]$endPoint,
-        [string]$aiServicesResourceId,
-        [string]$apiKey
+        [string]$serviceProperties
     )
     
     $rootPath = Get-Item -Path (Get-Location).Path
@@ -2816,6 +2848,88 @@ ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resource
     catch {
         Write-Error "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    return $filePath
+}
+
+# Function to update AI connection file
+function Update-AIConnectionFile {
+    param (
+        [string]$resourceGroupName,
+        [string]$resourceType,
+        [string]$searchServiceName = $global:searchServiceName,
+        [string]$serviceName,
+        [string]$serviceProperties
+    )
+    
+    $rootPath = Get-Item -Path (Get-Location).Path
+
+    #$rootAppPath = Find-AppRoot -currentDirectory (Get-Location).Path
+    #$filePath = "$rootPath/app/ai.connection.yaml"
+    $yamlFileName = "$serviceProperties.YamlFileName"
+
+    $filePath = "$rootPath/$yamlFileName"
+
+    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
+    
+    $storageAccountKey = az storage account keys list `
+        --resource-group $resourceGroupName `
+        --account-name $storageAccountName `
+        --query "[0].value" `
+        --output tsv
+
+    switch ($resourceType) {
+        "AiService" {
+            $endpoint = "https://$searchServiceName.cognitiveservices.azure.com/"
+            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+
+            $content = @"
+name: $serviceName
+type: azure_ai_services
+endpoint: $endpoint
+api_key: $apiKey
+ai_services_resource_id: $resourceId
+"@
+        }
+        "SearchService" {
+            $endpoint = "https://api.openai.com/v1"
+            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+            
+            $content = @"
+            name: $serviceName
+type: "azure_ai_search"
+
+endpoint: $endpoint
+api_key: $apiKey
+"@   
+        }
+        "StorageAccount" {
+            $endpoint = "https://$storageAccountName.blob.core.windows.net/"
+            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+            $containerName = $serviceProperties.ContainerName
+
+            $content = @"
+name: $serviceName
+type: azure_blob
+url: $endpoint
+container_name: $containerName
+account_name: $storageAccountName
+
+credentials:
+  account_key: $storageAccountKey
+"@
+        }
+    }
+
+    try {
+        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
+        Write-Host "File '$yamlFileName' created and populated."
+        Write-Log -message "File '$yamlFileName' created and populated."
+    }
+    catch {
+        Write-Error "Failed to create or write to '$yamlFileName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create or write to '$yamlFileName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 
     return $filePath
