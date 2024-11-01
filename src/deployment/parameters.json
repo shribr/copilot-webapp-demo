@@ -14,7 +14,7 @@
   "blobStorageContainerName": "content",
   "configFilePath": "app/frontend/config.json",
   "cognitiveServiceName": "cog-copilot-demo-001",
-  "computerVisionName": "cv-copilot-demo-001",
+  "computerVisionName": "cv2-copilot-demo-001",
   "containerAppName": "ca-copilot-demo-001",
   "containerAppsEnvironmentName": "cae-copilot-demo-001",
   "containerRegistryName": "crcopilotdemo001",
@@ -47,6 +47,56 @@
   "storageAccountName": "stcopilotdemo001",
   "subscriptionId": "00000000-0000-0000-0000-000000000000",
   "userAssignedIdentityName": "id-copilot-demo-001",
+  "containerRegistryConnectionYamlProperties": {
+    "Name": "",
+    "Description": "",
+    "Location": "",
+    "Tags": {
+      "Description": ""
+    },
+    "ReplicationLocations": {
+      "Location1": "",
+      "Location2": "",
+      "Location3": ""
+    }
+  },
+  "machineLearningConnectionYamlProperties": {
+    "Name": "",
+    "DisplayName": "",
+    "Description": "",
+    "Location": "",
+    "StorageAccountName": "",
+    "ContainerRegistryName": "",
+    "KeyVaultName": "",
+    "ApplicationInsightsName": "",
+    "Tags": {
+      "Purpose": ""
+    }
+  },
+  "aiConnectionYamlProperties": {
+    "Name": "",
+    "Type": "",
+    "Endpoint": "",
+    "Key": ""
+  },
+  "searchConnectionYamlProperties": {
+    "Name": "",
+    "Type": "",
+    "Api-Key": "",
+    "Endpoint": "",
+    "AIServicesResourceID": ""
+  },
+  "storageConnectionYamlProperties": {
+    "Name": "",
+    "Type": "",
+    "Url": "",
+    "ContainerName": "",
+    "AccountName": "",
+    "Credentials": {
+      "SasToken": "",
+      "AccountKey": ""
+    }
+  },
   "virtualNetwork": {
     "Name": "vnet-copilot-demo-001",
     "AddressPrefix": "",
@@ -59,7 +109,7 @@
       }
     ]
   },
-  "SubNet": [
+  "subNet": [
     {
       "Name": "subnet-copilot-demo-001",
       "Description": "subnet-copilot-demo-001",
@@ -98,7 +148,7 @@
       ]
     }
   ],
-  "PrivateEndpoints": [
+  "privateEndpoints": [
     {
       "Name": "pe-copilot-demo-001",
       "Location": "east us",

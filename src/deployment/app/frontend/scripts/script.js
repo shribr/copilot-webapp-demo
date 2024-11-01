@@ -338,6 +338,7 @@ async function showResponse(questionBubble) {
     const config = await fetchConfig();
     const chatInput = document.getElementById('chat-input').value.trim();
     const chatDisplay = document.getElementById('chat-display');
+    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
 
     // Retrieve the text from the input field
 
@@ -412,6 +413,8 @@ async function showResponse(questionBubble) {
 
         let chatDisplayHeight = chatDisplay.scrollHeight;
         let questionBubbleHeight = questionBubble.clientHeight;
+
+        chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
 
         // Scroll to the top of the chat display
         //chatDisplay.scrollTop = questionBubbleHeight + 63
