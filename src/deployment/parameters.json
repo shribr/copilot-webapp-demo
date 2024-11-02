@@ -14,7 +14,7 @@
   "blobStorageContainerName": "content",
   "configFilePath": "app/frontend/config.json",
   "cognitiveServiceName": "cog-copilot-demo-001",
-  "computerVisionName": "cv2-copilot-demo-001",
+  "computerVisionName": "cv-copilot-demo-001",
   "containerAppName": "ca-copilot-demo-001",
   "containerAppsEnvironmentName": "cae-copilot-demo-001",
   "containerRegistryName": "crcopilotdemo001",
@@ -59,7 +59,7 @@
       "Location2": "",
       "Location3": ""
     },
-    "YamlFileName": "container-registry.yaml"
+    "YamlFileName": "container.registry.yaml"
   },
   "machineLearningProperties": {
     "Name": "",
@@ -79,26 +79,26 @@
     "Name": "ai-service-copilot-demo-001",
     "Type": "azure_ai_search",
     "Endpoint": "https://srch-copilot-demo-001.cognitiveservices.azure.com/",
-    "Key": "",
+    "Key": "xxx",
     "YamlFileName": "ai.connection.yaml"
   },
   "searchServiceProperties": {
     "Name": "srch-copilot-demo-001",
-    "Type": "",
-    "Api-Key": "",
-    "Endpoint": "",
+    "Type": "azure_ai_search",
+    "Api-Key": "xxx",
+    "Endpoint": "https://srch-copilot-demo-001.search.windows.net",
     "AIServicesResourceID": "",
     "YamlFileName": "search.connection.yaml"
   },
   "storageServiceProperties": {
-    "Name": "",
-    "Type": "",
-    "Url": "",
-    "ContainerName": "",
-    "AccountName": "",
+    "Name": "stcopilotdemo001",
+    "Type": "azure_blob",
+    "Url": "https://stcopilotdemo001.blob.core.windows.net/azureml",
+    "ContainerName": "azureml",
+    "AccountName": "stcopilotdemo001",
     "Credentials": {
-      "SasToken": "",
-      "AccountKey": ""
+      "SasToken": "xxx",
+      "AccountKey": "xxx"
     },
     "YamlFileName": "storage.connection.yaml"
   },

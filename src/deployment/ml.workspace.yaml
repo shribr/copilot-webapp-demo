@@ -1,0 +1,10 @@
+name: 
+location:
+display_name: 
+description: This configuration specifies a workspace configuration with existing dependent resources
+storage_account: 
+container_registry:
+key_vault: 
+application_insights: 
+tags:
+  purpose: Azure AI related activities

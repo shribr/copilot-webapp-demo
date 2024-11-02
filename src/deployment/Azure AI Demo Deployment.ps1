@@ -975,10 +975,10 @@ function New-AIHubAndModel {
     }
 
     # Add storage account connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "StorageService" -serviceName $storageAccountName -serviceProperties $storageServiceProperties
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageAccountName -serviceProperties $storageServiceProperties
         
     # Add search service connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $searchServiceName -serviceProperties $searchServiceProperties
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $global:searchServiceName -serviceProperties $searchServiceProperties
 
 }
 
@@ -995,57 +995,27 @@ function New-AIHubConnection {
     #https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-blob?view=azureml-api-2
 
     $existingConnections = az ml connection list --workspace-name $aiProjectName --resource-group $resourceGroupName --query "[?name=='$serviceName'].name" --output tsv
-
-    <#
-        # {    # Define the AI services and their new endpoints
-            $aiServices = @{
-                "aiService1" = "https://new-endpoint-1.api.cognitive.microsoft.com"
-                "aiService2" = "https://new-endpoint-2.api.cognitive.microsoft.com"
-                "aiService3" = "https://new-endpoint-3.api.cognitive.microsoft.com"
-            }
-
-            # Loop through each AI service and update the endpoint
-            foreach ($aiServiceName in $aiServices.Keys) {
-                $newEndpoint = $aiServices[$aiServiceName]
-            
-                az cognitiveservices account update `
-                    --name $aiServiceName `
-                    --resource-group $resourceGroupName `
-                    --custom-domain $newEndpoint
-            
-                Write-Host "Updated endpoint for $aiServiceName to $newEndpoint"
-            }:Enter a comment or description}
-        #>
-    
+   
     if ($existingConnections -notcontains $serviceName) {
         try {
-            $aiConnectionFile = Update-AIConnectionFile -resourceGroupName $resourceGroupName -aiServiceName $aiServiceName
+            $ErrorActionPreference = 'Stop'
+
+            $aiConnectionFile = Update-AIConnectionFile -resourceGroupName $resourceGroupName -serviceName $serviceName -serviceProperties $serviceProperties -resourceType $resourceType
 
             az ml connection create --file $aiConnectionFile --resource-group $resourceGroupName --workspace-name $aiProjectName
             
-            Write-Host "Azure AI Machine Learning Hub connection '$aiHubName' created."
-            Write-Log -message "Azure AI Machine Learning Hub connection '$aiHubName' created." -logFilePath $global:LogFilePath
+            Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' created."
+            Write-Log -message  "Azure $resourceType '$serviceName' connection for '$aiHubName' created." -logFilePath $global:LogFilePath
         }
         catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
-                try {
-                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -resourceType "Microsoft.MachineLearningServices/workspaces"    
-                }
-                catch {
-                    Write-Error "Failed to restore soft-deleted AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore soft-deleted AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
-                }
-            }
-            else {
-                Write-Error "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Azure AI Machine Learning Hub connection '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
-            }    
+
+            Write-Error "Failed to create Azure $resourceType '$serviceName' connection for '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Azure $resourceType '$serviceName' connection for '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath  
         }
     }
     else {              
-        Write-Host "AI Hub connection for '$aiHubName' already exists."
-        Write-Log -message "AI Hub connection for '$aiHubName' already exists." -logFilePath $global:LogFilePath
+        Write-Host "Azure  $resourceType'$serviceName' connection for '$aiHubName' already exists."
+        Write-Log -message "Azure $resourceType '$serviceName' connection for '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 }
 
@@ -2747,7 +2717,7 @@ function Update-ContainerRegistryFile {
     
     $rootPath = Get-Item -Path (Get-Location).Path
 
-    $filePath = "$rootPath/app/container.registry.yaml"
+    $filePath = "$rootPath/container.registry.yaml"
 
     $locationNoSpaces = $location.ToLower() -replace " ", ""
 
@@ -2789,7 +2759,7 @@ function Update-MLWorkspaceFile {
     
     $rootPath = Get-Item -Path (Get-Location).Path
 
-    $filePath = "$rootPath/app/ml.workspace.yaml"
+    $filePath = "$rootPath/ml.workspace.yaml"
 
     $content = @"
 name: $aiProjectName
@@ -2817,87 +2787,43 @@ tags:
 }
 
 # Function to update AI connection file
-function Update-AIConnectionFileOld {
-    param (
-        [string]$resourceGroupName,
-        [string]$resourceType,
-        [string]$serviceName,
-        [string]$serviceProperties
-    )
-    
-    $rootPath = Get-Item -Path (Get-Location).Path
-
-    #$rootAppPath = Find-AppRoot -currentDirectory (Get-Location).Path
-    $filePath = "$rootPath/app/ai.connection.yaml"
-
-    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $cognitiveServiceName
-
-    $content = @"
-name: $aiServiceName
-type: azure_ai_services
-endpoint: https://eastus.api.cognitive.microsoft.com/
-api_key: $apiKey
-ai_services_resource_id: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$aiServiceName
-"@
-
-    try {
-        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
-        Write-Host "File 'ai.connection.yaml' created and populated."
-        Write-Log -message "File 'ai.connection.yaml' created and populated."
-    }
-    catch {
-        Write-Error "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create or write to 'ai.connection.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    return $filePath
-}
-
-# Function to update AI connection file
 function Update-AIConnectionFile {
     param (
         [string]$resourceGroupName,
         [string]$resourceType,
-        [string]$searchServiceName = $global:searchServiceName,
-        [string]$serviceName,
-        [string]$serviceProperties
+        [string]$serviceName = $global:storageAccountName,
+        [string]$serviceProperties = $global:storageServiceProperties
     )
     
     $rootPath = Get-Item -Path (Get-Location).Path
 
-    #$rootAppPath = Find-AppRoot -currentDirectory (Get-Location).Path
-    #$filePath = "$rootPath/app/ai.connection.yaml"
-    $yamlFileName = $serviceProperties.YamlFileName
+    # Convert the serviceProperties string to a hashtable
+    $serviceProperties = $serviceProperties.Trim('@{}')
+    $servicePropertiesArray = $serviceProperties -split ';'
+    $servicePropertiesHashtable = @{}
 
-    $filePath = "$rootPath/app/$yamlFileName"
+    foreach ($property in $servicePropertiesArray) {
+        if ($property -match '^\s*(\w+)\s*=\s*(.*)\s*$') {
+            $key = $matches[1]
+            $value = $matches[2]
+            $servicePropertiesHashtable[$key] = $value
+        }
+    }
+
+    # Access the YamlFileName property
+    $yamlFileName = $servicePropertiesHashtable['YamlFileName']
+
+    $filePath = "$rootPath/$yamlFileName"
 
     $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
     
-    $storageAccountKey = az storage account keys list `
-        --resource-group $resourceGroupName `
-        --account-name $storageAccountName `
-        --query "[0].value" `
-        --output tsv
-
     switch ($resourceType) {
-        "AiService" {
-            $endpoint = "https://$searchServiceName.cognitiveservices.azure.com/"
-            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
-
-            $content = @"
-name: $serviceName
-type: azure_ai_services
-endpoint: $endpoint
-api_key: $apiKey
-ai_services_resource_id: $resourceId
-"@
-        }
         "SearchService" {
             $endpoint = "https://api.openai.com/v1"
-            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+            #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
             
             $content = @"
-            name: $serviceName
+name: $serviceName
 type: "azure_ai_search"
 
 endpoint: $endpoint
@@ -2905,9 +2831,15 @@ api_key: $apiKey
 "@   
         }
         "StorageAccount" {
-            $endpoint = "https://$storageAccountName.blob.core.windows.net/"
-            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
-            $containerName = $serviceProperties.ContainerName
+            $containerName = $servicePropertiesHashtable["ContainerName"]
+            $endpoint = "https://$storageAccountName.blob.core.windows.net/$containerName"
+            #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+
+            $storageAccountKey = az storage account keys list `
+                --resource-group $resourceGroupName `
+                --account-name $storageAccountName `
+                --query "[0].value" `
+                --output tsv
 
             $content = @"
 name: $serviceName
@@ -2915,9 +2847,6 @@ type: azure_blob
 url: $endpoint
 container_name: $containerName
 account_name: $storageAccountName
-
-credentials:
-  account_key: $storageAccountKey
 "@
         }
     }
