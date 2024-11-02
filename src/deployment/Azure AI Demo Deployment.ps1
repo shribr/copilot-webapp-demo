@@ -2835,11 +2835,13 @@ api_key: $apiKey
             $endpoint = "https://$storageAccountName.blob.core.windows.net/$containerName"
             #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
 
-            $storageAccountKey = az storage account keys list `
+            <#
+ # {            $storageAccountKey = az storage account keys list `
                 --resource-group $resourceGroupName `
                 --account-name $storageAccountName `
                 --query "[0].value" `
-                --output tsv
+                --output tsv:Enter a comment or description}
+#>
 
             $content = @"
 name: $serviceName
