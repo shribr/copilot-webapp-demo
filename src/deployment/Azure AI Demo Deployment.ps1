@@ -2819,7 +2819,7 @@ function Update-AIConnectionFile {
     
     switch ($resourceType) {
         "SearchService" {
-            $endpoint = "https://api.openai.com/v1"
+            $endpoint = "https://$serviceName.search.windows.net"
             #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
             
             $content = @"
