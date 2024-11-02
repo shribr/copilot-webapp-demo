@@ -77,7 +77,7 @@
   },
   "aiServiceProperties": {
     "Name": "ai-service-copilot-demo-001",
-    "Type": "azure_ai_search",
+    "Type": "azure_ai_services",
     "Endpoint": "https://srch-copilot-demo-001.cognitiveservices.azure.com/",
     "Key": "xxx",
     "YamlFileName": "ai.connection.yaml"

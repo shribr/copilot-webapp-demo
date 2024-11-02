@@ -1,5 +1,5 @@
 name: srch-copilot-demo-001
 type: "azure_ai_search"
 
-endpoint: https://api.openai.com/v1
+endpoint: https://srch-copilot-demo-001.search.windows.net
 api_key: fda9b2d80ab74a69b14a42fc96340697

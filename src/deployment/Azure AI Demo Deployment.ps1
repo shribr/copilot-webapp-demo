@@ -1648,7 +1648,10 @@ function New-Resources {
     if ($existingResources -notcontains $cognitiveServiceName) {
         try {
             $ErrorActionPreference = 'Stop'
-            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
+
+            $cognitiveServicesUrl = "https://$cognitiveServiceName.cognitiveservices.azure.com/"
+
+            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --custom-domain $cognitiveServicesUrl  --output none
             
             Write-Host "Cognitive Services account '$cognitiveServiceName' created."
             Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."       
