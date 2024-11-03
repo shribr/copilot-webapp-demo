@@ -62,18 +62,18 @@
     "YamlFileName": "container.registry.yaml"
   },
   "machineLearningProperties": {
-    "Name": "",
-    "DisplayName": "",
-    "Description": "",
-    "Location": "",
-    "StorageAccountName": "",
-    "ContainerRegistryName": "",
-    "KeyVaultName": "",
-    "ApplicationInsightsName": "",
+    "Name": "project-ai-copilot-demo-001",
+    "DisplayName": "AI Hub Copilot Demo Project",
+    "Description": "This configuration specifies a project configuration with existing dependent resources",
+    "Location": "east us",
+    "StorageAccountName": "stcopilotdemo001",
+    "ContainerRegistryName": "crcopilotdemo001",
+    "KeyVaultName": "kv-copilot-demo-001",
+    "ApplicationInsightsName": "appi-copilot-demo-001",
     "Tags": {
       "Purpose": ""
     },
-    "YamlFileName": "ml.workspace.yaml"
+    "YamlFileName": "ai.project.yaml"
   },
   "aiServiceProperties": {
     "Name": "ai-service-copilot-demo-001",

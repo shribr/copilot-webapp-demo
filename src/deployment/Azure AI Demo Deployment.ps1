@@ -803,6 +803,7 @@ function New-AIHubAndModel {
         [string]$resourceGroupName,
         [string]$location,
         [string]$appInsightsName,
+        [string]$userAssignedIdentityName,
         [array]$existingResources
     )
 
@@ -847,7 +848,11 @@ function New-AIHubAndModel {
         try {
             $ErrorActionPreference = 'Stop'
             
-            az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --custom-domain --output none
+            $aiServicesUrl = "$aiServiceName.openai.azure.com"
+
+            #az resource show --resource-group "$resourceGroupName" --name "$aiServiceName" --resource-type accounts --namespace Microsoft.CognitiveServices
+            
+            az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
             
             Write-Host "AI Service: '$aiServiceName' created."
             Write-Log -message "AI Service: '$aiServiceName' created."
@@ -869,16 +874,22 @@ function New-AIHubAndModel {
             }    
         }
     }
+    else {
+        Write-Host "AI Service '$aiServiceName' already exists."
+        Write-Log -message "AI Service '$aiServiceName' already exists." -logFilePath $global:LogFilePath
+    }
 
     # Create AI Model Deployment
     if ($existingResources -notcontains $aiModelName) {
 
-        $modelList = az cognitiveservices model list `
-            --location $location `
-            --query "[].{Kind:kind, ModelName:model.name, Version:model.version, Format:model.format, LifecycleStatus:model.lifecycleStatus, MaxCapacity:model.maxCapacity, SKUName:model.skus[0].name, DefaultCapacity:model.skus[0].capacity.default}" `
-            --output table | Out-String
-        
-        Write-Host $modelList
+        <#
+        # {        $modelList = az cognitiveservices model list `
+                    --location $location `
+                    --query "[].{Kind:kind, ModelName:model.name, Version:model.version, Format:model.format, LifecycleStatus:model.lifecycleStatus, MaxCapacity:model.maxCapacity, SKUName:model.skus[0].name, DefaultCapacity:model.skus[0].capacity.default}" `
+                    --output table | Out-String:Enter a comment or description}
+
+                    Write-Host $modelList
+        #>
 
         try {
             $ErrorActionPreference = 'Stop'
@@ -919,60 +930,25 @@ function New-AIHubAndModel {
         Write-Log -message "AI Model '$aiModelName' already exists." -logFilePath $global:LogFilePath
     }
 
-    # Create AI Project / ML Studio Workspace
+    # Create AI Studio AI Project / ML Studio Workspace
     if ($existingResources -notcontains $aiProjectName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-            
-            # https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-openai?view=azureml-api-2
-            # "While the az ml connection commands can be used to manage both Azure Machine Learning and Azure AI Studio connections, the OpenAI connection is specific to Azure AI Studio."
-
-            $mlWorkspaceFile = Update-MLWorkspaceFile `
-                -aiProjectName $aiProjectName `
-                -resourceGroupName $resourceGroupName `
-                -appInsightsName $appInsightsName `
-                -keyVaultName $keyVaultName `
-                -location $location `
-                -subscriptionId $subscriptionId `
-                -storageAccountName $storageAccountName `
-                -containerRegistryName $containerRegistryName 2>&1
-            
-            #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
-
-            $jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
-
-            if ($jsonOutput -match "error") {
-
-                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
-
-                $errorName = $errorInfo["Error"]
-                $errorCode = $errorInfo["Code"]
-                $errorDetails = $errorInfo["Message"]
-
-                $errorMessage = "Failed to create AI Project '$aiProjectName'. `
-        Error: $errorName `
-        Code: $errorCode `
-        Message: $errorDetails"
-
-                #throw $errorMessage
-
-                Write-Host $errorMessage
-                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
-            }
-            else {
-                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
-                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
-            }
-        }
-        catch {
-            Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
-        }
+        New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
+            -subscriptionId $global:subscriptionId `
+            -aiHubName $aiHubName `
+            -storageAccountName $storageAccountName `
+            -containerRegistryName $global:containerRegistryName `
+            -keyVaultName $keyVaultName `
+            -appInsightsName $appInsightsName `
+            -aiProjectName $aiProjectName `
+            -userAssignedIdentityName $userAssignedIdentityName `
+            -location $location
     }
     else {
         Write-Host "AI Project '$aiProjectName' already exists."
         Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
+
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $aiServiceName -serviceProperties $aiServiceProperties
 
     # Add storage account connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageAccountName -serviceProperties $storageServiceProperties
@@ -1014,7 +990,7 @@ function New-AIHubConnection {
         }
     }
     else {              
-        Write-Host "Azure  $resourceType'$serviceName' connection for '$aiHubName' already exists."
+        Write-Host "Azure  $resourceType '$serviceName' connection for '$aiHubName' already exists."
         Write-Log -message "Azure $resourceType '$serviceName' connection for '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 }
@@ -1286,6 +1262,132 @@ function New-ManagedIdentity {
     catch {
         Write-Error "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create User Assigned Identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Function to create a new machine learning workspace
+function New-MachineLearningWorkspace {
+    param(
+        [string]$aiProjectName,
+        [string]$subscriptionId,
+        [string]$aiHubName,
+        [string]$appInsightsName,
+        [string]$containerRegistryName,
+        [string]$userAssignedIdentityName,
+        [string]$storageAccountName,
+        [string]$keyVaultName,
+        [string]$resourceGroupName,
+        [string]$workspaceName,
+        [string]$location
+    )
+
+    $storageAccountName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+    $containerRegistryName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName"
+    $keyVaultName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+    $appInsightsName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
+    $userAssignedIdentityName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
+
+    <#
+        # {    $azCliCommand = @"
+        New-AzMlWorkspace -ResourceGroupName $resourceGroupName `
+            -Kind project `
+            -Name $aiProjectName `
+            -Description $machineLearningProperties.Description `
+            -Location $location `
+            -ApplicationInsightId $appInsightsName `
+            -ContainerRegistryId $containerRegistryName `
+            -HubResourceId $aiHubName `
+            -KeyVaultId $keyVaultName `
+            -StorageAccountId $storageAccountName `
+            -IdentityType "SystemAssigned" `
+            -SubscriptionId $subscriptionId
+        "@}
+        #>
+
+    try {
+        $ErrorActionPreference = 'Stop'
+            
+        # https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-openai?view=azureml-api-2
+        # "While the az ml connection commands can be used to manage both Azure Machine Learning and Azure AI Studio connections, the OpenAI connection is specific to Azure AI Studio."
+
+        $mlWorkspaceFile = Update-MLWorkspaceFile `
+            -aiProjectName $aiProjectName `
+            -resourceGroupName $resourceGroupName `
+            -appInsightsName $appInsightsName `
+            -keyVaultName $keyVaultName `
+            -location $location `
+            -subscriptionId $subscriptionId `
+            -storageAccountName $storageAccountName `
+            -containerRegistryName $containerRegistryName `
+            -userAssignedIdentityName $userAssignedIdentityName 2>&1
+            
+        #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
+
+        #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
+
+        #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
+        $jsonOutput = az ml workspace create --file $mlWorkspaceFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityName --kind project --hub-id $aiHubName
+
+        <#
+        # {        $azCliCommand = @"
+        az ml workspace create --resource-group $resourceGroupName `
+            --application-insights $appInsightsName `
+            --container-registry $containerRegistryName `
+            --description "This configuration specifies a workspace configuration with existing dependent resources" `
+            --display-name "AI Studio Project / Machine Learning Workspace" `
+            --hub-id $aiHubName `
+            --key-vault $keyVaultName `
+            --kind project `
+            --location $location `
+            --name $aiProjectName `
+            --primary-user-assigned-identity $userAssignedIdentityName `
+            --storage-account $storageAccountName `
+            --tags "purpose: Azure AI Hub Project"`
+            --output none
+        "@}
+        #>
+
+        #$jsonOutput = Invoke-Expression $azCliCommand
+        <#
+        # {        $jsonOutput = az ml workspace create --resource-group $resourceGroupName `
+                    --application-insights $appInsightsName `
+                    --description "This configuration specifies a workspace configuration with existing dependent resources" `
+                    --display-name "AI Studio Project / Machine Learning Workspace" `
+                    --hub-id $aiHubName `
+                    --kind project `
+                    --location $location `
+                    --name $aiProjectName `
+                    --output none --no-wait}
+        #>
+
+        if ($jsonOutput -match "error") {
+
+            $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+
+            $errorName = $errorInfo["Error"]
+            $errorCode = $errorInfo["Code"]
+            $errorDetails = $errorInfo["Message"]
+
+            $errorMessage = "Failed to create AI Project '$aiProjectName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+
+            Write-Host $errorMessage
+            Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+
+            return $errorMessage
+        }
+        else {
+            Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
+            Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+
+            return $jsonOutput
+        }
+    }
+    catch {
+        Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
     }
 }
 
@@ -2567,8 +2669,10 @@ function Start-Deployment {
 
     $functionAppServiceName = $functionAppService.Name
 
+    $userAssignedIdentityName = $global:userAssignedIdentityName
+
     # Create a new AI Hub and Model
-    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
     
     # Update configuration file for web frontend
     Update-ConfigFile - configFilePath "app/frontend/config.json" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppServiceName -searchIndexerName $searchIndexerName -searchIndexName $searchIndexName -siteLogo $global:siteLogo
@@ -2757,24 +2861,40 @@ function Update-MLWorkspaceFile {
         [string]$subscriptionId,
         [string]$storageAccountName,
         [string]$appInsightsName,
-        [string]$keyVaultName
+        [string]$keyVaultName,
+        [string]$userAssignedIdentityName
     )
     
     $rootPath = Get-Item -Path (Get-Location).Path
 
-    $filePath = "$rootPath/ml.workspace.yaml"
+    $filePath = "${rootPath}/ml.workspace.yaml"
+
+    #$userAssignedIdentityName = $global:userAssignedIdentityName
+
+    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName --query 'principalId' --output tsv
+
+    #`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
 
     $content = @"
+`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
 name: $aiProjectName
+resource_group: $resourceGroupName
 location: $location
 display_name: $aiProjectName
 description: This configuration specifies a workspace configuration with existing dependent resources
-storage_account: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName
-container_registry: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName
-key_vault: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName
-application_insights: /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName
-tags:
-  purpose: Azure AI Hub Project
+storage_account: $storageAccountName
+container_registry: $containerRegistryName
+key_vault: $keyVaultName
+application_insights: $appInsightsName
+#workspace_hub: $aiHubName
+identity:
+  type: user_assigned
+  tenant_id: $global:tenantId
+  principal_id: $assigneePrincipalId
+  user_assigned_identities: 
+    ${userAssignedIdentityName}: {}
+#tags:
+#  purpose: Azure AI Hub Project
 "@
 
     try {
@@ -2818,9 +2938,22 @@ function Update-AIConnectionFile {
 
     $filePath = "$rootPath/$yamlFileName"
 
-    $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
     
     switch ($resourceType) {
+        "AIService" {
+            $endpoint = "https://$serviceName.cognitiveservices.azure.com"
+            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
+    
+            $content = @"
+name: $serviceName
+type: "azure_ai_services"
+endpoint: $endpoint
+api_key: $apiKey
+ai_services_resource_id: $resourceId
+"@
+
+        }
         "SearchService" {
             $endpoint = "https://$serviceName.search.windows.net"
             #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
