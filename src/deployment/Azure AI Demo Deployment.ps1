@@ -1598,6 +1598,8 @@ function New-Resources {
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
 
+            az search service update --name $searchServiceName --resource-group $resourceGroupName --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
+
             $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
 
             if ($dataSourceExists -eq $false) {
@@ -1640,6 +1642,8 @@ function New-Resources {
         Write-Host "Search Service '$searchServiceName' already exists."
         Write-Log -message "Search Service '$searchServiceName' already exists."
 
+        az search service update --name $searchServiceName --resource-group $resourceGroupName --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
+      
         try {
             $ErrorActionPreference = 'Continue'
 

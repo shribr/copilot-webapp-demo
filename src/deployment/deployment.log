@@ -150,3 +150,74 @@
 2024-11-03 01:37:31 - AI Service 'ai-service-copilot-demo-001' already exists.
 2024-11-03 01:37:32 - AI Model deployment: 'ai-model-copilot-demo-001' created.
 2024-11-03 01:38:13 - File 'ml.workspace.yaml' created and populated.
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 11/07/2024 22:14:58 ***
+2024-11-07 22:15:05 - Storage account 'stcopilotdemo001' already exists.
+2024-11-07 22:15:05 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-07 22:15:06 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-07 22:15:08 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-07 22:15:11 - Search Index 'searchIndexName' already exists.
+2024-11-07 22:15:27 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+2024-11-07 22:15:27 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-11-07 22:15:27 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-11-07 22:15:27 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-11-07 22:15:27 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-11-07 22:15:28 - OpenAI model deployment 'ai' already exists.
+2024-11-07 22:15:28 - Container Registry 'crcopilotdemo001' already exists.
+2024-11-07 22:15:28 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-11-07 22:15:28 - Computer Vision Service 'cv-copilot-demo-001' already exists.
+2024-11-07 22:15:33 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-11-07 22:15:33 - Skipping deployment for Web app 'app-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-11-07 22:15:36 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
+2024-11-07 22:15:36 - Skipping deployment for Function app 'func-chat-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-11-07 22:15:36 - Identity 'id-copilot-demo-001' already exists.
+2024-11-07 22:15:36 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-11-07 22:15:36 - AI Hub 'hub-ai-copilot-demo-001' already exists.
+2024-11-07 22:15:36 - AI Service 'ai-service-copilot-demo-001' already exists.
+2024-11-07 22:15:37 - AI Model deployment: 'ai-model-copilot-demo-001' created.
+2024-11-07 22:15:55 - File 'ml.workspace.yaml' created and populated.
+2024-11-07 22:16:27 - AI Project 'project-ai-copilot-demo-001' in 'hub-ai-copilot-demo-001' created.
+2024-11-07 22:16:33 - File 'ai.connection.yaml' created and populated.
+2024-11-07 22:16:38 - Azure AIService 'ai-service-copilot-demo-001' connection for 'hub-ai-copilot-demo-001' created.
+2024-11-07 22:16:42 - File 'storage.connection.yaml' created and populated.
+2024-11-07 22:16:46 - Azure StorageAccount 'stcopilotdemo001' connection for 'hub-ai-copilot-demo-001' created.
+2024-11-07 22:16:50 - File 'search.connection.yaml' created and populated.
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 11/07/2024 22:18:53 ***
+2024-11-07 22:18:59 - Storage account 'stcopilotdemo001' already exists.
+2024-11-07 22:18:59 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-07 22:19:00 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-07 22:19:01 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-07 22:19:04 - Search Index 'searchIndexName' already exists.
+2024-11-07 22:19:20 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+2024-11-07 22:19:20 - Log Analytics workspace 'log-copilot-demo-001' already exists.
+2024-11-07 22:19:20 - Application Insights 'appi-copilot-demo-001' already exists.
+2024-11-07 22:19:20 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-11-07 22:19:20 - OpenAI Service 'openai-copilot-demo-001' already exists.
+2024-11-07 22:19:21 - OpenAI model deployment 'ai' already exists.
+2024-11-07 22:19:21 - Container Registry 'crcopilotdemo001' already exists.
+2024-11-07 22:19:21 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
+2024-11-07 22:19:21 - Computer Vision Service 'cv-copilot-demo-001' already exists.
+2024-11-07 22:19:24 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-11-07 22:19:24 - Skipping deployment for Web app 'app-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-11-07 22:19:27 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
+2024-11-07 22:19:27 - Skipping deployment for Function app 'func-chat-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-11-07 22:19:27 - Identity 'id-copilot-demo-001' already exists.
+2024-11-07 22:19:27 - Key Vault 'kv-copilot-demo-001' already exists.
+2024-11-07 22:19:27 - AI Hub 'hub-ai-copilot-demo-001' already exists.
+2024-11-07 22:19:27 - AI Service 'ai-service-copilot-demo-001' already exists.
+2024-11-07 22:19:28 - AI Model deployment: 'ai-model-copilot-demo-001' created.
+2024-11-07 22:19:28 - AI Project 'project-ai-copilot-demo-001' already exists.
+2024-11-07 22:19:34 - File 'ai.connection.yaml' created and populated.
+2024-11-07 22:19:47 - Azure AIService 'ai-service-copilot-demo-001' connection for 'hub-ai-copilot-demo-001' created.
+2024-11-07 22:19:51 - File 'storage.connection.yaml' created and populated.
+2024-11-07 22:19:55 - Azure StorageAccount 'stcopilotdemo001' connection for 'hub-ai-copilot-demo-001' created.
+2024-11-07 22:19:59 - File 'search.connection.yaml' created and populated.
+2024-11-07 22:20:04 - Azure SearchService 'srch-copilot-demo-001' connection for 'hub-ai-copilot-demo-001' created.
+2024-11-07 22:20:18 - Config file updated successfully.
+2024-11-07 22:20:20 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
+2024-11-07 22:20:36 - Web app 'app-copilot-demo-001' deployed successfully.
+2024-11-07 22:20:39 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
+2024-11-07 22:22:36 - Function app 'func-chat-copilot-demo-001' deployed successfully.
+2024-11-07 22:22:36 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 43 SEC : 022 MS ***
+
