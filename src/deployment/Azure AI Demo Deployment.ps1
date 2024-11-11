@@ -1002,6 +1002,9 @@ function New-ApiManagementService {
         [array]$apiManagementService
     )
 
+    #https://eastus.api.cognitive.microsoft.com/documentintelligence/documentModels/prebuilt-read:analyze?api-version=2024-07-31-preview&api-key=94a688bb516141839048e01dc680192d
+    #https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/read.png
+    
     $apiManagementServiceName = $apiManagementService.Name
 
     try {
@@ -1987,11 +1990,10 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create API Management Service
     
-    <#
-    # {    if ($existingResources -notcontains $apiManagementService.Name) {
-            New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
-        }:Enter a comment or description}
-    #>
+
+    if ($existingResources -notcontains $apiManagementService.Name) {
+        New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
+    }
 
 }
 
