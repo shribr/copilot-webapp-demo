@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2021-04-30",
+      "name": "[parameters('cognitiveServicesAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "S1"
+      },
+      "kind": "CognitiveServices",
+      "properties": {
+        "publicNetworkAccess": "Disabled",
+        "virtualNetworkRules": [
+          {
+            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2021-05-01",
+      "name": "[parameters('privateEndpointName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "subnet": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "cognitiveServicesPrivateLink",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.CognitiveServices/accounts', parameters('cognitiveServicesAccountName'))]",
+              "groupIds": ["account"]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones",
+      "apiVersion": "2021-05-01",
+      "name": "privatelink.search.windows.net",
+      "location": "global",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2021-05-01",
+      "name": "[concat('privatelink.search.windows.net/', parameters('vnetName'))]",
+      "location": "global",
+      "properties": {
+        "virtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+        },
+        "registrationEnabled": false
+      }
+    }
+  ]
+}

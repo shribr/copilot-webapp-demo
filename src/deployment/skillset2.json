@@ -1,0 +1,175 @@
+  {
+  "name": "vector-azure-search-openai-demo-csharp-skillset",
+  "description": "Skillset to chunk documents and generate embeddings",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
+      "name": "#1",
+      "context": "/document/normalized_images/*",
+      "inputs": [
+        {
+          "name": "image",
+          "source": "/document/normalized_images/*",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "targetName": "text"
+        }
+      ],
+      "defaultLanguageCode": "en",
+      "detectOrientation": true,
+      "lineEnding": "Space"
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
+      "name": "#2",
+      "context": "/document",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/content",
+          "inputs": []
+        },
+        {
+          "name": "itemsToInsert",
+          "source": "/document/normalized_images/*/text",
+          "inputs": []
+        },
+        {
+          "name": "offsets",
+          "source": "/document/normalized_images/*/contentOffset",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mergedText",
+          "targetName": "mergedText"
+        }
+      ],
+      "insertPreTag": " ",
+      "insertPostTag": " "
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+      "name": "#3",
+      "description": "Split skill to chunk documents",
+      "context": "/document",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/mergedText",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "textItems",
+          "targetName": "pages"
+        }
+      ],
+      "defaultLanguageCode": "en",
+      "textSplitMode": "pages",
+      "maximumPageLength": 2000,
+      "pageOverlapLength": 500,
+      "unit": "characters"
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
+      "name": "#4",
+      "description": "An AI Services Vision vectorization skill for text",
+      "context": "/document/pages/*",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/pages/*",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "vector",
+          "targetName": "text_vector"
+        }
+      ],
+      "modelVersion": "2023-04-15"
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
+      "name": "#5",
+      "description": "An AI Services Vision vectorization skill for images",
+      "context": "/document/normalized_images/*",
+      "inputs": [
+        {
+          "name": "image",
+          "source": "/document/normalized_images/*",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "vector",
+          "targetName": "image_vector"
+        }
+      ],
+      "modelVersion": "2023-04-15"
+    }
+  ],
+  "cognitiveServices": {
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
+    "key": null
+  },
+  "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
+  "indexProjections": {
+    "selectors": [
+      {
+        "targetIndexName": "vector-azure-search-openai-demo-csharp",
+        "parentKeyFieldName": "text_parent_id",
+        "sourceContext": "/document/pages/*",
+        "mappings": [
+          {
+            "name": "text_vector",
+            "source": "/document/pages/*/text_vector"
+          },
+          {
+            "name": "chunk",
+            "source": "/document/pages/*"
+          },
+          {
+            "name": "metadata_storage_path",
+            "source": "/document/metadata_storage_path"
+          },
+          {
+            "name": "title",
+            "source": "/document/title"
+          }
+        ]
+      },
+      {
+        "targetIndexName": "vector-azure-search-openai-demo-csharp",
+        "parentKeyFieldName": "image_parent_id",
+        "sourceContext": "/document/normalized_images/*",
+        "mappings": [
+          {
+            "name": "image_vector",
+            "source": "/document/normalized_images/*/image_vector"
+          },
+          {
+            "name": "metadata_storage_path",
+            "source": "/document/metadata_storage_path"
+          },
+          {
+            "name": "title",
+            "source": "/document/title"
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "projectionMode": "skipIndexingParentDocuments"
+    }
+  }
+}
