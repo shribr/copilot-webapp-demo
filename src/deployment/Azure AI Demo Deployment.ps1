@@ -1736,6 +1736,14 @@ function New-Resources {
                         Write-Host "Search Indexer '$searchIndexerName' already exists."
                         Write-Log -message "Search Indexer '$searchIndexerName' already exists."
                     }
+
+                    if ($searchSkillSetExists -eq $false) {
+                        New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+                    }
+                    else {
+                        Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                        Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+                    }
                 }
             }
             catch {
