@@ -136,3 +136,21 @@
     "message": "Skillset \u0027vector-srch-skillset2-copilot-demo-001\u0027 contains a skill of type \u0027Microsoft.Skills.Vision.VectorizeSkill\u0027 which is not supported in this API version. "
   }
 }
+*** LOG SEQUENCE: 15 ***
+*** SCRIPT START TIME: 11/27/2024 03:14:55 ***
+2024-11-27 03:15:02 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 03:15:02 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 03:15:03 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 03:15:08 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 03:15:11 - Search Index 'searchIndexName' already exists.
+2024-11-27 03:15:30 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 16 ***
+*** SCRIPT START TIME: 11/27/2024 03:26:56 ***
+2024-11-27 03:27:04 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 03:27:04 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 03:27:04 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2024-11-27 03:27:05 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 03:27:10 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 03:27:13 - Search Index 'searchIndexName' already exists.
+2024-11-27 03:27:31 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+2024-11-27 03:28:13 - Skillset '' created successfully.

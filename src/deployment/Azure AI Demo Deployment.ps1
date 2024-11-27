@@ -1619,6 +1619,47 @@ function New-Resources {
         Write-Log -message "App Service Plan '$appServicePlanName' already exists."
     }
 
+        #**********************************************************************************************************************
+    # Create a Cognitive Services account
+
+    $cognitiveServiceName = Get-ValidServiceName -serviceName $cognitiveServiceName
+
+    if ($existingResources -notcontains $cognitiveServiceName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+
+            $cognitiveServicesUrl = "https://$cognitiveServiceName.cognitiveservices.azure.com/"
+
+            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --custom-domain $cognitiveServicesUrl  --output none
+            
+            Write-Host "Cognitive Services account '$cognitiveServiceName' created."
+            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."       
+        }
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+                try {
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                    Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
+                    Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
+                }
+                catch {
+                    Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            } 
+        }
+    }
+    else {
+        Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
+        Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists."
+    }
+
     # **********************************************************************************************************************
     # Create a Search Service
 
@@ -1680,7 +1721,7 @@ function New-Resources {
                 }
 
                 if ($searchSkillSetExists -eq $false) {
-                    New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+                    New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
                 }
                 else {
                     Write-Host "Search Skill Set '$searchSkillSetName' already exists."
@@ -1748,7 +1789,7 @@ function New-Resources {
                     }
 
                     if ($searchSkillSetExists -eq $false) {
-                        New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+                        New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
                     }
                     else {
                         Write-Host "Search Skill Set '$searchSkillSetName' already exists."
@@ -1812,47 +1853,6 @@ function New-Resources {
     else {
         Write-Host "Application Insights '$appInsightsName' already exists."
         Write-Log -message "Application Insights '$appInsightsName' already exists."
-    }
-
-    #**********************************************************************************************************************
-    # Create a Cognitive Services account
-
-    $cognitiveServiceName = Get-ValidServiceName -serviceName $cognitiveServiceName
-
-    if ($existingResources -notcontains $cognitiveServiceName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-
-            $cognitiveServicesUrl = "https://$cognitiveServiceName.cognitiveservices.azure.com/"
-
-            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --custom-domain $cognitiveServicesUrl  --output none
-            
-            Write-Host "Cognitive Services account '$cognitiveServiceName' created."
-            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."       
-        }
-        catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
-                try {
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
-                    Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
-                    Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
-                }
-                catch {
-                    Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                }
-            }
-            else {
-                Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            } 
-        }
-    }
-    else {
-        Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
-        Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists."
     }
 
     #**********************************************************************************************************************
@@ -2283,10 +2283,16 @@ function New-SearchSkillSet
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         $searchServiceAPiVersion = "2024-05-01-Preview"
 
+        $cognitiveServiceKey = az cognitiveservices account keys list --name $cognitiveServiceName --resource-group $resourceGroupName --query "key1" --output tsv
+
         $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$searchServiceAPiVersion"
 
         # Convert the body hashtable to JSON
         $jsonBody = $global:searchSkillSet | ConvertTo-Json -Depth 10
+        $jsonObject = $jsonBody | ConvertFrom-Json
+
+        $jsonObject.cognitiveServices.key = $cognitiveServiceKey
+        $jsonBody = $jsonObject | ConvertTo-Json -Depth 10
 
         try {
             $ErrorActionPreference = 'Continue'
