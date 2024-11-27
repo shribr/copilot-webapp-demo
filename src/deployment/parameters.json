@@ -37,8 +37,11 @@
   "restoreSoftDeletedResources": true,
   "searchServiceName": "srch-copilot-demo-001",
   "searchIndexName": "srch-index-copilot-demo-001",
+  "searchVectorIndexName": "vector-srch-index-copilot-demo-001",
   "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",
   "searchIndexerName": "srch-indexer-copilot-demo-001",
+  "searchSkillSetName": "vector-srch-skillset-copilot-demo-001",
+  "searchVectorIndexerName": "vector-srch-indexer-copilot-demo-001",
   "serviceBusNamespaceName": "sb-copilot-demo-001",
   "searchDataSourceName": "srch-datasource-copilot-demo-001",
   "sharedDashboardName": "dash-copilot-demo-001",
@@ -90,7 +93,11 @@
     "AIServicesResourceID": "",
     "YamlFileName": "search.connection.yaml"
   },
-  "searchSkills":
+  "searchSkillSet":
+  {
+  "name": "vector-srch-skillset-copilot-demo-001",
+  "description": "Skillset to chunk documents and generate embeddings",
+  "skills":
   [
     {
       "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
@@ -207,7 +214,62 @@
       ],
       "modelVersion": "2023-04-15"
     }
-  ]   
+  ]
+  ,
+  "cognitiveServices": {
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
+  },
+  "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
+  "indexProjections": {
+    "selectors": [
+      {
+        "targetIndexName": "vector-srch-index-copilot-demo-001",
+        "parentKeyFieldName": "text_parent_id",
+        "sourceContext": "/document/pages/*",
+        "mappings": [
+          {
+            "name": "text_vector",
+            "source": "/document/pages/*/text_vector"
+          },
+          {
+            "name": "chunk",
+            "source": "/document/pages/*"
+          },
+          {
+            "name": "metadata_storage_path",
+            "source": "/document/metadata_storage_path"
+          },
+          {
+            "name": "title",
+            "source": "/document/title"
+          }
+        ]
+      },
+      {
+        "targetIndexName": "vector-srch-index-copilot-demo-001",
+        "parentKeyFieldName": "image_parent_id",
+        "sourceContext": "/document/normalized_images/*",
+        "mappings": [
+          {
+            "name": "image_vector",
+            "source": "/document/normalized_images/*/image_vector"
+          },
+          {
+            "name": "metadata_storage_path",
+            "source": "/document/metadata_storage_path"
+          },
+          {
+            "name": "title",
+            "source": "/document/title"
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "projectionMode": "skipIndexingParentDocuments"
+    }
+  }
+}
   ,
   "storageServiceProperties": {
     "Name": "stcopilotdemo001",

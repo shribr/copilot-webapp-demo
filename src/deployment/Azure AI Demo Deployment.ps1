@@ -474,6 +474,32 @@ function Get-SearchIndexers {
     }
 }
 
+# Function to check if a search skillset exists
+function Get-SearchSkillSets {
+    param (
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$subscriptionId
+    )
+
+    $subscriptionId = $global:subscriptionId
+    $resourceGroupName = $global:resourceGroupName
+
+    $accessToken = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
+   
+    $uri = "https://$searchServiceName.search.windows.net/skillsets?api-version=2024-07-01"
+    
+    try {
+        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "api-key" = "$accessToken" }
+        $skillsets = $response.value | Select-Object -ExpandProperty name
+        return $skillsets
+    }
+    catch {
+        Write-Error "Failed to query search skillsets: $_"
+        return $false
+    }
+}
+
 # Function to find a unique suffix and create resources
 function Get-UniqueSuffix {
     param (
@@ -674,6 +700,8 @@ function Initialize-Parameters {
     $global:searchIndexName = $parametersObject.searchIndexName
     $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
     $global:searchIndexerName = $parametersObject.searchIndexerName
+    $global:searchSkillSet = $parametersObject.searchSkillSet
+    $global:searchSkillSetName = $parametersObject.searchSkillSetName
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
     $global:sharedDashboardName = $parametersObject.sharedDashboardName
     $global:siteLogo = $parametersObject.siteLogo
@@ -771,6 +799,8 @@ function Initialize-Parameters {
         searchIndexName              = $searchIndexName
         searchIndexFieldNames        = $searchIndexFieldNames
         searchIndexerName            = $searchIndexerName
+        searchSkillSet               = $searchSkillSet
+        searchSkillSetName           = $searchSkillSetName
         serviceBusNamespaceName      = $serviceBusNamespaceName
         searchDataSourceName         = $searchDataSourceName
         sharedDashboardName          = $sharedDashboardName
@@ -1496,6 +1526,7 @@ function New-Resources {
         [string]$searchIndexName,
         [string]$searchIndexerName,
         [string]$searchDatasourceName,
+        [string]$searchSkillSetName,
         [string]$logAnalyticsWorkspaceName,
         [string]$computerVisionName,
         [string]$cognitiveServiceName,
@@ -1530,6 +1561,7 @@ function New-Resources {
     Write-Host "userPrincipalName: $userPrincipalName"
     Write-Host "searchIndexName: $searchIndexName"
     Write-Host "searchIndexerName: $searchIndexerName"
+    Write-Host "searchSkillSetName: $searchSkillSetName"
 
     # **********************************************************************************************************************
     # Create a storage account
@@ -1623,7 +1655,9 @@ function New-Resources {
                 New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
             }
             
-            $searchIndexExists = $searchIndexes -contains $global:searchIndexName
+            #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
+
+            $searchSkillSetExists = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
 
             Start-Sleep -Seconds 15
 
@@ -1632,6 +1666,18 @@ function New-Resources {
 
                 if ($searchIndexerExists -eq $false) {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
+                }
+                else {
+                    Write-Host "Search Indexer '$searchIndexerName' already exists."
+                    Write-Log -message "Search Indexer '$searchIndexerName' already exists."
+                }
+
+                if ($searchSkillSetExists -eq $false) {
+                    New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+                }
+                else {
+                    Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                    Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
                 }
             }
         }
@@ -1674,7 +1720,8 @@ function New-Resources {
                 Write-Log -message "Search Index '$searchIndexName' already exists."
             }
 
-            $searchIndexExists = $searchIndexes -contains $global:searchIndexName
+            #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
+            $searchSkillSetExists = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
 
             Start-Sleep -Seconds 15
 
@@ -2197,6 +2244,52 @@ function New-SearchIndexer {
     catch {
         Write-Error "Failed to create index '$global:searchIndexerName': $_"
         Write-Log -message "Failed to create index '$global:searchIndexerName': $_"
+
+        return false
+    }
+}
+
+# Function to create a new skillset
+function New-SearchSkillSet
+{
+    param(
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$skillSetName,
+        [string]$cognitiveServiceName
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        $searchServiceAPiVersion = "2024-07-01"
+
+        $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$searchServiceAPiVersion"
+
+        # Convert the body hashtable to JSON
+        $jsonBody = $global:searchSkillSet | ConvertTo-Json -Depth 10
+
+        try {
+            $ErrorActionPreference = 'Continue'
+
+            Invoke-RestMethod -Uri $skillSetUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+            
+            Write-Host "Skillset '$skillSetName' created successfully."
+            Write-Log -message "Skillset '$skillSetName' created successfully."
+
+            return true
+        }
+        catch {
+            Write-Error "Failed to create skillset '$skillSetName': $_"
+            Write-Log -message "Failed to create skillset '$skillSetName': $_"
+
+            return false
+        }
+    }
+    catch {
+        Write-Error "Failed to create skillset '$skillSetName': $_"
+        Write-Log -message "Failed to create skillset '$skillSetName': $_"
 
         return false
     }
