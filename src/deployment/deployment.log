@@ -34,3 +34,105 @@
 2024-11-11 00:28:48 - Function app 'func-chat-copilot-demo-001' deployed successfully.
 2024-11-11 00:28:48 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 55 SEC : 413 MS ***
 
+*** LOG SEQUENCE: 2 ***
+*** SCRIPT START TIME: 11/27/2024 02:15:03 ***
+2024-11-27 02:15:11 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:15:11 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:15:12 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:15:16 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:15:18 - Search Index 'searchIndexName' already exists.
+2024-11-27 02:15:36 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 3 ***
+*** SCRIPT START TIME: 11/27/2024 02:17:11 ***
+2024-11-27 02:17:18 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:17:18 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:17:19 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:17:22 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:17:25 - Search Index 'searchIndexName' already exists.
+2024-11-27 02:17:43 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 11/27/2024 02:18:34 ***
+2024-11-27 02:18:40 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:18:40 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:18:41 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:18:44 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:18:47 - Search Index 'searchIndexName' already exists.
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 11/27/2024 02:19:53 ***
+2024-11-27 02:20:02 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:20:02 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:20:03 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:20:07 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:20:10 - Search Index 'searchIndexName' already exists.
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 11/27/2024 02:21:46 ***
+2024-11-27 02:21:53 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:21:53 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:21:54 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:21:58 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:22:01 - Search Index 'searchIndexName' already exists.
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 11/27/2024 02:26:42 ***
+2024-11-27 02:26:48 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:26:48 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:26:50 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:26:56 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:26:59 - Search Index 'searchIndexName' already exists.
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 11/27/2024 02:29:16 ***
+2024-11-27 02:29:22 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:29:22 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:29:23 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:29:28 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:29:30 - Search Index 'searchIndexName' already exists.
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 11/27/2024 02:30:17 ***
+2024-11-27 02:30:23 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:30:23 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:30:24 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:30:29 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:30:32 - Search Index 'searchIndexName' already exists.
+*** LOG SEQUENCE: 10 ***
+*** SCRIPT START TIME: 11/27/2024 02:37:33 ***
+2024-11-27 02:37:39 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:37:39 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:37:40 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:37:45 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:37:47 - Search Index 'searchIndexName' already exists.
+*** LOG SEQUENCE: 11 ***
+*** SCRIPT START TIME: 11/27/2024 02:41:19 ***
+2024-11-27 02:41:25 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:41:25 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:41:26 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:41:30 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 12 ***
+*** SCRIPT START TIME: 11/27/2024 02:41:57 ***
+2024-11-27 02:42:04 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 02:42:04 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 02:42:05 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 02:42:09 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 02:42:12 - Search Index 'searchIndexName' already exists.
+2024-11-27 02:42:55 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 13 ***
+*** SCRIPT START TIME: 11/27/2024 03:01:31 ***
+2024-11-27 03:01:39 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 03:01:39 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 03:01:40 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 03:01:45 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 03:01:47 - Search Index 'searchIndexName' already exists.
+2024-11-27 03:02:05 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 14 ***
+*** SCRIPT START TIME: 11/27/2024 03:05:36 ***
+2024-11-27 03:05:43 - Storage account 'stcopilotdemo001' already exists.
+2024-11-27 03:05:43 - App Service Plan 'asp-copilot-demo-001' already exists.
+2024-11-27 03:05:44 - Search Service 'srch-copilot-demo-001' already exists.
+2024-11-27 03:05:48 - Search Data Source 'srch-datasource-copilot-demo-001' already exists.
+2024-11-27 03:05:51 - Search Index 'searchIndexName' already exists.
+2024-11-27 03:06:09 - Search Indexer 'srch-index-copilot-demo-001' already exists.
+2024-11-27 03:12:49 - Failed to create skillset '': 
+{
+  "error": {
+    "code": "",
+    "message": "Skillset \u0027vector-srch-skillset2-copilot-demo-001\u0027 contains a skill of type \u0027Microsoft.Skills.Vision.VectorizeSkill\u0027 which is not supported in this API version. "
+  }
+}

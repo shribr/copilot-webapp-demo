@@ -755,6 +755,9 @@ function Initialize-Parameters {
     Write-Host "searchIndexName from parametersObject: $($parametersObject.searchIndexName)"
     Write-Host "searchIndexName from global: $($global:searchIndexName)"
 
+    Write-Host "searchSkillSetName from parametersObject: $($parametersObject.searchSkillSetName)"
+    Write-Host "searchSkillSetName from global: $($global:searchSkillSetName)"
+
     return @{
         aiHubName                    = $aiHubName
         aiModelName                  = $aiModelName
@@ -1635,7 +1638,8 @@ function New-Resources {
 
             az search service update --name $searchServiceName --resource-group $resourceGroupName --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
 
-            $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+            $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+            $dataSourceExists = $dataSources -contains $searchDataSourceName 
 
             if ($dataSourceExists -eq $false) {
                 New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
@@ -1645,7 +1649,7 @@ function New-Resources {
                 Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
             }
 
-            $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+            #$dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
 
             $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 
@@ -1657,12 +1661,15 @@ function New-Resources {
             
             #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
 
-            $searchSkillSetExists = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+            $searchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+
+            $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
 
             Start-Sleep -Seconds 15
 
             if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
-                $searchIndexerExists = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
+                $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $global:searchIndexerName
+                $searchIndexerExists = $searchIndexers -contains $global:searchIndexerName
 
                 if ($searchIndexerExists -eq $false) {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
@@ -1706,7 +1713,8 @@ function New-Resources {
                 Write-Log -message "Search Data Source '$searchDataSourceName' already exists."
             }
 
-            $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+            $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+            $dataSourceExists = $dataSources -contains $searchDataSourceName
 
             $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 
@@ -1721,14 +1729,16 @@ function New-Resources {
             }
 
             #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
-            $searchSkillSetExists = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+            $searchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+            $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
 
             Start-Sleep -Seconds 15
 
             try {
                 if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
-                    $searchIndexerExists = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
-                
+                    $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
+                    $searchIndexerExists = $searchIndexers -contains $global:searchIndexerName
+
                     if ($searchIndexerExists -eq $false) {
                         New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexerName $searchIndexerName -searchDatasourceName $searchDatasourceName -searchIndexSchema $searchIndexSchema -searchIndexerSchedule $searchIndexerSchedule
                     }
@@ -2263,7 +2273,7 @@ function New-SearchSkillSet
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
-        [string]$skillSetName,
+        [string]$searchSkillSetName,
         [string]$cognitiveServiceName
     )
 
@@ -2271,7 +2281,7 @@ function New-SearchSkillSet
         $ErrorActionPreference = 'Stop'
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        $searchServiceAPiVersion = "2024-07-01"
+        $searchServiceAPiVersion = "2024-05-01-Preview"
 
         $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$searchServiceAPiVersion"
 
@@ -2693,6 +2703,7 @@ function Start-Deployment {
             `searchIndexName $searchIndexName `
             `searchIndexerName $searchIndexerName `
             -searchDatasourceName $searchDatasourceName `
+            -searchSkillSetName $searchSkillSetName `
             -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
             -cognitiveServiceName $cognitiveServiceName `
             -computerVisionName $computerVisionName `
@@ -2719,6 +2730,7 @@ function Start-Deployment {
             `searchIndexName $searchIndexName `
             `searchIndexerName $searchIndexerName `
             -searchDatasourceName $searchDatasourceName `
+            -searchSkillSetName $searchSkillSetName `
             -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
             -cognitiveServiceName $cognitiveServiceName `
             -computerVisionName $computerVisionName `

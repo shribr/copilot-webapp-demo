@@ -40,7 +40,7 @@
   "searchVectorIndexName": "vector-srch-index-copilot-demo-001",
   "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",
   "searchIndexerName": "srch-indexer-copilot-demo-001",
-  "searchSkillSetName": "vector-srch-skillset-copilot-demo-001",
+  "searchSkillSetName": "vector-srch-skillset2-copilot-demo-001",
   "searchVectorIndexerName": "vector-srch-indexer-copilot-demo-001",
   "serviceBusNamespaceName": "sb-copilot-demo-001",
   "searchDataSourceName": "srch-datasource-copilot-demo-001",
@@ -95,7 +95,7 @@
   },
   "searchSkillSet":
   {
-  "name": "vector-srch-skillset-copilot-demo-001",
+  "name": "vector-srch-skillset2-copilot-demo-001",
   "description": "Skillset to chunk documents and generate embeddings",
   "skills":
   [
@@ -171,8 +171,7 @@
       "defaultLanguageCode": "en",
       "textSplitMode": "pages",
       "maximumPageLength": 2000,
-      "pageOverlapLength": 500,
-      "unit": "characters"
+      "pageOverlapLength": 500
     },
     {
       "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
@@ -217,7 +216,8 @@
   ]
   ,
   "cognitiveServices": {
-    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
+    "key": "bcf9c45063404ef1b36d124ce3c2b241"
   },
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "indexProjections": {
