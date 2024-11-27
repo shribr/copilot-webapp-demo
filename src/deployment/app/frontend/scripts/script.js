@@ -461,7 +461,14 @@ async function getAnswers(userInput) {
         const data = await response.json();
         
         // Extract the source documents from the response
-        const sourceDocuments = data.choices[0].message.metadata.sources;
+        try {
+            const sourceDocuments = data.choices[0].message.metadata.sources;
+        } 
+        catch (error) 
+        {
+            console.error('Error extracting source documents:', error);
+        }
+        
 
         return data;
     }
