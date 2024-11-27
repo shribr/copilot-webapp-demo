@@ -40,7 +40,7 @@
   "searchVectorIndexName": "vector-srch-index-copilot-demo-001",
   "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",
   "searchIndexerName": "srch-indexer-copilot-demo-001",
-  "searchSkillSetName": "vector-srch-skillset2-copilot-demo-001",
+  "searchSkillSetName": "vector-srch-skillset-copilot-demo-001",
   "searchVectorIndexerName": "vector-srch-indexer-copilot-demo-001",
   "serviceBusNamespaceName": "sb-copilot-demo-001",
   "searchDataSourceName": "srch-datasource-copilot-demo-001",
@@ -95,7 +95,7 @@
   },
   "searchSkillSet":
   {
-  "name": "vector-srch-skillset2-copilot-demo-001",
+  "name": "vector-srch-skillset-copilot-demo-001",
   "description": "Skillset to chunk documents and generate embeddings",
   "skills":
   [
