@@ -493,7 +493,7 @@ async function getAnswersFromAzureSearch(userInput) {
 
     const apiKey = config.AZURE_SEARCH_API_KEY;
     //const searchFunctionName = config.AZURE_SEARCH_FUNCTION_APP_NAME;
-    const indexName = config.AZURE_SEARCH_INDEX_NAME;
+    const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
     const apiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
