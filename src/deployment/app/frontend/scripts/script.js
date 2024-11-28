@@ -517,19 +517,24 @@ async function getAnswersFromAzureSearch(userInput) {
     
     const jsonString = JSON.stringify(searchQuery);
     
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'api-key': `${apiKey}`
-        },
-        body: jsonString
-    });
-
-    const data = await response.json();
-    console.log(data);
-
-    return data;
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`
+            },
+            body: jsonString
+        });
+    
+        const data = await response.json();
+        console.log(data);
+        
+        return data;
+    } 
+    catch (error) {
+        console.log('Error fetching answers from Azure Search:', error);
+    }
 }
 
 //function to create side navigation links
