@@ -517,22 +517,17 @@ async function getAnswersFromAzureSearch(userInput) {
     
     const jsonString = JSON.stringify(searchQuery);
     
-    try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': `${apiKey}`
-            },
-            body: jsonString,
-            mode: 'no-cors'
-        });
-    
-        const data = await response.json();
-        console.log(data);
-    } catch (error) {
-        console.error('Error:', error);
-    }
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': `${apiKey}`
+        },
+        body: jsonString
+    });
+
+    const data = await response.json();
+    console.log(data);
 
     return data;
 }
