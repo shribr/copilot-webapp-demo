@@ -524,7 +524,8 @@ async function getAnswersFromAzureSearch(userInput) {
                 'Content-Type': 'application/json',
                 'api-key': `${apiKey}`
             },
-            body: jsonString
+            body: jsonString,
+            mode: 'no-cors'
         });
     
         const data = await response.json();
