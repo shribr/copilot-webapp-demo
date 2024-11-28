@@ -385,7 +385,7 @@ async function showResponse(questionBubble) {
             const sourceDocumentLink = response.value[0].metadata_storage_path;
 
             thoughtProcessContent.textContent = 'Thought process content goes here.';
-            supportingContentContent.textContent = '<a href="' + sourceDocumentLink + '" target="_blank">' + sourceDocument + '</a>';
+            supportingContentContent.innerHTML = '<a href="' + sourceDocumentLink + '" target="_blank">' + sourceDocument + '</a>';
         }
 
         // Append tabs and contents to chat bubble
