@@ -1765,8 +1765,8 @@ function New-Resources {
                 New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $searchIndexName -searchIndexFieldNames $searchIndexFieldNames
             }
             else {
-                Write-Host "Search Index '$searchIndexName' already exists."
-                Write-Log -message "Search Index '$searchIndexName' already exists."
+                Write-Host "Search Index '$global:searchIndexName' already exists."
+                Write-Log -message "Search Index '$global:searchIndexName' already exists."
             }
 
             #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
