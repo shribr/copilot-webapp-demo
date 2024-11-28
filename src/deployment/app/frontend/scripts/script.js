@@ -366,15 +366,27 @@ async function showResponse(questionBubble) {
         // Create tab contents
         const answerContent = document.createElement('div');
         answerContent.className = 'tab-content active';
-        answerContent.textContent = response.choices[0].message.content;
 
         const thoughtProcessContent = document.createElement('div');
         thoughtProcessContent.className = 'tab-content';
-        thoughtProcessContent.textContent = 'Thought process content goes here.';
 
         const supportingContentContent = document.createElement('div');
         supportingContentContent.className = 'tab-content';
-        supportingContentContent.textContent = 'Supporting content goes here.';
+
+        if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == "true") {
+            answerContent.textContent = response.choices[0].message.content;
+
+            thoughtProcessContent.textContent = 'Thought process content goes here.';
+            supportingContentContent.textContent = 'Supporting content goes here.';
+        }
+        else {
+            answerContent.textContent = response.value[0].chunk;
+            const sourceDocument = response.value[0].title;
+            const sourceDocumentLink = response.value[0].metadata_storage_path;
+
+            thoughtProcessContent.textContent = 'Thought process content goes here.';
+            supportingContentContent.textContent = '<a href="' + sourceDocumentLink + '" target="_blank">' + sourceDocument + '</a>';
+        }
 
         // Append tabs and contents to chat bubble
         chatResponse.appendChild(tabs);
