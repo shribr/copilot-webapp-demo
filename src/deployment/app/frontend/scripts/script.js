@@ -344,8 +344,8 @@ async function showResponse(questionBubble) {
 
     if (chatInput) {
 
+        const response = await getAnswersFromAzureSearch(chatInput);
         //const response = await getAnswers(chatInput);
-        const response = await getAnswers(chatInput);
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -492,33 +492,46 @@ async function getAnswersFromAzureSearch(userInput) {
     const config = await fetchConfig();
 
     const apiKey = config.AZURE_SEARCH_API_KEY;
-    const searchFunctionName = config.AZURE_SEARCH_FUNCTION_APP_NAME;
-    const indexName = config.AZURE_SEARCH_INDEX;
-    //const endpoint = `https://${searchFunctionName}.azurewebsites.net/api/${searchFunctionName}?code=${apiKey}`;
-    //const endpoint = "https://func-copilot-demo-003.azurewebsites.net/api/SearchTest?code=TewiFybiLLEUIYTRgsht_ZQDNBd6ZLuS7E5mExZtlVHpAzFuElxX5Q%3D%3D";
-    const endpoint = "https://func-copilot-demo-003.azurewebsites.net/api/HttpTriggerTest?code=uHA6ljrTv8xx-cBdBGhBKFQE3bNN0Ufx-fEm31UykdYiAzFu9Ndw9g%3D%3D";
-
-    /*
+    //const searchFunctionName = config.AZURE_SEARCH_FUNCTION_APP_NAME;
+    const indexName = config.AZURE_SEARCH_INDEX_NAME;
+    const apiVersion = config.AZURE_SEARCH_API_VERSION;
+    const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
+    const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
+    
     const searchQuery = {
         search: userInput,
-        top: 5 // Number of results to return
-    };
-    */
-
-    const searchQuery = {
-        "name": "Azure"
+        count: true,
+        vectorQueries: [
+          {
+            kind: "text",
+            text: userInput,
+            fields: "text_vector,image_vector"
+          }
+        ],
+        queryType: "semantic",
+        semanticConfiguration: config.AZURE_SEARCH_SEMANTIC_CONFIG,
+        captions: "extractive",
+        answers: "extractive|count-3",
+        queryLanguage: "en-us"
+      };
+    
+    const jsonString = JSON.stringify(searchQuery);
+    
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`
+            },
+            body: jsonString
+        });
+    
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error('Error:', error);
     }
-
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'api-key': `${apiKey}`
-        },
-        body: JSON.stringify(searchQuery)
-    });
-
-    const data = await response.json();
 
     return data;
 }
