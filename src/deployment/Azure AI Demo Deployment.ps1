@@ -692,6 +692,7 @@ function Initialize-Parameters {
     $global:portalDashboardName = $parametersObject.portalDashboardName
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
+    $global:resourceBaseName = $parametersObject.resourceBaseName
     $global:resourceGroupName = $parametersObject.resourceGroupName
     $global:resourceSuffix = $parametersObject.resourceSuffix
     $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
@@ -793,6 +794,7 @@ function Initialize-Parameters {
         portalDashboardName          = $portalDashboardName
         privateEndPointName          = $privateEndPointName
         redisCacheName               = $redisCacheName
+        resourceBaseName             = $resourceBaseName
         resourceGroupName            = $resourceGroupName
         resourceGuid                 = $resourceGuid
         resourceSuffix               = $resourceSuffix
@@ -2800,7 +2802,16 @@ function Start-Deployment {
     New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
     
     # Update configuration file for web frontend
-    Update-ConfigFile - configFilePath "app/frontend/config.json" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -searchServiceName $searchServiceName -openAIName $openAIName -functionAppName $functionAppServiceName -searchIndexerName $searchIndexerName -searchIndexName $searchIndexName -siteLogo $global:siteLogo
+    Update-ConfigFile - configFilePath "app/frontend/config.json" `
+    -resourceBaseName $resourceBaseName `
+    -resourceGroupName $resourceGroupName `
+    -storageAccountName $storageAccountName `
+    -searchServiceName $searchServiceName `
+    -openAIName $openAIName `
+    -functionAppName $functionAppServiceName `
+    -searchIndexerName $searchIndexerName `
+    -searchIndexName $searchIndexName `
+    -siteLogo $global:siteLogo
     
     # Deploy web app and function app services
     foreach ($appService in $appServices) {
@@ -3131,6 +3142,7 @@ account_name: $storageAccountName
 function Update-ConfigFile {
     param (
         [string]$configFilePath,
+        [string]$resourceBaseName,
         [string]$resourceGroupName,
         [string]$storageAccountName,
         [string]$searchServiceName,
@@ -3220,6 +3232,7 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_FULL_URL = $fulllUrl
         $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
         $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
+        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$config.AZURE_RESOURCE_BASE_NAME-semantic-configuration"
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey

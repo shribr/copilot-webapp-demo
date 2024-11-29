@@ -33,6 +33,7 @@
   "portalDashboardName": "portaldash-copilot-demo-001",
   "redisCacheName": "redis-copilot-demo-001",
   "resourceGroupName": "RG-COPILOT-DEMO-001",
+  "resourceBaseName": "copilot-demo-001",
   "resourceSuffix": 1,
   "restoreSoftDeletedResources": true,
   "searchServiceName": "srch-copilot-demo-001",
