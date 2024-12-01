@@ -1,0 +1,204 @@
+{
+  "name": "vector-srch-index-copilot-demo-002",
+  "fields": [
+    {
+      "name": "content",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": true,
+      "sortable": true,
+      "facetable": true,
+      "analyzer": "standard.lucene",
+      "synonymMaps": []
+    },
+    {
+      "name": "chunk_id",
+      "type": "Edm.String",
+      "key": true,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": true,
+      "sortable": true,
+      "facetable": true,
+      "analyzer": "keyword",
+      "synonymMaps": []
+    },
+    {
+      "name": "text_parent_id",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": true,
+      "sortable": true,
+      "facetable": true,
+      "synonymMaps": []
+    },
+    {
+      "name": "chunk",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": false,
+      "sortable": false,
+      "facetable": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "title",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": true,
+      "sortable": false,
+      "facetable": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_storage_path",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": false,
+      "sortable": false,
+      "facetable": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "image_parent_id",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": true,
+      "sortable": true,
+      "facetable": true,
+      "synonymMaps": []
+    },
+    {
+      "name": "text_vector",
+      "type": "Collection(Edm.Single)",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": false,
+      "sortable": false,
+      "facetable": false,
+      "synonymMaps": [],
+      "dimensions": 1024,
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-002-text-profile"
+    },
+    {
+      "name": "image_vector",
+      "type": "Collection(Edm.Single)",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": false,
+      "sortable": false,
+      "facetable": false,
+      "synonymMaps": [],
+      "dimensions": 1024,
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-002-image-profile"
+    }
+  ],
+  "scoringProfiles": [],
+  "corsOptions": {
+    "allowedOrigins": [
+      "*"
+    ],
+    "maxAgeInSeconds": 300
+  },
+  "suggesters": [],
+  "analyzers": [],
+  "tokenizers": [],
+  "tokenFilters": [],
+  "charFilters": [],
+  "normalizers": [],
+  "similarity": {
+    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
+  },
+  "semantic": {
+    "configurations": [
+      {
+        "name": "vector-profile-srch-index-copilot-demo-002-semantic-configuration",
+        "prioritizedFields": {
+          "titleField": {
+            "fieldName": "title"
+          },
+          "prioritizedContentFields": [
+            {
+              "fieldName": "chunk"
+            },
+            {
+              "fieldName": "content"
+            }
+          ],
+          "prioritizedKeywordsFields": []
+        }
+      }
+    ]
+  },
+  "vectorSearch": {
+    "algorithms": [
+      {
+        "name": "vector-config-srch-index-copilot-demo-002-algorithm",
+        "kind": "hnsw",
+        "hnswParameters": {
+          "m": 4,
+          "efConstruction": 400,
+          "efSearch": 500,
+          "metric": "cosine"
+        }
+      }
+    ],
+    "profiles": [
+      {
+        "name": "vector-profile-srch-index-copilot-demo-002-text-profile",
+        "algorithm": "vector-config-srch-index-copilot-demo-002-algorithm",
+        "vectorizer": "vector-profile-srch-index-copilot-demo-002-text-vectorizer"
+      },
+      {
+        "name": "vector-profile-srch-index-copilot-demo-002-image-profile",
+        "algorithm": "vector-config-srch-index-copilot-demo-002-algorithm",
+        "vectorizer": "vector-profile-srch-index-copilot-demo-002-image-vectorizer"
+      }
+    ],
+    "vectorizers": [
+      {
+        "name": "vector-profile-srch-index-copilot-demo-002-text-vectorizer",
+        "kind": "aiServicesVision",
+        "aiServicesVisionParameters": {
+          "modelVersion": "2023-04-15",
+          "resourceUri": "https://eastus.api.cognitive.microsoft.com",
+          "apiKey": "<redacted>"
+        }
+      },
+      {
+        "name": "vector-profile-srch-index-copilot-demo-002-image-vectorizer",
+        "kind": "aiServicesVision",
+        "aiServicesVisionParameters": {
+          "modelVersion": "2023-04-15",
+          "resourceUri": "https://eastus.api.cognitive.microsoft.com",
+          "apiKey": "<redacted>"
+        }
+      }
+    ],
+    "compressions": []
+  },
+  "@odata.etag": "\"0x8DD101A99DFDAE1\""
+}

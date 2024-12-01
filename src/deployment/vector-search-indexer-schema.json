@@ -1,0 +1,33 @@
+{
+    "@odata.context": "https://srch-copilot-demo-002.search.windows.net/$metadata#indexers/$entity",
+    "@odata.etag": "\"0x8DD102F99E2BC2D\"",
+    "name": "vector-indexer-copilot-demo-002",
+    "description": null,
+    "dataSourceName": "srch-datasource-copilot-demo-002",
+    "skillsetName": "vector-srch-skillset-copilot-demo-002",
+    "targetIndexName": "vector-srch-index-copilot-demo-002",
+    "disabled": null,
+    "schedule": null,
+    "parameters": {
+      "batchSize": null,
+      "maxFailedItems": null,
+      "maxFailedItemsPerBatch": null,
+      "base64EncodeKeys": null,
+      "configuration": {
+        "dataToExtract": "contentAndMetadata",
+        "parsingMode": "default",
+        "imageAction": "generateNormalizedImages",
+        "allowSkillsetToReadFileData": true
+      }
+    },
+    "fieldMappings": [
+      {
+        "sourceFieldName": "metadata_storage_name",
+        "targetFieldName": "title",
+        "mappingFunction": null
+      }
+    ],
+    "outputFieldMappings": [],
+    "cache": null,
+    "encryptionKey": null
+  }

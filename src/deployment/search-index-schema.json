@@ -228,6 +228,7 @@
   "tokenizers": [],
   "tokenFilters": [],
   "charFilters": [],
+  "normalizers": [],
   "encryptionKey": null,
   "similarity": {
     "@odata.type": "#Microsoft.Azure.Search.BM25Similarity",
