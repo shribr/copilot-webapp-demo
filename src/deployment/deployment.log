@@ -367,3 +367,48 @@
 2024-12-02 00:45:14 - Computer Vision Service 'cv-copilot-demo-002' already exists.
 2024-12-02 00:45:20 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
 2024-12-02 00:45:20 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+*** LOG SEQUENCE: 19 ***
+*** SCRIPT START TIME: 12/02/2024 00:46:23 ***
+2024-12-02 00:46:28 - Storage account 'stcopilotdemo002' already exists.
+2024-12-02 00:46:28 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-02 00:46:28 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-02 00:46:29 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-02 00:46:33 - Search Data Source 'srch-datasource-copilot-demo-002' already exists.
+2024-12-02 00:47:17 - Search Index 'srch-index-copilot-demo-002' already exists.
+2024-12-02 00:47:19 - Search Index 'vector-srch-index-copilot-demo-002' already exists.
+2024-12-02 00:47:37 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-02 00:47:40 - Failed to create index 'vector-srch-indexer-copilot-demo-002': 
+{
+  "error": {
+    "code": "",
+    "message": "An indexer must have a valid target index name"
+  }
+}
+2024-12-02 00:47:40 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-02 00:47:40 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-02 00:47:40 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-02 00:47:40 - OpenAI Service 'openai-copilot-demo-002' already exists.
+2024-12-02 00:47:43 - OpenAI model deployment 'ai' created successfully.
+2024-12-02 00:47:43 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-02 00:47:43 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-02 00:47:43 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-02 00:47:45 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-02 00:47:45 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-02 00:47:48 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-02 00:47:48 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-02 00:47:48 - Identity 'id-copilot-demo-002' already exists.
+2024-12-02 00:47:48 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-02 00:47:48 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-02 00:47:48 - AI Service 'ai-service-copilot-demo-002' already exists.
+2024-12-02 00:47:50 - AI Model deployment: 'ai-model-copilot-demo-002' created.
+2024-12-02 00:47:50 - AI Project 'project-ai-copilot-demo-002' already exists.
+2024-12-02 00:47:54 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-02 00:47:58 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-02 00:48:01 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-02 00:48:12 - Config file updated successfully.
+2024-12-02 00:48:15 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-02 00:48:39 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-02 00:48:42 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-02 00:50:12 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-12-02 00:50:12 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 49 SEC : 265 MS ***
+
