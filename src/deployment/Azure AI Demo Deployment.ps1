@@ -997,6 +997,7 @@ function New-AIHubAndModel {
 
 }
 
+# Function to create a new AI Hub connection
 function New-AIHubConnection {
     param (
         [string]$aiHubName,
@@ -1888,7 +1889,10 @@ function New-Resources {
             az cognitiveservices account create --name $computerVisionName --resource-group $resourceGroupName --location $location --kind ComputerVision --sku S1 --output none
             Write-Host "Computer Vision account '$computerVisionName' created."
             Write-Log -message "Computer Vision account '$computerVisionName' created."
-        }
+
+            # Assign custom domain
+            az cognitiveservices account update --name $computerVisionName --resource-group $resourceGroupName --custom-domain $computerVisionName
+        }   
         catch {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted") {
@@ -2015,8 +2019,7 @@ function New-SearchIndex {
         #$jsonContent.'@odata.context' = $searchIndexUrl
         $jsonContent.name = $searchIndexName
     
-        if ($searchIndexName -notlike "*vector*") 
-        {
+        if ($searchIndexName -notlike "*vector*") {
             if ($jsonContent.PSObject.Properties.Match('semantic')) {
                 $jsonContent.PSObject.Properties.Remove('semantic')
             }
@@ -2273,7 +2276,7 @@ function New-SearchService {
                 if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
                     
                     foreach ($indexer in $global:searchIndexers) {
-                        $indexName = $indexer.IndexName
+                        $indexName = $index.IndexName
                         $indexerName = $indexer.Name
                         $indexerSchema = $indexer.Schema
     
@@ -2341,21 +2344,21 @@ function New-SearchSkillSet {
 
             Invoke-RestMethod -Uri $skillSetUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
             
-            Write-Host "Skillset '$skillSetName' created successfully."
-            Write-Log -message "Skillset '$skillSetName' created successfully."
+            Write-Host "Skillset '$searchSkillSetName' created successfully."
+            Write-Log -message "Skillset '$searchSkillSetName' created successfully."
 
             return true
         }
         catch {
-            Write-Error "Failed to create skillset '$skillSetName': $_"
-            Write-Log -message "Failed to create skillset '$skillSetName': $_"
+            Write-Error "Failed to create skillset '$searchSkillSetName': $_"
+            Write-Log -message "Failed to create skillset '$searchSkillSetName': $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create skillset '$skillSetName': $_"
-        Write-Log -message "Failed to create skillset '$skillSetName': $_"
+        Write-Error "Failed to create skillset '$searchSkillSetName': $_"
+        Write-Log -message "Failed to create skillset '$searchSkillSetName': $_"
 
         return false
     }
