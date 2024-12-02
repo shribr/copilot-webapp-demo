@@ -2429,6 +2429,32 @@ function Remove-AzureResourceGroup {
     }
 }
 
+# Function to reset search indexer
+function Reset-SearchIndexer {
+    param (
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$searchIndexerName
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        $searchServiceAPiVersion = "2024-07-01"
+
+        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/reset?api-version=$searchServiceAPiVersion"
+
+        Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
+        Write-Host "Indexer '$searchIndexerName' reset successfully."
+        Write-Log -message "Indexer '$searchIndexerName' reset successfully."
+    }
+    catch {
+        Write-Error "Failed to reset indexer '$searchIndexerName': $_"
+        Write-Log -message "Failed to reset indexer '$searchIndexerName': $_"
+    }
+}
+
 # Function to restore soft-deleted resources
 function Restore-SoftDeletedResource {
     param(
@@ -2530,6 +2556,33 @@ function Restore-SoftDeletedResource {
         default {
             Write-Output "Resource type $resourceType is not supported for restoration."
         }
+    }
+}
+
+# Function to run search indexer
+function Run-SearchIndexer
+{
+    param (
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$searchIndexerName
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        $searchServiceAPiVersion = "2024-07-01"
+
+        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/run?api-version=$searchServiceAPiVersion"
+
+        Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
+        Write-Host "Indexer '$searchIndexerName' run successfully."
+        Write-Log -message "Indexer '$searchIndexerName' run successfully."
+    }
+    catch {
+        Write-Error "Failed to run indexer '$searchIndexerName': $_"
+        Write-Log -message "Failed to run indexer '$searchIndexerName': $_"
     }
 }
 
