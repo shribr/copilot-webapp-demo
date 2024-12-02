@@ -2911,6 +2911,7 @@ function Start-Deployment {
 }
 
 # Function to run search indexer
+# https://learn.microsoft.com/en-us/azure/search/search-howto-run-reset-indexers?tabs=reset-indexer-rest
 function Start-SearchIndexer
 {
     param (
