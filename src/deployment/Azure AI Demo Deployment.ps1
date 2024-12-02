@@ -2211,6 +2211,8 @@ function New-SearchService {
                         Write-Host "Search Indexer '$indexer' already exists."
                         Write-Log -message "Search Indexer '$indexer' already exists."
                     }
+
+                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
                 }
 
                 if ($searchSkillSetExists -eq $false) {
@@ -2299,6 +2301,8 @@ function New-SearchService {
                         Write-Host "Search Skill Set '$searchSkillSetName' already exists."
                         Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
                     }
+
+                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
                 }
             }
             catch {
@@ -2556,33 +2560,6 @@ function Restore-SoftDeletedResource {
         default {
             Write-Output "Resource type $resourceType is not supported for restoration."
         }
-    }
-}
-
-# Function to run search indexer
-function Run-SearchIndexer
-{
-    param (
-        [string]$searchServiceName,
-        [string]$resourceGroupName,
-        [string]$searchIndexerName
-    )
-
-    try {
-        $ErrorActionPreference = 'Stop'
-
-        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        $searchServiceAPiVersion = "2024-07-01"
-
-        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/run?api-version=$searchServiceAPiVersion"
-
-        Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
-        Write-Host "Indexer '$searchIndexerName' run successfully."
-        Write-Log -message "Indexer '$searchIndexerName' run successfully."
-    }
-    catch {
-        Write-Error "Failed to run indexer '$searchIndexerName': $_"
-        Write-Log -message "Failed to run indexer '$searchIndexerName': $_"
     }
 }
 
@@ -2931,6 +2908,33 @@ function Start-Deployment {
 
     # Add a line break
     Add-Content -Path $logFilePath -Value ""
+}
+
+# Function to run search indexer
+function Start-SearchIndexer
+{
+    param (
+        [string]$searchServiceName,
+        [string]$resourceGroupName,
+        [string]$searchIndexerName
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        $searchServiceAPiVersion = "2024-07-01"
+
+        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/run?api-version=$searchServiceAPiVersion"
+
+        Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
+        Write-Host "Indexer '$searchIndexerName' run successfully."
+        Write-Log -message "Indexer '$searchIndexerName' run successfully."
+    }
+    catch {
+        Write-Error "Failed to run indexer '$searchIndexerName': $_"
+        Write-Log -message "Failed to run indexer '$searchIndexerName': $_"
+    }
 }
 
 # Function to check if directory exists and create it if not
