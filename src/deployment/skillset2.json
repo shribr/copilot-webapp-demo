@@ -1,4 +1,4 @@
-  {
+{
   "name": "vector-azure-search-openai-demo-csharp-skillset",
   "description": "Skillset to chunk documents and generate embeddings",
   "skills": [

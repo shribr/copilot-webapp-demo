@@ -471,16 +471,15 @@ async function getAnswers(userInput) {
         });
 
         const data = await response.json();
-        
+
         // Extract the source documents from the response
         try {
             const sourceDocuments = data.choices[0].message.metadata.sources;
-        } 
-        catch (error) 
-        {
+        }
+        catch (error) {
             console.error('Error extracting source documents:', error);
         }
-        
+
 
         return data;
     }
@@ -509,26 +508,26 @@ async function getAnswersFromAzureSearch(userInput) {
     const apiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
-    
+
     const searchQuery = {
         search: userInput,
         count: true,
         vectorQueries: [
-          {
-            kind: "text",
-            text: userInput,
-            fields: "text_vector,image_vector"
-          }
+            {
+                kind: "text",
+                text: userInput,
+                fields: "text_vector,image_vector"
+            }
         ],
         queryType: "semantic",
         semanticConfiguration: config.AZURE_SEARCH_SEMANTIC_CONFIG,
         captions: "extractive",
         answers: "extractive|count-3",
         queryLanguage: "en-us"
-      };
-    
+    };
+
     const jsonString = JSON.stringify(searchQuery);
-    
+
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -538,12 +537,12 @@ async function getAnswersFromAzureSearch(userInput) {
             },
             body: jsonString
         });
-    
+
         const data = await response.json();
         console.log(data);
-        
+
         return data;
-    } 
+    }
     catch (error) {
         console.log('Error fetching answers from Azure Search:', error);
     }
@@ -763,6 +762,34 @@ async function renderDocuments(blobs) {
     }
 }
 
+// Function to run Search Indexer after new file is uploaded
+async function runSearchIndexer() {
+
+    const config = await fetchConfig();
+
+    const apiKey = config.AZURE_SEARCH_API_KEY;
+    const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
+    const searchServiceApiVersion = "2024-07-01";
+
+    const searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
+
+    // Invoke the REST method to run the search indexer
+    try {
+        fetch(searchIndexerUrl, {
+            method: 'POST',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => console.log('Indexer run response:', data))
+            .catch(error => console.error('Error running indexer:', error));
+    } catch (error) {
+        console.error(`Error running search indexer`, error.message);
+    }
+}
+
 // Function to sort documents
 function sortDocuments(criteria) {
     const sortDirection = currentSortColumn === criteria && currentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -903,6 +930,8 @@ async function uploadFilesToAzure(files) {
     }
     // Clear the file input after successful upload
     clearFileInput();
+
+    //runSearchIndexer();
 }
 
 //code to clear file input

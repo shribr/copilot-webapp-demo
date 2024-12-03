@@ -1,5 +1,5 @@
-name: srch-copilot-demo-002
+name: srch-copilot-demo-003
 type: "azure_ai_search"
 
-endpoint: https://srch-copilot-demo-002.search.windows.net
+endpoint: https://srch-copilot-demo-003.search.windows.net
 api_key: 

@@ -1,11 +1,11 @@
 {
-  "@odata.context": "https://srch-copilot-demo-003.search.windows.net/indexers?api-version=2024-07-01",
+  "@odata.context": "https://srch-**********.search.windows.net/indexers?api-version=2024-07-01",
   "@odata.etag": "\"0x8DD102F99E2BC2D\"",
-  "name": "vector-srch-indexer-copilot-demo-003",
+  "name": "vector-srch-indexer-**********",
   "description": null,
-  "dataSourceName": "srch-datasource-copilot-demo-003",
-  "skillsetName": "vector-srch-skillset-copilot-demo-003",
-  "targetIndexName": "",
+  "dataSourceName": "srch-datasource-**********.",
+  "skillsetName": "vector-srch-skillset-**********.",
+  "targetIndexName": "vector-srch-index-**********.",
   "disabled": null,
   "schedule": null,
   "parameters": {

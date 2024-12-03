@@ -2006,15 +2006,23 @@ function New-SearchIndex {
     )
 
     try {
-        $jsonFilePath = $searchIndexSchema
-    
+
+        $content = Get-Content -Path $searchIndexSchema
+
+        # Replace the placeholder with the actual resource base name
+        $updatedContent = $content -replace "\*{10}", $resourceBaseName
+
+        $searchIndexFilePath = $searchIndexSchema -replace "-template", ""
+
+        Set-Content -Path $searchIndexFilePath -Value $updatedContent
+       
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
         $searchServiceAPiVersion = "2024-07-01"
     
         #$searchIndexUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
     
-        $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+        $jsonContent = Get-Content -Path $searchIndexFilePath -Raw | ConvertFrom-Json
     
         #$jsonContent.'@odata.context' = $searchIndexUrl
         $jsonContent.name = $searchIndexName
@@ -2034,8 +2042,8 @@ function New-SearchIndex {
         }
     
         $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
-    
-        $updatedJsonContent | Set-Content -Path $jsonFilePath
+
+        $updatedJsonContent | Set-Content -Path $searchIndexFilePath
     
         # Construct the REST API URL
         $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
@@ -2049,6 +2057,7 @@ function New-SearchIndex {
             return true
         }
         catch {
+            # If you are getting the 'Normalizers" error, create the index via the Azure Portal and just select "Add index (JSON)" and copy the contents of the appropriate index json file into the textarea and click "save".
             Write-Error "Failed to create index '$searchIndexName': $_"
             Write-Log -message "Failed to create index '$searchIndexName': $_"
 
@@ -2072,12 +2081,22 @@ function New-SearchIndexer {
         [string]$searchIndexerName,
         [string]$searchDatasourceName,
         [string]$searchIndexerSchema,
+        [string]$searchSkillSetName,
         [string]$searchIndexerSchedule = "0 0 0 * * *"
     )
 
     try {
 
-        $jsonFilePath = $searchIndexerSchema
+        $resourceBaseName = $global:resourceBaseName
+
+        $content = Get-Content -Path $searchIndexerSchema
+
+        # Replace the placeholder with the actual resource base name
+        $updatedContent = $content -replace "\*{10}", $resourceBaseName
+
+        $searchIndexerFilePath = $searchIndexerSchema -replace "-template", ""
+
+        Set-Content -Path $searchIndexerFilePath -Value $updatedContent
     
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
@@ -2085,11 +2104,13 @@ function New-SearchIndexer {
     
         $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
     
-        $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+        $jsonContent = Get-Content -Path $searchIndexerFilePath -Raw | ConvertFrom-Json
     
         $jsonContent.'@odata.context' = $searchIndexerUrl
         $jsonContent.name = $searchIndexerName
         $jsonContent.dataSourceName = $searchDatasourceName
+        $jsonContent.targetIndexName = $searchIndexName
+        #$jsonContent.skillsetName = $searchSkillSetName
         $jsonContent.targetIndexName = $searchIndexName
     
         if ($jsonContent.PSObject.Properties.Match('cache')) {
@@ -2106,7 +2127,7 @@ function New-SearchIndexer {
     
         $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
     
-        $updatedJsonContent | Set-Content -Path $jsonFilePath
+        $updatedJsonContent | Set-Content -Path $searchIndexerFilePath
     
         # Construct the REST API URL
         $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
@@ -2114,21 +2135,21 @@ function New-SearchIndexer {
         # Create the index
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-            Write-Host "Index '$searchIndexerName' created successfully."
-            Write-Log -message "Index '$searchIndexerName' created successfully."
+            Write-Host "Search Indexer '$searchIndexerName' created successfully."
+            Write-Log -message "Search Indexer '$searchIndexerName' created successfully."
 
             return true
         }
         catch {
-            Write-Error "Failed to create index '$searchIndexerName': $_"
-            Write-Log -message "Failed to create index '$searchIndexerName': $_"
+            Write-Error "Failed to create Search Indexer '$searchIndexerName': $_"
+            Write-Log -message "Failed to create Search Indexer '$searchIndexerName': $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create index '$searchIndexerName': $_"
-        Write-Log -message "Failed to create index '$searchIndexerName': $_"
+        Write-Error "Failed to create Search Indexer '$searchIndexerName': $_"
+        Write-Log -message "Failed to create Search Indexer '$searchIndexerName': $_"
 
         return false
     }
@@ -2194,6 +2215,14 @@ function New-SearchService {
 
             Start-Sleep -Seconds 15
 
+            if ($searchSkillSetExists -eq $false) {
+                New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
+            }
+            else {
+                Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+            }
+                
             if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
                 
                 foreach ($indexer in $global:searchIndexers) {
@@ -2205,7 +2234,7 @@ function New-SearchService {
                     $searchIndexerExists = $searchIndexers -contains $indexerName
 
                     if ($searchIndexerExists -eq $false) {
-                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
+                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillsetName $searchSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
                     }
                     else {
                         Write-Host "Search Indexer '$indexer' already exists."
@@ -2213,14 +2242,6 @@ function New-SearchService {
                     }
 
                     Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
-                }
-
-                if ($searchSkillSetExists -eq $false) {
-                    New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
-                }
-                else {
-                    Write-Host "Search Skill Set '$searchSkillSetName' already exists."
-                    Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
                 }
             }
         }
@@ -2274,11 +2295,19 @@ function New-SearchService {
 
             Start-Sleep -Seconds 15
 
+            if ($searchSkillSetExists -eq $false) {
+                New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
+            }
+            else {
+                Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+            }
+                
             try {
                 if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
                     
                     foreach ($indexer in $global:searchIndexers) {
-                        $indexName = $index.IndexName
+                        $indexName = $indexer.IndexName
                         $indexerName = $indexer.Name
                         $indexerSchema = $indexer.Schema
     
@@ -2286,7 +2315,7 @@ function New-SearchService {
                         $searchIndexerExists = $searchIndexers -contains $indexerName
     
                         if ($searchIndexerExists -eq $false) {
-                            New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
+                            New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $searchSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
                         }
                         else {
                             Write-Host "Search Indexer '$indexer' already exists."
@@ -2302,7 +2331,7 @@ function New-SearchService {
                         Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
                     }
 
-                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
+                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
                 }
             }
             catch {
@@ -2912,8 +2941,7 @@ function Start-Deployment {
 
 # Function to run search indexer
 # https://learn.microsoft.com/en-us/azure/search/search-howto-run-reset-indexers?tabs=reset-indexer-rest
-function Start-SearchIndexer
-{
+function Start-SearchIndexer {
     param (
         [string]$searchServiceName,
         [string]$resourceGroupName,
@@ -2933,8 +2961,8 @@ function Start-SearchIndexer
         Write-Log -message "Indexer '$searchIndexerName' run successfully."
     }
     catch {
-        Write-Error "Failed to run indexer '$searchIndexerName': $_"
-        Write-Log -message "Failed to run indexer '$searchIndexerName': $_"
+        Write-Error "Failed to run Search Indexer '$searchIndexerName': $_"
+        Write-Log -message "Failed to run Search Indexer '$searchIndexerName': $_"
     }
 }
 
@@ -3239,6 +3267,24 @@ account_name: $storageAccountName
     return $filePath
 }
 
+# Function to update search index files
+function Update-SearchIndexFiles {
+
+    $resourceBaseName = $global:resourceBaseName
+
+    $searchIndexFiles = @("search-index-schema-template.json,search-indexer-schema-template.json,vector-search-index-schema-template.json,vector-search-indexer-schema-template.json" )
+
+    foreach ($fileName in $searchIndexFiles) {
+        $searchIndexFilePath = $fileName -replace "-template", ""
+
+        $content = Get-Content -Path $fileName
+
+        $updatedContent = $content -replace "**********", $resourceBaseName
+
+        Set-Content -Path $searchIndexFilePath -Value $updatedContent
+    }
+}
+
 # Function to update the config file
 function Update-ConfigFile {
     param (
@@ -3249,6 +3295,8 @@ function Update-ConfigFile {
         [string]$searchServiceName,
         [string]$searchIndexName,
         [string]$searchIndexerName,
+        [string]$searchVectorIndexName,
+        [string]$searchVectorIndexerName,
         [string]$openAIName,
         [string]$functionAppName,
         [string]$siteLogo
@@ -3326,6 +3374,7 @@ function Update-ConfigFile {
         $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
     
         # Update the config with the new key-value pair
+        $config.AZURE_RESOURCE_BASE_NAME = $resourceBaseName
         $config.AZURE_STORAGE_KEY = $storageKey
         $config.AZURE_STORAGE_ACCOUNT_NAME = $storageAccountName
         $config.AZURE_SEARCH_SERVICE_NAME = $searchServiceName
@@ -3333,6 +3382,8 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_FULL_URL = $fulllUrl
         $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
         $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
+        $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
+        $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
         $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$config.AZURE_RESOURCE_BASE_NAME-semantic-configuration"
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
