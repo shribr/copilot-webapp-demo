@@ -194,3 +194,50 @@
 2024-12-03 14:54:43 - Function app 'func-chat-copilot-demo-003' deployed successfully.
 2024-12-03 14:54:43 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 54 SEC : 519 MS ***
 
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 12/03/2024 15:56:44 ***
+2024-12-03 15:56:51 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 15:56:51 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 15:56:51 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 15:56:52 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 15:56:56 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 15:56:58 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 15:57:00 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 15:57:16 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 15:57:37 - Failed to create Search Indexer 'srch-indexer-copilot-demo-003': 
+{
+  "error": {
+    "code": "",
+    "message": "Skill \u0027#1\u0027 requires a valid image action"
+  }
+}
+2024-12-03 15:57:38 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 15:57:38 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 15:57:39 - Indexer 'vector-srch-indexer-copilot-demo-003' run successfully.
+2024-12-03 15:57:39 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 15:57:39 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 15:57:39 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 15:57:42 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 15:57:42 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 15:57:42 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 15:57:42 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 15:57:46 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 15:57:46 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 15:57:50 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 15:57:50 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 15:57:50 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 15:57:50 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 15:57:50 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 15:57:50 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 15:57:51 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 15:57:51 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 15:58:07 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 15:58:13 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 15:58:17 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 15:58:29 - Failed to update the config file: : (Line 3386) : Exception setting "AZURE_SEARCH_VECTOR_INDEXER_NAME": "The property 'AZURE_SEARCH_VECTOR_INDEXER_NAME' cannot be found on this object. Verify that the property exists and can be set."
+2024-12-03 15:58:32 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 15:58:46 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 15:58:49 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 15:59:26 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 15:59:26 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 42 SEC : 151 MS ***
+

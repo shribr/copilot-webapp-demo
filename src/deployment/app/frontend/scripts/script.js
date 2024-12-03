@@ -931,7 +931,7 @@ async function uploadFilesToAzure(files) {
     // Clear the file input after successful upload
     clearFileInput();
 
-    //runSearchIndexer();
+    runSearchIndexer();
 }
 
 //code to clear file input
