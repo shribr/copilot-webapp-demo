@@ -97,18 +97,21 @@ param (
 
 # Mapping of global resource types
 $global:ResourceTypes = @(
-    "Microsoft.Storage/storageAccounts",
-    "Microsoft.KeyVault/vaults",
-    "Microsoft.Sql/servers",
+    "Microsoft.ApiManagement",
+    "Microsoft.CognitiveServices/accounts",
+    "Microsoft.ContainerRegistry",
+    "Microsoft.ContainerRegistry/registries",
+    "Microsoft.DataFactory/factories",
     "Microsoft.DocumentDB/databaseAccounts",
+    "Microsoft.KeyVault/vaults",
+    "Microsoft.Network/virtualNetworks",
+    "Microsoft.Network/virtualNetworks/subnets",
+    "Microsoft.Search/searchServices",
+    "Microsoft.Sql/servers",
+    "Microsoft.Storage/storageAccounts",
+    "Microsoft.Web/hostingEnvironments",
     "Microsoft.Web/serverFarms",
     "Microsoft.Web/sites",
-    "Microsoft.DataFactory/factories",
-    "Microsoft.ContainerRegistry/registries",
-    "Microsoft.CognitiveServices/accounts",
-    "Microsoft.Search/searchServices",
-    "Microsoft.ApiManagement",
-    "Microsoft.ContainerRegistry",
     "microsoft.alertsmanagement/alerts",
     "microsoft.insights/actiongroups"
 )
@@ -167,6 +170,42 @@ function ConvertTo-ProperCase {
     # Join the words back into a single string
     $properCaseString = $properCaseWords -join " "
     return $properCaseString
+}
+
+# Function to deploy an Azure AI model
+function Deploy-OpenAIModel {
+    param (
+        [string]$resourceGroupName,
+        [string]$openAIAccountName,
+        [string]$aiModelType
+    )
+
+    $deploymentName = "ai"
+    $modelName = $aiModelType
+    $modelFormat = "OpenAI"
+    $modelVersion = "2024-05-13"
+    $skuName = "Standard"
+    $skuCapacity = "100"
+
+    try {
+        # Check if the deployment already exists
+        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIAccountName --query "[?name=='$deploymentName']" --output tsv
+
+        if ($deploymentExists) {
+            Write-Host "OpenAI model deployment '$deploymentName' already exists."
+            Write-Log -message "OpenAI model deployment '$deploymentName' already exists."
+        }
+        else {
+            # Create the deployment if it does not exist
+            az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIName --deployment-name $deploymentName --model-name $modelName --model-format $modelFormat --model-version $modelVersion --sku-name $skuName --sku-capacity $skuCapacity
+            Write-Host "OpenAI model deployment '$deploymentName' created successfully."
+            Write-Log -message "OpenAI model deployment '$deploymentName' created successfully."
+        }
+    }
+    catch {
+        Write-Error "Failed to create OpenAI model deployment '$deploymentName': $_"
+        Write-Log -message "Failed to create OpenAI model deployment '$deploymentName': $_"
+    }
 }
 
 # function to get the app root directory
@@ -668,6 +707,7 @@ function Initialize-Parameters {
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appServicePlanName = $parametersObject.appServicePlanName
+    $global:appServiceEnvironmentName = $parametersObject.$appServiceEnvironmentName
     $global:appServices = $parametersObject.appServices
     $global:appInsightsName = $parametersObject.appInsightsName
     $global:blobStorageAccountName = $parametersObject.blobStorageAccountName
@@ -688,7 +728,7 @@ function Initialize-Parameters {
     $global:location = $parametersObject.location
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
     $global:managedIdentityName = $parametersObject.managedIdentityName
-    $global:openAIName = $parametersObject.openAIName
+    $global:openAIAccountName = $parametersObject.openAIAccountName
     $global:portalDashboardName = $parametersObject.portalDashboardName
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
@@ -768,12 +808,14 @@ function Initialize-Parameters {
         aiModelName                  = $aiModelName
         aiModelType                  = $aiModelType
         aiModelVersion               = $aiModelVersion
-        aiServiceName                = $aiServiceName
         aiProjectName                = $aiProjectName
+        aiServiceName                = $aiServiceName
+        aiServiceProperties          = $aiServiceProperties
         apiManagementService         = $apiManagementService
         appendUniqueSuffix           = $appendUniqueSuffix
         appServices                  = $appServices
         appServicePlanName           = $appServicePlanName
+        appServiceEnvironmentName    = $appServiceEnvironmentName
         appInsightsName              = $appInsightsName
         blobStorageAccountName       = $blobStorageAccountName
         blobStorageContainerName     = $blobStorageContainerName
@@ -783,6 +825,7 @@ function Initialize-Parameters {
         containerAppName             = $containerAppName
         containerAppsEnvironmentName = $containerAppsEnvironmentName
         containerRegistryName        = $containerRegistryName
+        containerRegistryProperties  = $containerRegistryProperties
         cosmosDbAccountName          = $cosmosDbAccountName
         createResourceGroup          = $createResourceGroup
         deleteResourceGroup          = $deleteResourceGroup
@@ -792,8 +835,9 @@ function Initialize-Parameters {
         keyVaultName                 = $keyVaultName
         location                     = $location
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
+        machineLearningProperties    = $machineLearningProperties
         managedIdentityName          = $managedIdentityName
-        openAIName                   = $openAIName
+        openAIAccountName            = $openAIAccountName
         objectId                     = $objectId
         portalDashboardName          = $portalDashboardName
         privateEndPointName          = $privateEndPointName
@@ -816,21 +860,18 @@ function Initialize-Parameters {
         searchSkillSetName           = $searchSkillSetName
         serviceBusNamespaceName      = $serviceBusNamespaceName
         searchDataSourceName         = $searchDataSourceName
+        searchServiceProperties      = $searchServiceProperties
         sharedDashboardName          = $sharedDashboardName
         siteLogo                     = $siteLogo
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
+        storageServiceProperties     = $storageServiceProperties
         subNetName                   = $subNetName
         subscriptionId               = $subscriptionId
         tenantId                     = $tenantId
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
         virtualNetwork               = $virtualNetwork
-        aiServiceProperties          = $aiServiceProperties
-        containerRegistryProperties  = $containerRegistryProperties
-        machineLearningProperties    = $machineLearningProperties
-        searchServiceProperties      = $searchServiceProperties
-        storageServiceProperties     = $storageServiceProperties
         parameters                   = $parametersObject
     }
 }
@@ -1009,7 +1050,8 @@ function New-AIHubConnection {
         [string]$resourceGroupName,
         [string]$resourceType,
         [string]$serviceName,
-        [string]$serviceProperties
+        [string]$serviceProperties,
+        [array]$existingResources
     )
 
     #https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-blob?view=azureml-api-2
@@ -1043,7 +1085,8 @@ function New-AIHubConnection {
 function New-ApiManagementService {
     param (
         [string]$resourceGroupName,
-        [array]$apiManagementService
+        [array]$apiManagementService,
+        [array]$existingResources
     )
 
     #https://eastus.api.cognitive.microsoft.com/documentintelligence/documentModels/prebuilt-read:analyze?api-version=2024-07-31-preview&api-key=94a688bb516141839048e01dc680192d
@@ -1051,19 +1094,25 @@ function New-ApiManagementService {
     
     $apiManagementServiceName = $apiManagementService.Name
 
-    try {
-        $ErrorActionPreference = 'Stop'
-        $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait
-
-        Write-Host $jsonOutput
-
-        Write-Host "API Management service '$apiManagementServiceName' created."
-        Write-Log -message "API Management service '$apiManagementServiceName' created." -logFilePath $global:LogFilePath
-
+    if ($existingResources -notcontains $appServiceEnvirontmentName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait
+    
+            Write-Host $jsonOutput
+    
+            Write-Host "API Management service '$apiManagementServiceName' created."
+            Write-Log -message "API Management service '$apiManagementServiceName' created." -logFilePath $global:LogFilePath
+    
+        }
+        catch {
+            Write-Error "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        }
     }
-    catch {
-        Write-Error "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+    else {
+        Write-Host "API Management service '$apiManagementServiceName' already exists."
+        Write-Log -message "API Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
     }
 }
 
@@ -1073,7 +1122,8 @@ function New-AppService {
         [array]$appService,
         [string]$resourceGroupName,
         [string]$storageAccountName,
-        [bool]$deployZipResources
+        [bool]$deployZipResources,
+        [array]$existingResources
     )
 
     $appExists = @()
@@ -1194,6 +1244,292 @@ function New-AppService {
     Set-DirectoryPath -targetDirectory $global:deploymentPath
 }
 
+function New-ApplicationInsights {
+    param (
+        [string]$appInsightsName,
+        [string]$location,
+        [string]$resourceGroupName,
+        [array]$existingResources
+    )
+    
+    if ($existingResources -notcontains $appInsightsName) {
+
+
+        $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
+
+        # Try to create an Application Insights component
+        try {
+            $ErrorActionPreference = 'Stop'
+            az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
+            Write-Host "Application Insights component '$appInsightsName' created."
+            Write-Log -message "Application Insights component '$appInsightsName' created."
+        }
+        catch {
+            Write-Error "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "Application Insights '$appInsightsName' already exists."
+        Write-Log -message "Application Insights '$appInsightsName' already exists."
+    }
+}
+
+# Function to create a new App Service Environment (ASE)
+function New-AppServiceEnvironment {
+    param (
+        [string]$appServiceEnvironmentName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$vnetName,
+        [string]$subnetName,
+        [string]$subscriptionId,
+        [array]$existingResources
+    )
+
+    if ($existingResources -notcontains $appServicePlanName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+    
+            # Create the ASE
+            az appservice ase create --name $appServiceEnvironmentName --resource-group $resourceGroupName --location $location --vnet-name $vnetName --subnet $subnetName --subscription $subscriptionId --output none
+            Write-Host "App Service Environment '$appServiceEnvironmentName' created."
+            Write-Log -message "App Service Environment '$appServiceEnvironmentName' created."
+        }
+        catch {
+            Write-Error "Failed to create App Service Environment '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create App Service Environment '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "App Service Environment '$appServiceEnvironmentName' already exists."
+        Write-Log -message "App Service Environment '$appServiceEnvironmentName' already exists."
+    }
+}
+
+# Function to create a new App Service Plan
+function New-AppServicePlan {
+    param (
+        [string]$appServicePlanName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$appServiceEnvironmentName,
+        [string]$sku,
+        [array]$existingResources
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+        az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --sku $sku --output none
+        Write-Host "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
+        Write-Log -message "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
+    }
+    catch {
+        Write-Error "Failed to create App Service Plan '$appServicePlanName' in ASE '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create App Service Plan '$appServicePlanName' in ASE '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Function to create new Azure Cognitive Services account
+function New-CognitiveServicesAccount {
+    param (
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$cognitiveServiceName,
+        [array]$existingResources
+    )
+
+    if ($existingResources -notcontains $cognitiveServiceName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+
+            #$cognitiveServicesUrl = "https://$cognitiveServiceName.cognitiveservices.azure.com/"
+
+            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
+            
+            Write-Host "Cognitive Services account '$cognitiveServiceName' created."
+            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."       
+        }
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+                try {
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                    Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
+                    Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
+                }
+                catch {
+                    Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            } 
+        }
+    }
+    else {
+        Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
+        Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists."
+    }
+}
+
+# Function to create a new Computer Vision account
+function New-ComputerVisionAccount {
+    param (
+        [string]$computerVisionName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [array]$existingResources
+    )
+
+    if ($existingResources -notcontains $computerVisionName) {
+        $computerVisionName = Get-ValidServiceName -serviceName $computerVisionName
+
+        try {
+            $ErrorActionPreference = 'Stop'
+            az cognitiveservices account create --name $computerVisionName --resource-group $resourceGroupName --location $location --kind ComputerVision --sku S1 --output none
+            Write-Host "Computer Vision account '$computerVisionName' created."
+            Write-Log -message "Computer Vision account '$computerVisionName' created."
+
+            # Assign custom domain
+            az cognitiveservices account update --name $computerVisionName --resource-group $resourceGroupName --custom-domain $computerVisionName
+        }   
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted") {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    Restore-SoftDeletedResource -resourceName $computerVisionName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                    Write-Host "Computer Vision account '$computerVisionName' restored."
+                    Write-Log -message "Computer Vision account '$computerVisionName' restored."
+                }
+                catch {
+                    Write-Error "Failed to restore Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                Write-Error "Failed to create Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+    }
+    else {
+        Write-Host "Computer Vision Service '$computerVisionName' already exists."
+        Write-Log -message "Computer Vision Service '$computerVisionName' already exists."
+    }
+}
+
+# Function to create a new container registry
+function New-ContainerRegistry {
+    param (
+        [string]$containerRegistryName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [array]$existingResources
+    )
+    
+    if ($existingResources -notcontains $containerRegistryName) {
+        $containerRegistryFile = Update-ContainerRegistryFile -resourceGroupName $resourceGroupName -containerRegistryName $containerRegistryName -location $location
+
+        try {
+            az ml registry create --file $containerRegistryFile --resource-group $resourceGroupName
+        
+            Write-Host "Container Registry '$containerRegistryName' created."
+            Write-Log -message "Container Registry '$containerRegistryName' created."
+        }
+        catch {
+            Write-Error "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }   
+    }
+    else {
+        Write-Host "Container Registry '$containerRegistryName' already exists."
+        Write-Log -message "Container Registry '$containerRegistryName' already exists."
+    }
+}
+
+# Function to create a new document intelligence account
+function New-DocumentIntelligenceAccount {
+    param (
+        [string]$documentIntelligenceName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$subscriptionId,
+        [array]$existingResources
+    )
+    
+    if ($existingResources -notcontains $documentIntelligenceName) {
+
+        $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
+
+        # Check if the desired location is available
+        if ($availableLocations -contains $($location.ToUpper() -replace '\s', '')  ) {
+            # Try to create a Document Intelligence account
+            try {
+                $ErrorActionPreference = 'Stop'
+                               
+                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --sku S0 --output none
+                # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+    
+                if ($jsonOutput -match "error") {
+
+                    $jsonProperties = '{"restore": true}'
+                    $jsonOutput = az resource create --subscription $subscriptionId -g $resourceGroupName -n $documentIntelligenceName --location $location --namespace Microsoft.CognitiveServices --resource-type accounts --properties $jsonProperties
+                
+                    $errorInfo = Format-ErrorInfo -jsonOutput $jsonOutput
+                    
+                    $errorMessage = "Failed to create Document Intelligence Service  '$documentIntelligenceName'. `
+        `Error: $($errorInfo.Code) `
+        `Code: $($errorInfo.Error) `
+        `Details: $($errorInfo.SKU)"
+
+                    Write-Host $errorMessage
+
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                }
+                else {
+                    Write-Host "Document Intelligence account '$documentIntelligenceName' created."
+                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' created." -logFilePath $global:LogFilePath
+                }
+                
+            }
+            catch {     
+                # Check if the error is due to soft deletion
+                if ($_ -match "has been soft-deleted") {
+                    try {
+                        $ErrorActionPreference = 'Stop'
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        Recover-SoftDeletedResource -resourceName $documentIntelligenceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                        Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
+                        Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored."
+                    }
+                    catch {
+                        Write-Error "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
+                }
+                else {
+                    Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }        
+            }
+        }
+        else {
+            Write-Error "The desired location '$location' is not available for FormRecognizer."
+            Write-Log -message "The desired location '$location' is not available for FormRecognizer."
+        }
+    }
+    else {
+        Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists."
+        Write-Log -message "Document Intelligence Service '$documentIntelligenceName' already exists."
+    }
+}
+
 # Function to create key vault
 function New-KeyVault {
     param (
@@ -1253,13 +1589,43 @@ function New-KeyVault {
     }
 }
 
+# Function to create a new Log Analytics workspace
+function New-LogAnalyticsWorkspace {
+    param (
+        [string]$logAnalyticsWorkspaceName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [array]$existingResources
+    )
+
+    $logAnalyticsWorkspaceName = Get-ValidServiceName -serviceName $logAnalyticsWorkspaceName
+
+    if ($existingResources -notcontains $logAnalyticsWorkspaceName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az monitor log-analytics workspace create --workspace-name $logAnalyticsWorkspaceName --resource-group $resourceGroupName --location $location --output none
+            Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
+            Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
+        }
+        catch {
+            Write-Error "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
+        Write-Log -message "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
+    }
+}
+
 # Function to create a new managed identity
 function New-ManagedIdentity {
     param (
         [string]$userAssignedIdentityName,
         [string]$resourceGroupName,
         [string]$location,
-        [string]$subscriptionId
+        [string]$subscriptionId,
+        [array]$existingResources
     )
 
     try {
@@ -1325,7 +1691,8 @@ function New-MachineLearningWorkspace {
         [string]$keyVaultName,
         [string]$resourceGroupName,
         [string]$workspaceName,
-        [string]$location
+        [string]$location,
+        [array]$existingResources
     )
 
     $storageAccountName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
@@ -1438,6 +1805,50 @@ function New-MachineLearningWorkspace {
     }
 }
 
+# Function to create new OpenAI account
+function New-OpenAIAccount {
+    param (
+        [string]$openAIName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [array]$existingResources
+    )
+
+    if ($existingResources -notcontains $openAIName) {
+
+        try {
+            $ErrorActionPreference = 'Stop'
+            az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
+            Write-Host "Azure OpenAI account '$openAIName' created."
+            Write-Log -message "Azure OpenAI account '$openAIName' created."
+        }
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+                try {
+                    $ErrorActionPreference = 'Stop'
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    Restore-SoftDeletedResource -resourceName $openAIName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                    Write-Host "OpenAI account '$openAIName' restored."
+                    Write-Log -message "OpenAI account '$openAIName' restored."
+                }
+                catch {
+                    Write-Error "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+            }
+            else {
+                Write-Error "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }   
+        }
+    }
+    else {
+        Write-Host "OpenAI Service '$openAIName' already exists."
+        Write-Log -message "OpenAI Service '$openAIName' already exists."
+    }
+}
+
 # Function to create a new private endpoint
 function New-PrivateEndPoint {
     param (
@@ -1446,7 +1857,8 @@ function New-PrivateEndPoint {
         [string]$resourceGroupName,
         [string]$location,
         [string]$subnetId,
-        [string]$privateLinkServiceId
+        [string]$privateLinkServiceId,
+        [array]$existingResources
     )
 
     try {
@@ -1536,6 +1948,7 @@ function New-Resources {
         [string]$storageAccountName,
         [string]$blobStorageContainerName,
         [string]$appServicePlanName,
+        [string]$appServiceEnvironmentName,
         [string]$searchServiceName,
         [string]$searchIndexName,
         [string]$searchIndexerName,
@@ -1550,11 +1963,13 @@ function New-Resources {
         [string]$managedEnvironmentName,
         [string]$userAssignedIdentityName,
         [string]$userPrincipalName,
-        [string]$openAIName,
+        [string]$openAIAccountName,
         [string]$documentIntelligenceName,
         [string]$containerRegistryName,
         [array]$existingResources,
-        [array]$apiManagementService
+        [array]$apiManagementService,
+        [array]$virtualNetwork,
+        [array]$subNet
     )
 
     # Get the latest API versions
@@ -1580,96 +1995,35 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create a storage account
 
-    if ($existingResources -notcontains $storageAccountName) {
-
-        try {
-            az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
-            
-            Write-Host "Storage account '$storageAccountName' created."
-            Write-Log -message "Storage account '$storageAccountName' created."
-
-            # Retrieve the storage account key
-            $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
-        
-            # Enable CORS
-            az storage cors clear --account-name $storageAccountName --services bfqt
-            az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageAccountName --account-key $storageAccessKey
-            
-            az storage container create --name $blobStorageContainerName --account-name $storageAccountName --account-key $storageAccessKey --output none
-
-        }
-        catch {
-            Write-Error "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-    else {
-        Write-Host "Storage account '$storageAccountName' already exists."
-        Write-Log -message "Storage account '$storageAccountName' already exists."
-    }
+    New-StorageAccount -storageAccountName $storageAccountName -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #$storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
     #$storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
 
     # **********************************************************************************************************************
-    # Create an App Service Plan
+    # Create new Virtual Network
 
-    if ($existingResources -notcontains $appServicePlanName) {
-        try {
-            az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku B1 --output none
-            Write-Host "App Service Plan '$appServicePlanName' created."
-            Write-Log -message "App Service Plan '$appServicePlanName' created."
-        }
-        catch {
-            Write-Error "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-    else {
-        Write-Host "App Service Plan '$appServicePlanName' already exists."
-        Write-Log -message "App Service Plan '$appServicePlanName' already exists."
-    }
+    New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroupName -existingResources $existingResources
+
+    # **********************************************************************************************************************
+    # Create new Subnet
+
+    New-SubNet -subNet $subNet -resourceGroupName $resourceGroupName
+
+    # **********************************************************************************************************************
+    # Create App Service Environment
+
+    New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetworkName -subnetName $subnetName -subscriptionId $subscriptionId -existingResources $existingResources
+
+    # **********************************************************************************************************************
+    # Create App Service Plan
+
+    New-AppServicePlan -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroupName -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku "P1V2" -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create a Cognitive Services account
 
-    $cognitiveServiceName = Get-ValidServiceName -serviceName $cognitiveServiceName
-
-    if ($existingResources -notcontains $cognitiveServiceName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-
-            #$cognitiveServicesUrl = "https://$cognitiveServiceName.cognitiveservices.azure.com/"
-
-            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
-            
-            Write-Host "Cognitive Services account '$cognitiveServiceName' created."
-            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."       
-        }
-        catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
-                try {
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
-                    Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
-                    Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
-                }
-                catch {
-                    Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                }
-            }
-            else {
-                Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            } 
-        }
-    }
-    else {
-        Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
-        Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists."
-    }
+    New-CognitiveServicesAccount -cognitiveServiceName $cognitiveServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create a Search Service
@@ -1679,257 +2033,42 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create a Log Analytics Workspace
 
-    $logAnalyticsWorkspaceName = Get-ValidServiceName -serviceName $logAnalyticsWorkspaceName
-
-    if ($existingResources -notcontains $logAnalyticsWorkspaceName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-            az monitor log-analytics workspace create --workspace-name $logAnalyticsWorkspaceName --resource-group $resourceGroupName --location $location --output none
-            Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
-            Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
-        }
-        catch {
-            Write-Error "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-    else {
-        Write-Host "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
-        Write-Log -message "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
-    }
+    New-LogAnalyticsWorkspace -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create an Application Insights component
 
-    if ($existingResources -notcontains $appInsightsName) {
-
-
-        $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
-
-        # Try to create an Application Insights component
-        try {
-            $ErrorActionPreference = 'Stop'
-            az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
-            Write-Host "Application Insights component '$appInsightsName' created."
-            Write-Log -message "Application Insights component '$appInsightsName' created."
-        }
-        catch {
-            Write-Error "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-    else {
-        Write-Host "Application Insights '$appInsightsName' already exists."
-        Write-Log -message "Application Insights '$appInsightsName' already exists."
-    }
+    New-ApplicationInsights -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create OpenAI account
 
-    if ($existingResources -notcontains $openAIName) {
-
-        try {
-            $ErrorActionPreference = 'Stop'
-            az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
-            Write-Host "Azure OpenAI account '$openAIName' created."
-            Write-Log -message "Azure OpenAI account '$openAIName' created."
-        }
-        catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
-                try {
-                    $ErrorActionPreference = 'Stop'
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $openAIName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
-                    Write-Host "OpenAI account '$openAIName' restored."
-                    Write-Log -message "OpenAI account '$openAIName' restored."
-                }
-                catch {
-                    Write-Error "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                }
-            }
-            else {
-                Write-Error "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }   
-        }
-    }
-    else {
-        Write-Host "OpenAI Service '$openAIName' already exists."
-        Write-Log -message "OpenAI Service '$openAIName' already exists."
-    }
+    New-OpenAIAccount -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Deploy Open AI model
 
-    $deploymentName = "ai"
-    $modelName = $aiModelType
-    $modelFormat = "OpenAI"
-    $modelVersion = "2024-05-13"
-    $skuName = "Standard"
-    $skuCapacity = "100"
-
-    try {
-        # Check if the deployment already exists
-        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIName --query "[?name=='$deploymentName']" --output tsv
-
-        if ($deploymentExists) {
-            Write-Host "OpenAI model deployment '$deploymentName' already exists."
-            Write-Log -message "OpenAI model deployment '$deploymentName' already exists."
-        }
-        else {
-            # Create the deployment if it does not exist
-            az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIName --deployment-name $deploymentName --model-name $modelName --model-format $modelFormat --model-version $modelVersion --sku-name $skuName --sku-capacity $skuCapacity
-            Write-Host "OpenAI model deployment '$deploymentName' created successfully."
-            Write-Log -message "OpenAI model deployment '$deploymentName' created successfully."
-        }
-    }
-    catch {
-        Write-Error "Failed to create OpenAI model deployment '$deploymentName': $_"
-        Write-Log -message "Failed to create OpenAI model deployment '$deploymentName': $_"
-    }
-    
+    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location
     
     #**********************************************************************************************************************
     # Create Container Registry
 
-    if ($existingResources -notcontains $containerRegistryName) {
-        $containerRegistryFile = Update-ContainerRegistryFile -resourceGroupName $resourceGroupName -containerRegistryName $containerRegistryName -location $location
-
-        try {
-            az ml registry create --file $containerRegistryFile --resource-group $resourceGroupName
-        
-            Write-Host "Container Registry '$containerRegistryName' created."
-            Write-Log -message "Container Registry '$containerRegistryName' created."
-        }
-        catch {
-            Write-Error "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }   
-    }
-    else {
-        Write-Host "Container Registry '$containerRegistryName' already exists."
-        Write-Log -message "Container Registry '$containerRegistryName' already exists."
-    }
+    New-ContainerRegistry -containerRegistryName $containerRegistryName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Document Intelligence account
 
-    if ($existingResources -notcontains $documentIntelligenceName) {
-
-        $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
-
-        # Check if the desired location is available
-        if ($availableLocations -contains $($location.ToUpper() -replace '\s', '')  ) {
-            # Try to create a Document Intelligence account
-            try {
-                $ErrorActionPreference = 'Stop'
-                               
-                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --sku S0 --output none
-                # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
-    
-                if ($jsonOutput -match "error") {
-
-                    $jsonProperties = '{"restore": true}'
-                    $jsonOutput = az resource create --subscription $subscriptionId -g $resourceGroupName -n $documentIntelligenceName --location $location --namespace Microsoft.CognitiveServices --resource-type accounts --properties $jsonProperties
-                
-                    $errorInfo = Format-ErrorInfo -jsonOutput $jsonOutput
-                    
-                    $errorMessage = "Failed to create Document Intelligence Service  '$documentIntelligenceName'. `
-        `Error: $($errorInfo.Code) `
-        `Code: $($errorInfo.Error) `
-        `Details: $($errorInfo.SKU)"
-
-                    Write-Host $errorMessage
-
-                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
-                }
-                else {
-                    Write-Host "Document Intelligence account '$documentIntelligenceName' created."
-                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' created." -logFilePath $global:LogFilePath
-                }
-                
-            }
-            catch {     
-                # Check if the error is due to soft deletion
-                if ($_ -match "has been soft-deleted") {
-                    try {
-                        $ErrorActionPreference = 'Stop'
-                        # Attempt to restore the soft-deleted Cognitive Services account
-                        Recover-SoftDeletedResource -resourceName $documentIntelligenceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
-                        Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
-                        Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored."
-                    }
-                    catch {
-                        Write-Error "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                        Write-Log -message "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    }
-                }
-                else {
-                    Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                }        
-            }
-        }
-        else {
-            Write-Error "The desired location '$location' is not available for FormRecognizer."
-            Write-Log -message "The desired location '$location' is not available for FormRecognizer."
-        }
-    }
-    else {
-        Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists."
-        Write-Log -message "Document Intelligence Service '$documentIntelligenceName' already exists."
-    }
+    New-DocumentIntelligenceAccount -documentIntelligenceName $documentIntelligenceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Computer Vision account
 
-    if ($existingResources -notcontains $computerVisionName) {
-        $computerVisionName = Get-ValidServiceName -serviceName $computerVisionName
-
-        try {
-            $ErrorActionPreference = 'Stop'
-            az cognitiveservices account create --name $computerVisionName --resource-group $resourceGroupName --location $location --kind ComputerVision --sku S1 --output none
-            Write-Host "Computer Vision account '$computerVisionName' created."
-            Write-Log -message "Computer Vision account '$computerVisionName' created."
-
-            # Assign custom domain
-            az cognitiveservices account update --name $computerVisionName --resource-group $resourceGroupName --custom-domain $computerVisionName
-        }   
-        catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted") {
-                try {
-                    $ErrorActionPreference = 'Stop'
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $computerVisionName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
-                    Write-Host "Computer Vision account '$computerVisionName' restored."
-                    Write-Log -message "Computer Vision account '$computerVisionName' restored."
-                }
-                catch {
-                    Write-Error "Failed to restore Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                }
-            }
-            else {
-                Write-Error "Failed to create Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-        }
-    }
-    else {
-        Write-Host "Computer Vision Service '$computerVisionName' already exists."
-        Write-Log -message "Computer Vision Service '$computerVisionName' already exists."
-    }
+    New-ComputerVisionAccount -computerVisionName $computerVisionName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create API Management Service
     
-
-    if ($existingResources -notcontains $apiManagementService.Name) {
-        New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
-    }
+    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
 
 }
 
@@ -1999,6 +2138,7 @@ function New-SearchDataSource {
         return false
     }
 }
+
 # Function to create a new search index
 function New-SearchIndex {
     param(
@@ -2401,42 +2541,94 @@ function New-SearchSkillSet {
     }
 }
 
+function New-StorageAccount {
+    param (
+        [string]$resourceGroupName,
+        [string]$storageAccountName,
+        [string]$location,
+        [array]$existingResources
+    )
+
+    if ($existingResources -notcontains $storageAccountName) {
+
+        try {
+            az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
+            
+            Write-Host "Storage account '$storageAccountName' created."
+            Write-Log -message "Storage account '$storageAccountName' created."
+
+            # Retrieve the storage account key
+            $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
+        
+            # Enable CORS
+            az storage cors clear --account-name $storageAccountName --services bfqt
+            az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageAccountName --account-key $storageAccessKey
+            
+            az storage container create --name $blobStorageContainerName --account-name $storageAccountName --account-key $storageAccessKey --output none
+
+        }
+        catch {
+            Write-Error "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Storage Account '$storageAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "Storage account '$storageAccountName' already exists."
+        Write-Log -message "Storage account '$storageAccountName' already exists."
+    }
+}
+
 # Function to create a new subnet
 function New-SubNet {
     param (
         [string]$resourceGroupName,
         [string]$vnetName,
-        [string]$subnetName,
-        [string]$subnetAddressPrefix
+        [array]$subnet,
+        [string]$subnetAddressPrefix,
+        [array]$existingResources
     )
 
-    try {
-        az network vnet subnet create --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --address-prefixes $subnetAddressPrefix --output none
-        Write-Host "Subnet '$subnetName' created."
-        Write-Log -message "Subnet '$subnetName' created."
+    $subnetName = $subnet.Name
+    $subnetAddressPrefix = $subnet.AddressPrefix
+
+    if ($existingResources -notcontains $subnetName) {
+        try {
+            az network vnet subnet create --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --address-prefixes $subnetAddressPrefix --output none
+            Write-Host "Subnet '$subnetName' created."
+            Write-Log -message "Subnet '$subnetName' created."
+        }
+        catch {
+            Write-Error "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
-    catch {
-        Write-Error "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    else {
+        Write-Host "Subnet '$subnetName' already exists."
+        Write-Log -message "Subnet '$subnetName' already exists."
     }
 }
 
 # Function to create a new virtual network
 function New-VirtualNetwork {
     param (
-        [array]$virtualNetwork
+        [array]$virtualNetwork,
+        [array]$existingResources
     )
 
     $vnetName = $virtualNetwork.Name
 
-    try {
-        az network vnet create --resource-group $virtualNetwork.ResourceGroup --name  $virtualNetwork.Name --output none
-        Write-Host "Virtual Network '$vnetName' created."
-        Write-Log -message "Virtual Network '$vnetName' created."
-    }
-    catch {
-        Write-Error "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    if ($existingResources -notcontains $virtualNetworkName) {
+        {
+            try {
+                az network vnet create --resource-group $virtualNetwork.ResourceGroup --name  $virtualNetwork.Name --output none
+                Write-Host "Virtual Network '$vnetName' created."
+                Write-Log -message "Virtual Network '$vnetName' created."
+            }
+            catch {
+                Write-Error "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
     }
 }
 
@@ -2827,7 +3019,7 @@ function Start-Deployment {
             -managedEnvironmentName $managedEnvironmentName `
             -userAssignedIdentityName $userAssignedIdentityName `
             -userPrincipalName $userPrincipalName `
-            -openAIName $openAIName `
+            -openAIAccountName $openAIAccountName `
             -documentIntelligenceName $documentIntelligenceName `
             -containerRegistryName $containerRegistryName `
             -existingResources $existingResources
@@ -2854,7 +3046,7 @@ function Start-Deployment {
             -managedEnvironmentName $managedEnvironmentName `
             -userAssignedIdentityName $userAssignedIdentityName `
             -userPrincipalName $userPrincipalName `
-            -openAIName $openAIName `
+            -openAIAccountName $openAIAccountName `
             -documentIntelligenceName $documentIntelligenceName `
             -existingResources $existingResources `
             -apiManagementService $apiManagementService `
