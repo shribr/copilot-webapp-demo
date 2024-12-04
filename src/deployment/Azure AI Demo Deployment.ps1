@@ -702,12 +702,13 @@ function Initialize-Parameters {
     $global:aiModelName = $parametersObject.aiModelName
     $global:aiModelType = $parametersObject.aiModelType
     $global:aiModelVersion = $parametersObject.aiModelVersion
+    $global:aiProjectName = $parametersObject.aiProjectName
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiProjectName = $parametersObject.aiProjectName
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appServicePlanName = $parametersObject.appServicePlanName
-    $global:appServiceEnvironmentName = $parametersObject.$appServiceEnvironmentName
+    $global:appServiceEnvironmentName = $parametersObject.appServiceEnvironmentName
     $global:appServices = $parametersObject.appServices
     $global:appInsightsName = $parametersObject.appInsightsName
     $global:blobStorageAccountName = $parametersObject.blobStorageAccountName
@@ -753,6 +754,7 @@ function Initialize-Parameters {
     $global:sqlServerName = $parametersObject.sqlServerName
     $global:storageAccountName = $parametersObject.storageAccountName
     $global:subNetName = $parametersObject.subNetName
+    $global:subNet = $parametersObject.subNet
     $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
     $global:virtualNetwork = $parametersObject.virtualNetwork
 
@@ -802,6 +804,12 @@ function Initialize-Parameters {
 
     Write-Host "searchSkillSetName from parametersObject: $($parametersObject.searchSkillSetName)"
     Write-Host "searchSkillSetName from global: $($global:searchSkillSetName)"
+
+    Write-Host "virtualNetworkName from parametersObject: $($parametersObject.virtualNetwork.Name)"
+    Write-Host "virtualNetworkName from global: $($global:virtualNetwork.Name)"
+
+    Write-Host "appServiceEnvironmentName from parametersObject: $($parametersObject.appServiceEnvironmentName)"
+    Write-Host "appServiceEnvironmentName from global: $($global:appServiceEnvironmentName)"
 
     return @{
         aiHubName                    = $aiHubName
@@ -866,6 +874,7 @@ function Initialize-Parameters {
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
         storageServiceProperties     = $storageServiceProperties
+        subNet                       = $subNet
         subNetName                   = $subNetName
         subscriptionId               = $subscriptionId
         tenantId                     = $tenantId
@@ -1081,6 +1090,57 @@ function New-AIHubConnection {
     }
 }
 
+# Function to create a new AI project
+function New-AIProject {
+    param (
+        [string]$resourceGroupName,
+        [string]$subscriptionId,
+        [string]$aiHubName,
+        [string]$aiProjectName,
+        [string]$appInsightsName,
+        [string]$userAssignedIdentityName,
+        [string]$location
+    )
+
+    $ErrorActionPreference = 'Stop'
+
+    try {
+
+        $ErrorActionPreference = 'Stop'
+
+        $storageAccountName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+        $containerRegistryName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName"
+        $keyVaultName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+        $appInsightsName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
+        $userAssignedIdentityName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
+
+
+        $aiProjectFile = Update-AIProjectFile `
+            -aiProjectName $aiProjectName `
+            -resourceGroupName $resourceGroupName `
+            -appInsightsName $appInsightsName `
+            -location $location `
+            -subscriptionId $subscriptionId `
+            -userAssignedIdentityName $userAssignedIdentityName 2>&1
+            
+        #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
+
+        #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
+
+        #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
+        $jsonOutput = az ml workspace create --file $aiProjectFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityName --kind project --hub-id $aiHubName
+
+        az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --storage-account $storageAccountId --key-vault $keyVaultId --container-registry $containerRegistryName --app-insights $appInsightsName --identity $userAssignedIdentityName --location $location
+
+        Write-Host "AI Project: '$aiProjectName' created."
+        Write-Log -message "AI Project: '$aiProjectName' created." -logFilePath $global:LogFilePath
+    }
+    catch {
+        Write-Error "Failed to create AI Project '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create AI Project '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+    }
+}
+
 # Function to create and deploy API Management service
 function New-ApiManagementService {
     param (
@@ -1291,8 +1351,23 @@ function New-AppServiceEnvironment {
         try {
             $ErrorActionPreference = 'Stop'
     
-            # Create the ASE
-            az appservice ase create --name $appServiceEnvironmentName --resource-group $resourceGroupName --location $location --vnet-name $vnetName --subnet $subnetName --subscription $subscriptionId --output none
+            # Create the ASE asynchronously
+            $job = Start-Job -ScriptBlock {
+                param (
+                    $appServiceEnvironmentName,
+                    $resourceGroupName,
+                    $location,
+                    $vnetName,
+                    $subnetName,
+                    $subscriptionId
+                )
+                az appservice ase create --name $appServiceEnvironmentName --resource-group $resourceGroupName --location $location --vnet-name $vnetName --subnet $subnetName --subscription $subscriptionId --output none
+            } -ArgumentList $appServiceEnvironmentName, $resourceGroupName, $location, $vnetName, $subnetName, $subscriptionId
+
+            Write-Host "Waiting for App Service Environment '$appServiceEnvironmentName' to be created before creating app service plan and app services."
+            Sleep -Seconds 30
+
+            #az appservice ase create --name $appServiceEnvironmentName --resource-group $resourceGroupName --location $location --vnet-name $vnetName --subnet $subnetName --subscription $subscriptionId --output none
             Write-Host "App Service Environment '$appServiceEnvironmentName' created."
             Write-Log -message "App Service Environment '$appServiceEnvironmentName' created."
         }
@@ -1320,7 +1395,7 @@ function New-AppServicePlan {
 
     try {
         $ErrorActionPreference = 'Stop'
-        az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --sku $sku --output none
+        az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --output none
         Write-Host "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
         Write-Log -message "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
     }
@@ -1808,7 +1883,7 @@ function New-MachineLearningWorkspace {
 # Function to create new OpenAI account
 function New-OpenAIAccount {
     param (
-        [string]$openAIName,
+        [string]$openAIAccountName,
         [string]$resourceGroupName,
         [string]$location,
         [array]$existingResources
@@ -1818,9 +1893,9 @@ function New-OpenAIAccount {
 
         try {
             $ErrorActionPreference = 'Stop'
-            az cognitiveservices account create --name $openAIName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
-            Write-Host "Azure OpenAI account '$openAIName' created."
-            Write-Log -message "Azure OpenAI account '$openAIName' created."
+            az cognitiveservices account create --name $openAIAccountName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
+            Write-Host "Azure OpenAI account '$openAIAccountName' created."
+            Write-Log -message "Azure OpenAI account '$openAIAccountName' created."
         }
         catch {
             # Check if the error is due to soft deletion
@@ -1828,24 +1903,24 @@ function New-OpenAIAccount {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $openAIName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
-                    Write-Host "OpenAI account '$openAIName' restored."
-                    Write-Log -message "OpenAI account '$openAIName' restored."
+                    Restore-SoftDeletedResource -resourceName $openAIAccountName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                    Write-Host "OpenAI account '$openAIAccountName' restored."
+                    Write-Log -message "OpenAI account '$openAIAccountName' restored."
                 }
                 catch {
-                    Write-Error "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to restore OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
             else {
-                Write-Error "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Azure OpenAI account '$openAIName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to create Azure OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Azure OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }   
         }
     }
     else {
-        Write-Host "OpenAI Service '$openAIName' already exists."
-        Write-Log -message "OpenAI Service '$openAIName' already exists."
+        Write-Host "OpenAI Service '$openAIAccountName' already exists."
+        Write-Log -message "OpenAI Service '$openAIAccountName' already exists."
     }
 }
 
@@ -1947,6 +2022,7 @@ function New-Resources {
     param (
         [string]$storageAccountName,
         [string]$blobStorageContainerName,
+        [string]$aiProjectName,
         [string]$appServicePlanName,
         [string]$appServiceEnvironmentName,
         [string]$searchServiceName,
@@ -1993,7 +2069,7 @@ function New-Resources {
     Write-Host "searchSkillSetName: $searchSkillSetName"
 
     # **********************************************************************************************************************
-    # Create a storage account
+    # Create Storage Account
 
     New-StorageAccount -storageAccountName $storageAccountName -resourceGroupName $resourceGroupName -existingResources $existingResources
 
@@ -2001,42 +2077,42 @@ function New-Resources {
     #$storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
 
     # **********************************************************************************************************************
-    # Create new Virtual Network
+    # Create Virtual Network
 
     New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
-    # Create new Subnet
+    # Create Subnet
 
-    New-SubNet -subNet $subNet -resourceGroupName $resourceGroupName
+    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName
 
     # **********************************************************************************************************************
     # Create App Service Environment
 
-    New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetworkName -subnetName $subnetName -subscriptionId $subscriptionId -existingResources $existingResources
+    New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create App Service Plan
 
-    New-AppServicePlan -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroupName -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku "P1V2" -existingResources $existingResources
+    New-AppServicePlan -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroupName -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku "Basic" -existingResources $existingResources
 
     #**********************************************************************************************************************
-    # Create a Cognitive Services account
+    # Create Cognitive Services account
 
     New-CognitiveServicesAccount -cognitiveServiceName $cognitiveServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     # **********************************************************************************************************************
-    # Create a Search Service
+    # Create Search Service
 
     New-SearchService -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     # **********************************************************************************************************************
-    # Create a Log Analytics Workspace
+    # Create Log Analytics Workspace
 
     New-LogAnalyticsWorkspace -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
-    # Create an Application Insights component
+    # Create Application Insights component
 
     New-ApplicationInsights -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
@@ -2050,6 +2126,11 @@ function New-Resources {
 
     Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location
     
+    #**********************************************************************************************************************
+    # Create AI Project
+
+    New-AIProject -aiProjectName $aiProjectName -subscriptionId $subscriptionId -aiHubName $aiHubName -appInsightsName $appInsightsName -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+
     #**********************************************************************************************************************
     # Create Container Registry
 
@@ -2541,6 +2622,7 @@ function New-SearchSkillSet {
     }
 }
 
+# Function to create new Azure storage account
 function New-StorageAccount {
     param (
         [string]$resourceGroupName,
@@ -2584,7 +2666,6 @@ function New-SubNet {
         [string]$resourceGroupName,
         [string]$vnetName,
         [array]$subnet,
-        [string]$subnetAddressPrefix,
         [array]$existingResources
     )
 
@@ -2617,10 +2698,10 @@ function New-VirtualNetwork {
 
     $vnetName = $virtualNetwork.Name
 
-    if ($existingResources -notcontains $virtualNetworkName) {
+    if ($existingResources -notcontains $vnetName) {
         {
             try {
-                az network vnet create --resource-group $virtualNetwork.ResourceGroup --name  $virtualNetwork.Name --output none
+                az network vnet create --resource-group $virtualNetwork.ResourceGroup --name $vnetName --output none
                 Write-Host "Virtual Network '$vnetName' created."
                 Write-Log -message "Virtual Network '$vnetName' created."
             }
@@ -3004,7 +3085,9 @@ function Start-Deployment {
 
         New-Resources -storageAccountName $storageAccountName `
             -blobStorageContainerName $blobStorageContainerName `
+            -aiProjectName $aiProjectName `
             -appServicePlanName $appServicePlanName `
+            -appServiceEnvironmentName $appServiceEnvironmentName `
             -searchServiceName $searchServiceName `
             `searchIndexName $searchIndexName `
             `searchIndexerName $searchIndexerName `
@@ -3022,6 +3105,8 @@ function Start-Deployment {
             -openAIAccountName $openAIAccountName `
             -documentIntelligenceName $documentIntelligenceName `
             -containerRegistryName $containerRegistryName `
+            -virtualNetwork $virtualNetwork `
+            -subNet $subNet `
             -existingResources $existingResources
     }
     else {
@@ -3031,7 +3116,9 @@ function Start-Deployment {
 
         New-Resources -storageAccountName $storageAccountName `
             -blobStorageContainerName $blobStorageContainerName `
+            -aiProjectName $aiProjectName `
             -appServicePlanName $appServicePlanName `
+            -appServiceEnvironmentName $appServiceEnvironmentName `
             -searchServiceName $searchServiceName `
             `searchIndexName $searchIndexName `
             `searchIndexerName $searchIndexerName `
@@ -3048,9 +3135,11 @@ function Start-Deployment {
             -userPrincipalName $userPrincipalName `
             -openAIAccountName $openAIAccountName `
             -documentIntelligenceName $documentIntelligenceName `
-            -existingResources $existingResources `
             -apiManagementService $apiManagementService `
-            -containerRegistryName $containerRegistryName
+            -containerRegistryName $containerRegistryName `
+            -virtualNetwork $virtualNetwork `
+            -subNet $subNet `
+            -existingResources $existingResources
     }
 
     # Create new web app and function app services
@@ -3481,6 +3570,51 @@ function Update-SearchIndexFiles {
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
     }
+}
+
+# Function to update the AI project file
+function Update-AIProjectFile {
+    param (
+        [string]$resourceGroupName,
+        [string]$aiProjectName,
+        [string]$appInsightsName,
+        [string]$userAssignedIdentityName
+    )
+
+    $rootPath = Get-Item -Path (Get-Location).Path
+
+    $filePath = "$rootPath/ai.project.yaml"
+
+    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName --query 'principalId' --output tsv
+
+    $content = @"
+`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
+name: $aiProjectName
+description: This configuration specifies a workspace configuration with existing dependent resources
+display_name: $aiProjectName
+location: $location
+application_insights: $appInsightsName
+identity:
+  type: user_assigned
+  tenant_id: $global:tenantId
+  principal_id: $assigneePrincipalId
+  user_assigned_identities: 
+    ${userAssignedIdentityName}: {}
+#tags:
+#  purpose: Azure AI Hub Project
+"@
+
+    try {
+        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
+        Write-Host "File 'ai.project.yaml' created and populated."
+        Write-Log -message "File 'ai.project.yaml' created and populated."
+    }
+    catch {
+        Write-Error "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+    return $filePath
+
 }
 
 # Function to update the config file
