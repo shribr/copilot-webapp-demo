@@ -8,6 +8,7 @@
   "aiHubProjectName": "project-ai-copilot-demo-004",
   "appendUniqueSuffix": false,
   "appServicePlanName": "asp-copilot-demo-004",
+  "appServicePlanSku": "I1V2",
   "appServiceEnvironmentName": "ase-copilot-demo-004",
   "appInsightsName": "appi-copilot-demo-004",
   "blobStrorageDatasourceName": "blob-datasource-copilot-demo-004",

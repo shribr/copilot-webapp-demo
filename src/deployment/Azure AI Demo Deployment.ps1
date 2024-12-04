@@ -708,6 +708,7 @@ function Initialize-Parameters {
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appServicePlanName = $parametersObject.appServicePlanName
+    $global:appServicePlanSku = $parametersObject.appServicePlanSku
     $global:appServiceEnvironmentName = $parametersObject.appServiceEnvironmentName
     $global:appServices = $parametersObject.appServices
     $global:appInsightsName = $parametersObject.appInsightsName
@@ -823,6 +824,7 @@ function Initialize-Parameters {
         appendUniqueSuffix           = $appendUniqueSuffix
         appServices                  = $appServices
         appServicePlanName           = $appServicePlanName
+        appServicePlanSku            = $appServicePlanSku
         appServiceEnvironmentName    = $appServiceEnvironmentName
         appInsightsName              = $appInsightsName
         blobStorageAccountName       = $blobStorageAccountName
@@ -1395,7 +1397,7 @@ function New-AppServicePlan {
 
     try {
         $ErrorActionPreference = 'Stop'
-        az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --output none
+        az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --sku $sku --output none
         Write-Host "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
         Write-Log -message "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
     }
@@ -2024,6 +2026,7 @@ function New-Resources {
         [string]$blobStorageContainerName,
         [string]$aiProjectName,
         [string]$appServicePlanName,
+        [string]$appServicePlanSku,
         [string]$appServiceEnvironmentName,
         [string]$searchServiceName,
         [string]$searchIndexName,
@@ -2094,7 +2097,7 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create App Service Plan
 
-    New-AppServicePlan -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroupName -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku "Basic" -existingResources $existingResources
+    New-AppServicePlan -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroupName -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku $appServicePlanSku -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Cognitive Services account
@@ -3087,6 +3090,7 @@ function Start-Deployment {
             -blobStorageContainerName $blobStorageContainerName `
             -aiProjectName $aiProjectName `
             -appServicePlanName $appServicePlanName `
+            -appServicePlanSku $appServicePlanSku `
             -appServiceEnvironmentName $appServiceEnvironmentName `
             -searchServiceName $searchServiceName `
             `searchIndexName $searchIndexName `
@@ -3118,6 +3122,7 @@ function Start-Deployment {
             -blobStorageContainerName $blobStorageContainerName `
             -aiProjectName $aiProjectName `
             -appServicePlanName $appServicePlanName `
+            -appServicePlanSku $appServicePlanSku `
             -appServiceEnvironmentName $appServiceEnvironmentName `
             -searchServiceName $searchServiceName `
             `searchIndexName $searchIndexName `
