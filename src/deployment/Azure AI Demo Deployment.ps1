@@ -698,11 +698,13 @@ function Initialize-Parameters {
     $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
     $global:searchDataSourceName = $parametersObject.searchDataSourceName
     $global:searchServiceName = $parametersObject.searchServiceName
-    #$global:searchIndexName = $parametersObject.searchIndexName
-    $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
-    #$global:searchIndexerName = $parametersObject.searchIndexerName
+    $global:searchIndexName = $parametersObject.searchIndexName
+    $global:searchIndexerName = $parametersObject.searchIndexerName
+    $global:searchVectorIndexName = $parametersObject.searchVectorIndexName
+    $global:searchVectorIndexerName = $parametersObject.searchVectorIndexerName
     $global:searchIndexes = $parametersObject.searchIndexes
     $global:searchIndexers = $parametersObject.searchIndexers
+    $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
     $global:searchSkillSet = $parametersObject.searchSkillSet
     $global:searchSkillSetName = $parametersObject.searchSkillSetName
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
@@ -803,9 +805,11 @@ function Initialize-Parameters {
         restoreSoftDeletedResource   = $restoreSoftDeletedResource
         result                       = $result
         searchServiceName            = $searchServiceName
-        #searchIndexName              = $searchIndexName
+        searchIndexName              = $searchIndexName
+        searchIndexerName            = $searchIndexerName
+        searchVectorIndexName        = $searchVectorIndexName
+        searchVectorIndexerName      = $searchVectorIndexerName
         searchIndexFieldNames        = $searchIndexFieldNames
-        #searchIndexerName            = $searchIndexerName
         searchIndexes                = $searchIndexes
         searchIndexers               = $searchIndexers
         searchSkillSet               = $searchSkillSet
@@ -2911,8 +2915,10 @@ function Start-Deployment {
         -searchServiceName $searchServiceName `
         -openAIName $openAIName `
         -functionAppName $functionAppServiceName `
-        -searchIndexerName $searchIndexerName `
-        -searchIndexName $searchIndexName `
+        -searchIndexerName $global:searchIndexerName `
+        -searchIndexName $global:searchIndexName `
+        -searchVectorIndexName $global:searchVectorIndexName `
+        -searchVectorIndexerName $global:searchVectorIndexerName `
         -siteLogo $global:siteLogo
     
     # Deploy web app and function app services
@@ -2957,8 +2963,8 @@ function Start-SearchIndexer {
         $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/run?api-version=$searchServiceAPiVersion"
 
         Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
-        Write-Host "Indexer '$searchIndexerName' run successfully."
-        Write-Log -message "Indexer '$searchIndexerName' run successfully."
+        Write-Host "Search Indexer '$searchIndexerName' ran successfully."
+        Write-Log -message "Search Indexer '$searchIndexerName' ran successfully."
     }
     catch {
         Write-Error "Failed to run Search Indexer '$searchIndexerName': $_"
@@ -3384,7 +3390,7 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
         $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
         $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
-        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$config.AZURE_RESOURCE_BASE_NAME-semantic-configuration"
+        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey

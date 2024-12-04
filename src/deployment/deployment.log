@@ -1,243 +1,321 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 12/03/2024 14:18:26 ***
-2024-12-03 14:18:34 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:18:34 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:18:34 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:18:35 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:18:42 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:18:44 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:18:46 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:19:02 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:19:04 - Failed to create index 'srch-indexer-copilot-demo-003': 
-{
-  "error": {
-    "code": "",
-    "message": "An indexer must have a valid target index name"
-  }
-}
-2024-12-03 14:19:07 - Failed to create index 'vector-srch-indexer-copilot-demo-003': 
-{
-  "error": {
-    "code": "",
-    "message": "An indexer must have a valid target index name"
-  }
-}
-2024-12-03 14:19:07 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:19:08 - Failed to create Search Indexer '': (Line 2336) : Failed to run indexer '': Response status code does not indicate success: 405 (Method Not Allowed).
-2024-12-03 14:19:08 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-03 14:19:08 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-03 14:19:08 - OpenAI Service 'openai-copilot-demo-003' already exists.
-2024-12-03 14:19:11 - OpenAI model deployment 'ai' created successfully.
-2024-12-03 14:19:11 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-03 14:19:11 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-03 14:19:11 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-03 14:19:14 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:19:14 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+*** SCRIPT START TIME: 12/03/2024 16:48:32 ***
+2024-12-03 16:48:40 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 16:48:40 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 16:48:40 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 16:48:42 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 16:48:46 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 16:48:49 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 16:48:51 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 16:49:07 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 16:49:09 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 16:49:10 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 16:49:10 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 16:49:11 - Indexer 'vector-srch-indexer-copilot-demo-003' run successfully.
+2024-12-03 16:49:11 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 16:49:11 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 16:49:11 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 16:49:15 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 16:49:15 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 16:49:15 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 16:49:15 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 16:49:20 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 16:49:20 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 16:49:23 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 16:49:23 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 16:49:23 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 16:49:23 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 16:49:23 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 16:49:23 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 16:49:25 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 16:49:25 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 16:49:42 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 16:49:48 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 16:49:54 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 16:50:13 - Failed to update the config file: : (Line 3386) : Exception setting "AZURE_SEARCH_VECTOR_INDEXER_NAME": "The property 'AZURE_SEARCH_VECTOR_INDEXER_NAME' cannot be found on this object. Verify that the property exists and can be set."
+2024-12-03 16:50:17 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 16:50:39 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 16:50:43 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 16:51:21 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 16:51:21 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 49 SEC : 020 MS ***
+
 *** LOG SEQUENCE: 2 ***
-*** SCRIPT START TIME: 12/03/2024 14:21:43 ***
-2024-12-03 14:21:49 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:21:49 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:21:49 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:21:50 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:21:53 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:21:56 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:21:58 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:22:14 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:23:51 - Failed to create index 'srch-indexer-copilot-demo-003': 
-{
-  "error": {
-    "code": "",
-    "message": "An indexer must have a valid target index name"
-  }
-}
-2024-12-03 14:26:04 - Index 'vector-srch-indexer-copilot-demo-003' created successfully.
-2024-12-03 14:26:04 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:26:06 - Failed to create Search Indexer '': (Line 2336) : Failed to run indexer '': Response status code does not indicate success: 405 (Method Not Allowed).
-2024-12-03 14:26:06 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-03 14:26:06 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-03 14:26:06 - OpenAI Service 'openai-copilot-demo-003' already exists.
-2024-12-03 14:26:08 - OpenAI model deployment 'ai' created successfully.
-2024-12-03 14:26:08 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-03 14:26:08 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-03 14:26:08 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-03 14:26:10 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:26:10 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-03 14:26:13 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:26:13 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-03 14:26:13 - Identity 'id-copilot-demo-003' already exists.
-2024-12-03 14:26:13 - Key Vault 'kv-copilot-demo-003' already exists.
-2024-12-03 14:26:13 - AI Hub 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:26:13 - AI Service 'ai-service-copilot-demo-003' already exists.
-2024-12-03 14:26:14 - AI Model deployment: 'ai-model-copilot-demo-003' created.
-2024-12-03 14:26:14 - AI Project 'project-ai-copilot-demo-003' already exists.
-2024-12-03 14:26:19 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:26:23 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:26:27 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:26:36 - Config file updated successfully.
-2024-12-03 14:26:39 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:26:51 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-03 14:26:53 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:27:28 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-2024-12-03 14:27:28 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 05 MIN : 44 SEC : 934 MS ***
+*** SCRIPT START TIME: 12/03/2024 17:00:59 ***
+2024-12-03 17:01:06 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 17:01:06 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 17:01:06 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 17:01:07 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 17:01:11 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 17:01:13 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 17:01:15 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 17:01:31 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:01:32 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 17:01:34 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 17:01:34 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:01:35 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-03 17:01:35 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 17:01:35 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 17:01:35 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 17:01:37 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 17:01:37 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 17:01:37 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 17:01:37 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 17:01:40 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:01:40 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:01:43 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:01:43 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:01:43 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 17:01:43 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 17:01:43 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:01:43 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 17:01:45 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 17:01:45 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 17:01:51 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:01:55 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:02:00 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:02:09 - Failed to update the config file: : (Line 3386) : Exception setting "AZURE_SEARCH_VECTOR_INDEXER_NAME": "The property 'AZURE_SEARCH_VECTOR_INDEXER_NAME' cannot be found on this object. Verify that the property exists and can be set."
+2024-12-03 17:02:11 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:02:25 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 17:02:29 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:03:05 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 17:03:05 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 05 SEC : 436 MS ***
 
 *** LOG SEQUENCE: 3 ***
-*** SCRIPT START TIME: 12/03/2024 14:30:05 ***
-2024-12-03 14:30:16 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:30:16 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:30:16 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:30:17 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:30:20 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:30:23 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:30:24 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:30:40 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:31:28 - Failed to create Search Indexer 'srch-indexer-copilot-demo-003': 
-{
-  "error": {
-    "code": "",
-    "message": "Skill \u0027#2\u0027 requires a valid image action"
-  }
-}
-*** LOG SEQUENCE: 4 ***
-*** SCRIPT START TIME: 12/03/2024 14:32:55 ***
-2024-12-03 14:33:00 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:33:00 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:33:01 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:33:02 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:33:05 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:33:07 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:33:09 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:33:25 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:33:33 - Failed to create Search Indexer 'srch-indexer-copilot-demo-003': 
-{
-  "error": {
-    "code": "",
-    "message": "Skill \u0027#2\u0027 requires a valid image action"
-  }
-}
-2024-12-03 14:34:49 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
-2024-12-03 14:34:49 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:36:38 - Indexer 'vector-srch-indexer-copilot-demo-003' run successfully.
-*** LOG SEQUENCE: 5 ***
-*** SCRIPT START TIME: 12/03/2024 14:37:32 ***
-2024-12-03 14:37:38 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:37:38 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:37:38 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:37:39 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:37:42 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:37:44 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:37:46 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:38:02 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-*** LOG SEQUENCE: 6 ***
-*** SCRIPT START TIME: 12/03/2024 14:38:57 ***
-2024-12-03 14:39:03 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:39:03 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:39:03 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:39:04 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:39:08 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:39:11 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:39:12 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:39:28 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-*** LOG SEQUENCE: 7 ***
-*** SCRIPT START TIME: 12/03/2024 14:47:30 ***
-2024-12-03 14:47:36 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:47:36 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:47:36 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:47:37 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:47:40 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:47:43 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:47:44 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:48:00 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-*** LOG SEQUENCE: 8 ***
-*** SCRIPT START TIME: 12/03/2024 14:51:49 ***
-2024-12-03 14:51:55 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 14:51:55 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 14:51:55 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 14:51:56 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 14:51:59 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 14:52:01 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 14:52:02 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 14:52:18 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:52:59 - Failed to create Search Indexer 'srch-indexer-copilot-demo-003': 
-{
-  "error": {
-    "code": "",
-    "message": "Skill \u0027#1\u0027 requires a valid image action"
-  }
-}
-2024-12-03 14:53:00 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
-2024-12-03 14:53:00 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 14:53:08 - Indexer 'vector-srch-indexer-copilot-demo-003' run successfully.
-2024-12-03 14:53:08 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-03 14:53:08 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-03 14:53:08 - OpenAI Service 'openai-copilot-demo-003' already exists.
-2024-12-03 14:53:10 - OpenAI model deployment 'ai' created successfully.
-2024-12-03 14:53:10 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-03 14:53:10 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-03 14:53:10 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-03 14:53:13 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:53:13 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-03 14:53:16 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:53:16 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-03 14:53:16 - Identity 'id-copilot-demo-003' already exists.
-2024-12-03 14:53:16 - Key Vault 'kv-copilot-demo-003' already exists.
-2024-12-03 14:53:16 - AI Hub 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:53:16 - AI Service 'ai-service-copilot-demo-003' already exists.
-2024-12-03 14:53:17 - AI Model deployment: 'ai-model-copilot-demo-003' created.
-2024-12-03 14:53:17 - AI Project 'project-ai-copilot-demo-003' already exists.
-2024-12-03 14:53:22 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:53:27 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:53:31 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 14:53:41 - Config file updated successfully.
-2024-12-03 14:53:44 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:54:05 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-03 14:54:07 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 14:54:43 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-2024-12-03 14:54:43 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 54 SEC : 519 MS ***
+*** SCRIPT START TIME: 12/03/2024 17:05:37 ***
+2024-12-03 17:05:43 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 17:05:43 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 17:05:43 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 17:05:44 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 17:05:48 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 17:05:50 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 17:05:52 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 17:06:08 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:06:09 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 17:06:11 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 17:06:11 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:06:12 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-03 17:06:12 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 17:06:12 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 17:06:12 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 17:06:14 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 17:06:14 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 17:06:14 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 17:06:14 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 17:06:17 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:06:17 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:06:20 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:06:20 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:06:20 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 17:06:20 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 17:06:20 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:06:20 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 17:06:21 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 17:06:21 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 17:06:26 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:06:31 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:06:35 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:06:46 - Config file updated successfully.
+2024-12-03 17:06:49 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:07:03 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 17:07:06 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:07:44 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 17:07:44 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 07 SEC : 652 MS ***
 
-*** LOG SEQUENCE: 9 ***
-*** SCRIPT START TIME: 12/03/2024 15:56:44 ***
-2024-12-03 15:56:51 - Storage account 'stcopilotdemo003' already exists.
-2024-12-03 15:56:51 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-03 15:56:51 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-03 15:56:52 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-03 15:56:56 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
-2024-12-03 15:56:58 - Search Index 'srch-index-copilot-demo-003' already exists.
-2024-12-03 15:57:00 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
-2024-12-03 15:57:16 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 15:57:37 - Failed to create Search Indexer 'srch-indexer-copilot-demo-003': 
-{
-  "error": {
-    "code": "",
-    "message": "Skill \u0027#1\u0027 requires a valid image action"
-  }
-}
-2024-12-03 15:57:38 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
-2024-12-03 15:57:38 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-03 15:57:39 - Indexer 'vector-srch-indexer-copilot-demo-003' run successfully.
-2024-12-03 15:57:39 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-03 15:57:39 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-03 15:57:39 - OpenAI Service 'openai-copilot-demo-003' already exists.
-2024-12-03 15:57:42 - OpenAI model deployment 'ai' created successfully.
-2024-12-03 15:57:42 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-03 15:57:42 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-03 15:57:42 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-03 15:57:46 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 15:57:46 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-03 15:57:50 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 15:57:50 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-03 15:57:50 - Identity 'id-copilot-demo-003' already exists.
-2024-12-03 15:57:50 - Key Vault 'kv-copilot-demo-003' already exists.
-2024-12-03 15:57:50 - AI Hub 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 15:57:50 - AI Service 'ai-service-copilot-demo-003' already exists.
-2024-12-03 15:57:51 - AI Model deployment: 'ai-model-copilot-demo-003' created.
-2024-12-03 15:57:51 - AI Project 'project-ai-copilot-demo-003' already exists.
-2024-12-03 15:58:07 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 15:58:13 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 15:58:17 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-03 15:58:29 - Failed to update the config file: : (Line 3386) : Exception setting "AZURE_SEARCH_VECTOR_INDEXER_NAME": "The property 'AZURE_SEARCH_VECTOR_INDEXER_NAME' cannot be found on this object. Verify that the property exists and can be set."
-2024-12-03 15:58:32 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 15:58:46 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-03 15:58:49 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-03 15:59:26 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-2024-12-03 15:59:26 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 42 SEC : 151 MS ***
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 12/03/2024 17:20:51 ***
+2024-12-03 17:20:57 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 17:20:57 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 17:20:57 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 17:20:58 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 17:21:02 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 17:21:05 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 17:21:07 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 17:21:23 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:21:24 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 17:21:25 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 17:21:25 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:21:27 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-03 17:21:27 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 17:21:27 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 17:21:27 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 17:21:29 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 17:21:29 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 17:21:29 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 17:21:29 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 17:21:32 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:21:32 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:21:35 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:21:35 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:21:35 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 17:21:36 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 17:21:36 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:21:36 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 17:21:37 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 17:21:37 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 17:21:42 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:21:47 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:21:51 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:22:03 - Config file updated successfully.
+2024-12-03 17:22:06 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:22:19 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 17:22:22 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:22:59 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 17:22:59 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 07 SEC : 436 MS ***
+
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 12/03/2024 17:32:03 ***
+2024-12-03 17:32:10 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 17:32:10 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 17:32:10 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 17:32:11 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 17:32:14 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 17:32:17 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 17:32:19 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 17:32:35 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:32:36 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 17:32:38 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 17:32:38 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 17:32:39 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-03 17:32:39 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 17:32:39 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 17:32:39 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 17:32:41 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 17:32:41 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 17:32:41 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 17:32:41 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 17:32:44 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:32:44 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:32:47 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:32:47 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 17:32:47 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 17:32:47 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 17:32:47 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:32:47 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 17:32:48 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 17:32:48 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 17:32:53 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:32:58 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:33:02 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 17:33:12 - Config file updated successfully.
+2024-12-03 17:33:15 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:33:28 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 17:33:35 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 17:34:21 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 17:34:21 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 17 SEC : 777 MS ***
+
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 12/03/2024 19:35:43 ***
+2024-12-03 19:35:49 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 19:35:49 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 19:35:49 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 19:35:50 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 19:35:54 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 19:35:57 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 19:35:58 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 19:36:15 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 19:36:16 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 19:36:17 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 19:36:17 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 19:36:19 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-03 19:36:19 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 19:36:19 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 19:36:19 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 19:36:21 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 19:36:21 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 19:36:21 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 19:36:21 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 19:36:25 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:36:25 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 19:36:28 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:36:28 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 19:36:28 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 19:36:28 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 19:36:28 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:36:28 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 19:36:29 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 19:36:29 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 19:36:40 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:36:44 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:36:48 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:41:48 - Config file updated successfully.
+2024-12-03 19:41:51 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:42:13 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 19:42:17 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:42:59 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 19:42:59 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 07 MIN : 16 SEC : 016 MS ***
+
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 12/03/2024 19:48:04 ***
+2024-12-03 19:48:10 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 19:48:10 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 19:48:10 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 19:48:11 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 19:48:14 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 19:48:17 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 19:48:18 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 19:48:34 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 19:48:36 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 19:48:37 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 19:48:37 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 19:48:38 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-03 19:48:38 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 19:48:38 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 19:48:38 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 19:48:40 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 19:48:40 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 19:48:40 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 19:48:40 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 19:48:43 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:48:43 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 19:48:45 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:48:45 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 19:48:45 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 19:48:45 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 19:48:45 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:48:45 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 19:48:47 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 19:48:47 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 19:48:51 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:48:55 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:49:00 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 12/03/2024 19:53:53 ***
+2024-12-03 19:53:59 - Storage account 'stcopilotdemo003' already exists.
+2024-12-03 19:53:59 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-03 19:53:59 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-03 19:54:01 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-03 19:54:05 - Search Data Source 'srch-datasource-copilot-demo-003' already exists.
+2024-12-03 19:54:07 - Search Index 'srch-index-copilot-demo-003' already exists.
+2024-12-03 19:54:09 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2024-12-03 19:54:25 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 19:54:26 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema-template.json}' already exists.
+2024-12-03 19:54:27 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema-template.json}' already exists.
+2024-12-03 19:54:27 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-03 19:54:29 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-03 19:54:29 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-03 19:54:29 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-03 19:54:29 - OpenAI Service 'openai-copilot-demo-003' already exists.
+2024-12-03 19:54:31 - OpenAI model deployment 'ai' created successfully.
+2024-12-03 19:54:31 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-03 19:54:31 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-03 19:54:31 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-03 19:54:35 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:54:35 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 19:54:37 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:54:37 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-03 19:54:37 - Identity 'id-copilot-demo-003' already exists.
+2024-12-03 19:54:37 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-03 19:54:37 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:54:37 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-03 19:54:39 - AI Model deployment: 'ai-model-copilot-demo-003' created.
+2024-12-03 19:54:39 - AI Project 'project-ai-copilot-demo-003' already exists.
+2024-12-03 19:54:51 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:54:56 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:55:01 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-03 19:55:43 - Config file updated successfully.
+2024-12-03 19:55:46 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:56:05 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-03 19:56:07 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-03 19:56:48 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-03 19:56:48 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 55 SEC : 528 MS ***
 
