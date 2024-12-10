@@ -1,10 +1,36 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 12/04/2024 15:54:15 ***
-2024-12-04 15:54:21 - Storage account 'stcopilotdemo004' already exists.
-2024-12-04 15:54:24 - Subnet 'subnet-copilot-demo-004' created.
-2024-12-04 15:54:24 - App Service Environment 'ase-copilot-demo-004' created.
-*** LOG SEQUENCE: 2 ***
-*** SCRIPT START TIME: 12/04/2024 15:54:52 ***
-2024-12-04 15:55:01 - Storage account 'stcopilotdemo004' already exists.
-2024-12-04 15:55:05 - Subnet 'subnet-copilot-demo-004' created.
-2024-12-04 15:55:05 - App Service Environment 'ase-copilot-demo-004' created.
+*** SCRIPT START TIME: 12/10/2024 18:07:18 ***
+2024-12-10 18:07:24 - Storage account 'stcopilotdemo004' already exists.
+2024-12-10 18:07:24 - App Service Plan 'asp-copilot-demo-004' already exists.
+2024-12-10 18:07:25 - Cognitive Service 'cog-copilot-demo-004' already exists.
+2024-12-10 18:07:26 - Search Service 'srch-copilot-demo-004' already exists.
+2024-12-10 18:07:30 - Search Data Source 'srch-datasource-copilot-demo-004' already exists.
+2024-12-10 18:07:33 - Failed to create index 'srch-index-copilot-demo-004': 
+{
+  "error": {
+    "code": "",
+    "message": "The request is invalid. Details: Cannot find nested property \u0027normalizers\u0027 on the resource type \u0027Microsoft.Azure.Search.V2024_07_01.IndexDefinition\u0027."
+  }
+}
+2024-12-10 18:07:36 - Failed to create index 'vector-srch-index-copilot-demo-004': 
+{
+  "error": {
+    "code": "",
+    "message": "The request is invalid. Details: Cannot find nested property \u0027normalizers\u0027 on the resource type \u0027Microsoft.Azure.Search.V2024_07_01.IndexDefinition\u0027."
+  }
+}
+2024-12-10 18:07:55 - Failed to create skillset 'vector-srch-skillset-copilot-demo-004': 
+{
+  "error": {
+    "code": "",
+    "message": "One or more index projection selectors are invalid. Details: Index \u0027vector-srch-index-copilot-demo-004\u0027 does not exist; Index \u0027vector-srch-index-copilot-demo-004\u0027 does not exist"
+  }
+}
+2024-12-10 18:07:55 - Log Analytics workspace 'log-copilot-demo-004' already exists.
+2024-12-10 18:07:55 - Application Insights 'appi-copilot-demo-004' already exists.
+2024-12-10 18:07:55 - OpenAI Service 'openai-copilot-demo-004' already exists.
+2024-12-10 18:07:58 - Failed to deploy AI Model 'ai-model-copilot-demo-004'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 47. The current quota usage is 103 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 47. The current quota usage is 103 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-10 18:07:59 - File 'ai.project.yaml' created and populated.

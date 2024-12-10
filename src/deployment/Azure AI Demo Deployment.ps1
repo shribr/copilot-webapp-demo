@@ -197,9 +197,32 @@ function Deploy-OpenAIModel {
         }
         else {
             # Create the deployment if it does not exist
-            az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIName --deployment-name $deploymentName --model-name $modelName --model-format $modelFormat --model-version $modelVersion --sku-name $skuName --sku-capacity $skuCapacity
-            Write-Host "OpenAI model deployment '$deploymentName' created successfully."
-            Write-Log -message "OpenAI model deployment '$deploymentName' created successfully."
+            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $deploymentName --model-name $modelName --model-format $modelFormat --model-version $modelVersion --sku-name $skuName --sku-capacity $skuCapacity 2>&1
+
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to deploy AI Model '$aiModelName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+
+                Write-Host $errorMessage
+                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+            }
+            else {
+                Write-Host "OpenAI model '$deploymentName' deployed successfully."
+                Write-Log -message "OpenAI model '$deploymentName' deployed successfully." -logFilePath $global:LogFilePath
+            }
+
+
         }
     }
     catch {
@@ -918,7 +941,7 @@ function New-AIHubAndModel {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
                 try {
                     Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -resourceType "Microsoft.MachineLearningServices/workspaces"
                 }
@@ -954,7 +977,7 @@ function New-AIHubAndModel {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
                 try {
                     Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -resourceType "Microsoft.CognitiveServices/accounts"    
                 }
@@ -1123,7 +1146,14 @@ function New-AIProject {
             -appInsightsName $appInsightsName `
             -location $location `
             -subscriptionId $subscriptionId `
-            -userAssignedIdentityName $userAssignedIdentityName 2>&1
+            -storageAccountName $storageAccountName `
+            -containerRegistryName $containerRegistryName `
+            -keyVaultName $keyVaultName `
+            -userAssignedIdentityName $userAssignedIdentityName
+
+        #az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
+        #$jsonOutput = az ml workspace create --file $aiProjectFile --resource-group $resourceGroupName --workspace-name $aiProjectName --location $location --storage-account $storageAccountId --key-vault $keyVaultId --container-registry $containerRegistryName --app-insights $appInsightsName
+        -userAssignedIdentityName $userAssignedIdentityName 2>&1
             
         #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
@@ -1390,10 +1420,40 @@ function New-AppServicePlan {
         [string]$appServicePlanName,
         [string]$resourceGroupName,
         [string]$location,
-        [string]$appServiceEnvironmentName,
         [string]$sku,
         [array]$existingResources
     )
+
+    $sku = "B1"
+
+    if ($existingResources -notcontains $appServicePlanName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku $sku --output none
+            Write-Host "App Service Plan '$appServicePlanName' created."
+            Write-Log -message "App Service Plan '$appServicePlanName' created."
+        }
+        catch {
+            Write-Error "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "App Service Plan '$appServicePlanName' already exists."
+        Write-Log -message "App Service Plan '$appServicePlanName' already exists."
+    }
+}
+
+# Function to create a new App Service Plan in an App Service Environment (ASE)
+function New-AppServicePlanInASE {
+    param (
+        [string]$appServicePlanName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [string]$appServiceEnvironmentName,
+        [array]$existingResources
+    )
+
 
     try {
         $ErrorActionPreference = 'Stop'
@@ -1429,7 +1489,7 @@ function New-CognitiveServicesAccount {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
                 try {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
@@ -1514,10 +1574,30 @@ function New-ContainerRegistry {
         $containerRegistryFile = Update-ContainerRegistryFile -resourceGroupName $resourceGroupName -containerRegistryName $containerRegistryName -location $location
 
         try {
-            az ml registry create --file $containerRegistryFile --resource-group $resourceGroupName
-        
-            Write-Host "Container Registry '$containerRegistryName' created."
-            Write-Log -message "Container Registry '$containerRegistryName' created."
+            $jsonOutput = az ml registry create --file $containerRegistryFile --resource-group $resourceGroupName 2>&1
+
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create Container Registry '$containerRegistryName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+
+                Write-Host $errorMessage
+                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+            }
+            else {
+                Write-Host "Container Registry '$containerRegistryName' created."
+                Write-Log -message "Container Registry '$containerRegistryName' created."
+            }
         }
         catch {
             Write-Error "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1642,7 +1722,7 @@ function New-KeyVault {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
                 Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "KeyVault" -resourceGroupName $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
             }
             else {
@@ -1891,7 +1971,7 @@ function New-OpenAIAccount {
         [array]$existingResources
     )
 
-    if ($existingResources -notcontains $openAIName) {
+    if ($existingResources -notcontains $openAIAccountName) {
 
         try {
             $ErrorActionPreference = 'Stop'
@@ -1901,7 +1981,7 @@ function New-OpenAIAccount {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services account
@@ -2082,22 +2162,24 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create Virtual Network
 
-    New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroupName -existingResources $existingResources
+    #New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Subnet
 
-    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName
+    #New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName
 
     # **********************************************************************************************************************
     # Create App Service Environment
 
-    New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
+    #New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create App Service Plan
 
     New-AppServicePlan -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroupName -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku $appServicePlanSku -existingResources $existingResources
+
+    #New-AppServicePlanInASE -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroupName -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku $appServicePlanSku -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Cognitive Services account
@@ -2127,7 +2209,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Deploy Open AI model
 
-    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location
+    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location -aiModelType $global:aiModelType
     
     #**********************************************************************************************************************
     # Create AI Project
@@ -2451,7 +2533,7 @@ function New-SearchService {
                 Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
             }
                 
-            if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
+            if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
                 
                 foreach ($indexer in $global:searchIndexers) {
                     $indexName = $indexer.IndexName
@@ -2532,7 +2614,7 @@ function New-SearchService {
             }
                 
             try {
-                if ($dataSourceExists -eq "true" && $searchIndexExists -eq $true) {
+                if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
                     
                     foreach ($indexer in $global:searchIndexers) {
                         $indexName = $indexer.IndexName
@@ -2677,7 +2759,7 @@ function New-SubNet {
 
     if ($existingResources -notcontains $subnetName) {
         try {
-            az network vnet subnet create --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --address-prefixes $subnetAddressPrefix --output none
+            az network vnet subnet create --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --address-prefixes $subnetAddressPrefix --delegations Microsoft.Web/hostingEnvironments --output none
             Write-Host "Subnet '$subnetName' created."
             Write-Log -message "Subnet '$subnetName' created."
         }
@@ -3191,7 +3273,7 @@ function Start-Deployment {
     $userAssignedIdentityName = $global:userAssignedIdentityName
 
     # Create a new AI Hub and Model
-    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
+    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $global:aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
     
     # Update configuration file for web frontend
     Update-ConfigFile - configFilePath "app/frontend/config.json" `
@@ -3583,7 +3665,9 @@ function Update-AIProjectFile {
         [string]$resourceGroupName,
         [string]$aiProjectName,
         [string]$appInsightsName,
-        [string]$userAssignedIdentityName
+        [string]$userAssignedIdentityName,
+        [string]$location,
+        [string]$storageAccountName
     )
 
     $rootPath = Get-Item -Path (Get-Location).Path
@@ -3599,6 +3683,7 @@ description: This configuration specifies a workspace configuration with existin
 display_name: $aiProjectName
 location: $location
 application_insights: $appInsightsName
+storage_account: $global:storageAccountName
 identity:
   type: user_assigned
   tenant_id: $global:tenantId
