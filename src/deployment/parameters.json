@@ -141,7 +141,8 @@
         ],
         "defaultLanguageCode": "en",
         "detectOrientation": true,
-        "lineEnding": "Space"
+        "lineEnding": "Space",
+        "action": "extractText"
       },
       {
         "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
@@ -234,6 +235,7 @@
             "targetName": "image_vector"
           }
         ],
+        "action": "extractText",
         "modelVersion": "2023-04-15"
       }
     ],

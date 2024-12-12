@@ -1124,7 +1124,8 @@ function New-AIProject {
         [string]$aiProjectName,
         [string]$appInsightsName,
         [string]$userAssignedIdentityName,
-        [string]$location
+        [string]$location,
+        [string]$keyVaultName
     )
 
     $ErrorActionPreference = 'Stop'
@@ -1133,36 +1134,36 @@ function New-AIProject {
 
         $ErrorActionPreference = 'Stop'
 
-        $storageAccountName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
-        $containerRegistryName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName"
-        $keyVaultName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
-        $appInsightsName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
-        $userAssignedIdentityName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
-
+        $storageAccountResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+        $containerRegistryResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName"
+        $keyVaultResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+        $appInsightsResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
+        $userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+        $aiHubResoureceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.MachineLearningServices/workspaces/$aiHubName"
 
         $aiProjectFile = Update-AIProjectFile `
             -aiProjectName $aiProjectName `
             -resourceGroupName $resourceGroupName `
-            -appInsightsName $appInsightsName `
+            -appInsightsName $appInsightsResourceId `
             -location $location `
             -subscriptionId $subscriptionId `
-            -storageAccountName $storageAccountName `
-            -containerRegistryName $containerRegistryName `
-            -keyVaultName $keyVaultName `
-            -userAssignedIdentityName $userAssignedIdentityName
+            -storageAccountName $storageAccountResourceId `
+            -containerRegistryName $containerRegistryResourceId `
+            -keyVaultName $keyVaultResourceId `
+            -userAssignedIdentityName $userAssignedIdentityResourceId
 
         #az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
-        #$jsonOutput = az ml workspace create --file $aiProjectFile --resource-group $resourceGroupName --workspace-name $aiProjectName --location $location --storage-account $storageAccountId --key-vault $keyVaultId --container-registry $containerRegistryName --app-insights $appInsightsName
-        -userAssignedIdentityName $userAssignedIdentityName 2>&1
+        #$jsonOutput = az ml workspace create --file $aiProjectFile --resource-group $resourceGroupName --name $aiProjectName --location $location --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId 2>&1
             
         #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
         #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
 
         #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
-        $jsonOutput = az ml workspace create --file $aiProjectFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityName --kind project --hub-id $aiHubName
+        $jsonOutput = az ml workspace create --file $aiProjectFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityResourceId --kind project --hub-id $aiHubResoureceId
 
-        az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --storage-account $storageAccountId --key-vault $keyVaultId --container-registry $containerRegistryName --app-insights $appInsightsName --identity $userAssignedIdentityName --location $location
+        az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --hub-id $aiHubResoureceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
+        #az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --hub-id $$aiHubResoureceId --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
 
         Write-Host "AI Project: '$aiProjectName' created."
         Write-Log -message "AI Project: '$aiProjectName' created." -logFilePath $global:LogFilePath
@@ -2162,17 +2163,17 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create Virtual Network
 
-    #New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroupName -existingResources $existingResources
+    New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Subnet
 
-    #New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName
+    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName
 
     # **********************************************************************************************************************
     # Create App Service Environment
 
-    #New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
+    New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create App Service Plan
@@ -2214,7 +2215,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create AI Project
 
-    New-AIProject -aiProjectName $aiProjectName -subscriptionId $subscriptionId -aiHubName $aiHubName -appInsightsName $appInsightsName -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+    New-AIProject -aiProjectName $aiProjectName -subscriptionId $subscriptionId -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Container Registry
@@ -3683,7 +3684,6 @@ description: This configuration specifies a workspace configuration with existin
 display_name: $aiProjectName
 location: $location
 application_insights: $appInsightsName
-storage_account: $global:storageAccountName
 identity:
   type: user_assigned
   tenant_id: $global:tenantId

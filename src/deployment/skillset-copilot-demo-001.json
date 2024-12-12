@@ -1,5 +1,5 @@
 {
-  "name": "vector-azure-search-openai-demo-csharp-skillset",
+  "name": "vector-srch-skillset-copilot-demo-004",
   "description": "Skillset to chunk documents and generate embeddings",
   "skills": [
     {
@@ -21,7 +21,8 @@
       ],
       "defaultLanguageCode": "en",
       "detectOrientation": true,
-      "lineEnding": "Space"
+      "lineEnding": "Space",
+      "action": "extractText"
     },
     {
       "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
@@ -115,18 +116,22 @@
           "targetName": "image_vector"
         }
       ],
+      "defaultLanguageCode": "en",
+      "detectOrientation": true,
+      "lineEnding": "Space",
+      "action": "extractText",
       "modelVersion": "2023-04-15"
     }
   ],
   "cognitiveServices": {
     "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
-    "key": null
+    "key": "4f9afaf0e0c04c6fab8881451ad59b20"
   },
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "indexProjections": {
     "selectors": [
       {
-        "targetIndexName": "vector-azure-search-openai-demo-csharp",
+        "targetIndexName": "vector-srch-index-copilot-demo-004",
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
         "mappings": [
@@ -149,7 +154,7 @@
         ]
       },
       {
-        "targetIndexName": "vector-azure-search-openai-demo-csharp",
+        "targetIndexName": "vector-srch-index-copilot-demo-004",
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
         "mappings": [
