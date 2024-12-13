@@ -368,12 +368,15 @@ async function showResponse(questionBubble) {
         // Create tab contents
         const answerContent = document.createElement('div');
         answerContent.className = 'tab-content active';
+        answerContent.style.fontStyle = 'italic';
 
         const thoughtProcessContent = document.createElement('div');
         thoughtProcessContent.className = 'tab-content';
+        thoughtProcessContent.style.fontStyle = 'italic';
 
         const supportingContent = document.createElement('div');
         supportingContent.className = 'tab-content';
+        supportingContent.style.fontStyle = 'italic';
 
         if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == "true") {
             answerContent.textContent = response.choices[0].message.content;
@@ -395,36 +398,32 @@ async function showResponse(questionBubble) {
                 if (answer.text) {
                     const correspondingDoc = docMap.get(answer.key);
                     if (correspondingDoc) {
-                        const rephrasedAnswerText = await rephraseText(answer.answerText);
+                        //const rephrasedAnswerText = await rephraseText(answer.text);
                         answers.push({
-                            answerText: rephrasedAnswerText,
+                            answerText: answer.text,
                             document: correspondingDoc
                         });
                     }
                 }
             });
 
-            const answerResults = "";
-            const supportingContentLink = ""
-
-            const answerNumber = 1;
+            var answerResults = "";
+            var supportingContentLink = "";
+            var answerNumber = 1;
 
             answers.forEach(answer => {
                 if (answer.answerText) {
                     supportingContentLink = '<a href="' + answer.document.metadata_storage_path + '" target="_blank">' + answer.document.title + '</a>';
                     answerResults += answerNumber + ". " + answer.answerText + '\n\n';
-                    answerResults += supportingContentLink
+                    answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
+
+                    supportingContent.innerHTML += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n';
 
                     answerNumber++;
-
-                    //answerResults += answer.document.title + '\n\n';
-                    //answerResults += answer.document.metadata_storage_path + '\n\n';
-
-                    supportingContent.innerHTML += supportingContentLink + '<br>';
                 }
             });
 
-            answerContent.textContent = answerResults;
+            answerContent.innerHTML = answerResults;
 
             console.log('Cross-referenced answers:', answers);
         }
