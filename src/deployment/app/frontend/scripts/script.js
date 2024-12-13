@@ -413,7 +413,7 @@ async function showResponse(questionBubble) {
 
             answers.forEach(answer => {
                 if (answer.answerText) {
-                    supportingContentLink = '<a href="' + answer.document.metadata_storage_path + '" target="_blank">' + answer.document.title + '</a>';
+                    supportingContentLink = '<a href="' + answer.document.metadata_storage_path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
                     answerResults += answerNumber + ". " + answer.answerText + '\n\n';
                     answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
 
