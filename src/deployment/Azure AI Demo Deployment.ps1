@@ -772,6 +772,7 @@ function Initialize-Parameters {
     $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
     $global:searchSkillSet = $parametersObject.searchSkillSet
     $global:searchSkillSetName = $parametersObject.searchSkillSetName
+    $global:searchPublicInternetResults = $parametersObject.searchPublicInternetResults
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
     $global:sharedDashboardName = $parametersObject.sharedDashboardName
     $global:siteLogo = $parametersObject.siteLogo
@@ -891,6 +892,7 @@ function Initialize-Parameters {
         searchIndexers               = $searchIndexers
         searchSkillSet               = $searchSkillSet
         searchSkillSetName           = $searchSkillSetName
+        searchPublicInternetResults  = $searchPublicInternetResults
         serviceBusNamespaceName      = $serviceBusNamespaceName
         searchDataSourceName         = $searchDataSourceName
         searchServiceProperties      = $searchServiceProperties
@@ -2173,7 +2175,7 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create App Service Environment
 
-    New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
+    #New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroupName -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create App Service Plan
@@ -2275,6 +2277,9 @@ function New-SearchDataSource {
             container   = @{
                 name  = $searchDatasourceContainerName
                 query = $searchDatasourceQuery
+            }
+            identity    = @{
+                type = "SystemAssigned"
             }
         }
 
@@ -2785,16 +2790,14 @@ function New-VirtualNetwork {
     $vnetName = $virtualNetwork.Name
 
     if ($existingResources -notcontains $vnetName) {
-        {
-            try {
-                az network vnet create --resource-group $virtualNetwork.ResourceGroup --name $vnetName --output none
-                Write-Host "Virtual Network '$vnetName' created."
-                Write-Log -message "Virtual Network '$vnetName' created."
-            }
-            catch {
-                Write-Error "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
+        try {
+            az network vnet create --resource-group $virtualNetwork.ResourceGroup --name $vnetName --output none
+            Write-Host "Virtual Network '$vnetName' created."
+            Write-Log -message "Virtual Network '$vnetName' created."
+        }
+        catch {
+            Write-Error "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
 }
@@ -2987,7 +2990,8 @@ function Set-DirectoryPath {
 
 # Function to set Key Vault access policies
 function Set-KeyVaultAccessPolicies {
-    param([string]$keyVaultName, 
+    param(
+        [string]$keyVaultName, 
         [string]$resourceGroupName, 
         [string]$userPrincipalName)
     
@@ -3164,6 +3168,8 @@ function Start-Deployment {
     
     if ($appendUniqueSuffix -eq $true) {
 
+        $userPrincipalName = "$($parameters.userPrincipalName)"
+
         # Find a unique suffix
         $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
 
@@ -3254,7 +3260,7 @@ function Start-Deployment {
     # Create Key Vault
 
     if ($existingResources -notcontains $keyVaultName) {
-        New-KeyVault -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -location $location -useRBAC $useRBAC -userAssignedIdentityName $userAssignedIdentityName
+        New-KeyVault -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -location $location -useRBAC $useRBAC -userAssignedIdentityName $userAssignedIdentityName -userPrincipalName $userPrincipalName
     }
     else {
         Write-Host "Key Vault '$keyVaultName' already exists."
@@ -3283,6 +3289,7 @@ function Start-Deployment {
         -storageAccountName $storageAccountName `
         -searchServiceName $searchServiceName `
         -openAIName $openAIName `
+        -aiServiceName $aiServiceName `
         -functionAppName $functionAppServiceName `
         -searchIndexerName $global:searchIndexerName `
         -searchIndexName $global:searchIndexName `
@@ -3720,6 +3727,7 @@ function Update-ConfigFile {
         [string]$searchVectorIndexName,
         [string]$searchVectorIndexerName,
         [string]$openAIName,
+        [string]$aiServiceName,
         [string]$functionAppName,
         [string]$siteLogo
     )
@@ -3729,7 +3737,9 @@ function Update-ConfigFile {
         $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-    
+        #$openAIKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+        $openAIKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $aiServiceName --query "key1" --output tsv
+        #$openAIKey = "4115eab42bb84bac924697124317ae32"
         $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
         $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
@@ -3817,9 +3827,12 @@ function Update-ConfigFile {
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
+        $config.OPEN_AI_KEY = $openAIKey
+        $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
+        $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
         $config.SITE_LOGO = $global:siteLogo
 
-        $config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+        #$config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
     
         # Convert the updated object back to JSON format
         $updatedConfig = $config | ConvertTo-Json -Depth 10

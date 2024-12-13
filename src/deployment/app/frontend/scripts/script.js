@@ -344,7 +344,7 @@ async function showResponse(questionBubble) {
 
     if (chatInput) {
 
-        //const response = await getAnswersFromAzureSearch(chatInput);
+        const docResponse = await getAnswersFromAzureSearch(chatInput);
         const response = await getAnswers(chatInput);
 
         // Create a new chat bubble element
@@ -380,12 +380,17 @@ async function showResponse(questionBubble) {
             supportingContentContent.textContent = 'Supporting content goes here.';
         }
         else {
-            answerContent.textContent = response.value[0].chunk;
-            const sourceDocument = response.value[0].title;
-            const sourceDocumentLink = response.value[0].metadata_storage_path;
+            try {
+                answerContent.textContent = response.value[0].chunk;
+                const sourceDocument = response.value[0].title;
+                const sourceDocumentLink = response.value[0].metadata_storage_path;
 
-            thoughtProcessContent.textContent = 'Thought process content goes here.';
-            supportingContentContent.innerHTML = '<a href="' + sourceDocumentLink + '" target="_blank">' + sourceDocument + '</a>';
+                thoughtProcessContent.textContent = 'Thought process content goes here.';
+                supportingContentContent.innerHTML = '<a href="' + sourceDocumentLink + '" target="_blank">' + sourceDocument + '</a>';
+            } catch (error) {
+                console.error('Error fetching response:', error);
+                answerContent.textContent = 'An error occurred while fetching the response.';
+            }
         }
 
         // Append tabs and contents to chat bubble
