@@ -3738,8 +3738,9 @@ function Update-ConfigFile {
         $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         #$openAIKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+        $aiServiceKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $aiServiceName --query "key1" --output tsv
         $openAIKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $aiServiceName --query "key1" --output tsv
-        #$openAIKey = "4115eab42bb84bac924697124317ae32"
+        #$openAIKey = "8e020697cdd94fa68c75ef04d1cc6589"
         $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
         $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
@@ -3817,6 +3818,7 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
         $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
         $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
+        $config.AZURE_AI_SERVICE_API_KEY = $aiServiceKey
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey

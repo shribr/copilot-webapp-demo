@@ -347,6 +347,8 @@ async function showResponse(questionBubble) {
         const docResponse = await getAnswersFromAzureSearch(chatInput);
         const response = await getAnswers(chatInput);
 
+        const answers = [];
+
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
         chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
@@ -370,34 +372,68 @@ async function showResponse(questionBubble) {
         const thoughtProcessContent = document.createElement('div');
         thoughtProcessContent.className = 'tab-content';
 
-        const supportingContentContent = document.createElement('div');
-        supportingContentContent.className = 'tab-content';
+        const supportingContent = document.createElement('div');
+        supportingContent.className = 'tab-content';
 
         if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == "true") {
             answerContent.textContent = response.choices[0].message.content;
 
             thoughtProcessContent.textContent = 'Thought process content goes here.';
-            supportingContentContent.textContent = 'Supporting content goes here.';
+            supportingContent.textContent = 'Supporting content goes here.';
         }
-        else {
-            try {
-                answerContent.textContent = response.value[0].chunk;
-                const sourceDocument = response.value[0].title;
-                const sourceDocumentLink = response.value[0].metadata_storage_path;
 
-                thoughtProcessContent.textContent = 'Thought process content goes here.';
-                supportingContentContent.innerHTML = '<a href="' + sourceDocumentLink + '" target="_blank">' + sourceDocument + '</a>';
-            } catch (error) {
-                console.error('Error fetching response:', error);
-                answerContent.textContent = 'An error occurred while fetching the response.';
-            }
+        if (docResponse && docResponse["@search.answers"] && docResponse.value && docResponse.value.length > 0) {
+
+            // Create a map of documents using their key
+            const docMap = new Map();
+            docResponse.value.forEach(doc => {
+                docMap.set(doc.chunk_id, doc);
+            });
+
+            // Iterate over the answers and cross-reference with documents
+            docResponse["@search.answers"].forEach(async answer => {
+                if (answer.text) {
+                    const correspondingDoc = docMap.get(answer.key);
+                    if (correspondingDoc) {
+                        const rephrasedAnswerText = await rephraseText(answer.answerText);
+                        answers.push({
+                            answerText: rephrasedAnswerText,
+                            document: correspondingDoc
+                        });
+                    }
+                }
+            });
+
+            const answerResults = "";
+            const supportingContentLink = ""
+
+            const answerNumber = 1;
+
+            answers.forEach(answer => {
+                if (answer.answerText) {
+                    supportingContentLink = '<a href="' + answer.document.metadata_storage_path + '" target="_blank">' + answer.document.title + '</a>';
+                    answerResults += answerNumber + ". " + answer.answerText + '\n\n';
+                    answerResults += supportingContentLink
+
+                    answerNumber++;
+
+                    //answerResults += answer.document.title + '\n\n';
+                    //answerResults += answer.document.metadata_storage_path + '\n\n';
+
+                    supportingContent.innerHTML += supportingContentLink + '<br>';
+                }
+            });
+
+            answerContent.textContent = answerResults;
+
+            console.log('Cross-referenced answers:', answers);
         }
 
         // Append tabs and contents to chat bubble
         chatResponse.appendChild(tabs);
         chatResponse.appendChild(answerContent);
         chatResponse.appendChild(thoughtProcessContent);
-        chatResponse.appendChild(supportingContentContent);
+        chatResponse.appendChild(supportingContent);
 
         // Append the chat bubble to the chat-display div
         chatDisplay.appendChild(chatResponse);
@@ -470,7 +506,8 @@ async function getAnswers(userInput) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': `${apiKey}`
+                'api-key': `${apiKey}`,
+                'http2': 'true'
             },
             body: jsonString
         });
@@ -538,7 +575,8 @@ async function getAnswersFromAzureSearch(userInput) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': `${apiKey}`
+                'api-key': `${apiKey}`,
+                'http2': 'true'
             },
             body: jsonString
         });
@@ -551,6 +589,26 @@ async function getAnswersFromAzureSearch(userInput) {
     catch (error) {
         console.log('Error fetching answers from Azure Search:', error);
     }
+}
+
+async function rephraseText(text) {
+    const config = await fetchConfig();
+
+    const apiKey = config.OPEN_AI_KEY;
+    const response = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            prompt: `Rephrase the following text to sound more human: "${text}"`,
+            max_tokens: 150
+        })
+    });
+
+    const data = await response.json();
+    return data.choices[0].text.trim();
 }
 
 //function to create side navigation links
