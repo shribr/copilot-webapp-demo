@@ -737,6 +737,7 @@ function Initialize-Parameters {
     $global:appInsightsName = $parametersObject.appInsightsName
     $global:blobStorageAccountName = $parametersObject.blobStorageAccountName
     $global:blobStorageContainerName = $parametersObject.blobStorageContainerName
+    $global:storageAPIVersion = $parametersObject.storageAPIVersion
     $global:computerVisionName = $parametersObject.computerVisionName
     $global:configFilePath = $parametersObject.configFilePath
     $global:cognitiveServiceName = $parametersObject.cognitiveServiceName
@@ -754,6 +755,7 @@ function Initialize-Parameters {
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
     $global:managedIdentityName = $parametersObject.managedIdentityName
     $global:openAIAccountName = $parametersObject.openAIAccountName
+    $global:openAIVersion = $parametersObject.openAIVersion
     $global:portalDashboardName = $parametersObject.portalDashboardName
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
@@ -772,6 +774,7 @@ function Initialize-Parameters {
     $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
     $global:searchSkillSet = $parametersObject.searchSkillSet
     $global:searchSkillSetName = $parametersObject.searchSkillSetName
+    $global:searchAPIVersion = $parametersObject.searchAPIVersion
     $global:searchPublicInternetResults = $parametersObject.searchPublicInternetResults
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
     $global:sharedDashboardName = $parametersObject.sharedDashboardName
@@ -872,6 +875,7 @@ function Initialize-Parameters {
         machineLearningProperties    = $machineLearningProperties
         managedIdentityName          = $managedIdentityName
         openAIAccountName            = $openAIAccountName
+        openAIVersion                = $openAIVersion
         objectId                     = $objectId
         portalDashboardName          = $portalDashboardName
         privateEndPointName          = $privateEndPointName
@@ -882,6 +886,7 @@ function Initialize-Parameters {
         resourceSuffix               = $resourceSuffix
         restoreSoftDeletedResource   = $restoreSoftDeletedResource
         result                       = $result
+        searchAPIVersion             = $searchAPIVersion
         searchServiceName            = $searchServiceName
         searchIndexName              = $searchIndexName
         searchIndexerName            = $searchIndexerName
@@ -901,6 +906,7 @@ function Initialize-Parameters {
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
         storageServiceProperties     = $storageServiceProperties
+        storageAPIVersion            = $storageAPIVersion
         subNet                       = $subNet
         subNetName                   = $subNetName
         subscriptionId               = $subscriptionId
@@ -3809,7 +3815,14 @@ function Update-ConfigFile {
         # Update the config with the new key-value pair
         $config.AZURE_RESOURCE_BASE_NAME = $resourceBaseName
         $config.AZURE_STORAGE_KEY = $storageKey
+        $config.AZURE_STORAGE_API_VERSION = $global:storageAPIVersion
         $config.AZURE_STORAGE_ACCOUNT_NAME = $storageAccountName
+        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
+        $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
+        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
+        $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
+        $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
         $config.AZURE_SEARCH_SERVICE_NAME = $searchServiceName
         $config.AZURE_SEARCH_API_KEY = $searchApiKey
         $config.AZURE_SEARCH_FULL_URL = $fulllUrl
@@ -3818,18 +3831,14 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
         $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
         $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
+        $config.AZURE_SEARCH_API_VERSION = $global:searchAPIVersion
         $config.AZURE_AI_SERVICE_API_KEY = $aiServiceKey
-        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
-        $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
-        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
-        $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
-        $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
-        $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
         $config.OPEN_AI_KEY = $openAIKey
+        $config.OPEN_AI_API_VERSION = $global:openAIAPIVersion
         $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
         $config.SITE_LOGO = $global:siteLogo

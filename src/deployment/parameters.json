@@ -33,6 +33,7 @@
   "managedIdentityName": "id-copilot-demo-004",
   "openAIAccountName": "openai-copilot-demo-004",
   "openAIKey": "4115eab42bb84bac924697124317ae32",
+  "openAIVersion": "2024-10-01-preview",
   "portalDashboardName": "portaldash-copilot-demo-004",
   "redisCacheName": "redis-copilot-demo-004",
   "resourceGroupName": "RG-COPILOT-DEMO-004",
@@ -49,10 +50,12 @@
   "serviceBusNamespaceName": "sb-copilot-demo-004",
   "searchDataSourceName": "srch-datasource-copilot-demo-004",
   "searchPublicInternetResults": true,
+  "searchAPIVersion": "2024-07-01",
   "sharedDashboardName": "dash-copilot-demo-004",
   "siteLogo": "custom",
   "sqlServerName": "sql-copilot-demo-004",
   "storageAccountName": "stcopilotdemo004",
+  "storageAPIVersion": "2023-11-01",
   "subscriptionId": "00000000-0000-0000-0000-000000000000",
   "userAssignedIdentityName": "id-copilot-demo-004",
   "containerRegistryProperties": {
@@ -88,12 +91,14 @@
     "Type": "azure_ai_services",
     "Endpoint": "https://srch-copilot-demo-004.cognitiveservices.azure.com/",
     "Key": "xxx",
+    "Api-Version": "2024-10-01-preview",
     "YamlFileName": "ai.connection.yaml"
   },
   "searchServiceProperties": {
     "Name": "srch-copilot-demo-004",
     "Type": "azure_ai_search",
     "Api-Key": "xxx",
+    "Api-Version": "2024-07-01",
     "Endpoint": "https://srch-copilot-demo-004.search.windows.net",
     "AIServicesResourceID": "",
     "YamlFileName": "search.connection.yaml"
@@ -306,6 +311,7 @@
       "SasToken": "xxx",
       "AccountKey": "xxx"
     },
+    "ApiVersion": "2023-11-01",
     "YamlFileName": "storage.connection.yaml"
   },
   "virtualNetwork": {

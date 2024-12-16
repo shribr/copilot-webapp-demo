@@ -875,7 +875,7 @@ async function runSearchIndexer() {
 
     const apiKey = config.AZURE_SEARCH_API_KEY;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const searchServiceApiVersion = "2024-07-01";
+    const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
 
     const searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
 
