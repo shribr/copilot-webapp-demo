@@ -334,7 +334,7 @@ label[for="chat-input"] {
 }
 
 #chat-container button:hover {
-  background-color: #0056b3;
+  background-color: #0046b3;
 }
 
 /* Add this to your CSS file or within a <style> tag in your HTML */
@@ -461,7 +461,7 @@ label[for="chat-input"] {
 }
 
 #send-button:hover {
-  background-color: #005a9e;
+  background-color: #004a9e;
 }
 
 /* Document container styles */
@@ -687,7 +687,7 @@ label[for="chat-input"] {
 }
 
 #choose-files-button:hover {
-  background-color: #0056b3;
+  background-color: #0046b3;
 }
 
 .upload-button {
@@ -706,7 +706,7 @@ label[for="chat-input"] {
 }
 
 .upload-button:hover:enabled {
-  background-color: #0056b3;
+  background-color: #0046b3;
 }
 
 #upload-info {
@@ -912,11 +912,11 @@ label[for="chat-input"] {
 }
 
 #send-button:hover {
-  background-color: #0056b3;
+  background-color: #0046b3;
 }
 
 #clear-button:hover {
-  background-color: #0056b3;
+  background-color: #0046b3;
 }
 
 .bi {

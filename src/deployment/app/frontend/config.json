@@ -1,29 +1,29 @@
 {
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
-  "AZURE_RESOURCE_BASE_NAME": "copilot-demo-005",
+  "AZURE_RESOURCE_BASE_NAME": "copilot-demo-004",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
-  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo005",
-  "AZURE_STORAGE_KEY": "VDJm0TuvExHwritYtJKxRhdhNQbvJBb/nUzf5uNy7aMEsL+9yTPRr5lug6TzdMLW3AgPuUn2zKb6+AStgD6KzA==",
+  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo004",
+  "AZURE_STORAGE_KEY": "HyiNLdR2xOtMyzMJkQlCSUztKthiOWue+P5Amd3s1E+DYtG9ZuZ3Hi9IQBhBhCra8fgkbdsROedn+AStluDHhA==",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-005",
-  "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-005",
-  "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-005",
-  "AZURE_SEARCH_VECTOR_INDEX_NAME": "vector-srch-index-copilot-demo-005",
-  "AZURE_SEARCH_VECTOR_INDEXER_NAME": "vector-srch-indexer-copilot-demo-005",
-  "AZURE_SEARCH_API_KEY": "sUY76KOFZjhRBCd0ylPbOPzFjw5svhMluxUiskfvzQAzSeDnXrPd",
+  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-004",
+  "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-004",
+  "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-004",
+  "AZURE_SEARCH_VECTOR_INDEX_NAME": "vector-srch-index-copilot-demo-004",
+  "AZURE_SEARCH_VECTOR_INDEXER_NAME": "vector-srch-indexer-copilot-demo-004",
+  "AZURE_SEARCH_API_KEY": "WDcZ9g8OjuAocBRxrvD5ZCejU3F6izv4LssSgTsc84AzSeBldHjB",
   "AZURE_SEARCH_API_VERSION": "2024-11-01-preview",
-  "AZURE_SEARCH_FULL_URL": "https://stcopilotdemo005.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-12-11T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbtq&srt=co&sig=qdAGaqTeL4Am/K9q/ZAiuW5slfOW4A60Wl%2BWyF2M0%2B4%3D",
-  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-005-semantic-configuration",
+  "AZURE_SEARCH_FULL_URL": "https://stcopilotdemo004.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-12-11T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=btfq&srt=co&sig=2BkpI5WZYWLoh4jv5IGXJGBA/JpgnQgJpsqZp%2BJYt5w%3D",
+  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-004-semantic-configuration",
   "AZURE_SEARCH_PUBLIC_INTERNET_RESULTS": true,
-  "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-005",
+  "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-004",
   "AZURE_FUNCTION_NAME": "Chat",
-  "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-005.azurewebsites.net",
-  "AZURE_FUNCTION_API_KEY": "SUpi1VPaIpypUciGsK5VMRfBeYVzApYgPHRYxD9XZ7JhAzFuPWiZ1A==",
-  "AZURE_AI_SERVICE_API_KEY": "8e020697cdd94fa68c75ef04d1cc6589",
-  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-005",
+  "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-004.azurewebsites.net",
+  "AZURE_FUNCTION_API_KEY": "dRlkuRbDk2p8O0BU5n0REjkoQ9JEnl__tp0D4GcZNNTLAzFu9fI_0w==",
+  "AZURE_AI_SERVICE_API_KEY": "4115eab42bb84bac924697124317ae32",
+  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-004",
   "STORAGE_CONTAINER_NAME": "content",
-  "OPEN_AI_KEY": "8e020697cdd94fa68c75ef04d1cc6589",
-  "API_VERSION": "2024-08-01-preview",
+  "OPEN_AI_KEY": "4115eab42bb84bac924697124317ae32",
+  "API_VERSION": "2024-10-01-preview",
   "DEPLOYMENT_ID": "ai",
   "REGION": "eastus",
   "SITE_LOGO": "custom",
@@ -38,21 +38,34 @@
             "text": "You are an AI assistant that helps people find information."
           }
         ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": ""
+          }
+        ]
       }
     ],
     "temperature": 0.7,
     "top_p": 0.95,
-    "max_tokens": 800
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "max_tokens": 800,
+    "stop": null,
+    "stream": true
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "fbtq",
+    "SS": "btfq",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2025-12-11T23:59:59Z",
     "ST": "2024-12-11T23:59:59Z",
     "SPR": "https",
-    "SIG": "qdAGaqTeL4Am/K9q/ZAiuW5slfOW4A60Wl%2BWyF2M0%2B4%3D",
+    "SIG": "2BkpI5WZYWLoh4jv5IGXJGBA/JpgnQgJpsqZp%2BJYt5w%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"

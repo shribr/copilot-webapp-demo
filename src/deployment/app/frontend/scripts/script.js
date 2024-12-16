@@ -398,9 +398,9 @@ async function showResponse(questionBubble) {
                 if (answer.text) {
                     const correspondingDoc = docMap.get(answer.key);
                     if (correspondingDoc) {
-                        //const rephrasedAnswerText = await rephraseText(answer.text);
+                        const rephrasedAnswerText = await rephraseText(answer.text);
                         answers.push({
-                            answerText: answer.text,
+                            answerText: rephrasedAnswerText,
                             document: correspondingDoc
                         });
                     }
@@ -594,20 +594,64 @@ async function rephraseText(text) {
     const config = await fetchConfig();
 
     const apiKey = config.OPEN_AI_KEY;
-    const response = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-            prompt: `Rephrase the following text to sound more human: "${text}"`,
-            max_tokens: 150
-        })
-    });
+    const apiVersion = config.API_VERSION;
+    const deploymentId = config.DEPLOYMENT_ID;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
 
-    const data = await response.json();
-    return data.choices[0].text.trim();
+    const payload = {
+        "messages": [
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "You are an AI assistant that helps people find information."
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": `Rephrase the following text to sound more human: "${text}"`
+                    }
+                ]
+            }
+        ],
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "max_tokens": 800,
+        "stop": null,
+        "stream": true
+    };
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': apiKey
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error: ${errorData.error.message}`);
+        }
+
+        const data = await response.json();
+        return data.choices[0].text.trim();
+    } catch (error) {
+        console.error('Error rephrasing text:', error);
+        throw error;
+    }
+
+    return text;
 }
 
 //function to create side navigation links
