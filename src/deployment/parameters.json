@@ -32,7 +32,7 @@
   "logAnalyticsWorkspaceName": "log-copilot-demo-004",
   "managedIdentityName": "id-copilot-demo-004",
   "openAIAccountName": "openai-copilot-demo-004",
-  "openAIKey": "4115eab42bb84bac924697124317ae32",
+  "openAIAPIKey": "4115eab42bb84bac924697124317ae32",
   "openAIVersion": "2024-10-01-preview",
   "portalDashboardName": "portaldash-copilot-demo-004",
   "redisCacheName": "redis-copilot-demo-004",

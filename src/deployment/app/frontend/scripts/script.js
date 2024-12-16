@@ -489,8 +489,8 @@ async function getAnswers(userInput) {
 
     const config = await fetchConfig();
 
-    const apiKey = config.OPEN_AI_KEY;
-    const apiVersion = config.API_VERSION;
+    const apiKey = config.OPENAI_API_KEY;
+    const apiVersion = config.OPENAI_API_VERSION;
     const deploymentId = config.DEPLOYMENT_ID;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
@@ -594,7 +594,7 @@ async function rephraseText(text) {
     const config = await fetchConfig();
 
     const apiKey = config.OPEN_AI_KEY;
-    const apiVersion = config.API_VERSION;
+    const apiVersion = config.OPENAI_API_VERSION;
     const deploymentId = config.DEPLOYMENT_ID;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
@@ -995,6 +995,7 @@ async function uploadFilesToAzure(files) {
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const apiVersion = config.AZURE_STORAGE_API_VERSION;
     const fileTypes = config.FILE_TYPES;
 
     // Construct the SAS token from the individual components
@@ -1014,7 +1015,8 @@ async function uploadFilesToAzure(files) {
                     'Content-Type': file.type,
                     'Content-Length': file.size.toString(),
                     'x-ms-date': date,
-                    'x-ms-version': '2020-10-02',
+                    //'x-ms-version': '2020-10-02',
+                    'x-ms-version': apiVersion,
                     'x-ms-blob-content-type': file.type,
                     'x-ms-blob-type': 'BlockBlob'
                 },

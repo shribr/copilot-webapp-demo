@@ -755,7 +755,8 @@ function Initialize-Parameters {
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
     $global:managedIdentityName = $parametersObject.managedIdentityName
     $global:openAIAccountName = $parametersObject.openAIAccountName
-    $global:openAIVersion = $parametersObject.openAIVersion
+    $global:openAIAPIKey = $parametersObject.openAIAPIKey
+    $global:openAIAPIVersion = $parametersObject.openAIAPIVersion
     $global:portalDashboardName = $parametersObject.portalDashboardName
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
@@ -875,7 +876,8 @@ function Initialize-Parameters {
         machineLearningProperties    = $machineLearningProperties
         managedIdentityName          = $managedIdentityName
         openAIAccountName            = $openAIAccountName
-        openAIVersion                = $openAIVersion
+        openAIAPIVersion             = $openAIAPIVersion
+        openAIAPIKey                 = $openAIAPIKey
         objectId                     = $objectId
         portalDashboardName          = $portalDashboardName
         privateEndPointName          = $privateEndPointName
@@ -3837,8 +3839,8 @@ function Update-ConfigFile {
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
-        $config.OPEN_AI_KEY = $openAIKey
-        $config.OPEN_AI_API_VERSION = $global:openAIAPIVersion
+        $config.OPENAI_API_KEY = $openAIAPIKey
+        $config.OPENAI_API_VERSION = $global:openAIAPIVersion
         $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
         $config.SITE_LOGO = $global:siteLogo
