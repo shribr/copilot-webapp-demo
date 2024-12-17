@@ -390,19 +390,61 @@ async function showResponse(questionBubble) {
             // Create a map of documents using their key
             const docMap = new Map();
             docResponse.value.forEach(doc => {
-                docMap.set(doc.chunk_id, doc);
+                //var key = "Page " + doc.chunk_id.split('_pages_')[1];
+                var key = doc.chunk_id;
+
+                docMap.set(key, doc);
             });
+
+            try {
+                // Convert Map to an array for sorting
+                const docArray = Array.from(docMap.values());
+
+                docArray.sort((a, b) => {
+                    if (a.key < b.key) {
+                        return -1;
+                    }
+                    if (a.key > b.key) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                // Convert sorted array back to Map
+                const sortedDocMap = new Map(docArray.map(doc => [doc.chunk_id, doc]));
+
+            } catch (error) {
+
+            }
 
             // Iterate over the answers and cross-reference with documents
             docResponse["@search.answers"].forEach(async answer => {
                 if (answer.text) {
                     const correspondingDoc = docMap.get(answer.key);
                     if (correspondingDoc) {
-                        const rephrasedAnswerText = await rephraseText(answer.text);
-                        answers.push({
-                            answerText: rephrasedAnswerText,
-                            document: correspondingDoc
-                        });
+
+                        try {
+                            //const rephrasedAnswerText = await rephraseText(answer.text);
+                            const rephrasedAnswerText = answer.text;
+
+                            if (rephrasedAnswerText == "error") {
+                                answers.push({
+                                    answerText: answer.text,
+                                    document: correspondingDoc
+                                });
+                            }
+                            else {
+                                answers.push({
+                                    answerText: rephrasedAnswerText,
+                                    document: correspondingDoc
+                                });
+                            }
+                        } catch (error) {
+                            answers.push({
+                                answerText: answer.text,
+                                document: correspondingDoc
+                            });
+                        }
                     }
                 }
             });
@@ -410,14 +452,27 @@ async function showResponse(questionBubble) {
             var answerResults = "";
             var supportingContentLink = "";
             var answerNumber = 1;
+            var sourceNumber = 1;
+
+            // Initialize a Set to store unique document paths
+            const listedPaths = new Set();
 
             answers.forEach(answer => {
                 if (answer.answerText) {
-                    supportingContentLink = '<a href="' + answer.document.metadata_storage_path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
+                    const path = answer.document.metadata_storage_path;
+
+                    supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
                     answerResults += answerNumber + ". " + answer.answerText + '\n\n';
                     answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
 
-                    supportingContent.innerHTML += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n';
+                    if (!listedPaths.has(path)) {
+                        listedPaths.add(path);
+
+                        supportingContent.innerHTML += 'Source #' + sourceNumber + ': ' + supportingContentLink + '\n\n';
+                        sourceNumber++;
+                    } else {
+                        console.log(`Document already listed: ${path}`);
+                    }
 
                     answerNumber++;
                 }
@@ -489,16 +544,17 @@ async function getAnswers(userInput) {
 
     const config = await fetchConfig();
 
-    const apiKey = config.OPENAI_API_KEY;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiVersion = config.OPENAI_API_VERSION;
     const deploymentId = config.DEPLOYMENT_ID;
+    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
 
-    const userMessageContent = config.OPEN_AI_REQUEST_BODY.messages.find(message => message.role === 'user').content[0];
+    const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
     userMessageContent.text = userInput;
 
-    const jsonString = JSON.stringify(config.OPEN_AI_REQUEST_BODY);
+    const jsonString = JSON.stringify(openAIRequestBody);
 
     try {
         const response = await fetch(endpoint, {
@@ -583,6 +639,27 @@ async function getAnswersFromAzureSearch(userInput) {
         const data = await response.json();
         console.log(data);
 
+        try {
+            // Process the search results to extract relevant chunks
+            const relevantChunks = data.value.map(result => {
+                return {
+                    score: result['@search.score'],
+                    text: result.text,
+                    // Add other fields as necessary
+                };
+            });
+
+            // Sort chunks by score (descending)
+            relevantChunks.sort((a, b) => b.score - a.score);
+
+            // Use the top chunks based on your criteria
+            const topChunks = relevantChunks.slice(0, 3); // Example: top 3 chunks
+        } catch (error) {
+            console.error('Error processing search results:', error);
+
+        }
+
+
         return data;
     }
     catch (error) {
@@ -593,7 +670,7 @@ async function getAnswersFromAzureSearch(userInput) {
 async function rephraseText(text) {
     const config = await fetchConfig();
 
-    const apiKey = config.OPEN_AI_KEY;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiVersion = config.OPENAI_API_VERSION;
     const deploymentId = config.DEPLOYMENT_ID;
     const region = config.REGION;
@@ -615,7 +692,7 @@ async function rephraseText(text) {
                 "content": [
                     {
                         "type": "text",
-                        "text": `Rephrase the following text to sound more human: "${text}"`
+                        "text": `Rephrase the following text to sound more human: '${text}'`
                     }
                 ]
             }
@@ -626,8 +703,10 @@ async function rephraseText(text) {
         "presence_penalty": 0,
         "max_tokens": 800,
         "stop": null,
-        "stream": true
+        "stream": false
     };
+
+    const jsonString = JSON.stringify(payload)
 
     try {
         const response = await fetch(endpoint, {
@@ -636,7 +715,7 @@ async function rephraseText(text) {
                 'Content-Type': 'application/json',
                 'api-key': apiKey
             },
-            body: JSON.stringify(payload)
+            body: jsonString
         });
 
         if (!response.ok) {
@@ -648,7 +727,8 @@ async function rephraseText(text) {
         return data.choices[0].text.trim();
     } catch (error) {
         console.error('Error rephrasing text:', error);
-        throw error;
+        return "error";
+        //throw error;
     }
 
     return text;

@@ -1120,7 +1120,7 @@ function New-AIHubConnection {
         }
     }
     else {              
-        Write-Host "Azure  $resourceType '$serviceName' connection for '$aiHubName' already exists."
+        Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' already exists."
         Write-Log -message "Azure $resourceType '$serviceName' connection for '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 }
@@ -3296,7 +3296,7 @@ function Start-Deployment {
         -resourceGroupName $resourceGroupName `
         -storageAccountName $storageAccountName `
         -searchServiceName $searchServiceName `
-        -openAIName $openAIName `
+        -openAIAccountName $openAIAccountName `
         -aiServiceName $aiServiceName `
         -functionAppName $functionAppServiceName `
         -searchIndexerName $global:searchIndexerName `
@@ -3734,7 +3734,7 @@ function Update-ConfigFile {
         [string]$searchIndexerName,
         [string]$searchVectorIndexName,
         [string]$searchVectorIndexerName,
-        [string]$openAIName,
+        [string]$openAIAccountName,
         [string]$aiServiceName,
         [string]$functionAppName,
         [string]$siteLogo
@@ -3745,10 +3745,8 @@ function Update-ConfigFile {
         $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        #$openAIKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+        $openAIAPIKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $global:openAIAccountName --query "key1" --output tsv
         $aiServiceKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $aiServiceName --query "key1" --output tsv
-        $openAIKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $aiServiceName --query "key1" --output tsv
-        #$openAIKey = "8e020697cdd94fa68c75ef04d1cc6589"
         $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
         $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
@@ -3841,6 +3839,7 @@ function Update-ConfigFile {
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
         $config.OPENAI_API_KEY = $openAIAPIKey
         $config.OPENAI_API_VERSION = $global:openAIAPIVersion
+        $config.OPENAI_ACCOUNT_NAME = $global:openAIAccountName
         $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
         $config.SITE_LOGO = $global:siteLogo
