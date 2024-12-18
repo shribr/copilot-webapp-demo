@@ -600,11 +600,13 @@ async function getAnswersFromAzureSearch(userInput) {
     const config = await fetchConfig();
 
     const apiKey = config.AZURE_SEARCH_API_KEY;
-    //const searchFunctionName = config.AZURE_SEARCH_FUNCTION_APP_NAME;
+    const deploymentId = config.DEPLOYMENT_ID;
     const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
     const apiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
+
+    const embeddings = await generateEmbeddingAsync(userInput, apiKey, deploymentId);
 
     const searchQuery = {
         search: userInput,
@@ -613,6 +615,7 @@ async function getAnswersFromAzureSearch(userInput) {
             {
                 kind: "text",
                 text: userInput,
+                value: embeddings,
                 fields: "text_vector,image_vector"
             }
         ],
@@ -654,6 +657,9 @@ async function getAnswersFromAzureSearch(userInput) {
 
             // Use the top chunks based on your criteria
             const topChunks = relevantChunks.slice(0, 3); // Example: top 3 chunks
+
+            console.log('Top chunks:', topChunks);
+
         } catch (error) {
             console.error('Error processing search results:', error);
 
@@ -665,6 +671,27 @@ async function getAnswersFromAzureSearch(userInput) {
     catch (error) {
         console.log('Error fetching answers from Azure Search:', error);
     }
+}
+
+// Function to generate embeddings
+async function generateEmbeddingAsync(text, apiKey, deploymentId) {
+
+    const endpoint = "https://eastus.api.cognitive.microsoft.com/openai/deployments/ai/chat/completions?api-version=2024-08-01-preview";
+
+    const response = await fetch(`${endpoint}/openai/deployments/${deploymentId}/embeddings`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': apiKey
+        },
+        body: JSON.stringify({
+            input: text,
+            model: 'text-embedding-ada-002' // Example model
+        })
+    });
+
+    const data = await response.json();
+    return data.data[0].embedding;
 }
 
 async function rephraseText(text) {
