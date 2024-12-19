@@ -56,7 +56,7 @@
   "siteLogo": "custom",
   "sqlServerName": "sql-copilot-demo-004",
   "storageAccountName": "stcopilotdemo004",
-  "storageAPIVersion": "2023-11-01",
+  "storageAPIVersion": "2020-10-02",
   "subscriptionId": "00000000-0000-0000-0000-000000000000",
   "userAssignedIdentityName": "id-copilot-demo-004",
   "containerRegistryProperties": {

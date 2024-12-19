@@ -29,7 +29,12 @@ $(document).ready(function () {
 
     createSidenavLinks();
 
-    //getSasToken();
+    const chatDisplay = document.getElementById('chat-display');
+    const loadingAnimation = document.createElement('div');
+    loadingAnimation.setAttribute('class', 'loading-animation');
+    loadingAnimation.innerHTML = '<div class="spinner"></div> Fetching results...';
+    loadingAnimation.style.display = 'none'; // Hide it initially
+    chatDisplay.appendChild(loadingAnimation);
 
     $('#send-button').on('click', postQuestion);
     $('#clear-button').on('click', clearChatDisplay);
@@ -226,6 +231,7 @@ $(document).ready(function () {
     });
 });
 
+// Function to set the site logo
 async function setSiteLogo() {
     const siteLogo = document.getElementById('site-logo');
     const siteLogoText = document.getElementById('site-logo-text');
@@ -245,6 +251,7 @@ async function setSiteLogo() {
     }
 }
 
+// Function to toggle all checkboxes
 function toggleAllCheckboxes() {
 
     const allCheckbox = document.getElementById('datasource-all');
@@ -264,6 +271,7 @@ function clearChatDisplay() {
     chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
 }
 
+// Function to set the height of the chat display container
 function setChatDisplayHeight() {
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatInfoTextCopy = document.getElementById('chat-info-text-copy');
@@ -277,6 +285,7 @@ function setChatDisplayHeight() {
     chatDisplayContainer.style.height = `${desiredHeight}px`;
 }
 
+// Function to post a question to the chat display
 async function postQuestion() {
 
     const config = await fetchConfig();
@@ -286,7 +295,7 @@ async function postQuestion() {
     const dateTimestamp = new Date().toLocaleString();
 
     // Check if chatInput ends with a question mark, if not, add one
-    if (!chatInput.trim().endsWith('?')) {
+    if (!chatInput.trim().endsWith('?') && isQuestion(chatInput)) {
         chatInput += '?';
     }
 
@@ -333,6 +342,14 @@ async function postQuestion() {
     showResponse(questionBubble);
 }
 
+// Function to check if a text is a question
+function isQuestion(text) {
+    const questionWords = ['who', 'what', 'where', 'when', 'why', 'how'];
+    const words = text.trim().toLowerCase().split(/\s+/);
+    return questionWords.includes(words[0]);
+}
+
+// Function to show responses to questions
 async function showResponse(questionBubble) {
 
     const config = await fetchConfig();
@@ -340,12 +357,22 @@ async function showResponse(questionBubble) {
     const chatDisplay = document.getElementById('chat-display');
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
 
-    // Retrieve the text from the input field
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+
+    // Show the loading animation
+    const loadingAnimation = document.querySelector('.loading-animation');
+    loadingAnimation.style.display = 'flex';
 
     if (chatInput) {
 
         const docResponse = await getAnswersFromAzureSearch(chatInput);
         const response = await getAnswers(chatInput);
+
+        // Hide the loading animation once results are returned
+        loadingAnimation.style.display = 'none';
 
         const answers = [];
 
@@ -419,13 +446,15 @@ async function showResponse(questionBubble) {
 
             // Iterate over the answers and cross-reference with documents
             docResponse["@search.answers"].forEach(async answer => {
+                var answerText = answer.text;
+                answerText = answerText.replace("  ", " ");
                 if (answer.text) {
                     const correspondingDoc = docMap.get(answer.key);
                     if (correspondingDoc) {
 
                         try {
-                            //const rephrasedAnswerText = await rephraseText(answer.text);
-                            const rephrasedAnswerText = answer.text;
+                            const rephrasedAnswerText = await rephraseText(answer.text);
+                            //const rephrasedAnswerText = answer.text;
 
                             if (rephrasedAnswerText == "error") {
                                 answers.push({
@@ -459,7 +488,7 @@ async function showResponse(questionBubble) {
 
             answers.forEach(answer => {
                 if (answer.answerText) {
-                    const path = answer.document.metadata_storage_path;
+                    const path = `${answer.document.metadata_storage_path}?${sasToken}`;
 
                     supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
                     answerResults += answerNumber + ". " + answer.answerText + '\n\n';
@@ -525,6 +554,9 @@ async function showResponse(questionBubble) {
 
         // Scroll to the top of the chat display
         //chatDisplay.scrollTop = questionBubbleHeight + 63
+    }
+    else {
+        loadingAnimation.style.display = 'none';
     }
 }
 
@@ -608,24 +640,51 @@ async function getAnswersFromAzureSearch(userInput) {
 
     const embeddings = await generateEmbeddingAsync(userInput, apiKey, deploymentId);
 
-    const searchQuery = {
-        search: userInput,
-        count: true,
-        vectorQueries: [
-            {
-                kind: "text",
-                text: userInput,
-                value: embeddings,
-                fields: "text_vector,image_vector"
-            }
-        ],
-        queryType: "semantic",
-        semanticConfiguration: config.AZURE_SEARCH_SEMANTIC_CONFIG,
-        captions: "extractive",
-        answers: "extractive|count-3",
-        queryLanguage: "en-us"
-    };
+    //need to add code to handle error if embeddings are null
 
+    var searchQuery = {};
+
+    if (embeddings === null) {
+        console.error('Error: Embeddings are null. Using fallback search query.');
+    }
+
+    if (embeddings == null) {
+        searchQuery = {
+            search: userInput,
+            count: true,
+            vectorQueries: [
+                {
+                    kind: "text",
+                    text: userInput,
+                    fields: "text_vector,image_vector"
+                }
+            ],
+            queryType: "semantic",
+            semanticConfiguration: config.AZURE_SEARCH_SEMANTIC_CONFIG,
+            captions: "extractive",
+            answers: "extractive|count-1",
+            queryLanguage: "en-us"
+        };
+    }
+    else {
+        searchQuery = {
+            search: userInput,
+            count: true,
+            vectorQueries: [
+                {
+                    kind: "text",
+                    text: userInput,
+                    value: embeddings,
+                    fields: "text_vector,image_vector"
+                }
+            ],
+            queryType: "semantic",
+            semanticConfiguration: config.AZURE_SEARCH_SEMANTIC_CONFIG,
+            captions: "extractive",
+            answers: "extractive|count-3",
+            queryLanguage: "en-us"
+        };
+    }
     const jsonString = JSON.stringify(searchQuery);
 
     try {
@@ -676,24 +735,29 @@ async function getAnswersFromAzureSearch(userInput) {
 // Function to generate embeddings
 async function generateEmbeddingAsync(text, apiKey, deploymentId) {
 
-    const endpoint = "https://eastus.api.cognitive.microsoft.com/openai/deployments/ai/chat/completions?api-version=2024-08-01-preview";
+    try {
+        const endpoint = "https://eastus.api.cognitive.microsoft.com/openai/deployments/ai/chat/completions?api-version=2024-08-01-preview";
 
-    const response = await fetch(`${endpoint}/openai/deployments/${deploymentId}/embeddings`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'api-key': apiKey
-        },
-        body: JSON.stringify({
-            input: text,
-            model: 'text-embedding-ada-002' // Example model
-        })
-    });
+        const response = await fetch(`${endpoint}/openai/deployments/${deploymentId}/embeddings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': apiKey
+            },
+            body: JSON.stringify({
+                input: text,
+                model: 'text-embedding-ada-002' // Example model
+            })
+        });
 
-    const data = await response.json();
-    return data.data[0].embedding;
+        const data = await response.json();
+        return data.data[0].embedding;
+    } catch (error) {
+        return null;
+    }
 }
 
+// Function to rephrase text
 async function rephraseText(text) {
     const config = await fetchConfig();
 
@@ -751,7 +815,7 @@ async function rephraseText(text) {
         }
 
         const data = await response.json();
-        return data.choices[0].text.trim();
+        return data.choices[0].message.content.trim();
     } catch (error) {
         console.error('Error rephrasing text:', error);
         return "error";
@@ -1094,6 +1158,11 @@ function updatePlaceholder() {
     }
 }
 
+function deleteDocuments() {
+    //code to delete documents
+
+}
+
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
     const config = await fetchConfig();
@@ -1122,7 +1191,6 @@ async function uploadFilesToAzure(files) {
                     'Content-Type': file.type,
                     'Content-Length': file.size.toString(),
                     'x-ms-date': date,
-                    //'x-ms-version': '2020-10-02',
                     'x-ms-version': apiVersion,
                     'x-ms-blob-content-type': file.type,
                     'x-ms-blob-type': 'BlockBlob'
@@ -1173,7 +1241,7 @@ async function getSasTokenOld() {
     return data.sasToken;
 }
 
-
+// Function to get SAS token from Azure Key Vault
 async function getSasToken() {
 
     const config = await fetchConfig();
