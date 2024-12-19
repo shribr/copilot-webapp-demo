@@ -405,7 +405,7 @@ async function showResponse(questionBubble) {
         supportingContent.className = 'tab-content';
         supportingContent.style.fontStyle = 'italic';
 
-        if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == "true") {
+        if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == true) {
             answerContent.textContent = response.choices[0].message.content;
 
             thoughtProcessContent.textContent = 'Thought process content goes here.';
@@ -507,7 +507,9 @@ async function showResponse(questionBubble) {
                 }
             });
 
-            answerContent.innerHTML = answerResults;
+            if (answerResults != "") {
+                answerContent.innerHTML += answerResults;
+            }
 
             console.log('Cross-referenced answers:', answers);
         }
