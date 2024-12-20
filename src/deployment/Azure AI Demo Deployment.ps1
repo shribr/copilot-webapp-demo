@@ -203,7 +203,7 @@ function Deploy-OpenAIModel {
 
             if ($jsonOutput -match "error") {
 
-                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
                 $errorName = $errorInfo["Error"]
                 $errorCode = $errorInfo["Code"]
@@ -286,7 +286,7 @@ function Format-ErrorInfo {
     $errorInfo | Format-List -Property *
 }
 
-function Format-AIModelErrorInfo {
+function Format-CustomErrorInfo {
     param([array]$jsonOutput
     )
 
@@ -308,20 +308,6 @@ function Format-AIModelErrorInfo {
     }
 
     Write-Host "Error Information: $properties"
-
-    <#
- # {    # Convert the hashtable to an array of key-value pairs
-    $array = @()
-    foreach ($entry in $properties.GetEnumerator()) {
-        $array += [PSCustomObject]@{
-            Key   = $entry.Key
-            Value = $entry.Value
-        }
-    }
-
-    # Output the array
-    $array | Format-Table -AutoSize:Enter a comment or description}
-#>
 
     return $properties
 }
@@ -767,6 +753,7 @@ function Initialize-Parameters {
     $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
     $global:searchDataSourceName = $parametersObject.searchDataSourceName
     $global:searchServiceName = $parametersObject.searchServiceName
+    $global:searchEndpoint = $parametersObject.searchEndpoint
     $global:searchIndexName = $parametersObject.searchIndexName
     $global:searchIndexerName = $parametersObject.searchIndexerName
     $global:searchVectorIndexName = $parametersObject.searchVectorIndexName
@@ -892,6 +879,7 @@ function Initialize-Parameters {
         result                       = $result
         searchAPIVersion             = $searchAPIVersion
         searchServiceName            = $searchServiceName
+        searchEndpoint               = $searchEndpoint
         searchIndexName              = $searchIndexName
         searchIndexerName            = $searchIndexerName
         searchVectorIndexName        = $searchVectorIndexName
@@ -953,9 +941,9 @@ function New-AIHubAndModel {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
-                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -resourceType "Microsoft.MachineLearningServices/workspaces"
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -location $location -resourceType "AIHub"
                 }
                 catch {
                     Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -989,9 +977,9 @@ function New-AIHubAndModel {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
-                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -resourceType "Microsoft.CognitiveServices/accounts"    
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -location $location -resourceType "Microsoft.CognitiveServices/accounts"    
                 }
                 catch {
                     Write-Error "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1030,7 +1018,7 @@ function New-AIHubAndModel {
 
             if ($jsonOutput -match "error") {
 
-                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
                 $errorName = $errorInfo["Error"]
                 $errorCode = $errorInfo["Code"]
@@ -1498,18 +1486,56 @@ function New-CognitiveServicesAccount {
             $ErrorActionPreference = 'Stop'
 
             #$cognitiveServicesUrl = "https://$cognitiveServiceName.cognitiveservices.azure.com/"
+       
+            $jsonOutput = az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none 2>&1
 
-            az cognitiveservices account create --name $cognitiveServiceName --resource-group $resourceGroupName --location $location --sku S0 --kind CognitiveServices --output none
-            
-            Write-Host "Cognitive Services account '$cognitiveServiceName' created."
-            Write-Log -message "Cognitive Services account '$cognitiveServiceName' created."       
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create Cognitive Services account '$cognitiveServiceName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+               
+                # Check if the error is due to soft deletion
+                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
+                    try {
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveService" -location $location -resourceGroupName $resourceGroupName
+                        Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
+                        Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
+                    }
+                    catch {
+                        Write-Error "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
+                }
+                else {
+                    Write-Error "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Cognitive Services account '$cognitiveServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                } 
+            }
+            else {
+                Write-Host "Cognitive Services account '$cognitiveServiceName' created."
+                Write-Log -message "Cognitive Services account '$cognitiveServiceName' created." 
+            }
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                    Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveService" -resourceGroupName $resourceGroupName
                     Write-Host "Cognitive Services account '$cognitiveServiceName' restored."
                     Write-Log -message "Cognitive Services account '$cognitiveServiceName' restored."
                 }
@@ -1526,7 +1552,7 @@ function New-CognitiveServicesAccount {
     }
     else {
         Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
-        Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists."
+        Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists." -logFilePath $global:LogFilePath
     }
 }
 
@@ -1550,10 +1576,13 @@ function New-ComputerVisionAccount {
 
             # Assign custom domain
             az cognitiveservices account update --name $computerVisionName --resource-group $resourceGroupName --custom-domain $computerVisionName
+
+            Write-Host "Custom Domain created for Computer Vision account '$computerVisionName'."
+            Write-Log -message "Custom Domain created for Computer Vision account '$computerVisionName'."
         }   
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted") {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services account
@@ -1597,7 +1626,7 @@ function New-ContainerRegistry {
 
             if ($jsonOutput -match "error") {
 
-                $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
                 $errorName = $errorInfo["Error"]
                 $errorCode = $errorInfo["Code"]
@@ -1674,7 +1703,7 @@ function New-DocumentIntelligenceAccount {
             }
             catch {     
                 # Check if the error is due to soft deletion
-                if ($_ -match "has been soft-deleted") {
+                if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                     try {
                         $ErrorActionPreference = 'Stop'
                         # Attempt to restore the soft-deleted Cognitive Services account
@@ -1739,8 +1768,8 @@ function New-KeyVault {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
-                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "KeyVault" -resourceGroupName $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "KeyVault" -location $location -resourceGroupName $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
             }
             else {
                 Write-Error "Failed to restore soft-deleted Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1933,7 +1962,7 @@ function New-MachineLearningWorkspace {
 
         if ($jsonOutput -match "error") {
 
-            $errorInfo = Format-AIModelErrorInfo -jsonOutput $jsonOutput
+            $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
             $errorName = $errorInfo["Error"]
             $errorCode = $errorInfo["Code"]
@@ -1981,11 +2010,11 @@ function New-OpenAIAccount {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $openAIAccountName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                    Restore-SoftDeletedResource -resourceName $openAIAccountName -resourceType "CognitiveServices" -location $location -resourceGroupName $resourceGroupName
                     Write-Host "OpenAI account '$openAIAccountName' restored."
                     Write-Log -message "OpenAI account '$openAIAccountName' restored."
                 }
@@ -2212,11 +2241,6 @@ function New-Resources {
     Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location -aiModelType $global:aiModelType
     
     #**********************************************************************************************************************
-    # Create AI Project
-
-    New-AIProject -aiProjectName $aiProjectName -subscriptionId $subscriptionId -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
-
-    #**********************************************************************************************************************
     # Create Container Registry
 
     New-ContainerRegistry -containerRegistryName $containerRegistryName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
@@ -2230,6 +2254,11 @@ function New-Resources {
     # Create Computer Vision account
 
     New-ComputerVisionAccount -computerVisionName $computerVisionName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+
+    #**********************************************************************************************************************
+    # Create AI Project
+
+    #New-AIProject -aiProjectName $aiProjectName -subscriptionId $subscriptionId -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create API Management Service
@@ -2328,7 +2357,7 @@ function New-SearchIndex {
        
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
-        $searchServiceAPiVersion = "2024-07-01"
+        $searchServiceAPiVersion = $searchAPIVersion
     
         #$searchIndexUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
     
@@ -2410,7 +2439,7 @@ function New-SearchIndexer {
     
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
-        $searchServiceAPiVersion = "2024-07-01"
+        $searchServiceAPiVersion = $global:searchAPIVersion
     
         $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
     
@@ -2488,12 +2517,17 @@ function New-SearchService {
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
 
+            $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+
+            $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
+            $searchManagementUrl += "?api-version=$global:searchAPIVersion"
+
             az search service update --name $searchServiceName --resource-group $resourceGroupName --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
 
             $body = @{
                 location   = $location.Replace(" ", "")
                 sku        = @{
-                    name = basic
+                    name = "basic"
                 }
                 properties = @{
                     replicaCount   = 1
@@ -2512,8 +2546,15 @@ function New-SearchService {
             # Convert the body hashtable to JSON
             $jsonBody = $body | ConvertTo-Json -Depth 10
 
-            Invoke-RestMethod -Uri $searchEndpoint -Method Put -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchAPIKey }
+            $accessToken = (az account get-access-token --query accessToken -o tsv)
 
+            $headers = @{
+                "api-key"       = $searchAPIKey
+                "Authorization" = "Bearer $accessToken"  # Add the authorization header
+            }
+
+            #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+            #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
             $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
             $dataSourceExists = $dataSources -contains $searchDataSourceName 
 
@@ -2591,10 +2632,15 @@ function New-SearchService {
 
         az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
       
+        $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        
+        $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
+        $searchManagementUrl += "?api-version=$global:searchAPIVersion"
+
         $body = @{
             location   = $location.Replace(" ", "")
             sku        = @{
-                name = basic
+                name = "basic"
             }
             properties = @{
                 replicaCount   = 1
@@ -2613,7 +2659,15 @@ function New-SearchService {
     # Convert the body hashtable to JSON
     $jsonBody = $body | ConvertTo-Json -Depth 10
 
-    Invoke-RestMethod -Uri $searchEndpoint -Method Put -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchAPIKey }
+    $accessToken = (az account get-access-token --query accessToken -o tsv)
+
+    $headers = @{
+        "api-key"       = $searchAPIKey
+        "Authorization" = "Bearer $accessToken"  # Add the authorization header
+    }
+
+    #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+    #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
 
     try {
         $ErrorActionPreference = 'Continue'
@@ -2717,7 +2771,10 @@ function New-SearchSkillSet {
         $ErrorActionPreference = 'Stop'
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        $searchServiceAPiVersion = "2024-05-01-Preview"
+        #$searchServiceAPiVersion = "2024-05-01-Preview"
+        $searchServiceAPiVersion = $global:searchAPIVersion
+
+        # Might need to get search service API version from the parameters.json file
 
         $cognitiveServiceKey = az cognitiveservices account keys list --name $cognitiveServiceName --resource-group $resourceGroupName --query "key1" --output tsv
 
@@ -2935,15 +2992,15 @@ function Restore-SoftDeletedResource {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Key Vault
-                    az keyvault recover --name $keyVaultName --resource-group $resourceGroupName --location $location --output none
-                    Write-Host "Key Vault: '$keyVaultName' created with Vault Access Policies."
-                    Write-Log -message "Key Vault: '$keyVaultName' created with Vault Access Policies."
+                    az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --output none
+                    Write-Host "Key Vault: '$resourceName' created with Vault Access Policies."
+                    Write-Log -message "Key Vault: '$resourceName' created with Vault Access Policies."
 
-                    Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
+                    Set-KeyVaultAccessPolicies -keyVaultName $resourceName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
                 }
                 catch {
-                    Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
         }
@@ -2961,35 +3018,48 @@ function Restore-SoftDeletedResource {
             # Code to restore Cognitive Service
             try {
                 Write-Output "Restoring Cognitive Service: $resourceName"
-                az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind AIHub --sku S0 --output none
-                Write-Host "AI Hub '$aiHubName' restored."
-                Write-Log -message "AI Hub '$aiHubName' restored." -logFilePath $global:LogFilePath
+                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
+                Write-Host "Cognitive Service '$resourceName' restored."
+                Write-Log -message "Cognitive Service '$resourceName' restored." -logFilePath $global:LogFilePath
             }
             catch {
-                Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to restore Cognitive Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore Cognitive Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
+        "AIHub" {
+            # Code to restore Cognitive Service
+            try {
+                Write-Output "Restoring AI Hub: $resourceName"
+                az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind AIHub --output none
+                Write-Host "AI Hub '$resourceName' restored."
+                Write-Log -message "AI Hub '$resourceName' restored." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to restore AI Hub '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore AI Hub '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
         "OpenAI" {
             # Code to restore OpenAI
             Write-Output "Restoring OpenAI: $resourceName"
-            az cognitiveservices account recover --name $openAIName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind OpenAI --sku S0 --output none
-            Write-Host "OpenAI account '$openAIName' restored."
-            Write-Log -message "OpenAI account '$openAIName' restored." -logFilePath $global:LogFilePath
+            az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind OpenAI --output none
+            Write-Host "OpenAI account '$resourceName' restored."
+            Write-Log -message "OpenAI account '$resourceName' restored." -logFilePath $global:LogFilePath
         }
         "ContainerRegistry" {
             # Code to restore Container Registry
             Write-Output "Restoring Container Registry: $resourceName"
-            az ml registry recover --name $containerRegistryName --resource-group $resourceGroupName --output none
-            Write-Host "Container Registry '$containerRegistryName' restored."
-            Write-Log -message "Container Registry '$containerRegistryName' restored." -logFilePath $global:LogFilePath
+            az ml registry recover --name $resourceName --resource-group $resourceGroupName --output none
+            Write-Host "Container Registry '$resourceName' restored."
+            Write-Log -message "Container Registry '$resourceName' restored." -logFilePath $global:LogFilePath
         }
         "DocumentIntelligence" {
             # Code to restore Document Intelligence
             Write-Output "Restoring Document Intelligence: $resourceName"
-            az cognitiveservices account recover --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '')   --kind FormRecognizer --sku S0 --output none
-            Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
-            Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored." -logFilePath $global:LogFilePath
+            az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --output none
+            Write-Host "Document Intelligence account '$resourceName' restored."
+            Write-Log -message "Document Intelligence account '$resourceName' restored." -logFilePath $global:LogFilePath
         }
         "Microsoft.MachineLearningServices/workspaces" {
             # Code to restore Machine Learning Workspace
@@ -3212,14 +3282,25 @@ function Start-Deployment {
 
     #return 
     
-    if ($appendUniqueSuffix -eq $true) {
+    $userPrincipalName = "$($parameters.userPrincipalName)"
 
-        $userPrincipalName = "$($parameters.userPrincipalName)"
+    $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv
+
+    #**********************************************************************************************************************
+    # Create User Assigned Identity
+
+    if ($existingResources -notcontains $userAssignedIdentityName) {
+        New-ManagedIdentity -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -subscriptionId $subscriptionId
+    }
+    else {
+        Write-Host "Identity '$userAssignedIdentityName' already exists."
+        Write-Log -message "Identity '$userAssignedIdentityName' already exists."
+    }
+
+    if ($appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
         $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
-
-        $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv
 
         New-Resources -storageAccountName $storageAccountName `
             -blobStorageContainerName $blobStorageContainerName `
@@ -3249,9 +3330,6 @@ function Start-Deployment {
             -existingResources $existingResources
     }
     else {
-        $userPrincipalName = "$($parameters.userPrincipalName)"
-
-        $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv
 
         New-Resources -storageAccountName $storageAccountName `
             -blobStorageContainerName $blobStorageContainerName `
@@ -3287,17 +3365,6 @@ function Start-Deployment {
         if ($existingResources -notcontains $appService) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $false
         }
-    }
-
-    #**********************************************************************************************************************
-    # Create User Assigned Identity
-
-    if ($existingResources -notcontains $userAssignedIdentityName) {
-        New-ManagedIdentity -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -subscriptionId $subscriptionId
-    }
-    else {
-        Write-Host "Identity '$userAssignedIdentityName' already exists."
-        Write-Log -message "Identity '$userAssignedIdentityName' already exists."
     }
 
     $useRBAC = $false
@@ -3707,7 +3774,7 @@ function Update-SearchIndexFiles {
 
         $content = Get-Content -Path $fileName
 
-        $updatedContent = $content -replace "**********", $resourceBaseName
+        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
     }
@@ -3936,7 +4003,7 @@ $initParams = Initialize-Parameters -parametersFile $parametersFile
 $parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
 
 # Set the user-assigned identity name
-$userPrincipalName = $parameters.userPrincipalName
+$global:userPrincipalName = $parameters.userPrincipalName
 
 Set-DirectoryPath -targetDirectory $global:deploymentPath
 
