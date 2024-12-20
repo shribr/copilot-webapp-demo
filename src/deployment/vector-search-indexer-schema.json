@@ -1,5 +1,5 @@
 {
-  "@odata.context": "https://srch-copilot-demo-001.search.windows.net/indexers?api-version=2024-07-01",
+  "@odata.context": "https://srch-copilot-demo-001.search.windows.net/indexers?api-version=2024-11-01-preview",
   "@odata.etag": "\"0x8DD102F99E2BC2D\"",
   "name": "vector-srch-indexer-copilot-demo-001",
   "description": null,

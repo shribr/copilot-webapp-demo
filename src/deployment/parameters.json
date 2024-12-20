@@ -48,6 +48,7 @@
   "searchIndexerName": "srch-indexer-copilot-demo-001",
   "searchVectorIndexerName": "vector-srch-indexer-copilot-demo-001",
   "searchSkillSetName": "vector-srch-skillset-copilot-demo-001",
+  "searchSkillSetSchema": "skillset-copilot-demo.json",
   "serviceBusNamespaceName": "sb-copilot-demo-001",
   "searchDataSourceName": "srch-datasource-copilot-demo-001",
   "searchPublicInternetResults": true,
@@ -151,8 +152,7 @@
         ],
         "defaultLanguageCode": "en",
         "detectOrientation": true,
-        "lineEnding": "Space",
-        "action": "extractText"
+        "lineEnding": "Space"
       },
       {
         "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
@@ -245,7 +245,6 @@
             "targetName": "image_vector"
           }
         ],
-        "action": "extractText",
         "modelVersion": "2023-04-15"
       }
     ],

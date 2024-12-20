@@ -1,5 +1,5 @@
 {
-  "@odata.context": "https://srch-copilot-demo-001..search.windows.net/indexers?api-version=2024-07-01",
+  "@odata.context": "https://srch-copilot-demo-001..search.windows.net/indexers?api-version=2024-11-01-preview",
   "@odata.etag": "\"0x8DCEFF89EE80374\"",
   "name": "srch-indexer-copilot-demo-001",
   "description": "",

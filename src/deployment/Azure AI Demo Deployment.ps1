@@ -763,6 +763,7 @@ function Initialize-Parameters {
     $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
     $global:searchSkillSet = $parametersObject.searchSkillSet
     $global:searchSkillSetName = $parametersObject.searchSkillSetName
+    $global:searchSkillSetSchema = $parametersObject.searchSkillSetSchema
     $global:searchAPIVersion = $parametersObject.searchAPIVersion
     $global:searchPublicInternetResults = $parametersObject.searchPublicInternetResults
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
@@ -889,6 +890,7 @@ function Initialize-Parameters {
         searchIndexers               = $searchIndexers
         searchSkillSet               = $searchSkillSet
         searchSkillSetName           = $searchSkillSetName
+        searchSkillSetSchema         = $searchSkillSetSchema
         searchPublicInternetResults  = $searchPublicInternetResults
         serviceBusNamespaceName      = $serviceBusNamespaceName
         searchDataSourceName         = $searchDataSourceName
@@ -1881,7 +1883,7 @@ function New-ManagedIdentity {
     }
 }
 
-# Function to create a new machine learning workspace
+# Function to create a new machine learning workspace (Azure AI Project)
 function New-MachineLearningWorkspace {
     param(
         [string]$aiProjectName,
@@ -2004,34 +2006,73 @@ function New-OpenAIAccount {
 
         try {
             $ErrorActionPreference = 'Stop'
-            az cognitiveservices account create --name $openAIAccountName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none
-            Write-Host "Azure OpenAI account '$openAIAccountName' created."
-            Write-Log -message "Azure OpenAI account '$openAIAccountName' created."
+            
+            $jsonOutput = az cognitiveservices account create --name $openAIAccountName --resource-group $resourceGroupName --location $location --kind OpenAI --sku S0 --output none 2>&1
+
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create Open AI service '$openAIAccountName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+               
+                # Check if the error is due to soft deletion
+                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
+                    try {
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        Restore-SoftDeletedResource -resourceName $openAIAccountName -resourceType "OpenAI" -location $location -resourceGroupName $resourceGroupName
+                    }
+                    catch {
+                        Write-Error "Failed to restore Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
+                }
+                else {
+                    Write-Error "Failed to create Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                } 
+            }
+            else {
+                Write-Host "Azure OpenAI service '$openAIAccountName' created successfully."
+                Write-Log -message "Azure OpenAI service '$openAIAccountName' created successfully." 
+            }
+
+            Write-Host "Azure OpenAI service '$openAIAccountName' created successfully."
+            Write-Log -message "Azure OpenAI service '$openAIAccountName' created successfully."
         }
         catch {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
                     $ErrorActionPreference = 'Stop'
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $openAIAccountName -resourceType "CognitiveServices" -location $location -resourceGroupName $resourceGroupName
-                    Write-Host "OpenAI account '$openAIAccountName' restored."
-                    Write-Log -message "OpenAI account '$openAIAccountName' restored."
+                    # Attempt to restore the soft-deleted Cognitive Services service
+                    Restore-SoftDeletedResource -resourceName $openAIAccountName -resourceType "OpenAI" -location $location -resourceGroupName $resourceGroupName
                 }
                 catch {
-                    Write-Error "Failed to restore OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to restore Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
             else {
-                Write-Error "Failed to create Azure OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Azure OpenAI account '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to create Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Azure OpenAI service '$openAIAccountName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }   
         }
     }
     else {
-        Write-Host "OpenAI Service '$openAIAccountName' already exists."
-        Write-Log -message "OpenAI Service '$openAIAccountName' already exists."
+        Write-Host "Azure OpenAI service '$openAIAccountName' already exists."
+        Write-Log -message "Azure OpenAI service '$openAIAccountName' already exists."
     }
 }
 
@@ -3019,8 +3060,8 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring Cognitive Service: $resourceName"
                 az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
-                Write-Host "Cognitive Service '$resourceName' restored."
-                Write-Log -message "Cognitive Service '$resourceName' restored." -logFilePath $global:LogFilePath
+                Write-Host "Cognitive Service '$resourceName' restored successfully."
+                Write-Log -message "Cognitive Service '$resourceName' restored successfully." -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore Cognitive Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3032,8 +3073,8 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring AI Hub: $resourceName"
                 az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind AIHub --output none
-                Write-Host "AI Hub '$resourceName' restored."
-                Write-Log -message "AI Hub '$resourceName' restored." -logFilePath $global:LogFilePath
+                Write-Host "AI Hub '$resourceName' restored successfully."
+                Write-Log -message "AI Hub '$resourceName' restored successfully." -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore AI Hub '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3042,31 +3083,55 @@ function Restore-SoftDeletedResource {
         }
         "OpenAI" {
             # Code to restore OpenAI
-            Write-Output "Restoring OpenAI: $resourceName"
-            az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind OpenAI --output none
-            Write-Host "OpenAI account '$resourceName' restored."
-            Write-Log -message "OpenAI account '$resourceName' restored." -logFilePath $global:LogFilePath
+            try {
+                Write-Output "Restoring OpenAI: $resourceName"
+                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
+                Write-Host "Azure OpenAI service '$resourceName' restored successfully."
+                Write-Log -message "Azure OpenAI service '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to restore Azure OpenAI service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore Azure OpenAI service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
         "ContainerRegistry" {
             # Code to restore Container Registry
-            Write-Output "Restoring Container Registry: $resourceName"
-            az ml registry recover --name $resourceName --resource-group $resourceGroupName --output none
-            Write-Host "Container Registry '$resourceName' restored."
-            Write-Log -message "Container Registry '$resourceName' restored." -logFilePath $global:LogFilePath
+            try {
+                Write-Output "Restoring Container Registry: $resourceName"
+                az ml registry recover --name $resourceName --resource-group $resourceGroupName --output none
+                Write-Host "Container Registry '$resourceName' restored successfully."
+                Write-Log -message "Container Registry '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to restore Container Registry '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore Container Registry '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
         "DocumentIntelligence" {
             # Code to restore Document Intelligence
-            Write-Output "Restoring Document Intelligence: $resourceName"
-            az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --output none
-            Write-Host "Document Intelligence account '$resourceName' restored."
-            Write-Log -message "Document Intelligence account '$resourceName' restored." -logFilePath $global:LogFilePath
+            try {
+                Write-Output "Restoring Document Intelligence: $resourceName"
+                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --output none
+                Write-Host "Document Intelligence account '$resourceName' restored successfully."
+                Write-Log -message "Document Intelligence account '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to restore Document Intelligence '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore Document Intelligence '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
-        "Microsoft.MachineLearningServices/workspaces" {
+        "MachineLearningWorkspace" {
             # Code to restore Machine Learning Workspace
-            Write-Output "Restoring Machine Learning Workspace: $resourceName"
-            az ml workspace recover --name $resourceName --resource-group $resourceGroupName --output none
-            Write-Host "Machine Learning Workspace '$resourceName' restored."
-            Write-Log -message "Machine Learning Workspace '$resourceName' restored." -logFilePath $global:LogFilePath
+            try {
+                Write-Output "Restoring Machine Learning Workspace: $resourceName"
+                az ml workspace recover --name $resourceName --resource-group $resourceGroupName --output none
+                Write-Host "Machine Learning Workspace '$resourceName' restored successfully."
+                Write-Log -message "Machine Learning Workspace '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to restore Machine Learning Workspace '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore Machine Learning Workspace '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
         default {
             Write-Output "Resource type $resourceType is not supported for restoration."
