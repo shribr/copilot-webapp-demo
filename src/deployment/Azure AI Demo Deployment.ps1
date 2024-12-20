@@ -177,27 +177,25 @@ function Deploy-OpenAIModel {
     param (
         [string]$resourceGroupName,
         [string]$openAIAccountName,
-        [string]$aiModelType
+        [string]$aiModelType,
+        [string]$aiModelVersion,
+        [string]$aiModelFormat,
+        [string]$aiModelSkuName,
+        [string]$aiModelSkuCapacity,
+        [string]$aiDeploymentName
     )
-
-    $deploymentName = "ai"
-    $modelName = $aiModelType
-    $modelFormat = "OpenAI"
-    $modelVersion = "2024-05-13"
-    $skuName = "Standard"
-    $skuCapacity = "100"
 
     try {
         # Check if the deployment already exists
-        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIAccountName --query "[?name=='$deploymentName']" --output tsv
+        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIAccountName --query "[?name=='$aiDeploymentName']" --output tsv
 
         if ($deploymentExists) {
-            Write-Host "OpenAI model deployment '$deploymentName' already exists."
-            Write-Log -message "OpenAI model deployment '$deploymentName' already exists."
+            Write-Host "OpenAI model deployment '$aiDeploymentName' already exists."
+            Write-Log -message "OpenAI model deployment '$aiDeploymentName' already exists."
         }
         else {
             # Create the deployment if it does not exist
-            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $deploymentName --model-name $modelName --model-format $modelFormat --model-version $modelVersion --sku-name $skuName --sku-capacity $skuCapacity 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $aiDeploymentName --model-name $aiModelName --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -228,6 +226,61 @@ function Deploy-OpenAIModel {
     catch {
         Write-Error "Failed to create OpenAI model deployment '$deploymentName': $_"
         Write-Log -message "Failed to create OpenAI model deployment '$deploymentName': $_"
+    }
+}
+
+# Function to deploy an Azure AI model (possibly redundant as Deploy-OpenAIModel does the same thing)
+function Deploy-AIModel {
+    param (
+        [string]$aiHubName,
+        [string]$aiModelName,
+        [string]$aiModelType,
+        [string]$aiModelVersion,
+        [string]$aiServiceName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [array]$existingResources
+    )
+    
+    # Create AI Model Deployment
+    if ($existingResources -notcontains $aiModelName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            
+            $jsonOutput = az cognitiveservices account deployment create --name $aiServiceName --resource-group $resourceGroupName --deployment-name ai --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "Standard" 2>&1
+
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create AI Model deployment '$aiModelName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+
+                Write-Host $errorMessage
+                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+            }
+            else {
+                Write-Host "AI Model deployment: '$aiModelName' created."
+                Write-Log -message "AI Model deployment: '$aiModelName' created." -logFilePath $global:LogFilePath
+            }
+        }
+        catch {
+            
+            Write-Host "Failed to create AI Model deployment '$aiModelName'."
+            Write-Log -message "Failed to create AI Model deployment '$aiModelName'." -logFilePath $global:LogFilePath
+        }
+    }
+    else {
+        Write-Host "AI Model '$aiModelName' already exists."
+        Write-Log -message "AI Model '$aiModelName' already exists." -logFilePath $global:LogFilePath
     }
 }
 
@@ -711,6 +764,10 @@ function Initialize-Parameters {
     $global:aiModelName = $parametersObject.aiModelName
     $global:aiModelType = $parametersObject.aiModelType
     $global:aiModelVersion = $parametersObject.aiModelVersion
+    $global:aiModelFormat = $parametersObject.aiModelFormat
+    $global:aiModelSkuName = $parametersObject.aiModelSkuName
+    $global:aiModelSkuCapacity = $parametersObject.aiModelSkuCapacity
+    $global:aiDeploymentName = $parametersObject.aiDeploymentName
     $global:aiProjectName = $parametersObject.aiProjectName
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiProjectName = $parametersObject.aiProjectName
@@ -776,6 +833,7 @@ function Initialize-Parameters {
     $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
     $global:virtualNetwork = $parametersObject.virtualNetwork
 
+    $global:serviceProperties = $parametersObject.serviceProperties
     $global:aiServiceProperties = $parametersObject.aiServiceProperties
     $global:containerRegistryProperties = $parametersObject.containerRegistryProperties
     $global:machineLearningProperties = $parametersObject.machineLearningProperties
@@ -836,6 +894,10 @@ function Initialize-Parameters {
         aiModelVersion               = $aiModelVersion
         aiProjectName                = $aiProjectName
         aiServiceName                = $aiServiceName
+        aiModelFormat                = $aiModelFormat
+        aiModelSkuName               = $aiModelSkuName
+        aiModelSkuCapacity           = $aiModelSkuCapacity
+        aiDeploymentName             = $aiDeploymentName
         aiServiceProperties          = $aiServiceProperties
         apiManagementService         = $apiManagementService
         appendUniqueSuffix           = $appendUniqueSuffix
@@ -896,6 +958,7 @@ function Initialize-Parameters {
         searchDataSourceName         = $searchDataSourceName
         searchServiceProperties      = $searchServiceProperties
         sharedDashboardName          = $sharedDashboardName
+        serviceProperties            = $serviceProperties
         siteLogo                     = $siteLogo
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
@@ -912,8 +975,8 @@ function Initialize-Parameters {
     }
 }
 
-# Function to create AI Hub and AI Model
-function New-AIHubAndModel {
+# Function to create a new AI Hub
+function New-AIHub {
     param (
         [string]$aiHubName,
         [string]$aiModelName,
@@ -962,6 +1025,16 @@ function New-AIHubAndModel {
         Write-Host "AI Hub '$aiHubName' already exists."
         Write-Log -message "AI Hub '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
+}
+
+# Function to create a new AI Service
+function New-AIService {
+    param (
+        [string]$aiServiceName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [array]$existingResources
+    )
 
     # Create AI Service
     if ($existingResources -notcontains $aiServiceName) {
@@ -971,9 +1044,48 @@ function New-AIHubAndModel {
             #$aiServicesUrl = "$aiServiceName.openai.azure.com"
 
             #az resource show --resource-group "$resourceGroupName" --name "$aiServiceName" --resource-type accounts --namespace Microsoft.CognitiveServices
-            
-            az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none
-            
+             
+            $jsonOutput = az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none 2>&1
+
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create AI Services account '$aiServiceName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+               
+                # Check if the error is due to soft deletion
+                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
+                    try {
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        Restore-SoftDeletedResource -resourceName $aiServiceName -resourceType "AIServices" -location $location -resourceGroupName $resourceGroupName
+                    }
+                    catch {
+                        Write-Error "Failed to restore AI Services account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore AI Services account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
+                }
+                else {
+                    Write-Error "Failed to create AI Service account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create AI Service account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                } 
+            }
+            else {
+                Write-Host "AI Service account '$aiServiceName' created."
+                Write-Log -message "AI Service account '$aiServiceName' created." 
+            }
+
             Write-Host "AI Service: '$aiServiceName' created."
             Write-Log -message "AI Service: '$aiServiceName' created."
         }
@@ -981,7 +1093,7 @@ function New-AIHubAndModel {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
                 try {
-                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -location $location -resourceType "Microsoft.CognitiveServices/accounts"    
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -location $location -resourceType "AIService"    
                 }
                 catch {
                     Write-Error "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -998,84 +1110,6 @@ function New-AIHubAndModel {
         Write-Host "AI Service '$aiServiceName' already exists."
         Write-Log -message "AI Service '$aiServiceName' already exists." -logFilePath $global:LogFilePath
     }
-
-    # Create AI Model Deployment
-    if ($existingResources -notcontains $aiModelName) {
-
-        <#
-        # {        $modelList = az cognitiveservices model list `
-                    --location $location `
-                    --query "[].{Kind:kind, ModelName:model.name, Version:model.version, Format:model.format, LifecycleStatus:model.lifecycleStatus, MaxCapacity:model.maxCapacity, SKUName:model.skus[0].name, DefaultCapacity:model.skus[0].capacity.default}" `
-                    --output table | Out-String:Enter a comment or description}
-
-                    Write-Host $modelList
-        #>
-
-        try {
-            $ErrorActionPreference = 'Stop'
-            
-            $jsonOutput = az cognitiveservices account deployment create --name $aiServiceName --resource-group $resourceGroupName --deployment-name ai --model-name gpt-4o --model-version "2024-05-13" --model-format OpenAI --sku-capacity 1 --sku-name "Standard" 2>&1
-
-            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
-
-            if ($jsonOutput -match "error") {
-
-                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
-
-                $errorName = $errorInfo["Error"]
-                $errorCode = $errorInfo["Code"]
-                $errorDetails = $errorInfo["Message"]
-
-                $errorMessage = "Failed to create AI Model deployment '$aiModelName'. `
-        Error: $errorName `
-        Code: $errorCode `
-        Message: $errorDetails"
-
-                Write-Host $errorMessage
-                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
-            }
-            else {
-                Write-Host "AI Model deployment: '$aiModelName' created."
-                Write-Log -message "AI Model deployment: '$aiModelName' created." -logFilePath $global:LogFilePath
-            }
-        }
-        catch {
-            
-            Write-Host "Failed to create AI Model deployment '$aiModelName'."
-            Write-Log -message "Failed to create AI Model deployment '$aiModelName'." -logFilePath $global:LogFilePath
-        }
-    }
-    else {
-        Write-Host "AI Model '$aiModelName' already exists."
-        Write-Log -message "AI Model '$aiModelName' already exists." -logFilePath $global:LogFilePath
-    }
-
-    # Create AI Studio AI Project / ML Studio Workspace
-    if ($existingResources -notcontains $aiProjectName) {
-        New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
-            -subscriptionId $global:subscriptionId `
-            -aiHubName $aiHubName `
-            -storageAccountName $storageAccountName `
-            -containerRegistryName $global:containerRegistryName `
-            -keyVaultName $keyVaultName `
-            -appInsightsName $appInsightsName `
-            -aiProjectName $aiProjectName `
-            -userAssignedIdentityName $userAssignedIdentityName `
-            -location $location
-    }
-    else {
-        Write-Host "AI Project '$aiProjectName' already exists."
-        Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
-    }
-
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $aiServiceName -serviceProperties $aiServiceProperties
-
-    # Add storage account connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageAccountName -serviceProperties $storageServiceProperties
-        
-    # Add search service connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $global:searchServiceName -serviceProperties $searchServiceProperties
-
 }
 
 # Function to create a new AI Hub connection
@@ -1906,31 +1940,33 @@ function New-MachineLearningWorkspace {
     $appInsightsName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
     $userAssignedIdentityName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
 
-    try {
-        $ErrorActionPreference = 'Stop'
+    if ($existingResources -notcontains $aiProjectName) {
+
+        try {
+            $ErrorActionPreference = 'Stop'
             
-        # https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-openai?view=azureml-api-2
-        # "While the az ml connection commands can be used to manage both Azure Machine Learning and Azure AI Studio connections, the OpenAI connection is specific to Azure AI Studio."
+            # https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-openai?view=azureml-api-2
+            # "While the az ml connection commands can be used to manage both Azure Machine Learning and Azure AI Studio connections, the OpenAI connection is specific to Azure AI Studio."
 
-        $mlWorkspaceFile = Update-MLWorkspaceFile `
-            -aiProjectName $aiProjectName `
-            -resourceGroupName $resourceGroupName `
-            -appInsightsName $appInsightsName `
-            -keyVaultName $keyVaultName `
-            -location $location `
-            -subscriptionId $subscriptionId `
-            -storageAccountName $storageAccountName `
-            -containerRegistryName $containerRegistryName `
-            -userAssignedIdentityName $userAssignedIdentityName 2>&1
+            $mlWorkspaceFile = Update-MLWorkspaceFile `
+                -aiProjectName $aiProjectName `
+                -resourceGroupName $resourceGroupName `
+                -appInsightsName $appInsightsName `
+                -keyVaultName $keyVaultName `
+                -location $location `
+                -subscriptionId $subscriptionId `
+                -storageAccountName $storageAccountName `
+                -containerRegistryName $containerRegistryName `
+                -userAssignedIdentityName $userAssignedIdentityName 2>&1
             
-        #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
+            #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
-        #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
+            #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
 
-        #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
-        $jsonOutput = az ml workspace create --file $mlWorkspaceFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityName --kind project --hub-id $aiHubName
+            #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
+            $jsonOutput = az ml workspace create --file $mlWorkspaceFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityName --kind project --hub-id $aiHubName
 
-        <#
+            <#
         # {        $azCliCommand = @"
         az ml workspace create --resource-group $resourceGroupName `
             --application-insights $appInsightsName `
@@ -1949,8 +1985,8 @@ function New-MachineLearningWorkspace {
         "@}
         #>
 
-        #$jsonOutput = Invoke-Expression $azCliCommand
-        <#
+            #$jsonOutput = Invoke-Expression $azCliCommand
+            <#
         # {        $jsonOutput = az ml workspace create --resource-group $resourceGroupName `
                     --application-insights $appInsightsName `
                     --description "This configuration specifies a workspace configuration with existing dependent resources" `
@@ -1962,37 +1998,41 @@ function New-MachineLearningWorkspace {
                     --output none --no-wait}
         #>
 
-        if ($jsonOutput -match "error") {
+            if ($jsonOutput -match "error") {
 
-            $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
-            $errorName = $errorInfo["Error"]
-            $errorCode = $errorInfo["Code"]
-            $errorDetails = $errorInfo["Message"]
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
 
-            $errorMessage = "Failed to create AI Project '$aiProjectName'. `
+                $errorMessage = "Failed to create AI Project '$aiProjectName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
 
-            Write-Host $errorMessage
-            Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                Write-Host $errorMessage
+                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
 
-            return $errorMessage
+                return $errorMessage
+            }
+            else {
+                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
+                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+
+                return $jsonOutput
+            }
         }
-        else {
-            Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
-            Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
-
-            return $jsonOutput
+        catch {
+            Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
-    catch {
-        Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+    else {
+        Write-Host "AI Project '$aiProjectName' in '$aiHubName' already exists."
+        Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 }
-
 # Function to create new OpenAI account
 function New-OpenAIAccount {
     param (
@@ -2629,7 +2669,7 @@ function New-SearchService {
 
             $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
 
-            Start-Sleep -Seconds 15
+            Start-Sleep -Seconds 10
 
             if ($searchSkillSetExists -eq $false) {
                 New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
@@ -3107,6 +3147,19 @@ function Restore-SoftDeletedResource {
                 Write-Log -message "Failed to restore Container Registry '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
+        "AIServices" {
+            # Code to restore AI Services
+            try {
+                Write-Output "Restoring AI Service: $resourceName"
+                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName  --location $($location.ToUpper() -replace '\s', '') --output none
+                Write-Host "AI Service '$resourceName' restored successfully."
+                Write-Log -message "AI Service '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to restore AI Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore AI Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+        }
         "DocumentIntelligence" {
             # Code to restore Document Intelligence
             try {
@@ -3458,8 +3511,35 @@ function Start-Deployment {
     $userAssignedIdentityName = $global:userAssignedIdentityName
 
     # Create a new AI Hub and Model
-    New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $global:aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
+    New-AIHub -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $global:aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -appInsightsName $appInsightsName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
     
+    # Create a new AI Service
+    New-AIService -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+
+    # Deploy AI Model
+    Deploy-AIModel -aiModelName $aiModelName -aiModelType $global:aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
+
+    # Create AI Studio AI Project / ML Studio Workspace
+    New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
+        -subscriptionId $global:subscriptionId `
+        -aiHubName $aiHubName `
+        -storageAccountName $storageAccountName `
+        -containerRegistryName $global:containerRegistryName `
+        -keyVaultName $keyVaultName `
+        -appInsightsName $appInsightsName `
+        -aiProjectName $aiProjectName `
+        -userAssignedIdentityName $userAssignedIdentityName `
+        -location $location
+
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $aiServiceProperties
+
+    # Add storage account connection to AI Hub
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageAccountName -serviceProperties $storageServiceProperties
+        
+    # Add search service connection to AI Hub
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $global:searchServiceName -serviceProperties $searchServiceProperties
+
+
     # Update configuration file for web frontend
     Update-ConfigFile - configFilePath "app/frontend/config.json" `
         -resourceBaseName $resourceBaseName `
@@ -3739,8 +3819,8 @@ function Update-AIConnectionFile {
     param (
         [string]$resourceGroupName,
         [string]$resourceType,
-        [string]$serviceName = $global:storageAccountName,
-        [string]$serviceProperties = $global:storageServiceProperties
+        [string]$serviceName ,
+        [string]$serviceProperties
     )
     
     $rootPath = Get-Item -Path (Get-Location).Path

@@ -2,7 +2,11 @@
   "aiHubName": "hub-ai-copilot-demo-001",
   "aiModelName": "ai-model-copilot-demo-001",
   "aiModelType": "gpt-4o",
-  "aiModelVersion": "v1",
+  "aiModelVersion": "2024-05-13",
+  "aiModelDeploymentName": "ai",
+  "aiModelFormat": "OpenAI",
+  "aiModelSkuName": "Standard",
+  "aiModelSkuCapacity": 100,
   "aiProjectName": "project-ai-copilot-demo-001",
   "aiServiceName": "ai-service-copilot-demo-001",
   "aiHubProjectName": "project-ai-copilot-demo-001",
@@ -107,6 +111,30 @@
     "AIServicesResourceID": "",
     "YamlFileName": "search.connection.yaml"
   },
+  "storageServiceProperties": {
+    "Name": "stcopilotdemo001",
+    "Type": "azure_blob",
+    "Url": "https://stcopilotdemo001.blob.core.windows.net/azureml",
+    "ContainerName": "azureml",
+    "AccountName": "stcopilotdemo001",
+    "Credentials": {
+      "SasToken": "xxx",
+      "AccountKey": "xxx"
+    },
+    "ApiVersion": "2023-11-01",
+    "YamlFileName": "storage.connection.yaml"
+  },
+  "aiHubConnections": [
+    {
+      "Name": "AIService"
+    },
+    {
+      "Name": "StorageAccount"
+    },
+    {
+      "Name": "SearchService"
+    }
+  ],
   "searchIndexes": [
     {
       "Name": "srch-index-copilot-demo-001",
@@ -303,19 +331,6 @@
       }
     }
   },
-  "storageServiceProperties": {
-    "Name": "stcopilotdemo001",
-    "Type": "azure_blob",
-    "Url": "https://stcopilotdemo001.blob.core.windows.net/azureml",
-    "ContainerName": "azureml",
-    "AccountName": "stcopilotdemo001",
-    "Credentials": {
-      "SasToken": "xxx",
-      "AccountKey": "xxx"
-    },
-    "ApiVersion": "2023-11-01",
-    "YamlFileName": "storage.connection.yaml"
-  },
   "virtualNetwork": {
     "Name": "vnet-copilot-demo-001",
     "AddressPrefix": "",
@@ -460,5 +475,70 @@
       "StructuredData": false,
       "RelationalDatabase": false
     }
-  }
+  },
+  "azureServices": [
+    {
+      "Type": "Container Registry",
+      "Name": "crcopilotdemo001-copilot-demo-001",
+      "Description": "",
+      "Location": "",
+      "Tags": {
+        "Description": ""
+      },
+      "ReplicationLocations": {
+        "Location1": "",
+        "Location2": "",
+        "Location3": ""
+      },
+      "YamlFileName": "container.registry.yaml"
+    },
+    {
+      "Type": "AI Project",
+      "Name": "project-ai-copilot-demo-001",
+      "DisplayName": "AI Hub Copilot Demo Project",
+      "Description": "This configuration specifies a project configuration with existing dependent resources",
+      "Location": "east us",
+      "StorageAccountName": "stcopilotdemo001",
+      "ContainerRegistryName": "crcopilotdemo001",
+      "KeyVaultName": "kv-copilot-demo-001",
+      "ApplicationInsightsName": "appi-copilot-demo-001",
+      "Tags": {
+        "Purpose": ""
+      },
+      "YamlFileName": "ai.project.yaml"
+    },
+    {
+      "Type": "azure_ai_services",
+      "Description": "AIService",
+      "Name": "ai-service-copilot-demo-001",
+      "Endpoint": "https://srch-copilot-demo-001.cognitiveservices.azure.com/",
+      "Key": "xxx",
+      "Api-Version": "2024-10-01-preview",
+      "YamlFileName": "ai.connection.yaml"
+    },
+    {
+      "Type": "azure_ai_search",
+      "Description": "SearchService",
+      "Name": "srch-copilot-demo-001",
+      "ApiKey": "xxx",
+      "ApiVersion": "2024-11-01-preview",
+      "Endpoint": "https://srch-copilot-demo-001.search.windows.net",
+      "AIServicesResourceID": "",
+      "YamlFileName": "search.connection.yaml"
+    },
+    {
+      "Type": "azure_blob",
+      "Description": "StorageService",
+      "Name": "stcopilotdemo001",
+      "Url": "https://stcopilotdemo001.blob.core.windows.net/azureml",
+      "ContainerName": "azureml",
+      "AccountName": "stcopilotdemo001",
+      "Credentials": {
+        "SasToken": "xxx",
+        "AccountKey": "xxx"
+      },
+      "ApiVersion": "2023-11-01",
+      "YamlFileName": "storage.connection.yaml"
+    }
+  ]
 }
