@@ -1,5 +1,5 @@
 {
-  "name": "vector-srch-skillset-copilot-demo-004",
+  "name": "vector-srch-skillset-copilot-demo-003",
   "description": "Skillset to chunk documents and generate embeddings",
   "skills": [
     {
@@ -19,10 +19,10 @@
           "targetName": "text"
         }
       ],
-      "defaultLanguageCode": "en",
-      "detectOrientation": true,
-      "lineEnding": "Space",
-      "action": "extractText"
+      "textExtractionAlgorithm": "",
+      "lineEnding": "",
+      "defaultLanguageCode": "",
+      "detectOrientation": true
     },
     {
       "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
@@ -51,7 +51,6 @@
           "targetName": "mergedText"
         }
       ],
-      "action": "extractText",
       "insertPreTag": " ",
       "insertPostTag": " "
     },
@@ -117,10 +116,6 @@
           "targetName": "image_vector"
         }
       ],
-      "defaultLanguageCode": "en",
-      "detectOrientation": true,
-      "lineEnding": "Space",
-      "action": "extractText",
       "modelVersion": "2023-04-15"
     }
   ],
@@ -132,7 +127,7 @@
   "indexProjections": {
     "selectors": [
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-004",
+        "targetIndexName": "vector-srch-index-copilot-demo-003",
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
         "mappings": [
@@ -155,7 +150,7 @@
         ]
       },
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-004",
+        "targetIndexName": "vector-srch-index-copilot-demo-003",
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
         "mappings": [

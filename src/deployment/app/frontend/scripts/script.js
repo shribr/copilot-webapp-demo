@@ -353,14 +353,15 @@ function isQuestion(text) {
 async function showResponse(questionBubble) {
 
     const config = await fetchConfig();
+
     const chatInput = document.getElementById('chat-input').value.trim();
     const chatDisplay = document.getElementById('chat-display');
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
 
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    //const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
 
     // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    //const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
@@ -368,34 +369,21 @@ async function showResponse(questionBubble) {
 
     if (chatInput) {
 
-        const docResponse = await getAnswersFromAzureSearch(chatInput);
-        const response = await getAnswers(chatInput);
+        // Get answers from Azure Search
+        const docStorageResponse = await getAnswersFromAzureSearch(chatInput);
+
+        // Get answers from public internet
+        const publicInternetResponse = await getAnswersFromPublicInternet(chatInput);
 
         // Hide the loading animation once results are returned
         loadingAnimation.style.display = 'none';
-
-        const answers = [];
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
         chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
 
         // Create tabs
-        const tabs = document.createElement('div');
-        tabs.className = 'tabs';
-
-        // Loop through CHAT_TABS to create tabs dynamically
-        Object.entries(config.RESPONSE_TABS).forEach(([key, value], index) => {
-            const tab = document.createElement('div');
-            tab.className = `tab ${index === 0 ? 'active' : ''}`;
-            tab.innerHTML = `${value.SVG} ${value.TEXT}`;
-            tabs.appendChild(tab);
-        });
-
-        // Create tab contents
-        const answerContent = document.createElement('div');
-        answerContent.className = 'tab-content active';
-        answerContent.style.fontStyle = 'italic';
+        const tabs = await createTabs();
 
         const thoughtProcessContent = document.createElement('div');
         thoughtProcessContent.className = 'tab-content';
@@ -405,114 +393,19 @@ async function showResponse(questionBubble) {
         supportingContent.className = 'tab-content';
         supportingContent.style.fontStyle = 'italic';
 
+        const answerContent = document.createElement('div');
+        answerContent.className = 'tab-content active';
+        answerContent.style.fontStyle = 'italic';
+
         if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == true) {
-            answerContent.textContent = response.choices[0].message.content;
+            answerContent.textContent = publicInternetResponse.choices[0].message.content;
 
-            thoughtProcessContent.textContent = 'Thought process content goes here.';
-            supportingContent.textContent = 'Supporting content goes here.';
+            //thoughtProcessContent.textContent = 'Thought process content goes here.';
+            //supportingContent.textContent = 'Supporting content goes here.';
         }
 
-        if (docResponse && docResponse["@search.answers"] && docResponse.value && docResponse.value.length > 0) {
-
-            // Create a map of documents using their key
-            const docMap = new Map();
-            docResponse.value.forEach(doc => {
-                //var key = "Page " + doc.chunk_id.split('_pages_')[1];
-                var key = doc.chunk_id;
-
-                docMap.set(key, doc);
-            });
-
-            try {
-                // Convert Map to an array for sorting
-                const docArray = Array.from(docMap.values());
-
-                docArray.sort((a, b) => {
-                    if (a.key < b.key) {
-                        return -1;
-                    }
-                    if (a.key > b.key) {
-                        return 1;
-                    }
-                    return 0;
-                });
-
-                // Convert sorted array back to Map
-                const sortedDocMap = new Map(docArray.map(doc => [doc.chunk_id, doc]));
-
-            } catch (error) {
-
-            }
-
-            // Iterate over the answers and cross-reference with documents
-            docResponse["@search.answers"].forEach(async answer => {
-                var answerText = answer.text;
-                answerText = answerText.replace("  ", " ");
-                if (answer.text) {
-                    const correspondingDoc = docMap.get(answer.key);
-                    if (correspondingDoc) {
-
-                        try {
-                            const rephrasedAnswerText = await rephraseText(answer.text);
-                            //const rephrasedAnswerText = answer.text;
-
-                            if (rephrasedAnswerText == "error") {
-                                answers.push({
-                                    answerText: answer.text,
-                                    document: correspondingDoc
-                                });
-                            }
-                            else {
-                                answers.push({
-                                    answerText: rephrasedAnswerText,
-                                    document: correspondingDoc
-                                });
-                            }
-                        } catch (error) {
-                            answers.push({
-                                answerText: answer.text,
-                                document: correspondingDoc
-                            });
-                        }
-                    }
-                }
-            });
-
-            var answerResults = "";
-            var supportingContentLink = "";
-            var answerNumber = 1;
-            var sourceNumber = 1;
-
-            // Initialize a Set to store unique document paths
-            const listedPaths = new Set();
-
-            answers.forEach(answer => {
-                if (answer.answerText) {
-                    const path = `${answer.document.metadata_storage_path}?${sasToken}`;
-
-                    supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
-                    answerResults += answerNumber + ". " + answer.answerText + '\n\n';
-                    answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
-
-                    if (!listedPaths.has(path)) {
-                        listedPaths.add(path);
-
-                        supportingContent.innerHTML += 'Source #' + sourceNumber + ': ' + supportingContentLink + '\n\n';
-                        sourceNumber++;
-                    } else {
-                        console.log(`Document already listed: ${path}`);
-                    }
-
-                    answerNumber++;
-                }
-            });
-
-            if (answerResults != "") {
-                answerContent.innerHTML += answerResults;
-            }
-
-            console.log('Cross-referenced answers:', answers);
-        }
+        // Create tab contents
+        createTabContent(docStorageResponse, answerContent, supportingContent);
 
         // Append tabs and contents to chat bubble
         chatResponse.appendChild(tabs);
@@ -549,16 +442,144 @@ async function showResponse(questionBubble) {
         // Scroll to the position right above the newest questionBubble
         chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
-        let chatDisplayHeight = chatDisplay.scrollHeight;
-        let questionBubbleHeight = questionBubble.clientHeight;
-
         chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
 
-        // Scroll to the top of the chat display
-        //chatDisplay.scrollTop = questionBubbleHeight + 63
     }
     else {
         loadingAnimation.style.display = 'none';
+    }
+}
+
+// Function to rephrase text
+async function rephraseResponseText(searchAnswers) {
+    const config = await fetchConfig();
+
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    const apiVersion = config.OPENAI_API_VERSION;
+    const deploymentId = config.DEPLOYMENT_ID;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
+
+    const answers = [];
+
+    // Iterate over the answers and cross-reference with documents
+    searchAnswers.forEach(async answer => {
+        var answerText = answer.text;
+        answerText = answerText.replace("  ", " ");
+        if (answer.text) {
+            const correspondingDoc = docMap.get(answer.key);
+            if (correspondingDoc) {
+
+                try {
+                    const rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
+
+                    if (rephrasedResponseText == "error") {
+                        answers.push({
+                            answerText: answer.text,
+                            document: correspondingDoc
+                        });
+                    }
+                    else {
+                        answers.push({
+                            answerText: rephrasedResponseText,
+                            document: correspondingDoc
+                        });
+                    }
+                } catch (error) {
+                    answers.push({
+                        answerText: answer.text,
+                        document: correspondingDoc
+                    });
+                }
+            }
+        }
+    });
+
+    return answers;
+}
+
+// Function to rephrase text using Azure OpenAI Service
+async function rephraseResponseFromAzureOpenAI(text) {
+    const payload = {
+        "messages": [
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "You are an AI assistant that helps people find information."
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": `Rephrase the following text to sound more human: '${text}'`
+                    }
+                ]
+            }
+        ],
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "max_tokens": 800,
+        "stop": null,
+        "stream": false
+    };
+
+    const jsonString = JSON.stringify(payload)
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': apiKey
+            },
+            body: jsonString
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error: ${errorData.error.message}`);
+        }
+
+        const data = await response.json();
+        return data.choices[0].message.content.trim();
+    } catch (error) {
+        console.error('Error rephrasing text:', error);
+        return "error";
+        //throw error;
+    }
+}
+
+// Function to sort answers
+function sortAnswers(docMap) {
+    try {
+        // Convert Map to an array for sorting
+        const docArray = Array.from(docMap.values());
+
+        docArray.sort((a, b) => {
+            if (a.key < b.key) {
+                return -1;
+            }
+            if (a.key > b.key) {
+                return 1;
+            }
+            return 0;
+        });
+
+        // Convert sorted array back to Map
+        const sortedDocMap = new Map(docArray.map(doc => [doc.chunk_id, doc]));
+
+        return sortedDocMap;
+
+    }
+    catch (error) {
+        return "error";
     }
 }
 
@@ -570,7 +591,7 @@ function formatBytes(bytes) {
 }
 
 //code to send chat message to Azure Copilot
-async function getAnswers(userInput) {
+async function getAnswersFromPublicInternet(userInput) {
 
     if (!userInput) return;
 
@@ -664,7 +685,7 @@ async function getAnswersFromAzureSearch(userInput) {
             queryType: "semantic",
             semanticConfiguration: config.AZURE_SEARCH_SEMANTIC_CONFIG,
             captions: "extractive",
-            answers: "extractive|count-1",
+            answers: "extractive|count-3",
             queryLanguage: "en-us"
         };
     }
@@ -726,7 +747,6 @@ async function getAnswersFromAzureSearch(userInput) {
 
         }
 
-
         return data;
     }
     catch (error) {
@@ -757,74 +777,6 @@ async function generateEmbeddingAsync(text, apiKey, deploymentId) {
     } catch (error) {
         return null;
     }
-}
-
-// Function to rephrase text
-async function rephraseText(text) {
-    const config = await fetchConfig();
-
-    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
-    const apiVersion = config.OPENAI_API_VERSION;
-    const deploymentId = config.DEPLOYMENT_ID;
-    const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
-
-    const payload = {
-        "messages": [
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "You are an AI assistant that helps people find information."
-                    }
-                ]
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": `Rephrase the following text to sound more human: '${text}'`
-                    }
-                ]
-            }
-        ],
-        "temperature": 0.7,
-        "top_p": 0.95,
-        "frequency_penalty": 0,
-        "presence_penalty": 0,
-        "max_tokens": 800,
-        "stop": null,
-        "stream": false
-    };
-
-    const jsonString = JSON.stringify(payload)
-
-    try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': apiKey
-            },
-            body: jsonString
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Error: ${errorData.error.message}`);
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content.trim();
-    } catch (error) {
-        console.error('Error rephrasing text:', error);
-        return "error";
-        //throw error;
-    }
-
-    return text;
 }
 
 //function to create side navigation links
@@ -862,6 +814,84 @@ async function createSidenavLinks() {
     } catch (error) {
         console.error('Failed to create sidenav links:', error);
     }
+}
+
+// Function to create tabs
+async function createTabs() {
+
+    const config = await fetchConfig();
+
+    const tabs = document.createElement('div');
+    tabs.className = 'tabs';
+
+    // Loop through CHAT_TABS to create tabs dynamically
+    Object.entries(config.RESPONSE_TABS).forEach(([key, value], index) => {
+        const tab = document.createElement('div');
+        tab.className = `tab ${index === 0 ? 'active' : ''}`;
+        tab.innerHTML = `${value.SVG} ${value.TEXT}`;
+        tabs.appendChild(tab);
+    });
+
+    return tabs;
+}
+
+// Function to create tab contents
+async function createTabContent(docStorageResponse, supportingContent, answerContent) {
+
+    const config = await fetchConfig();
+
+    if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
+
+        // Create a map of documents using their key
+        const docMap = new Map();
+        docResponse.value.forEach(doc => {
+            //var key = "Page " + doc.chunk_id.split('_pages_')[1];
+            var key = doc.chunk_id;
+
+            docMap.set(key, doc);
+        });
+
+        const sortedAnswers = sortAnswers(docMap);
+
+        const answers = await rephraseResponseText(docStorageResponse["@search.answers"]);
+
+        var answerResults = "";
+        var supportingContentLink = "";
+        var answerNumber = 1;
+        var sourceNumber = 1;
+
+        // Initialize a Set to store unique document paths
+        const listedPaths = new Set();
+
+        answers.forEach(answer => {
+            if (answer.answerText) {
+                const path = `${answer.document.metadata_storage_path}?${sasToken}`;
+
+                supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
+                answerResults += answerNumber + ". " + answer.answerText + '\n\n';
+                answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
+
+                if (!listedPaths.has(path)) {
+                    listedPaths.add(path);
+
+                    supportingContent.innerHTML += 'Source #' + sourceNumber + ': ' + supportingContentLink + '\n\n';
+                    sourceNumber++;
+                } else {
+                    console.log(`Document already listed: ${path}`);
+                }
+
+                answerNumber++;
+            }
+        });
+
+        if (answerResults != "") {
+            answerContent.innerHTML += answerResults;
+        }
+
+        console.log('Cross-referenced answers:', answers);
+    }
+
+    return answerContent;
 }
 
 //code to get documents from Azure Storage
@@ -1182,7 +1212,8 @@ async function uploadFilesToAzure(files) {
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
     for (const file of files) {
-        const uploadUrl = `${storageUrl}/${file.name}?&${sasToken}`;
+        const fileName = file.name.replace("#", "");
+        const uploadUrl = `${storageUrl}/${fileName}?&${sasToken}`;
         const date = new Date().toUTCString();
 
         try {

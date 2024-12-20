@@ -1,14 +1,14 @@
 $schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json
-name: project-ai-copilot-demo-004
+name: project-ai-copilot-demo-003
 description: This configuration specifies a workspace configuration with existing dependent resources
-display_name: project-ai-copilot-demo-004
+display_name: project-ai-copilot-demo-003
 location: east us
-application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-004/providers/Microsoft.insights/components/appi-copilot-demo-004
+application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.insights/components/appi-copilot-demo-003
 identity:
   type: user_assigned
   tenant_id: e362c86f-e64a-4e58-b26a-c8bf314b1093
-  principal_id: b00806fb-934e-4698-b1f6-e114964132a4
+  principal_id: d12e2797-efa5-4cae-a26e-b8d7747c5fe6
   user_assigned_identities: 
-    /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-004/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-copilot-demo-004: {}
+    /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-copilot-demo-003: {}
 #tags:
 #  purpose: Azure AI Hub Project

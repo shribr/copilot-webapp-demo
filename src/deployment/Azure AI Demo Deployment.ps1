@@ -758,6 +758,7 @@ function Initialize-Parameters {
     $global:openAIAPIKey = $parametersObject.openAIAPIKey
     $global:openAIAPIVersion = $parametersObject.openAIAPIVersion
     $global:portalDashboardName = $parametersObject.portalDashboardName
+    $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
     $global:resourceBaseName = $parametersObject.resourceBaseName
@@ -880,6 +881,7 @@ function Initialize-Parameters {
         openAIAPIKey                 = $openAIAPIKey
         objectId                     = $objectId
         portalDashboardName          = $portalDashboardName
+        previousResourceBaseName     = $previousResourceBaseName
         privateEndPointName          = $privateEndPointName
         redisCacheName               = $redisCacheName
         resourceBaseName             = $resourceBaseName
@@ -976,7 +978,7 @@ function New-AIHubAndModel {
         try {
             $ErrorActionPreference = 'Stop'
             
-            $aiServicesUrl = "$aiServiceName.openai.azure.com"
+            #$aiServicesUrl = "$aiServiceName.openai.azure.com"
 
             #az resource show --resource-group "$resourceGroupName" --name "$aiServiceName" --resource-type accounts --namespace Microsoft.CognitiveServices
             
@@ -1144,14 +1146,15 @@ function New-AIProject {
 
         $ErrorActionPreference = 'Stop'
 
-        $storageAccountResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
-        $containerRegistryResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName"
-        $keyVaultResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+        #$storageAccountResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+        #$containerRegistryResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName"
+        #$keyVaultResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
         $appInsightsResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
         $userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
         $aiHubResoureceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.MachineLearningServices/workspaces/$aiHubName"
 
-        $aiProjectFile = Update-AIProjectFile `
+        <#
+ # {        $aiProjectFile = Update-AIProjectFile `
             -aiProjectName $aiProjectName `
             -resourceGroupName $resourceGroupName `
             -appInsightsName $appInsightsResourceId `
@@ -1160,7 +1163,8 @@ function New-AIProject {
             -storageAccountName $storageAccountResourceId `
             -containerRegistryName $containerRegistryResourceId `
             -keyVaultName $keyVaultResourceId `
-            -userAssignedIdentityName $userAssignedIdentityResourceId
+            -userAssignedIdentityName $userAssignedIdentityResourceId:Enter a comment or description}
+#>
 
         #az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
         #$jsonOutput = az ml workspace create --file $aiProjectFile --resource-group $resourceGroupName --name $aiProjectName --location $location --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId 2>&1
@@ -1170,7 +1174,7 @@ function New-AIProject {
         #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
 
         #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName 2>&1
-        $jsonOutput = az ml workspace create --file $aiProjectFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityResourceId --kind project --hub-id $aiHubResoureceId
+        #$jsonOutput = az ml workspace create --file $aiProjectFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityResourceId --kind project --hub-id $aiHubResoureceId
 
         az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --hub-id $aiHubResoureceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
         #az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --hub-id $$aiHubResoureceId --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
@@ -1395,7 +1399,8 @@ function New-AppServiceEnvironment {
             $ErrorActionPreference = 'Stop'
     
             # Create the ASE asynchronously
-            $job = Start-Job -ScriptBlock {
+            <#
+ # {            $job = Start-Job -ScriptBlock {
                 param (
                     $appServiceEnvironmentName,
                     $resourceGroupName,
@@ -1406,7 +1411,8 @@ function New-AppServiceEnvironment {
                 )
                 az appservice ase create --name $appServiceEnvironmentName --resource-group $resourceGroupName --location $location --vnet-name $vnetName --subnet $subnetName --subscription $subscriptionId --output none
             } -ArgumentList $appServiceEnvironmentName, $resourceGroupName, $location, $vnetName, $subnetName, $subscriptionId
-
+:Enter a comment or description}
+#>
             Write-Host "Waiting for App Service Environment '$appServiceEnvironmentName' to be created before creating app service plan and app services."
             Sleep -Seconds 30
 
@@ -1869,23 +1875,6 @@ function New-MachineLearningWorkspace {
     $appInsightsName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
     $userAssignedIdentityName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
 
-    <#
-        # {    $azCliCommand = @"
-        New-AzMlWorkspace -ResourceGroupName $resourceGroupName `
-            -Kind project `
-            -Name $aiProjectName `
-            -Description $machineLearningProperties.Description `
-            -Location $location `
-            -ApplicationInsightId $appInsightsName `
-            -ContainerRegistryId $containerRegistryName `
-            -HubResourceId $aiHubName `
-            -KeyVaultId $keyVaultName `
-            -StorageAccountId $storageAccountName `
-            -IdentityType "SystemAssigned" `
-            -SubscriptionId $subscriptionId
-        "@}
-        #>
-
     try {
         $ErrorActionPreference = 'Stop'
             
@@ -2286,9 +2275,6 @@ function New-SearchDataSource {
                 name  = $searchDatasourceContainerName
                 query = $searchDatasourceQuery
             }
-            identity    = @{
-                type = "SystemAssigned"
-            }
         }
 
         # Convert the body hashtable to JSON
@@ -2305,15 +2291,15 @@ function New-SearchDataSource {
             return true
         }
         catch {
-            Write-Error "Failed to create datasource '$searchDatasourceName': $_"
-            Write-Log -message "Failed to create datasource '$searchDatasourceName': $_"
+            Write-Error "Failed to create datasource '$searchDatasourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create datasource '$searchDatasourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create datasource '$searchDatasourceName': $_"
-        Write-Log -message "Failed to create datasource '$searchDatasourceName': $_"
+        Write-Error "Failed to create datasource '$searchDatasourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create datasource '$searchDatasourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
         return false
     }
@@ -2334,7 +2320,7 @@ function New-SearchIndex {
         $content = Get-Content -Path $searchIndexSchema
 
         # Replace the placeholder with the actual resource base name
-        $updatedContent = $content -replace "\*{10}", $resourceBaseName
+        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
 
         $searchIndexFilePath = $searchIndexSchema -replace "-template", ""
 
@@ -2416,7 +2402,7 @@ function New-SearchIndexer {
         $content = Get-Content -Path $searchIndexerSchema
 
         # Replace the placeholder with the actual resource base name
-        $updatedContent = $content -replace "\*{10}", $resourceBaseName
+        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
 
         $searchIndexerFilePath = $searchIndexerSchema -replace "-template", ""
 
@@ -2504,6 +2490,30 @@ function New-SearchService {
 
             az search service update --name $searchServiceName --resource-group $resourceGroupName --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
 
+            $body = @{
+                location   = $location.Replace(" ", "")
+                sku        = @{
+                    name = basic
+                }
+                properties = @{
+                    replicaCount   = 1
+                    partitionCount = 1 
+                    hostingMode    = "default"
+                }
+                identity   = @{
+                    type                   = "UserAssigned, SystemAssigned"
+                    userAssignedIdentities = @{
+                        "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+                    }
+                }
+            }
+        
+
+            # Convert the body hashtable to JSON
+            $jsonBody = $body | ConvertTo-Json -Depth 10
+
+            Invoke-RestMethod -Uri $searchEndpoint -Method Put -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchAPIKey }
+
             $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
             $dataSourceExists = $dataSources -contains $searchDataSourceName 
 
@@ -2579,94 +2589,118 @@ function New-SearchService {
         Write-Host "Search Service '$searchServiceName' already exists."
         Write-Log -message "Search Service '$searchServiceName' already exists."
 
-        az search service update --name $searchServiceName --resource-group $resourceGroupName --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
+        az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
       
-        try {
-            $ErrorActionPreference = 'Continue'
-
-            $dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
-
-            if ($dataSourceExists -eq $false) {
-                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
+        $body = @{
+            location   = $location.Replace(" ", "")
+            sku        = @{
+                name = basic
             }
-            else {
-                Write-Host "Search Data Source '$searchDataSourceName' already exists."
-                Write-Log -message "Search Data Source '$searchDataSourceName' already exists."
+            properties = @{
+                replicaCount   = 1
+                partitionCount = 1 
+                hostingMode    = "default"
             }
-
-            $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
-            $dataSourceExists = $dataSources -contains $searchDataSourceName
-
-            foreach ($index in $global:searchIndexes) {
-                $indexName = $index.Name
-                $indexSchema = $index.Schema
-
-                $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
-                $searchIndexExists = $searchIndexes -contains $indexName
-
-                if ($searchIndexExists -eq $false) {
-                    New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchDatasourceName $searchDatasourceName -searchIndexSchema $indexSchema
-                }
-                else {
-                    Write-Host "Search Index '$indexName' already exists."
-                    Write-Log -message "Search Index '$indexName' already exists."
+            identity   = @{
+                type                   = "UserAssigned, SystemAssigned"
+                userAssignedIdentities = @{
+                    "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
                 }
             }
+        }
+    }
 
-            #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
-            $searchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
-            $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
+    # Convert the body hashtable to JSON
+    $jsonBody = $body | ConvertTo-Json -Depth 10
 
-            Start-Sleep -Seconds 15
+    Invoke-RestMethod -Uri $searchEndpoint -Method Put -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchAPIKey }
 
-            if ($searchSkillSetExists -eq $false) {
-                New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
+    try {
+        $ErrorActionPreference = 'Continue'
+
+        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+        $dataSourceExists = $dataSources -contains $searchDataSourceName
+
+        if ($dataSourceExists -eq $false) {
+            New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
+        }
+        else {
+            Write-Host "Search Data Source '$searchDataSourceName' already exists."
+            Write-Log -message "Search Data Source '$searchDataSourceName' already exists."
+        }
+
+        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+        $dataSourceExists = $dataSources -contains $searchDataSourceName
+
+        foreach ($index in $global:searchIndexes) {
+            $indexName = $index.Name
+            $indexSchema = $index.Schema
+
+            $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+            $searchIndexExists = $searchIndexes -contains $indexName
+
+            if ($searchIndexExists -eq $false) {
+                New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchDatasourceName $searchDatasourceName -searchIndexSchema $indexSchema
             }
             else {
-                Write-Host "Search Skill Set '$searchSkillSetName' already exists."
-                Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+                Write-Host "Search Index '$indexName' already exists."
+                Write-Log -message "Search Index '$indexName' already exists."
             }
+        }
+
+        #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
+        $searchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+        $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
+
+        Start-Sleep -Seconds 15
+
+        if ($searchSkillSetExists -eq $false) {
+            New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
+        }
+        else {
+            Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+            Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+        }
                 
-            try {
-                if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
+        try {
+            if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
                     
-                    foreach ($indexer in $global:searchIndexers) {
-                        $indexName = $indexer.IndexName
-                        $indexerName = $indexer.Name
-                        $indexerSchema = $indexer.Schema
+                foreach ($indexer in $global:searchIndexers) {
+                    $indexName = $indexer.IndexName
+                    $indexerName = $indexer.Name
+                    $indexerSchema = $indexer.Schema
     
-                        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
-                        $searchIndexerExists = $searchIndexers -contains $indexerName
+                    $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+                    $searchIndexerExists = $searchIndexers -contains $indexerName
     
-                        if ($searchIndexerExists -eq $false) {
-                            New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $searchSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
-                        }
-                        else {
-                            Write-Host "Search Indexer '$indexer' already exists."
-                            Write-Log -message "Search Indexer '$indexer' already exists."
-                        }
-                    }
-
-                    if ($searchSkillSetExists -eq $false) {
-                        New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
+                    if ($searchIndexerExists -eq $false) {
+                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $searchSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
                     }
                     else {
-                        Write-Host "Search Skill Set '$searchSkillSetName' already exists."
-                        Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+                        Write-Host "Search Indexer '$indexer' already exists."
+                        Write-Log -message "Search Indexer '$indexer' already exists."
                     }
-
-                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
                 }
-            }
-            catch {
-                Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                if ($searchSkillSetExists -eq $false) {
+                    New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
+                }
+                else {
+                    Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                    Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+                }
+
+                Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
             }
         }
         catch {
-            Write-Error "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Search Service '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
+    }
+    catch {
+        Write-Error "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Search Service '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
@@ -2688,6 +2722,10 @@ function New-SearchSkillSet {
         $cognitiveServiceKey = az cognitiveservices account keys list --name $cognitiveServiceName --resource-group $resourceGroupName --query "key1" --output tsv
 
         $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$searchServiceAPiVersion"
+
+        $fileContent = Get-Content -Path $global:searchSkillSetSchema -Raw
+        $updatedContent = $fileContent -replace $previousResourceBaseName, $resourceBaseName
+        Set-Content -Path $global:searchSkillSetSchema -Value $updatedContent
 
         # Convert the body hashtable to JSON
         $jsonBody = $global:searchSkillSet | ConvertTo-Json -Depth 10
