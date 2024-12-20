@@ -182,12 +182,12 @@ function Deploy-OpenAIModel {
         [string]$aiModelFormat,
         [string]$aiModelSkuName,
         [string]$aiModelSkuCapacity,
-        [string]$aiDeploymentName
+        [string]$aiModelDeploymentName
     )
 
     try {
         # Check if the deployment already exists
-        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIAccountName --query "[?name=='$aiDeploymentName']" --output tsv
+        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIAccountName --query "[?name=='$aiModelDeploymentName']" --output tsv
 
         if ($deploymentExists) {
             Write-Host "OpenAI model deployment '$aiDeploymentName' already exists."
@@ -195,7 +195,7 @@ function Deploy-OpenAIModel {
         }
         else {
             # Create the deployment if it does not exist
-            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $aiDeploymentName --model-name $aiModelName --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $aiDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -767,7 +767,7 @@ function Initialize-Parameters {
     $global:aiModelFormat = $parametersObject.aiModelFormat
     $global:aiModelSkuName = $parametersObject.aiModelSkuName
     $global:aiModelSkuCapacity = $parametersObject.aiModelSkuCapacity
-    $global:aiDeploymentName = $parametersObject.aiDeploymentName
+    $global:aiModelDeploymentName = $parametersObject.aiModelDeploymentName
     $global:aiProjectName = $parametersObject.aiProjectName
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiProjectName = $parametersObject.aiProjectName
@@ -801,9 +801,10 @@ function Initialize-Parameters {
     $global:openAIAPIKey = $parametersObject.openAIAPIKey
     $global:openAIAPIVersion = $parametersObject.openAIAPIVersion
     $global:portalDashboardName = $parametersObject.portalDashboardName
-    $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
+    
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
+    $global:redeployResources = $parametersObject.redeployResources
     $global:resourceBaseName = $parametersObject.resourceBaseName
     $global:resourceGroupName = $parametersObject.resourceGroupName
     $global:resourceSuffix = $parametersObject.resourceSuffix
@@ -840,7 +841,12 @@ function Initialize-Parameters {
     $global:searchServiceProperties = $parametersObject.searchServiceProperties
     $global:storageServiceProperties = $parametersObject.storageServiceProperties
 
-    #$global:objectId = $parametersObject.objectId
+    # Make sure the previousResourceBaseName parameter in the parameters.json file is different than the resourceBaseName parameter. 
+    # What this code does is determine whether or not you are attempting to redeploy the same resources with the same base name or if you are trying to provision an entirely new deployment with a new resource group name etc.
+    if ($parametersObject.previousResourceBaseName -eq $parametersObject.resourceBaseName -and $redeployResources -eq $false) {
+        Write-Host "The previousResourceBaseName parameter is the same as the resourceBaseName parameter. Please change the previousResourceBaseName parameter to a different value."
+        exit
+    }
 
     #**********************************************************************************************************************
     # Add the following code to the InitializeParameters function to set the subscription ID, tenant ID, object ID, and user principal name.
@@ -889,6 +895,7 @@ function Initialize-Parameters {
 
     return @{
         aiHubName                    = $aiHubName
+        $aiModelDeploymentName       = $aiModelDeploymentName
         aiModelName                  = $aiModelName
         aiModelType                  = $aiModelType
         aiModelVersion               = $aiModelVersion
@@ -933,6 +940,7 @@ function Initialize-Parameters {
         portalDashboardName          = $portalDashboardName
         previousResourceBaseName     = $previousResourceBaseName
         privateEndPointName          = $privateEndPointName
+        redeployResources            = $redeployResources
         redisCacheName               = $redisCacheName
         resourceBaseName             = $resourceBaseName
         resourceGroupName            = $resourceGroupName
@@ -1673,8 +1681,26 @@ function New-ContainerRegistry {
         Code: $errorCode `
         Message: $errorDetails"
 
-                Write-Host $errorMessage
-                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                # Check if the error is due to soft deletion
+                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
+                    try {
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        Restore-SoftDeletedResource -resourceName $containerRegistryName -resourceType "ContainerRegistry" -location $location -resourceGroupName $resourceGroupName
+                        Write-Host "Container Registry '$containerRegistryName' restored."
+                        Write-Log -message "Container Registry '$containerRegistryName' restored."
+                    }
+                    catch {
+                        Write-Error "Failed to restore Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
+                }
+                else {
+                    Write-Error "Failed to create CContainer Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Container Registry '$containerRegistryName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                } 
             }
             else {
                 Write-Host "Container Registry '$containerRegistryName' created."
@@ -2319,7 +2345,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Deploy Open AI model
 
-    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location -aiModelType $global:aiModelType
+    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location -aiModelType $global:aiModelType -aiModelDeploymentName $global:aiModelDeploymentName -aiModelFormat $aiModelFormat -aiModelVersion $aiModelVersion -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
     
     #**********************************************************************************************************************
     # Create Container Registry
@@ -2386,6 +2412,14 @@ function New-SearchDataSource {
                 query = $searchDatasourceQuery
             }
         }
+
+        # I need to add the identity property to the body hashtable
+        <#
+ # {        identity    = @{
+                odata                = "#Microsoft.Azure.Search.DataUserAssignedIdentity"
+                userAssignedIdentity = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
+            }:Enter a comment or description}
+#>
 
         # Convert the body hashtable to JSON
         $jsonBody = $body | ConvertTo-Json -Depth 10
@@ -2603,8 +2637,9 @@ function New-SearchService {
             $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
             $searchManagementUrl += "?api-version=$global:searchAPIVersion"
 
-            az search service update --name $searchServiceName --resource-group $resourceGroupName --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
-
+            az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
+            #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+       
             $body = @{
                 location   = $location.Replace(" ", "")
                 sku        = @{
@@ -2712,7 +2747,8 @@ function New-SearchService {
         Write-Log -message "Search Service '$searchServiceName' already exists."
 
         az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
-      
+        #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+
         $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         
         $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
@@ -3730,6 +3766,12 @@ function Update-ContainerRegistryFile {
     $rootPath = Get-Item -Path (Get-Location).Path
 
     $filePath = "$rootPath/container.registry.yaml"
+
+    $existingContent = Get-Content -Path $filePath
+
+    $updatedContent = $existingContent -replace $global:previousResourceBaseName, $global:resourceBaseName
+
+    Set-Content -Path $filePath -Value $updatedContent
 
     $locationNoSpaces = $location.ToLower() -replace " ", ""
 

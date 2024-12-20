@@ -1,5 +1,5 @@
 {
-  "name": "vector-srch-skillset-copilot-demo-001",
+  "name": "vector-srch-skillset-copilot-demo-003",
   "description": "Skillset to chunk documents and generate embeddings",
   "skills": [
     {
@@ -127,7 +127,7 @@
   "indexProjections": {
     "selectors": [
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-001",
+        "targetIndexName": "vector-srch-index-copilot-demo-002",
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
         "mappings": [
@@ -150,7 +150,7 @@
         ]
       },
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-001",
+        "targetIndexName": "vector-srch-index-copilot-demo-003",
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
         "mappings": [
@@ -174,9 +174,6 @@
     }
   }
 }
-
-
-
 
 
 
