@@ -360,14 +360,17 @@ For a more in-depth understanding of the chat workflow click [here](./README_CHA
 
 There are several manual steps which need to be performed because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing. A perfect example of this is the Azure Machine Learning Workspace schema. Despite the official Microsoft documentation showing a whole list of parameters that are available the "az ml workspace create" command will only accept the following parameters:
 
-- ` --name
-- ` --description
-- ` --display-name
-- ` --resource-group
-- ` --application-insights
-- ` --location
-- ` --key-vault
-- ` --storage-account
+```
+--name
+--description
+--display-name
+--resource-group
+--application-insights
+--location
+--key-vault
+--storage-account
+
+```
 
 1. Setting CORS to allow "All" for Azure Storage Service.
 2. Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content".
