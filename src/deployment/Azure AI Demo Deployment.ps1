@@ -1235,7 +1235,7 @@ function New-AppService {
             else {
 
                 # Check if the Function App exists
-                $appExists = az functionapp show --name $appService.Name --resource-group $resourceGroupName --query "name" --output tsv
+                $appExists = az functionapp show --name $appServiceName --resource-group $resourceGroupName --query "name" --output tsv
 
                 if (-not $appExists) {
                     # Create a new function app
@@ -2170,6 +2170,7 @@ function New-RandomPassword {
 # Function to create a new resource group
 function New-ResourceGroup {
     param (
+        [bool]$resourceGroupExists,
         [string]$resourceGroupName,
         [string]$location
     )
@@ -2177,7 +2178,7 @@ function New-ResourceGroup {
     do {
         $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -location $location
 
-        if ($resourceGroupExists -eq "true") {
+        if ($resourceGroupExists -eq $true) {
             Write-Host "Resource group '$resourceGroupName' already exists. Trying a new name."
             Write-Log -message "Resource group '$resourceGroupName' already exists. Trying a new name."
 
@@ -2185,15 +2186,17 @@ function New-ResourceGroup {
             $resourceGroupName = "$($resourceGroupName)-$resourceSuffix"
         }
 
-    } while ($resourceGroupExists -eq "true")
+    } while ($resourceGroupExists -eq $true)
 
     try {
         az group create --name $resourceGroupName --location $location --output none
         Write-Host "Resource group '$resourceGroupName' created."
+        Write-Log -message "Resource group '$resourceGroupName' created." -logFilePath $global:LogFilePath
         $resourceGroupExists = $false
     }
     catch {
         Write-Host "An error occurred while creating the resource group."
+        Write-Log -message "An error occurred while creating the resource group '$resourceGroupName'." -logFilePath $global:LogFilePath
     }
 
     return $resourceGroupName
@@ -2589,7 +2592,8 @@ function New-SearchService {
             $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
             $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
 
-            az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
+            #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+            # az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
             #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
        
             try {
@@ -2624,7 +2628,7 @@ function New-SearchService {
                 }
     
                 #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-                Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+                #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
                 
             }
             catch {
@@ -2707,7 +2711,8 @@ function New-SearchService {
         Write-Host "Search Service '$searchServiceName' already exists."
         Write-Log -message "Search Service '$searchServiceName' already exists."
 
-        az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
+        #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+        #az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
         #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
 
         $global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
@@ -2747,7 +2752,7 @@ function New-SearchService {
             }
     
             #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-            #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+            # Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
                 
         }
         catch {
@@ -2762,29 +2767,12 @@ function New-SearchService {
         $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
         $dataSourceExists = $dataSources -contains $searchDataSourceName
 
-        if ($dataSourceExists -eq $false) {
-            New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
-            $dataSourceExists = $dataSources -contains $searchDataSourceName
-        }
-        else {
-            Write-Host "Search Data Source '$searchDataSourceName' already exists."
-            Write-Log -message "Search Data Source '$searchDataSourceName' already exists."
-        }
-
         foreach ($index in $global:searchIndexes) {
             $indexName = $index.Name
             $indexSchema = $index.Schema
 
             $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
             $searchIndexExists = $searchIndexes -contains $indexName
-
-            if ($searchIndexExists -eq $false) {
-                New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchDatasourceName $searchDatasourceName -searchIndexSchema $indexSchema
-            }
-            else {
-                Write-Host "Search Index '$indexName' already exists."
-                Write-Log -message "Search Index '$indexName' already exists."
-            }
         }
 
         #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
@@ -3398,20 +3386,16 @@ function Start-Deployment {
     if ($deleteResourceGroup -eq $true) {
         # Delete existing resource groups with the same name
         Remove-AzureResourceGroup -resourceGroupName $resourceGroupName
+
+        $resourceGroupExists = $false
     }
     
     if ($resourceGroupExists -eq $true) {
-
-        if ($createResourceGroup -eq $true) {        
-            New-ResourceGroup -resourceGroupName $resourceGroupName -location $location
-        } 
-        else {
-            Write-Host "Using existing resource group '$resourceGroupName'."
-            Write-Log -message "Using existing resource group '$resourceGroupName'."
-        }  
+        Write-Host "Resource Group '$resourceGroupName' already exists."
+        Write-Log -message "Resource Group '$resourceGroupName' already exists." -logFilePath $logFilePath
     }
     else {
-        New-ResourceGroup -resourceGroupName $resourceGroupName -location $location
+        New-ResourceGroup -resourceGroupName $resourceGroupName -location $location -resourceGroupExists $false
     }
 
     #return 
@@ -3643,15 +3627,15 @@ function Test-ResourceGroupExists {
 
     if ($resourceGroupExists -eq $true) {
         #Write-Host "Resource group '$resourceGroupName' exists."
-        #Write-Log -message "Resource group '$resourceGroupName' exists."
+        #Write-Log -message "Resource group '$resourceGroupName' exists." -logFilePath $global:LogFilePath
 
-        return true
+        return $true
     }
     else {
         #Write-Host "Resource group '$resourceGroupName' does not exist."
-        #Write-Log -message "Resource group '$resourceGroupName' does not exist."
+        #Write-Log -message "Resource group '$resourceGroupName' does not exist." -logFilePath $global:LogFilePath
 
-        return false
+        return $false
     }
 }
 
