@@ -358,10 +358,12 @@ For a more in-depth understanding of the chat workflow click [here](./README_CHA
 
 ### Additional Notes:
 
-There are several manual steps which need to be performed because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed correctly or at least not executed based on the requirements of this solution. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing. 
+There are several manual steps which need to be performed for a variety of reasons but mainly because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed fully. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing. 
 
-
-1. **Azure AI Project / Machine Learning Workspace:** 
+1. Setting CORS to allow "All" for Azure Storage Service.
+2. Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content".
+3. Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix).
+4.  **Azure AI Project / Machine Learning Workspace:** 
 
 Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the "az ml workspace create" command will only accept the following parameters:
 
@@ -380,10 +382,7 @@ The problem with this is that this solution needs to have an Azure AI project cr
 
 Even trying to pass in a yaml file instead of specifying the parameters directly in the command won't work if you include any other parameters than the ones listed above.
 
-1. Setting CORS to allow "All" for Azure Storage Service.
-2. Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content".
-3. Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix).
-4. 
+
 
 ### Contributing
 
