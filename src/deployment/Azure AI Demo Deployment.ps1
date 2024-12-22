@@ -190,8 +190,8 @@ function Deploy-OpenAIModel {
         $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIAccountName --query "[?name=='$aiModelDeploymentName']" --output tsv
 
         if ($deploymentExists) {
-            Write-Host "OpenAI model deployment '$aiDeploymentName' already exists."
-            Write-Log -message "OpenAI model deployment '$aiDeploymentName' already exists."
+            Write-Host "OpenAI model deployment '$aiModelDeploymentName' already exists."
+            Write-Log -message "OpenAI model deployment '$aiModelDeploymentName' already exists."
         }
         else {
             # Create the deployment if it does not exist
@@ -2270,7 +2270,7 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create Subnet
 
-    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName
+    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create App Service Environment
@@ -2337,7 +2337,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create API Management Service
     
-    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName
+    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
 }
 
@@ -2669,7 +2669,7 @@ function New-SearchService {
 
             $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
 
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 15
 
             if ($searchSkillSetExists -eq $false) {
                 New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
@@ -3517,7 +3517,7 @@ function Start-Deployment {
     New-AIService -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     # Deploy AI Model
-    Deploy-AIModel -aiModelName $aiModelName -aiModelType $global:aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources -userAssignedIdentityName $userAssignedIdentityName -containerRegistryName $containerRegistryName
+    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -aiModelName $global:aiModelName -aiModelType $global:aiModelType -aiModelVersion $global:aiModelVersion -resourceGroupName $resourceGroupName -aiModelFormat $global:aiModelFormat -aiModelSkuName $global:aiModelSkuName -aiModelSkuCapacity $global:aiModelSkuCapacity -aiModelDeploymentName $global:aiModelDeploymentName -existingResources $existingResources
 
     # Create AI Studio AI Project / ML Studio Workspace
     New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
