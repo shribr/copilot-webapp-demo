@@ -700,7 +700,7 @@ function Initialize-Parameters {
 
     # Navigate to the project directory
     Set-DirectoryPath -targetDirectory $global:deploymentPath
-        
+    
     # Load parameters from the JSON file
     $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
@@ -2234,15 +2234,6 @@ function New-Resources {
         [array]$subNet
     )
 
-    # Get the latest API versions
-    #$storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
-    #$appServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Web" -resourceType "serverFarms"
-    #$searchServiceAPIVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
-    #$logAnalyticsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.OperationalInsights" -resourceType "workspaces"
-    #$cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
-    #$keyVaultApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.KeyVault" -resourceType "vaults"
-    #$appInsightsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Insights" -resourceType "components"
-
     # Debug statements to print variable values
     Write-Host "subscriptionId: $subscriptionId"
     Write-Host "resourceGroupName: $resourceGroupName"
@@ -3342,8 +3333,6 @@ function Start-Deployment {
     # Initialize the sequence number
     $sequenceNumber = 1
 
-    #$deleteResourceGroup = $false
-
     # Check if the log file exists
     if (Test-Path $logFilePath) {
         # Read all lines from the log file
@@ -3717,6 +3706,32 @@ function Test-ResourceExists {
             return $false
         }
     }
+}
+
+function Update-ParameterFileApiVersions {
+    # Load parameters from the JSON file
+    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+
+    # Get the latest API versions in order to Update the parameters.json file
+    $storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
+    $appServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Web" -resourceType "serverFarms"
+    $searchServiceAPIVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
+    $logAnalyticsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.OperationalInsights" -resourceType "workspaces"
+    $cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+    $keyVaultApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.KeyVault" -resourceType "vaults"
+    $appInsightsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Insights" -resourceType "components"
+
+    $parametersObject.storageApiVersion = $storageApiVersion
+    $parametersObject.appServiceApiVersion = $appServiceApiVersion
+    $parametersObject.searchServiceAPIVersion = $searchServiceAPIVersion
+    $parametersObject.logAnalyticsApiVersion = $logAnalyticsApiVersion
+    $parametersObject.cognitiveServicesApiVersion = $cognitiveServicesApiVersion
+    $parametersObject.keyVaultApiVersion = $keyVaultApiVersion
+    $parametersObject.appInsightsApiVersion = $appInsightsApiVersion
+    
+    # Convert the updated parameters object back to JSON and save it to the file
+    $parametersObject | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
+    
 }
 
 # Function to update ML workspace connection file
