@@ -1,5 +1,5 @@
 {
-  "name": "vector-srch-skillset-copilot-demo-003",
+  "name": "vector-srch-skillset-copilot-demo-004",
   "description": "Skillset to chunk documents and generate embeddings",
   "skills": [
     {
@@ -19,10 +19,9 @@
           "targetName": "text"
         }
       ],
-      "textExtractionAlgorithm": "",
-      "lineEnding": "",
-      "defaultLanguageCode": "",
-      "detectOrientation": true
+      "defaultLanguageCode": "en",
+      "detectOrientation": true,
+      "lineEnding": "Space"
     },
     {
       "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
@@ -75,8 +74,7 @@
       "defaultLanguageCode": "en",
       "textSplitMode": "pages",
       "maximumPageLength": 2000,
-      "pageOverlapLength": 500,
-      "unit": "characters"
+      "pageOverlapLength": 500
     },
     {
       "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
@@ -120,14 +118,14 @@
     }
   ],
   "cognitiveServices": {
-    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
-    "key": "0029a51993bb4cb393a1441f7f06c17f"
+    "key": "5fe845c047324c17a588dc528a75cac8",
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
   },
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "indexProjections": {
     "selectors": [
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-002",
+        "targetIndexName": "vector-srch-index-copilot-demo-004",
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
         "mappings": [
@@ -150,7 +148,7 @@
         ]
       },
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-003",
+        "targetIndexName": "vector-srch-index-copilot-demo-004",
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
         "mappings": [
@@ -174,6 +172,3 @@
     }
   }
 }
-
-
-

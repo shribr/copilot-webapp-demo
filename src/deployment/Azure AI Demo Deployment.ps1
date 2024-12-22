@@ -224,8 +224,8 @@ function Deploy-OpenAIModel {
         }
     }
     catch {
-        Write-Error "Failed to create OpenAI model deployment '$deploymentName': $_"
-        Write-Log -message "Failed to create OpenAI model deployment '$deploymentName': $_"
+        Write-Error "Failed to create OpenAI model deployment '$deploymentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create OpenAI model deployment '$deploymentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
@@ -274,8 +274,8 @@ function Deploy-AIModel {
         }
         catch {
             
-            Write-Host "Failed to create AI Model deployment '$aiModelName'."
-            Write-Log -message "Failed to create AI Model deployment '$aiModelName'." -logFilePath $global:LogFilePath
+            Write-Host "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create AI Model deployment '$aiModelName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
     else {
@@ -801,7 +801,9 @@ function Initialize-Parameters {
     $global:openAIAPIKey = $parametersObject.openAIAPIKey
     $global:openAIAPIVersion = $parametersObject.openAIAPIVersion
     $global:portalDashboardName = $parametersObject.portalDashboardName
-    
+
+    $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
+
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
     $global:redeployResources = $parametersObject.redeployResources
@@ -2466,6 +2468,8 @@ function New-SearchIndex {
         # Replace the placeholder with the actual resource base name
         $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
 
+        Set-Content -Path $searchIndexSchema -Value $updatedContent
+
         $searchIndexFilePath = $searchIndexSchema -replace "-template", ""
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
@@ -2512,15 +2516,15 @@ function New-SearchIndex {
         }
         catch {
             # If you are getting the 'Normalizers" error, create the index via the Azure Portal and just select "Add index (JSON)" and copy the contents of the appropriate index json file into the textarea and click "save".
-            Write-Error "Failed to create index '$searchIndexName': $_"
-            Write-Log -message "Failed to create index '$searchIndexName': $_"
+            Write-Error "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create index '$searchIndexName': $_"
-        Write-Log -message "Failed to create index '$searchIndexName': $_"
+        Write-Error "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
         return false
     }
@@ -2547,6 +2551,8 @@ function New-SearchIndexer {
 
         # Replace the placeholder with the actual resource base name
         $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
+
+        Set-Content -Path $searchIndexerSchema -Value $updatedContent
 
         $searchIndexerFilePath = $searchIndexerSchema -replace "-template", ""
 
@@ -2595,15 +2601,15 @@ function New-SearchIndexer {
             return true
         }
         catch {
-            Write-Error "Failed to create Search Indexer '$searchIndexerName': $_"
-            Write-Log -message "Failed to create Search Indexer '$searchIndexerName': $_"
+            Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create Search Indexer '$searchIndexerName': $_"
-        Write-Log -message "Failed to create Search Indexer '$searchIndexerName': $_"
+        Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
         return false
     }
@@ -2640,37 +2646,46 @@ function New-SearchService {
             az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
             #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
        
-            $body = @{
-                location   = $location.Replace(" ", "")
-                sku        = @{
-                    name = "basic"
-                }
-                properties = @{
-                    replicaCount   = 1
-                    partitionCount = 1 
-                    hostingMode    = "default"
-                }
-                identity   = @{
-                    type                   = "UserAssigned, SystemAssigned"
-                    userAssignedIdentities = @{
-                        "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+            try {
+                $ErrorActionPreference = 'Continue'
+                
+                $body = @{
+                    location   = $location.Replace(" ", "")
+                    sku        = @{
+                        name = "basic"
+                    }
+                    properties = @{
+                        replicaCount   = 1
+                        partitionCount = 1 
+                        hostingMode    = "default"
+                    }
+                    identity   = @{
+                        type                   = "UserAssigned, SystemAssigned"
+                        userAssignedIdentities = @{
+                            "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+                        }
                     }
                 }
+            
+                # Convert the body hashtable to JSON
+                $jsonBody = $body | ConvertTo-Json -Depth 10
+    
+                $accessToken = (az account get-access-token --query accessToken -o tsv)
+    
+                $headers = @{
+                    "api-key"       = $searchAPIKey
+                    "Authorization" = "Bearer $accessToken"  # Add the authorization header
+                }
+    
+                #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+                Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+                
             }
-        
-
-            # Convert the body hashtable to JSON
-            $jsonBody = $body | ConvertTo-Json -Depth 10
-
-            $accessToken = (az account get-access-token --query accessToken -o tsv)
-
-            $headers = @{
-                "api-key"       = $searchAPIKey
-                "Authorization" = "Bearer $accessToken"  # Add the authorization header
+            catch {
+                Write-Error "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
-
-            #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-            #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+            
             $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
             $dataSourceExists = $dataSources -contains $searchDataSourceName 
 
@@ -2754,37 +2769,46 @@ function New-SearchService {
         $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
         $searchManagementUrl += "?api-version=$global:searchAPIVersion"
 
-        $body = @{
-            location   = $location.Replace(" ", "")
-            sku        = @{
-                name = "basic"
-            }
-            properties = @{
-                replicaCount   = 1
-                partitionCount = 1 
-                hostingMode    = "default"
-            }
-            identity   = @{
-                type                   = "UserAssigned, SystemAssigned"
-                userAssignedIdentities = @{
-                    "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+        try {
+            $ErrorActionPreference = 'Continue'
+
+            $body = @{
+                location   = $location.Replace(" ", "")
+                sku        = @{
+                    name = "basic"
+                }
+                properties = @{
+                    replicaCount   = 1
+                    partitionCount = 1 
+                    hostingMode    = "default"
+                }
+                identity   = @{
+                    type                   = "UserAssigned, SystemAssigned"
+                    userAssignedIdentities = @{
+                        "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+                    }
                 }
             }
+            
+            # Convert the body hashtable to JSON
+            $jsonBody = $body | ConvertTo-Json -Depth 10
+    
+            $accessToken = (az account get-access-token --query accessToken -o tsv)
+    
+            $headers = @{
+                "api-key"       = $searchAPIKey
+                "Authorization" = "Bearer $accessToken"  # Add the authorization header
+            }
+    
+            #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+            Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+                
+        }
+        catch {
+            Write-Error "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
-
-    # Convert the body hashtable to JSON
-    $jsonBody = $body | ConvertTo-Json -Depth 10
-
-    $accessToken = (az account get-access-token --query accessToken -o tsv)
-
-    $headers = @{
-        "api-key"       = $searchAPIKey
-        "Authorization" = "Bearer $accessToken"  # Add the authorization header
-    }
-
-    #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-    #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
 
     try {
         $ErrorActionPreference = 'Continue'
@@ -2853,14 +2877,6 @@ function New-SearchService {
                     }
                 }
 
-                if ($searchSkillSetExists -eq $false) {
-                    New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
-                }
-                else {
-                    Write-Host "Search Skill Set '$searchSkillSetName' already exists."
-                    Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
-                }
-
                 Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
             }
         }
@@ -2871,7 +2887,7 @@ function New-SearchService {
     }
     catch {
         Write-Error "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Search Service '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
@@ -2905,8 +2921,15 @@ function New-SearchSkillSet {
         $jsonBody = $global:searchSkillSet | ConvertTo-Json -Depth 10
         $jsonObject = $jsonBody | ConvertFrom-Json
 
-        $jsonObject.cognitiveServices.key = $cognitiveServiceKey
+        # Add the cognitive services key to the skillset
+        $jsonObject.cognitiveServices = @{
+            "@odata.type" = "#Microsoft.Azure.Search.CognitiveServicesByKey"
+            "key"         = $cognitiveServiceKey
+        }
+
         $jsonBody = $jsonObject | ConvertTo-Json -Depth 10
+
+        Set-Content -Path $global:searchSkillSetSchema -Value $jsonBody
 
         try {
             $ErrorActionPreference = 'Continue'
@@ -2919,15 +2942,15 @@ function New-SearchSkillSet {
             return true
         }
         catch {
-            Write-Error "Failed to create skillset '$searchSkillSetName': $_"
-            Write-Log -message "Failed to create skillset '$searchSkillSetName': $_"
+            Write-Error "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
             return false
         }
     }
     catch {
-        Write-Error "Failed to create skillset '$searchSkillSetName': $_"
-        Write-Log -message "Failed to create skillset '$searchSkillSetName': $_"
+        Write-Error "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
         return false
     }
@@ -3633,12 +3656,13 @@ function Start-SearchIndexer {
         $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/run?api-version=$searchServiceAPiVersion"
 
         Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
+
         Write-Host "Search Indexer '$searchIndexerName' ran successfully."
         Write-Log -message "Search Indexer '$searchIndexerName' ran successfully."
     }
     catch {
-        Write-Error "Failed to run Search Indexer '$searchIndexerName': $_"
-        Write-Log -message "Failed to run Search Indexer '$searchIndexerName': $_"
+        Write-Error "Failed to run Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to run Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
