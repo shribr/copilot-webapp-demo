@@ -358,9 +358,12 @@ For a more in-depth understanding of the chat workflow click [here](./README_CHA
 
 ### Additional Notes:
 
-There are several manual steps which need to be performed because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed correctly or at least not executed based on the requirements of this solution. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing. A perfect example of this is the [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json). 
+There are several manual steps which need to be performed because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed correctly or at least not executed based on the requirements of this solution. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing. 
 
-Despite the official Microsoft documentation showing a whole list of parameters that are available the "az ml workspace create" command will only accept the following parameters:
+
+1. **Azure AI Project / Machine Learning Workspace:** 
+
+Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the "az ml workspace create" command will only accept the following parameters:
 
 ```
 --name
@@ -371,9 +374,9 @@ Despite the official Microsoft documentation showing a whole list of parameters 
 --location
 --key-vault
 --storage-account
-
 ```
-The problem with this is that this solution needs to have an Azure AI project created and associated with the Azure Hub deployed in the resource group. Now, despite the official documentation stating that the parameters ```kind``` and ```hub-id``` do exist (albeit currently in preview mode) you cannot set either of those parameters using the Azure CLI. Here's where things get a little confusing. By not having the ability to specify values for those parameters, the "project" gets created as an Azure Machine Learning Workspace and it will only be available in Azure Machine Learning Studio as opposed to Azure AI Studio (recently renamed to Azure AI Foundry).
+
+The problem with this is that this solution needs to have an Azure AI project created and associated with the Azure Hub deployed in the resource group. Now, despite the official documentation stating that the parameters ```kind``` and ```hub-id``` do exist (albeit currently in preview mode) you cannot set either of those parameters using the Azure CLI. Here's where things get a little confusing. By not having the ability to specify values for those parameters, the "project" gets created as an **Azure Machine Learning Workspace** and it will only be available in **Azure Machine Learning Studio** as opposed to **Azure AI Studio(( (recently renamed to **Azure AI Foundry**). Hence the reason why I titled this first item as **Azure AI Project / Machine Learning Workspace**. The reason, is that this resource can either be created in **Azure AI Foundary** or **Azure Machine Learning Studio**. Regardless of where the resource is created, it will display in your Resource Group. However, it will have different "purposes" and structure depending on where you provision it. The nice part about having a project/workspace is that it allows you to better organize your AI resources similar to how a resource group allows you to organize your cloud resources.
 
 Even trying to pass in a yaml file instead of specifying the parameters directly in the command won't work if you include any other parameters than the ones listed above.
 
