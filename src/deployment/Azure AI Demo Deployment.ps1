@@ -810,7 +810,6 @@ function Initialize-Parameters {
     $global:resourceGroupName = $parametersObject.resourceGroupName
     $global:resourceSuffix = $parametersObject.resourceSuffix
     $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
-    $global:searchAPIVersion = $parametersObject.searchAPIVersion
     $global:searchDataSourceName = $parametersObject.searchDataSourceName
     $global:searchEndpoint = $parametersObject.searchEndpoint
     $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
@@ -947,7 +946,6 @@ function Initialize-Parameters {
         resourceSuffix               = $resourceSuffix
         restoreSoftDeletedResource   = $restoreSoftDeletedResource
         result                       = $result
-        searchAPIVersion             = $searchServiceAPIVersion
         searchDataSourceName         = $searchDataSourceName
         searchEndpoint               = $searchEndpoint
         searchIndexFieldNames        = $searchIndexFieldNames
@@ -956,6 +954,7 @@ function Initialize-Parameters {
         searchIndexes                = $searchIndexes
         searchIndexers               = $searchIndexers
         searchPublicInternetResults  = $searchPublicInternetResults
+        searchServiceAPIVersion      = $searchServiceAPIVersion
         searchServiceName            = $searchServiceName
         searchServiceProperties      = $searchServiceProperties
         searchSkillSet               = $searchSkillSet
@@ -2389,13 +2388,12 @@ function New-SearchDataSource {
         $ErrorActionPreference = 'Continue'
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        $searchServiceAPiVersion = "2024-07-01"
 
         $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
 
         $searchDatasourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
 
-        $searchDatasourceUrl = "https://$searchServiceName.search.windows.net/datasources?api-version=$searchServiceAPiVersion"
+        $searchDatasourceUrl = "https://$searchServiceName.search.windows.net/datasources?api-version=$global:searchServiceAPiVersion"
     
         Write-Host "searchDatasourceUrl: $searchDatasourceUrl"
 
@@ -2467,14 +2465,9 @@ function New-SearchIndex {
         Set-Content -Path $searchIndexSchema -Value $updatedContent
        
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
-        $searchServiceAPiVersion = $searchServiceAPIVersion
-    
-        #$searchIndexUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
     
         $jsonContent = Get-Content -Path $searchIndexSchema -Raw | ConvertFrom-Json
     
-        #$jsonContent.'@odata.context' = $searchIndexUrl
         $jsonContent.name = $searchIndexName
     
         if ($searchIndexName -notlike "*vector*") {
@@ -2496,7 +2489,7 @@ function New-SearchIndex {
         $updatedJsonContent | Set-Content -Path $searchIndexSchema
     
         # Construct the REST API URL
-        $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
+        $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$global:searchServiceAPiVersion"
     
         # Create the index
         try {
@@ -2551,10 +2544,8 @@ function New-SearchIndexer {
         #Set-Content -Path $searchIndexerFilePath -Value $updatedContent
     
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
-        $searchServiceAPiVersion = $global:searchAPIVersion
     
-        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
+        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$global:searchServiceAPiVersion"
     
         $jsonContent = Get-Content -Path $searchIndexerSchema -Raw | ConvertFrom-Json
     
@@ -2582,7 +2573,7 @@ function New-SearchIndexer {
         $updatedJsonContent | Set-Content -Path $searchIndexerSchema
     
         # Construct the REST API URL
-        $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
+        $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$global:searchServiceAPiVersion"
     
         # Create the index
         try {
@@ -2896,14 +2887,12 @@ function New-SearchSkillSet {
         $ErrorActionPreference = 'Stop'
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        #$searchServiceAPiVersion = "2024-05-01-Preview"
-        $searchServiceAPiVersion = $global:searchAPIVersion
-
+  
         # Might need to get search service API version from the parameters.json file
 
         $cognitiveServiceKey = az cognitiveservices account keys list --name $cognitiveServiceName --resource-group $resourceGroupName --query "key1" --output tsv
 
-        $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$searchServiceAPiVersion"
+        $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$global:searchServiceAPiVersion"
 
         $fileContent = Get-Content -Path $global:searchSkillSetSchema -Raw
         $updatedContent = $fileContent -replace $previousResourceBaseName, $resourceBaseName
@@ -3075,9 +3064,8 @@ function Reset-SearchIndexer {
         $ErrorActionPreference = 'Stop'
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        $searchServiceAPiVersion = "2024-07-01"
 
-        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/reset?api-version=$searchServiceAPiVersion"
+        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/reset?api-version=$global:searchServiceAPiVersion"
 
         Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
         Write-Host "Indexer '$searchIndexerName' reset successfully."
@@ -3643,9 +3631,8 @@ function Start-SearchIndexer {
         $ErrorActionPreference = 'Stop'
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        $searchServiceAPiVersion = "2024-07-01"
 
-        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/run?api-version=$searchServiceAPiVersion"
+        $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers/$searchIndexerName/run?api-version=$global:searchServiceAPiVersion"
 
         Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
 
