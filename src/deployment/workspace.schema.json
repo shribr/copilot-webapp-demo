@@ -1,0 +1,409 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CustomerManagedKeySchema": {
+      "properties": {
+        "cosmosdb_id": {
+          "title": "cosmosdb_id",
+          "type": "string"
+        },
+        "key_uri": {
+          "title": "key_uri",
+          "type": "string"
+        },
+        "key_vault": {
+          "title": "key_vault",
+          "type": "string"
+        },
+        "search_id": {
+          "title": "search_id",
+          "type": "string"
+        },
+        "storage_id": {
+          "title": "storage_id",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "IdentitySchema": {
+      "properties": {
+        "principal_id": {
+          "title": "principal_id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "title": "tenant_id",
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "system_assigned",
+            "user_assigned",
+            "none",
+            "system_assigned,user_assigned"
+          ],
+          "title": "type"
+        },
+        "user_assigned_identities": {
+          "title": "user_assigned_identities",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "$ref": "#/definitions/UserAssignedIdentitySchema"
+          }
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "UserAssignedIdentitySchema": {
+      "properties": {
+        "client_id": {
+          "title": "client_id",
+          "type": "string"
+        },
+        "principal_id": {
+          "title": "principal_id",
+          "type": "string"
+        },
+        "resource_id": {
+          "title": "resource_id",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "ManagedNetworkSchema": {
+      "properties": {
+        "isolation_mode": {
+          "type": "string",
+          "enum": [
+            "disabled",
+            "allow_internet_outbound",
+            "allow_only_approved_outbound"
+          ],
+          "title": "isolation_mode"
+        },
+        "network_id": {
+          "title": "network_id",
+          "type": "string",
+          "readonly": true
+        },
+        "outbound_rules": {
+          "title": "outbound_rules",
+          "type": ["array", "null"],
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "$ref": "#/definitions/PrivateEndpointOutboundRuleSchema"
+              },
+              {
+                "type": "object",
+                "$ref": "#/definitions/ServiceTagOutboundRuleSchema"
+              },
+              {
+                "type": "object",
+                "$ref": "#/definitions/FqdnOutboundRuleSchema"
+              }
+            ]
+          }
+        },
+        "status": {
+          "type": "object",
+          "$ref": "#/definitions/ManagedNetworkStatusSchema"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PrivateEndpointOutboundRuleSchema": {
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["required", "recommended", "user_defined", "dependency"],
+          "title": "category",
+          "readonly": true
+        },
+        "destination": {
+          "type": "object",
+          "$ref": "#/definitions/PrivateEndpointDestinationSchema"
+        },
+        "name": {
+          "title": "name",
+          "type": "string"
+        },
+        "status": {
+          "title": "status",
+          "type": "string",
+          "readonly": true
+        },
+        "type": {
+          "const": "private_endpoint"
+        }
+      },
+      "type": "object",
+      "required": ["destination", "name"],
+      "additionalProperties": false
+    },
+    "PrivateEndpointDestinationSchema": {
+      "properties": {
+        "service_resource_id": {
+          "title": "service_resource_id",
+          "type": "string"
+        },
+        "spark_enabled": {
+          "title": "spark_enabled",
+          "type": "boolean"
+        },
+        "subresource_target": {
+          "title": "subresource_target",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service_resource_id",
+        "spark_enabled",
+        "subresource_target"
+      ],
+      "additionalProperties": false
+    },
+    "ServiceTagOutboundRuleSchema": {
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["required", "recommended", "user_defined"],
+          "title": "category",
+          "readonly": true
+        },
+        "destination": {
+          "type": "object",
+          "$ref": "#/definitions/ServiceTagDestinationSchema"
+        },
+        "name": {
+          "title": "name",
+          "type": "string"
+        },
+        "status": {
+          "title": "status",
+          "type": "string",
+          "readonly": true
+        },
+        "type": {
+          "const": "service_tag"
+        }
+      },
+      "type": "object",
+      "required": ["destination", "name"],
+      "additionalProperties": false
+    },
+    "ServiceTagDestinationSchema": {
+      "properties": {
+        "port_ranges": {
+          "title": "port_ranges",
+          "type": "string"
+        },
+        "protocol": {
+          "title": "protocol",
+          "type": "string"
+        },
+        "service_tag": {
+          "title": "service_tag",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": ["port_ranges", "protocol", "service_tag"],
+      "additionalProperties": false
+    },
+    "FqdnOutboundRuleSchema": {
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["required", "recommended", "user_defined"],
+          "title": "category",
+          "readonly": true
+        },
+        "destination": {
+          "title": "destination",
+          "type": "string"
+        },
+        "name": {
+          "title": "name",
+          "type": "string"
+        },
+        "status": {
+          "title": "status",
+          "type": "string",
+          "readonly": true
+        },
+        "type": {
+          "const": "fqdn"
+        }
+      },
+      "type": "object",
+      "required": ["destination", "name"],
+      "additionalProperties": false
+    },
+    "ManagedNetworkStatusSchema": {
+      "properties": {
+        "spark_ready": {
+          "title": "spark_ready",
+          "type": "boolean",
+          "readonly": true
+        },
+        "status": {
+          "title": "status",
+          "type": "string",
+          "readonly": true
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "ServerlessComputeSettingsSchema": {
+      "properties": {
+        "custom_subnet": {
+          "title": "custom_subnet",
+          "type": ["string", "null"]
+        },
+        "no_public_ip": {
+          "title": "no_public_ip",
+          "type": "boolean"
+        },
+        "$schema": {
+          "title": "$schema",
+          "type": "string",
+          "readonly": true
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "WorkspaceSchema": {
+      "properties": {
+        "allow_roleassignment_on_rg": {
+          "title": "allow_roleassignment_on_rg",
+          "type": "boolean"
+        },
+        "application_insights": {
+          "title": "application_insights",
+          "type": "string"
+        },
+        "container_registry": {
+          "title": "container_registry",
+          "type": "string"
+        },
+        "customer_managed_key": {
+          "type": "object",
+          "$ref": "#/definitions/CustomerManagedKeySchema"
+        },
+        "description": {
+          "title": "description",
+          "type": "string"
+        },
+        "discovery_url": {
+          "title": "discovery_url",
+          "type": "string"
+        },
+        "display_name": {
+          "title": "display_name",
+          "type": "string"
+        },
+        "enable_data_isolation": {
+          "title": "enable_data_isolation",
+          "type": "boolean"
+        },
+        "hbi_workspace": {
+          "title": "hbi_workspace",
+          "type": "boolean"
+        },
+        "id": {
+          "title": "id",
+          "type": "string",
+          "readonly": true
+        },
+        "identity": {
+          "type": "object",
+          "$ref": "#/definitions/IdentitySchema"
+        },
+        "image_build_compute": {
+          "title": "image_build_compute",
+          "type": "string"
+        },
+        "key_vault": {
+          "title": "key_vault",
+          "type": "string"
+        },
+        "location": {
+          "title": "location",
+          "type": "string"
+        },
+        "managed_network": {
+          "type": "object",
+          "$ref": "#/definitions/ManagedNetworkSchema"
+        },
+        "mlflow_tracking_uri": {
+          "title": "mlflow_tracking_uri",
+          "type": "string",
+          "readonly": true
+        },
+        "name": {
+          "title": "name",
+          "type": "string"
+        },
+        "primary_user_assigned_identity": {
+          "title": "primary_user_assigned_identity",
+          "type": "string"
+        },
+        "public_network_access": {
+          "type": "string",
+          "enum": ["Disabled", "Enabled"],
+          "title": "public_network_access"
+        },
+        "resource_group": {
+          "title": "resource_group",
+          "type": "string"
+        },
+        "$schema": {
+          "title": "$schema",
+          "type": "string",
+          "readonly": true
+        },
+        "serverless_compute": {
+          "type": "object",
+          "$ref": "#/definitions/ServerlessComputeSettingsSchema"
+        },
+        "storage_account": {
+          "title": "storage_account",
+          "type": "string"
+        },
+        "system_datastores_auth_mode": {
+          "title": "system_datastores_auth_mode",
+          "type": "string"
+        },
+        "tags": {
+          "title": "tags",
+          "type": "object",
+          "additionalProperties": {
+            "title": "tags",
+            "type": "string"
+          }
+        },
+        "workspace_hub": {
+          "title": "workspace_hub",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false
+    }
+  },
+  "$ref": "#/definitions/WorkspaceSchema"
+}
