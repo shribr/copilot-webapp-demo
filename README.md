@@ -356,6 +356,15 @@ The index.html file includes the following screens:
 
 For a more in-depth understanding of the chat workflow click [here](./README_CHATWORKFLOW.md)
 
+### Additional Notes:
+
+There are a few manual steps which need to be performed because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be performed.
+
+1. Setting CORS to allow "All" for Azure Storage Service.
+2. Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content".
+3. Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix).
+4. 
+
 ### Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
