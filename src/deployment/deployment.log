@@ -1,8 +1,0 @@
-*** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 12/21/2024 19:32:57 ***
-2024-12-21 19:33:03 - Identity 'id-copilot-demo-004' already exists.
-2024-12-21 19:33:03 - Storage account 'stcopilotdemo004' already exists.
-2024-12-21 19:33:06 - Subnet 'subnet-copilot-demo-004' created.
-2024-12-21 19:33:06 - App Service Plan 'asp-copilot-demo-004' already exists.
-2024-12-21 19:33:06 - Cognitive Service 'cog-copilot-demo-004' already exists.
-2024-12-21 19:33:07 - Search Service 'srch-copilot-demo-004' already exists.

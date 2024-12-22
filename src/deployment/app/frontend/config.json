@@ -1,62 +1,49 @@
 {
-  "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
+  "AZURE_AI_SERVICE_API_KEY": "4115eab42bb84bac924697124317ae32",
+  "AZURE_FUNCTION_API_KEY": "oT9yiObqzhi0y8BrmsGR-Q-4poHy_iG5K7BYXKB84CdxAzFuhOrwiw==",
+  "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-004",
+  "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-004.azurewebsites.net",
+  "AZURE_FUNCTION_NAME": "Chat",
+  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-004",
   "AZURE_RESOURCE_BASE_NAME": "copilot-demo-004",
-  "AZURE_STORAGE_URL": "blob.core.windows.net",
-  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo004",
-  "AZURE_STORAGE_KEY": "0xRKa+rtRxbFoXtDdZjzCHAXhJJWDbMJwsgUofKUreNnG8NkxX8Ld9T30kJ9B9LjvZG2G6yDSxwg+AStb1x/kw==",
-  "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_API_VERSION": "2020-10-02",
-  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-004",
-  "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-004",
-  "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-004",
-  "AZURE_SEARCH_VECTOR_INDEX_NAME": "vector-srch-index-copilot-demo-004",
-  "AZURE_SEARCH_VECTOR_INDEXER_NAME": "vector-srch-indexer-copilot-demo-004",
   "AZURE_SEARCH_API_KEY": "Ff1ClO3b0YKyjjCp4eSwozOOYYGqQWcdUU8q9KWZ9UAzSeD18P2l",
   "AZURE_SEARCH_API_VERSION": "2024-11-01-preview",
   "AZURE_SEARCH_FULL_URL": "https://stcopilotdemo004.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-12-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bftq&srt=co&sig=FDCGSwrVOHGgkJzHRc4EjPavSqkFfkl9%2Bkcgl3Q9PbE%3D",
-  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-004-semantic-configuration",
+  "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-004",
+  "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-004",
   "AZURE_SEARCH_PUBLIC_INTERNET_RESULTS": true,
-  "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-004",
-  "AZURE_FUNCTION_NAME": "Chat",
-  "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-004.azurewebsites.net",
-  "AZURE_FUNCTION_API_KEY": "oT9yiObqzhi0y8BrmsGR-Q-4poHy_iG5K7BYXKB84CdxAzFuhOrwiw==",
-  "AZURE_AI_SERVICE_API_KEY": "4115eab42bb84bac924697124317ae32",
-  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-004",
+  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-004-semantic-configuration",
+  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-004",
+  "AZURE_SEARCH_VECTOR_INDEX_NAME": "vector-srch-index-copilot-demo-004",
+  "AZURE_SEARCH_VECTOR_INDEXER_NAME": "vector-srch-indexer-copilot-demo-004",
+  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo004",
+  "AZURE_STORAGE_API_VERSION": "2020-10-02",
+  "AZURE_STORAGE_CONTAINER_NAME": "content",
+  "AZURE_STORAGE_KEY": "0xRKa+rtRxbFoXtDdZjzCHAXhJJWDbMJwsgUofKUreNnG8NkxX8Ld9T30kJ9B9LjvZG2G6yDSxwg+AStb1x/kw==",
+  "AZURE_STORAGE_URL": "blob.core.windows.net",
+  "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
+  "DEPLOYMENT_ID": "ai",
+  "ICON_COLOR": "true",
+  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-004",
   "OPENAI_API_KEY": "de6793ab3860457f833a168faf9cf411",
   "OPENAI_API_VERSION": "2024-08-01-preview",
-  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-004",
-  "DEPLOYMENT_ID": "ai",
   "REGION": "eastus",
   "SITE_LOGO": "custom",
-  "ICON_COLOR": "true",
-  "OPENAI_PAYLOAD": {
-    "messages": [
-      {
-        "role": "system",
-        "content": [
-          {
-            "type": "text",
-            "text": "You are an AI assistant that helps people find information."
-          }
-        ]
-      },
-      {
-        "role": "user",
-        "content": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ]
-      }
-    ],
-    "temperature": 0.7,
-    "top_p": 0.95,
-    "frequency_penalty": 0,
-    "presence_penalty": 0,
-    "max_tokens": 800,
-    "stop": null,
-    "stream": true
+  "ANSWER_GENERATION_CONFIG": {
+    "OVERRIDE_PROMPT_TEMPLATE": "false",
+    "NUM_DOCS_TO_RETRIEVE": 5,
+    "EXCLUDE_CATEGORIES": "[]",
+    "RETRIEVAL_MODEL": ["text", "hybrid", "vector"],
+    "USE_SEMANTIC_RANKER_FOR_RETRIEVAL": "true",
+    "USE_QUERY_CONTEXTUAL_SUMMARIES": "true",
+    "SUGGEST_FOLLOWUP_QUESTIONS": "true",
+    "INCLUDED_DATA_SOURCES": {
+      "File Share": false,
+      "Spreadsheet": false,
+      "Azure Storage": false,
+      "Structured Data": false,
+      "Relational Database": false
+    }
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
@@ -70,35 +57,6 @@
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
-  },
-  "ICONS": {
-    "QUESTION_MARK": {
-      "NAME": "Question Mark",
-      "SVG": "<svg width=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM12 7.75C11.3787 7.75 10.875 8.25368 10.875 8.875C10.875 9.28921 10.5392 9.625 10.125 9.625C9.71079 9.625 9.375 9.28921 9.375 8.875C9.375 7.42525 10.5503 6.25 12 6.25C13.4497 6.25 14.625 7.42525 14.625 8.875C14.625 9.58584 14.3415 10.232 13.883 10.704C13.7907 10.7989 13.7027 10.8869 13.6187 10.9708C13.4029 11.1864 13.2138 11.3753 13.0479 11.5885C12.8289 11.8699 12.75 12.0768 12.75 12.25V13C12.75 13.4142 12.4142 13.75 12 13.75C11.5858 13.75 11.25 13.4142 11.25 13V12.25C11.25 11.5948 11.555 11.0644 11.8642 10.6672C12.0929 10.3733 12.3804 10.0863 12.6138 9.85346C12.6842 9.78321 12.7496 9.71789 12.807 9.65877C13.0046 9.45543 13.125 9.18004 13.125 8.875C13.125 8.25368 12.6213 7.75 12 7.75ZM12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16C11 16.5523 11.4477 17 12 17Z\" fill=\"#0d0c34\"></path> </g></svg>"
-    },
-    "MAGNIFYING_GLASS": {
-      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" aria-hidden=\"true\" role=\"img\" class=\"iconify svg-icon\" preserveAspectRatio=\"xMidYMid meet\" fill=\"#000000\"><g stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path fill=\"#828282\" d=\"M27.388 24.642L24.56 27.47l-4.95-4.95l2.828-2.828z\"></path><path fill=\"#929292\" d=\"M34.683 29.11l-5.879-5.879a2 2 0 0 0-2.828 0l-2.828 2.828a2 2 0 0 0 0 2.828l5.879 5.879a4 4 0 1 0 5.656-5.656z\"></path><circle fill=\"#929292\" cx=\"13.586\" cy=\"13.669\" r=\"13.5\"></circle><circle fill=\"#d3d3d3\" cx=\"13.586\" cy=\"13.669\" r=\"9.5\"></circle></g></svg>",
-      "MONOTONE2": "<svg width=\"24\" viewBox=\"0 0 36 36\" fill=\"#000000\" xmlns=\"http://www.w3.org/2000/svg\" class=\"iconify svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path d=\"M16.417 9.583A7.917 7.917 0 1 1 8.5 1.666a7.917 7.917 0 0 1 7.917 7.917zm-3.297 3.103-2.424-2.424a3.978 3.978 0 1 0-1.119 1.12l2.424 2.423a.791.791 0 1 0 1.119-1.12zM9.633 5.808a3.189 3.189 0 1 1-2.255-.934 3.167 3.167 0 0 1 2.255.934z\"></path></g></svg>",
-      "COLOR": "<svg width=\"24\" align=\"center\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" aria-hidden=\"true\" role=\"img\" class=\"iconify-color svg-icon\" preserveAspectRatio=\"xMidYMid meet\" fill=\"#000000\"><g stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path fill=\"#9AAAB4\" d=\"M27.388 24.642L24.56 27.47l-4.95-4.95l2.828-2.828z\"></path><path fill=\"#66757F\" d=\"M34.683 29.11l-5.879-5.879a2 2 0 0 0-2.828 0l-2.828 2.828a2 2 0 0 0 0 2.828l5.879 5.879a4 4 0 1 0 5.656-5.656z\"></path><circle fill=\"#8899A6\" cx=\"13.586\" cy=\"13.669\" r=\"13.5\"></circle><circle fill=\"#BBDDF5\" cx=\"13.586\" cy=\"13.669\" r=\"9.5\"></circle></g></svg>"
-    },
-    "DELETE": {
-      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" fill=\"#000000\" class=\"iconify svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <title>1227</title> <defs> </defs> <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"> <path d=\"M12.566,8 L15.611,4.956 C16.031,4.535 16.031,3.853 15.611,3.434 L12.566,0.389 C12.146,-0.031 11.464,-0.031 11.043,0.389 L7.999,3.433 L4.955,0.389 C4.534,-0.031 3.852,-0.031 3.432,0.389 L0.388,3.434 C-0.034,3.854 -0.034,4.536 0.387,4.956 L3.431,8 L0.387,11.044 C-0.034,11.465 -0.034,12.147 0.388,12.567 L3.432,15.611 C3.852,16.032 4.534,16.032 4.955,15.611 L7.999,12.567 L11.043,15.611 C11.464,16.032 12.146,16.032 12.566,15.611 L15.611,12.567 C16.031,12.146 16.031,11.464 15.611,11.044 L12.566,8 L12.566,8 Z\" fill=\"#434343\" class=\"si-glyph-fill\"> </path> </g> </g></svg>",
-      "MONOTONE2": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" class=\"iconify svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path d=\"M16.417 10.283A7.917 7.917 0 1 1 8.5 2.366a7.916 7.916 0 0 1 7.917 7.917zm-6.804.01 3.032-3.033a.792.792 0 0 0-1.12-1.12L8.494 9.173 5.46 6.14a.792.792 0 0 0-1.12 1.12l3.034 3.033-3.033 3.033a.792.792 0 0 0 1.12 1.119l3.032-3.033 3.033 3.033a.792.792 0 0 0 1.12-1.12z\"></path></g></svg>",
-      "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"iconify-color svg-icon delete-icon\" xmlns=\"http://www.w3.org/2000/svg\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path d=\"M16.417 10.283A7.917 7.917 0 1 1 8.5 2.366a7.916 7.916 0 0 1 7.917 7.917zm-6.804.01 3.032-3.033a.792.792 0 0 0-1.12-1.12L8.494 9.173 5.46 6.14a.792.792 0 0 0-1.12 1.12l3.034 3.033-3.033 3.033a.792.792 0 0 0 1.12 1.119l3.032-3.033 3.033 3.033a.792.792 0 0 0 1.12-1.12z\"></path></g></svg>",
-      "COLOR2": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"iconify-color svg-icon delete-icon\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <polygon style=\"fill:#E21B1B;\" points=\"404.176,0 256,148.176 107.824,0 0,107.824 148.176,256 0,404.176 107.824,512 256,363.824 404.176,512 512,404.176 363.824,256 512,107.824 \"></polygon> </g></svg>",
-      "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" fill=\"#000000\" class=\"iconify-color svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <title>1227</title> <defs> </defs> <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"> <path d=\"M12.566,8 L15.611,4.956 C16.031,4.535 16.031,3.853 15.611,3.434 L12.566,0.389 C12.146,-0.031 11.464,-0.031 11.043,0.389 L7.999,3.433 L4.955,0.389 C4.534,-0.031 3.852,-0.031 3.432,0.389 L0.388,3.434 C-0.034,3.854 -0.034,4.536 0.387,4.956 L3.431,8 L0.387,11.044 C-0.034,11.465 -0.034,12.147 0.388,12.567 L3.432,15.611 C3.852,16.032 4.534,16.032 4.955,15.611 L7.999,12.567 L11.043,15.611 C11.464,16.032 12.146,16.032 12.566,15.611 L15.611,12.567 C16.031,12.146 16.031,11.464 15.611,11.044 L12.566,8 L12.566,8 Z\" fill=\"#434343\" class=\"si-glyph-fill\"> </path> </g> </g></svg>"
-    },
-    "EDIT": {
-      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"iconify svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"iconify-color svg-icon edit-icon\"></g><g id=\"SVGRepo_iconCarrier\"> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300706,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>",
-      "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"iconify-color svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.007,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
-      "COLOR2": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"iconify-color svg-icon edit-icon\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"iconify-color svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <polygon style=\"fill:#E21B1B;\" points=\"404.176,0 256,148.176 107.824,0 0,107.824 148.176,256 0,404.176 107.824,512 256,363.824 404.176,512 512,404.176 363.824,256 512,107.824 \"></polygon> </g></svg>",
-      "COLOR4": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.007,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
-      "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"iconify-color svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"iconify-color svg-icon edit-icon\"></g><g id=\"SVGRepo_iconCarrier\"> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300706,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>"
-    },
-    "SITE_LOGO": {
-      "NAME": "Site Logo",
-      "SVG": "<svg height=\"200px\" width=\"200px\" version=\"1.1\" id=\"_x32_\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" xml:space=\"preserve\" fill=\"#ffffff\" stroke=\"#ffffff\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <style type=\"text/css\"> .st0{fill:#ffffff;} </style> <g> <path class=\"st0\" d=\"M320.707,0L37.037,69.971v417.625L320.447,512l154.516-26.258V62.568L320.707,0z M290.346,471.742 l-92.584-7.974v-79.426l-55.086-0.677v75.36l-68.109-5.866V99.367l215.779-53.224V471.742z\"></path> <polygon class=\"st0\" points=\"271.25,76.933 226.537,86.32 226.537,138.956 271.25,131.246 \"></polygon> <polygon class=\"st0\" points=\"118.574,112.033 87.416,118.622 87.416,164.818 118.574,159.469 \"></polygon> <polygon class=\"st0\" points=\"190.012,95.942 150.426,104.23 150.426,153.027 190.012,146.202 \"></polygon> <polygon class=\"st0\" points=\"118.576,203.184 87.416,207.448 87.416,253.722 118.576,250.622 \"></polygon> <polygon class=\"st0\" points=\"190.012,192.792 150.426,198.154 150.426,246.952 190.012,243.052 \"></polygon> <polygon class=\"st0\" points=\"271.25,181.04 226.537,187.097 226.537,238.911 271.25,234.506 \"></polygon> <polygon class=\"st0\" points=\"271.25,286.135 226.537,288.889 226.537,340.702 271.25,339.6 \"></polygon> <polygon class=\"st0\" points=\"190.012,291.476 150.426,293.914 150.426,342.712 190.012,341.737 \"></polygon> <polygon class=\"st0\" points=\"118.574,296.198 87.416,298.136 87.416,344.409 118.574,343.634 \"></polygon> </g> </g></svg>"
-    }
   },
   "FILE_TYPES": {
     "PDF": {
@@ -141,36 +99,63 @@
       "SVG_COLOR": "<svg width=\"24\" version=\"1.1\" viewBox=\"0 0 512 512\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" aria-hidden=\"true\" role=\"img\" class=\"iconify-color svg-icon\" preserveAspectRatio=\"xMidYMid meet\" fill=\"#000000\"><g stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path fill=\"#F9E7C0\" d=\"M437.567 512H88.004a8.182 8.182 0 0 1-8.182-8.182V8.182A8.182 8.182 0 0 1 88.004 0H288.79l156.96 156.96v346.858a8.183 8.183 0 0 1-8.183 8.182z\"></path><path fill=\"#EAC083\" d=\"M288.79 0l156.96 156.96H322.152c-18.426 0-33.363-14.937-33.363-33.363V0z\"></path><path fill=\"#597B91\" d=\"M235.078 92.401H126.453c-6.147 0-11.13-4.983-11.13-11.13s4.983-11.13 11.13-11.13h108.625c6.147 0 11.13 4.983 11.13 11.13s-4.983 11.13-11.13 11.13zm11.13 61.723c0-6.147-4.983-11.13-11.13-11.13H126.453c-6.147 0-11.13 4.983-11.13 11.13s4.983 11.13 11.13 11.13h108.625c6.147 0 11.13-4.983 11.13-11.13zm0 72.854c0-6.147-4.983-11.13-11.13-11.13H126.453c-6.147 0-11.13 4.983-11.13 11.13s4.983 11.13 11.13 11.13h108.625c6.147-.001 11.13-4.983 11.13-11.13zm94.038 72.853c0-6.146-4.983-11.13-11.13-11.13H126.453c-6.147 0-11.13 4.983-11.13 11.13s4.983 11.13 11.13 11.13h202.663c6.147 0 11.13-4.983 11.13-11.13zm37.493-72.853c0-6.147-4.983-11.13-11.13-11.13h-74.985c-6.146 0-11.13 4.983-11.13 11.13s4.983 11.13 11.13 11.13h74.985c6.147-.001 11.13-4.983 11.13-11.13zM299.92 372.685c0-6.146-4.983-11.13-11.13-11.13H126.453c-6.147 0-11.13 4.983-11.13 11.13s4.983 11.13 11.13 11.13H288.79c6.147-.001 11.13-4.984 11.13-11.13zm66.21 72.853c0-6.146-4.983-11.13-11.13-11.13H126.453c-6.147 0-11.13 4.983-11.13 11.13s4.983 11.13 11.13 11.13H355c6.146 0 11.13-4.983 11.13-11.13z\"></path></g></svg>"
     }
   },
-  "RESPONSE_TABS": {
-    "TAB1": {
-      "TEXT": "Answer",
-      "SVG": "<svg id=\"answerTabSVG\" class=\"svg-icon\" viewBox=\"0 0 512.043 512.043\"><g>< title=\"bubble\">bubble</title><path d=\"M437.333,21.355H74.667C33.493,21.355,0,54.848,0,96.021v213.333c0,41.173,33.493,74.667,74.667,74.667h48.256 l-36.821,92.032c-1.771,4.395-0.405,9.429,3.328,12.352c1.92,1.515,4.245,2.283,6.592,2.283c2.176,0,4.352-0.661,6.208-1.984 l146.56-104.683h188.587c41.173,0,74.667-33.493,74.667-74.667V96.021C512,54.848,478.507,21.355,437.333,21.355z\"></path></g></svg>"
+  "ICONS": {
+    "QUESTION_MARK": {
+      "NAME": "Question Mark",
+      "SVG": "<svg width=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM12 7.75C11.3787 7.75 10.875 8.25368 10.875 8.875C10.875 9.28921 10.5392 9.625 10.125 9.625C9.71079 9.625 9.375 9.28921 9.375 8.875C9.375 7.42525 10.5503 6.25 12 6.25C13.4497 6.25 14.625 7.42525 14.625 8.875C14.625 9.58584 14.3415 10.232 13.883 10.704C13.7907 10.7989 13.7027 10.8869 13.6187 10.9708C13.4029 11.1864 13.2138 11.3753 13.0479 11.5885C12.8289 11.8699 12.75 12.0768 12.75 12.25V13C12.75 13.4142 12.4142 13.75 12 13.75C11.5858 13.75 11.25 13.4142 11.25 13V12.25C11.25 11.5948 11.555 11.0644 11.8642 10.6672C12.0929 10.3733 12.3804 10.0863 12.6138 9.85346C12.6842 9.78321 12.7496 9.71789 12.807 9.65877C13.0046 9.45543 13.125 9.18004 13.125 8.875C13.125 8.25368 12.6213 7.75 12 7.75ZM12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16C11 16.5523 11.4477 17 12 17Z\" fill=\"#0d0c34\"></path> </g></svg>"
     },
-    "TAB2": {
-      "TEXT": "Thought Process",
-      "SVG": "<svg id=\"thoughtProcessTabSVG\" class=\"svg-icon\" viewBox=\"0 0 24 24\"><g><title>lightbulb</title><path d=\"M12,2A7,7,0,0,0,8,14.74V17a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1V14.74A7,7,0,0,0,12,2ZM9,21a1,1,0,0,0,1,1h4a1,1,0,0,0,1-1V20H9Z\"></path></g></svg>"
+    "MAGNIFYING_GLASS": {
+      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" aria-hidden=\"true\" role=\"img\" class=\"iconify svg-icon\" preserveAspectRatio=\"xMidYMid meet\" fill=\"#000000\"><g stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path fill=\"#828282\" d=\"M27.388 24.642L24.56 27.47l-4.95-4.95l2.828-2.828z\"></path><path fill=\"#929292\" d=\"M34.683 29.11l-5.879-5.879a2 2 0 0 0-2.828 0l-2.828 2.828a2 2 0 0 0 0 2.828l5.879 5.879a4 4 0 1 0 5.656-5.656z\"></path><circle fill=\"#929292\" cx=\"13.586\" cy=\"13.669\" r=\"13.5\"></circle><circle fill=\"#d3d3d3\" cx=\"13.586\" cy=\"13.669\" r=\"9.5\"></circle></g></svg>",
+      "MONOTONE2": "<svg width=\"24\" viewBox=\"0 0 36 36\" fill=\"#000000\" xmlns=\"http://www.w3.org/2000/svg\" class=\"iconify svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path d=\"M16.417 9.583A7.917 7.917 0 1 1 8.5 1.666a7.917 7.917 0 0 1 7.917 7.917zm-3.297 3.103-2.424-2.424a3.978 3.978 0 1 0-1.119 1.12l2.424 2.423a.791.791 0 1 0 1.119-1.12zM9.633 5.808a3.189 3.189 0 1 1-2.255-.934 3.167 3.167 0 0 1 2.255.934z\"></path></g></svg>",
+      "COLOR": "<svg width=\"24\" align=\"center\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" aria-hidden=\"true\" role=\"img\" class=\"iconify-color svg-icon\" preserveAspectRatio=\"xMidYMid meet\" fill=\"#000000\"><g stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path fill=\"#9AAAB4\" d=\"M27.388 24.642L24.56 27.47l-4.95-4.95l2.828-2.828z\"></path><path fill=\"#66757F\" d=\"M34.683 29.11l-5.879-5.879a2 2 0 0 0-2.828 0l-2.828 2.828a2 2 0 0 0 0 2.828l5.879 5.879a4 4 0 1 0 5.656-5.656z\"></path><circle fill=\"#8899A6\" cx=\"13.586\" cy=\"13.669\" r=\"13.5\"></circle><circle fill=\"#BBDDF5\" cx=\"13.586\" cy=\"13.669\" r=\"9.5\"></circle></g></svg>"
     },
-    "TAB3": {
-      "TEXT": "Supporting Content",
-      "SVG": "<svg id=\"supportingContentTabSVG\" class=\"svg-icon\" viewBox=\"0 0 24 24\"><g><title>document</title><g stroke-width=\"0\"></g><g id=\"icon-document-tab\" stroke-linecap= \"round\" stroke-linejoin= \"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path d=\"M9 17H15\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M9 13H15\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M9 9H10\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M5 6C5 4.34315 6.34315 3 8 3H13.1716C13.702 3 14.2107 3.21071 14.5858 3.58579L18.4142 7.41421C18.7893 7.78929 19 8.29799 19 8.82843V18C19 19.6569 17.6569 21 16 21H8C6.34315 21 5 19.6569 5 18V6Z\" stroke=\"#000000\" stroke-width=\"2\"></path> <path d=\"M13 3V5C13 7.20914 14.7909 9 17 9H19\" stroke=\"#000000\" stroke-width=\"2\"></path> </g></svg>"
+    "DELETE": {
+      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" fill=\"#000000\" class=\"iconify svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <title>1227</title> <defs> </defs> <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"> <path d=\"M12.566,8 L15.611,4.956 C16.031,4.535 16.031,3.853 15.611,3.434 L12.566,0.389 C12.146,-0.031 11.464,-0.031 11.043,0.389 L7.999,3.433 L4.955,0.389 C4.534,-0.031 3.852,-0.031 3.432,0.389 L0.388,3.434 C-0.034,3.854 -0.034,4.536 0.387,4.956 L3.431,8 L0.387,11.044 C-0.034,11.465 -0.034,12.147 0.388,12.567 L3.432,15.611 C3.852,16.032 4.534,16.032 4.955,15.611 L7.999,12.567 L11.043,15.611 C11.464,16.032 12.146,16.032 12.566,15.611 L15.611,12.567 C16.031,12.146 16.031,11.464 15.611,11.044 L12.566,8 L12.566,8 Z\" fill=\"#434343\" class=\"si-glyph-fill\"> </path> </g> </g></svg>",
+      "MONOTONE2": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" class=\"iconify svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path d=\"M16.417 10.283A7.917 7.917 0 1 1 8.5 2.366a7.916 7.916 0 0 1 7.917 7.917zm-6.804.01 3.032-3.033a.792.792 0 0 0-1.12-1.12L8.494 9.173 5.46 6.14a.792.792 0 0 0-1.12 1.12l3.034 3.033-3.033 3.033a.792.792 0 0 0 1.12 1.119l3.032-3.033 3.033 3.033a.792.792 0 0 0 1.12-1.12z\"></path></g></svg>",
+      "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"iconify-color svg-icon delete-icon\" xmlns=\"http://www.w3.org/2000/svg\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"><path d=\"M16.417 10.283A7.917 7.917 0 1 1 8.5 2.366a7.916 7.916 0 0 1 7.917 7.917zm-6.804.01 3.032-3.033a.792.792 0 0 0-1.12-1.12L8.494 9.173 5.46 6.14a.792.792 0 0 0-1.12 1.12l3.034 3.033-3.033 3.033a.792.792 0 0 0 1.12 1.119l3.032-3.033 3.033 3.033a.792.792 0 0 0 1.12-1.12z\"></path></g></svg>",
+      "COLOR2": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"iconify-color svg-icon delete-icon\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <polygon style=\"fill:#E21B1B;\" points=\"404.176,0 256,148.176 107.824,0 0,107.824 148.176,256 0,404.176 107.824,512 256,363.824 404.176,512 512,404.176 363.824,256 512,107.824 \"></polygon> </g></svg>",
+      "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" fill=\"#000000\" class=\"iconify-color svg-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <title>1227</title> <defs> </defs> <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"> <path d=\"M12.566,8 L15.611,4.956 C16.031,4.535 16.031,3.853 15.611,3.434 L12.566,0.389 C12.146,-0.031 11.464,-0.031 11.043,0.389 L7.999,3.433 L4.955,0.389 C4.534,-0.031 3.852,-0.031 3.432,0.389 L0.388,3.434 C-0.034,3.854 -0.034,4.536 0.387,4.956 L3.431,8 L0.387,11.044 C-0.034,11.465 -0.034,12.147 0.388,12.567 L3.432,15.611 C3.852,16.032 4.534,16.032 4.955,15.611 L7.999,12.567 L11.043,15.611 C11.464,16.032 12.146,16.032 12.566,15.611 L15.611,12.567 C16.031,12.146 16.031,11.464 15.611,11.044 L12.566,8 L12.566,8 Z\" fill=\"#434343\" class=\"si-glyph-fill\"> </path> </g> </g></svg>"
+    },
+    "EDIT": {
+      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"iconify svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"iconify-color svg-icon edit-icon\"></g><g id=\"SVGRepo_iconCarrier\"> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300706,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>",
+      "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"iconify-color svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.007,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
+      "COLOR2": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"iconify-color svg-icon edit-icon\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"iconify-color svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <polygon style=\"fill:#E21B1B;\" points=\"404.176,0 256,148.176 107.824,0 0,107.824 148.176,256 0,404.176 107.824,512 256,363.824 404.176,512 512,404.176 363.824,256 512,107.824 \"></polygon> </g></svg>",
+      "COLOR4": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.007,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
+      "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"iconify-color svg-icon edit-icon\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"iconify-color svg-icon edit-icon\"></g><g id=\"SVGRepo_iconCarrier\"> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300706,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>"
+    },
+    "SITE_LOGO": {
+      "NAME": "Site Logo",
+      "SVG": "<svg height=\"200px\" width=\"200px\" version=\"1.1\" id=\"_x32_\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" xml:space=\"preserve\" fill=\"#ffffff\" stroke=\"#ffffff\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <style type=\"text/css\"> .st0{fill:#ffffff;} </style> <g> <path class=\"st0\" d=\"M320.707,0L37.037,69.971v417.625L320.447,512l154.516-26.258V62.568L320.707,0z M290.346,471.742 l-92.584-7.974v-79.426l-55.086-0.677v75.36l-68.109-5.866V99.367l215.779-53.224V471.742z\"></path> <polygon class=\"st0\" points=\"271.25,76.933 226.537,86.32 226.537,138.956 271.25,131.246 \"></polygon> <polygon class=\"st0\" points=\"118.574,112.033 87.416,118.622 87.416,164.818 118.574,159.469 \"></polygon> <polygon class=\"st0\" points=\"190.012,95.942 150.426,104.23 150.426,153.027 190.012,146.202 \"></polygon> <polygon class=\"st0\" points=\"118.576,203.184 87.416,207.448 87.416,253.722 118.576,250.622 \"></polygon> <polygon class=\"st0\" points=\"190.012,192.792 150.426,198.154 150.426,246.952 190.012,243.052 \"></polygon> <polygon class=\"st0\" points=\"271.25,181.04 226.537,187.097 226.537,238.911 271.25,234.506 \"></polygon> <polygon class=\"st0\" points=\"271.25,286.135 226.537,288.889 226.537,340.702 271.25,339.6 \"></polygon> <polygon class=\"st0\" points=\"190.012,291.476 150.426,293.914 150.426,342.712 190.012,341.737 \"></polygon> <polygon class=\"st0\" points=\"118.574,296.198 87.416,298.136 87.416,344.409 118.574,343.634 \"></polygon> </g> </g></svg>"
     }
   },
-  "SIDEBAR_NAV_ITEMS": {
-    "ITEM1": {
-      "TEXT": "Home",
-      "SVG": "<svg fill=\"currentColor\" class=\"svg-icon\" class=\"sidenav link\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M0 0h24v24H0z\" fill=\"none\"></path><path d=\"M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z\"></path></svg>",
-      "URL": "?screen=home"
-    },
-    "ITEM2": {
-      "TEXT": "Documents",
-      "SVG": "<svg fill=\"currentColor\" class=\"svg-icon\" class=\"sidenav link\" focusable=\"false\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"> <path d=\"M0 0h24v24H0V0z\" fill=\"none\"></path> <path d=\"M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2.06 11L15 15.28 12.06 17l.78-3.33-2.59-2.24 3.41-.29L15 8l1.34 3.14 3.41.29-2.59 2.24.78 3.33z\"> </path> </svg>",
-      "URL": "?screen=documents"
-    },
-    "ITEM3": {
-      "TEXT": "Chat",
-      "SVG": "<svg fill=\"currentColor\" class=\"svg-icon\" class=\"sidenav link\" focusable=\"false\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M0 0h24v24H0z\" fill=\"none\"></path><path d=\"M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z\"></path></svg>",
-      "URL": "?screen=chat"
-    }
+  "OPENAI_PAYLOAD": {
+    "messages": [
+      {
+        "role": "system",
+        "content": [
+          {
+            "type": "text",
+            "text": "You are an AI assistant that helps people find information."
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": ""
+          }
+        ]
+      }
+    ],
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "max_tokens": 800,
+    "stop": null,
+    "stream": true
   },
   "OPENAI_REQUEST_BODY": {
     "messages": [
@@ -221,20 +206,35 @@
       "INSTAGRAM": ""
     }
   },
-  "ANSWER_GENERATION_CONFIG": {
-    "OVERRIDE_PROMPT_TEMPLATE": "false",
-    "NUM_DOCS_TO_RETRIEVE": 5,
-    "EXCLUDE_CATEGORIES": "[]",
-    "RETRIEVAL_MODEL": ["text", "hybrid", "vector"],
-    "USE_SEMANTIC_RANKER_FOR_RETRIEVAL": "true",
-    "USE_QUERY_CONTEXTUAL_SUMMARIES": "true",
-    "SUGGEST_FOLLOWUP_QUESTIONS": "true",
-    "INCLUDED_DATA_SOURCES": {
-      "File Share": false,
-      "Spreadsheet": false,
-      "Azure Storage": false,
-      "Structured Data": false,
-      "Relational Database": false
+  "RESPONSE_TABS": {
+    "TAB1": {
+      "TEXT": "Answer",
+      "SVG": "<svg id=\"answerTabSVG\" class=\"svg-icon\" viewBox=\"0 0 512.043 512.043\"><g>< title=\"bubble\">bubble</title><path d=\"M437.333,21.355H74.667C33.493,21.355,0,54.848,0,96.021v213.333c0,41.173,33.493,74.667,74.667,74.667h48.256 l-36.821,92.032c-1.771,4.395-0.405,9.429,3.328,12.352c1.92,1.515,4.245,2.283,6.592,2.283c2.176,0,4.352-0.661,6.208-1.984 l146.56-104.683h188.587c41.173,0,74.667-33.493,74.667-74.667V96.021C512,54.848,478.507,21.355,437.333,21.355z\"></path></g></svg>"
+    },
+    "TAB2": {
+      "TEXT": "Thought Process",
+      "SVG": "<svg id=\"thoughtProcessTabSVG\" class=\"svg-icon\" viewBox=\"0 0 24 24\"><g><title>lightbulb</title><path d=\"M12,2A7,7,0,0,0,8,14.74V17a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1V14.74A7,7,0,0,0,12,2ZM9,21a1,1,0,0,0,1,1h4a1,1,0,0,0,1-1V20H9Z\"></path></g></svg>"
+    },
+    "TAB3": {
+      "TEXT": "Supporting Content",
+      "SVG": "<svg id=\"supportingContentTabSVG\" class=\"svg-icon\" viewBox=\"0 0 24 24\"><g><title>document</title><g stroke-width=\"0\"></g><g id=\"icon-document-tab\" stroke-linecap= \"round\" stroke-linejoin= \"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path d=\"M9 17H15\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M9 13H15\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M9 9H10\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M5 6C5 4.34315 6.34315 3 8 3H13.1716C13.702 3 14.2107 3.21071 14.5858 3.58579L18.4142 7.41421C18.7893 7.78929 19 8.29799 19 8.82843V18C19 19.6569 17.6569 21 16 21H8C6.34315 21 5 19.6569 5 18V6Z\" stroke=\"#000000\" stroke-width=\"2\"></path> <path d=\"M13 3V5C13 7.20914 14.7909 9 17 9H19\" stroke=\"#000000\" stroke-width=\"2\"></path> </g></svg>"
+    }
+  },
+  "SIDEBAR_NAV_ITEMS": {
+    "ITEM1": {
+      "TEXT": "Home",
+      "SVG": "<svg fill=\"currentColor\" class=\"svg-icon\" class=\"sidenav link\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M0 0h24v24H0z\" fill=\"none\"></path><path d=\"M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z\"></path></svg>",
+      "URL": "?screen=home"
+    },
+    "ITEM2": {
+      "TEXT": "Documents",
+      "SVG": "<svg fill=\"currentColor\" class=\"svg-icon\" class=\"sidenav link\" focusable=\"false\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"> <path d=\"M0 0h24v24H0V0z\" fill=\"none\"></path> <path d=\"M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2.06 11L15 15.28 12.06 17l.78-3.33-2.59-2.24 3.41-.29L15 8l1.34 3.14 3.41.29-2.59 2.24.78 3.33z\"> </path> </svg>",
+      "URL": "?screen=documents"
+    },
+    "ITEM3": {
+      "TEXT": "Chat",
+      "SVG": "<svg fill=\"currentColor\" class=\"svg-icon\" class=\"sidenav link\" focusable=\"false\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M0 0h24v24H0z\" fill=\"none\"></path><path d=\"M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z\"></path></svg>",
+      "URL": "?screen=chat"
     }
   }
 }

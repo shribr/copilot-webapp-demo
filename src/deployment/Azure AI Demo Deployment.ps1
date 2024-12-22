@@ -761,32 +761,32 @@ function Initialize-Parameters {
 
     # Initialize global variables for each item in the parameters.json file
     $global:aiHubName = $parametersObject.aiHubName
+    $global:aiModelDeploymentName = $parametersObject.aiModelDeploymentName
+    $global:aiModelFormat = $parametersObject.aiModelFormat
     $global:aiModelName = $parametersObject.aiModelName
+    $global:aiModelSkuCapacity = $parametersObject.aiModelSkuCapacity
+    $global:aiModelSkuName = $parametersObject.aiModelSkuName
     $global:aiModelType = $parametersObject.aiModelType
     $global:aiModelVersion = $parametersObject.aiModelVersion
-    $global:aiModelFormat = $parametersObject.aiModelFormat
-    $global:aiModelSkuName = $parametersObject.aiModelSkuName
-    $global:aiModelSkuCapacity = $parametersObject.aiModelSkuCapacity
-    $global:aiModelDeploymentName = $parametersObject.aiModelDeploymentName
     $global:aiProjectName = $parametersObject.aiProjectName
     $global:aiServiceName = $parametersObject.aiServiceName
-    $global:aiProjectName = $parametersObject.aiProjectName
+    $global:aiServiceProperties = $parametersObject.aiServiceProperties
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
+    $global:appInsightsName = $parametersObject.appInsightsName
+    $global:appServiceEnvironmentName = $parametersObject.appServiceEnvironmentName
     $global:appServicePlanName = $parametersObject.appServicePlanName
     $global:appServicePlanSku = $parametersObject.appServicePlanSku
-    $global:appServiceEnvironmentName = $parametersObject.appServiceEnvironmentName
     $global:appServices = $parametersObject.appServices
-    $global:appInsightsName = $parametersObject.appInsightsName
     $global:blobStorageAccountName = $parametersObject.blobStorageAccountName
     $global:blobStorageContainerName = $parametersObject.blobStorageContainerName
-    $global:storageAPIVersion = $parametersObject.storageAPIVersion
+    $global:cognitiveServiceName = $parametersObject.cognitiveServiceName
     $global:computerVisionName = $parametersObject.computerVisionName
     $global:configFilePath = $parametersObject.configFilePath
-    $global:cognitiveServiceName = $parametersObject.cognitiveServiceName
     $global:containerAppName = $parametersObject.containerAppName
     $global:containerAppsEnvironmentName = $parametersObject.containerAppsEnvironmentName
     $global:containerRegistryName = $parametersObject.containerRegistryName
+    $global:containerRegistryProperties = $parametersObject.containerRegistryProperties
     $global:cosmosDbAccountName = $parametersObject.cosmosDbAccountName
     $global:createResourceGroup = $parametersObject.createResourceGroup
     $global:deleteResourceGroup = $parametersObject.deleteResourceGroup
@@ -796,14 +796,13 @@ function Initialize-Parameters {
     $global:keyVaultName = $parametersObject.keyVaultName
     $global:location = $parametersObject.location
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
+    $global:machineLearningProperties = $parametersObject.machineLearningProperties
     $global:managedIdentityName = $parametersObject.managedIdentityName
     $global:openAIAccountName = $parametersObject.openAIAccountName
     $global:openAIAPIKey = $parametersObject.openAIAPIKey
     $global:openAIAPIVersion = $parametersObject.openAIAPIVersion
     $global:portalDashboardName = $parametersObject.portalDashboardName
-
     $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
-
     $global:privateEndPointName = $parametersObject.privateEndPointName
     $global:redisCacheName = $parametersObject.redisCacheName
     $global:redeployResources = $parametersObject.redeployResources
@@ -811,37 +810,34 @@ function Initialize-Parameters {
     $global:resourceGroupName = $parametersObject.resourceGroupName
     $global:resourceSuffix = $parametersObject.resourceSuffix
     $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
+    $global:searchAPIVersion = $parametersObject.searchAPIVersion
     $global:searchDataSourceName = $parametersObject.searchDataSourceName
-    $global:searchServiceName = $parametersObject.searchServiceName
     $global:searchEndpoint = $parametersObject.searchEndpoint
+    $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
     $global:searchIndexName = $parametersObject.searchIndexName
     $global:searchIndexerName = $parametersObject.searchIndexerName
-    $global:searchVectorIndexName = $parametersObject.searchVectorIndexName
-    $global:searchVectorIndexerName = $parametersObject.searchVectorIndexerName
-    $global:searchIndexes = $parametersObject.searchIndexes
     $global:searchIndexers = $parametersObject.searchIndexers
-    $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
+    $global:searchIndexes = $parametersObject.searchIndexes
+    $global:searchPublicInternetResults = $parametersObject.searchPublicInternetResults
+    $global:searchServiceName = $parametersObject.searchServiceName
+    $global:searchServiceProperties = $parametersObject.searchServiceProperties
     $global:searchSkillSet = $parametersObject.searchSkillSet
     $global:searchSkillSetName = $parametersObject.searchSkillSetName
     $global:searchSkillSetSchema = $parametersObject.searchSkillSetSchema
-    $global:searchAPIVersion = $parametersObject.searchAPIVersion
-    $global:searchPublicInternetResults = $parametersObject.searchPublicInternetResults
+    $global:searchVectorIndexName = $parametersObject.searchVectorIndexName
+    $global:searchVectorIndexerName = $parametersObject.searchVectorIndexerName
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
+    $global:serviceProperties = $parametersObject.serviceProperties
     $global:sharedDashboardName = $parametersObject.sharedDashboardName
     $global:siteLogo = $parametersObject.siteLogo
     $global:sqlServerName = $parametersObject.sqlServerName
+    $global:storageAPIVersion = $parametersObject.storageAPIVersion
     $global:storageAccountName = $parametersObject.storageAccountName
-    $global:subNetName = $parametersObject.subNetName
+    $global:storageServiceProperties = $parametersObject.storageServiceProperties
     $global:subNet = $parametersObject.subNet
+    $global:subNetName = $parametersObject.subNetName
     $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
     $global:virtualNetwork = $parametersObject.virtualNetwork
-
-    $global:serviceProperties = $parametersObject.serviceProperties
-    $global:aiServiceProperties = $parametersObject.aiServiceProperties
-    $global:containerRegistryProperties = $parametersObject.containerRegistryProperties
-    $global:machineLearningProperties = $parametersObject.machineLearningProperties
-    $global:searchServiceProperties = $parametersObject.searchServiceProperties
-    $global:storageServiceProperties = $parametersObject.storageServiceProperties
 
     # Make sure the previousResourceBaseName parameter in the parameters.json file is different than the resourceBaseName parameter. 
     # What this code does is determine whether or not you are attempting to redeploy the same resources with the same base name or if you are trying to provision an entirely new deployment with a new resource group name etc.
@@ -896,30 +892,30 @@ function Initialize-Parameters {
     Write-Host "appServiceEnvironmentName from global: $($global:appServiceEnvironmentName)"
 
     return @{
+        aiDeploymentName             = $aiDeploymentName
         aiHubName                    = $aiHubName
-        $aiModelDeploymentName       = $aiModelDeploymentName
+        aiModelDeploymentName        = $aiModelDeploymentName
+        aiModelFormat                = $aiModelFormat
         aiModelName                  = $aiModelName
+        aiModelSkuCapacity           = $aiModelSkuCapacity
+        aiModelSkuName               = $aiModelSkuName
         aiModelType                  = $aiModelType
         aiModelVersion               = $aiModelVersion
         aiProjectName                = $aiProjectName
         aiServiceName                = $aiServiceName
-        aiModelFormat                = $aiModelFormat
-        aiModelSkuName               = $aiModelSkuName
-        aiModelSkuCapacity           = $aiModelSkuCapacity
-        aiDeploymentName             = $aiDeploymentName
         aiServiceProperties          = $aiServiceProperties
         apiManagementService         = $apiManagementService
         appendUniqueSuffix           = $appendUniqueSuffix
-        appServices                  = $appServices
+        appInsightsName              = $appInsightsName
+        appServiceEnvironmentName    = $appServiceEnvironmentName
         appServicePlanName           = $appServicePlanName
         appServicePlanSku            = $appServicePlanSku
-        appServiceEnvironmentName    = $appServiceEnvironmentName
-        appInsightsName              = $appInsightsName
+        appServices                  = $appServices
         blobStorageAccountName       = $blobStorageAccountName
         blobStorageContainerName     = $blobStorageContainerName
+        cognitiveServiceName         = $cognitiveServiceName
         computerVisionName           = $computerVisionName
         configFilePath               = $configFilePath
-        cognitiveServiceName         = $cognitiveServiceName
         containerAppName             = $containerAppName
         containerAppsEnvironmentName = $containerAppsEnvironmentName
         containerRegistryName        = $containerRegistryName
@@ -935,10 +931,11 @@ function Initialize-Parameters {
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
         machineLearningProperties    = $machineLearningProperties
         managedIdentityName          = $managedIdentityName
-        openAIAccountName            = $openAIAccountName
-        openAIAPIVersion             = $openAIAPIVersion
-        openAIAPIKey                 = $openAIAPIKey
         objectId                     = $objectId
+        openAIAccountName            = $openAIAccountName
+        openAIAPIKey                 = $openAIAPIKey
+        openAIAPIVersion             = $openAIAPIVersion
+        parameters                   = $parametersObject
         portalDashboardName          = $portalDashboardName
         previousResourceBaseName     = $previousResourceBaseName
         privateEndPointName          = $privateEndPointName
@@ -950,30 +947,30 @@ function Initialize-Parameters {
         resourceSuffix               = $resourceSuffix
         restoreSoftDeletedResource   = $restoreSoftDeletedResource
         result                       = $result
-        searchAPIVersion             = $searchAPIVersion
-        searchServiceName            = $searchServiceName
+        searchAPIVersion             = $searchServiceAPIVersion
+        searchDataSourceName         = $searchDataSourceName
         searchEndpoint               = $searchEndpoint
+        searchIndexFieldNames        = $searchIndexFieldNames
         searchIndexName              = $searchIndexName
         searchIndexerName            = $searchIndexerName
-        searchVectorIndexName        = $searchVectorIndexName
-        searchVectorIndexerName      = $searchVectorIndexerName
-        searchIndexFieldNames        = $searchIndexFieldNames
         searchIndexes                = $searchIndexes
         searchIndexers               = $searchIndexers
+        searchPublicInternetResults  = $searchPublicInternetResults
+        searchServiceName            = $searchServiceName
+        searchServiceProperties      = $searchServiceProperties
         searchSkillSet               = $searchSkillSet
         searchSkillSetName           = $searchSkillSetName
         searchSkillSetSchema         = $searchSkillSetSchema
-        searchPublicInternetResults  = $searchPublicInternetResults
+        searchVectorIndexName        = $searchVectorIndexName
+        searchVectorIndexerName      = $searchVectorIndexerName
         serviceBusNamespaceName      = $serviceBusNamespaceName
-        searchDataSourceName         = $searchDataSourceName
-        searchServiceProperties      = $searchServiceProperties
-        sharedDashboardName          = $sharedDashboardName
         serviceProperties            = $serviceProperties
+        sharedDashboardName          = $sharedDashboardName
         siteLogo                     = $siteLogo
         sqlServerName                = $sqlServerName
         storageAccountName           = $storageAccountName
-        storageServiceProperties     = $storageServiceProperties
         storageAPIVersion            = $storageAPIVersion
+        storageServiceProperties     = $storageServiceProperties
         subNet                       = $subNet
         subNetName                   = $subNetName
         subscriptionId               = $subscriptionId
@@ -981,7 +978,6 @@ function Initialize-Parameters {
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
         virtualNetwork               = $virtualNetwork
-        parameters                   = $parametersObject
     }
 }
 
@@ -2272,7 +2268,7 @@ function New-Resources {
     # Get the latest API versions
     #$storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
     #$appServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Web" -resourceType "serverFarms"
-    #$searchApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
+    #$searchServiceAPIVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
     #$logAnalyticsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.OperationalInsights" -resourceType "workspaces"
     #$cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
     #$keyVaultApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.KeyVault" -resourceType "vaults"
@@ -2469,18 +2465,14 @@ function New-SearchIndex {
         $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
 
         Set-Content -Path $searchIndexSchema -Value $updatedContent
-
-        $searchIndexFilePath = $searchIndexSchema -replace "-template", ""
-
-        Set-Content -Path $searchIndexFilePath -Value $updatedContent
        
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
-        $searchServiceAPiVersion = $searchAPIVersion
+        $searchServiceAPiVersion = $searchServiceAPIVersion
     
         #$searchIndexUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
     
-        $jsonContent = Get-Content -Path $searchIndexFilePath -Raw | ConvertFrom-Json
+        $jsonContent = Get-Content -Path $searchIndexSchema -Raw | ConvertFrom-Json
     
         #$jsonContent.'@odata.context' = $searchIndexUrl
         $jsonContent.name = $searchIndexName
@@ -2501,7 +2493,7 @@ function New-SearchIndex {
     
         $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
 
-        $updatedJsonContent | Set-Content -Path $searchIndexFilePath
+        $updatedJsonContent | Set-Content -Path $searchIndexSchema
     
         # Construct the REST API URL
         $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexes?api-version=$searchServiceAPiVersion"
@@ -2554,9 +2546,9 @@ function New-SearchIndexer {
 
         Set-Content -Path $searchIndexerSchema -Value $updatedContent
 
-        $searchIndexerFilePath = $searchIndexerSchema -replace "-template", ""
+        #$searchIndexerFilePath = $searchIndexerSchema -replace "-template", ""
 
-        Set-Content -Path $searchIndexerFilePath -Value $updatedContent
+        #Set-Content -Path $searchIndexerFilePath -Value $updatedContent
     
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         #$searchServiceAPiVersion = az search service show --resource-group $resourceGroupName --name $searchServiceName --query "apiVersion" --output tsv
@@ -2564,7 +2556,7 @@ function New-SearchIndexer {
     
         $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
     
-        $jsonContent = Get-Content -Path $searchIndexerFilePath -Raw | ConvertFrom-Json
+        $jsonContent = Get-Content -Path $searchIndexerSchema -Raw | ConvertFrom-Json
     
         $jsonContent.'@odata.context' = $searchIndexerUrl
         $jsonContent.name = $searchIndexerName
@@ -2587,7 +2579,7 @@ function New-SearchIndexer {
     
         $updatedJsonContent = $jsonContent | ConvertTo-Json -Depth 10
     
-        $updatedJsonContent | Set-Content -Path $searchIndexerFilePath
+        $updatedJsonContent | Set-Content -Path $searchIndexerSchema
     
         # Construct the REST API URL
         $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
