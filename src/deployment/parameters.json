@@ -96,7 +96,7 @@
     {
       "Name": "text-embedding",
       "Type": "text-embedding-3-large",
-      "Version": "1",
+      "Version": "2023-05-15",
       "ApiKey": "xxx",
       "Format": "OpenAI",
       "Sku": {

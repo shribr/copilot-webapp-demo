@@ -3431,6 +3431,17 @@ function Start-Deployment {
 
     $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
 
+    if ($global:appDeploymentOnly -eq $true) {
+        # Deploy web app and function app services
+        foreach ($appService in $appServices) {
+            if ($existingResources -notcontains $appService) {
+                New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
+            }
+        }
+
+        return
+    }
+
     #**********************************************************************************************************************
     # Create User Assigned Identity
 
@@ -4214,6 +4225,9 @@ function Update-ConfigFile {
         # Clear existing values in AI_MODELS
         $config.AI_MODELS = @()
 
+        $aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+        $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
+
         # Loop through the AI models collection from global:aiModels
         foreach ($aiModel in $global:aiModels) {
             $aiModelName = $aiModel.Name
@@ -4227,6 +4241,7 @@ function Update-ConfigFile {
                 "Name"    = $aiModelName
                 "Type"    = $aiModelType
                 "Version" = $aiModelVersion
+                "ApiKey"  = $apiKey
                 "Format"  = $aiModelFormat
                 "Sku"     = @{
                     "Name"     = $aiModelSkuName

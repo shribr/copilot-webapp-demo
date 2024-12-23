@@ -665,7 +665,7 @@ async function getAnswersFromAzureSearch(userInput) {
 
     const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
 
-    const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.Version, aiEmbeddingModel.ApiKey, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
+    const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.Version, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
 
     //need to add code to handle error if embeddings are null
 
