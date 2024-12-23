@@ -742,6 +742,7 @@ function Initialize-Parameters {
     $global:location = $parametersObject.location
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
     $global:machineLearningProperties = $parametersObject.machineLearningProperties
+    $global:machineLearningWorkspace = $parametersObject.machineLearningWorkspace
     $global:managedIdentityName = $parametersObject.managedIdentityName
     $global:openAIAccountName = $parametersObject.openAIAccountName
     $global:openAIApiKey = $parametersObject.openAIApiKey
@@ -875,6 +876,7 @@ function Initialize-Parameters {
         location                     = $location
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
         machineLearningProperties    = $machineLearningProperties
+        machineLearningWorkspace     = $machineLearningWorkspace
         managedIdentityName          = $managedIdentityName
         objectId                     = $objectId
         openAIAccountName            = $openAIAccountName
@@ -1037,8 +1039,8 @@ function New-AIService {
                 Write-Log -message "AI Service account '$aiServiceName' created." 
             }
 
-            Write-Host "AI Service: '$aiServiceName' created."
-            Write-Log -message "AI Service: '$aiServiceName' created."
+            #Write-Host "AI Service: '$aiServiceName' created."
+            #Write-Log -message "AI Service: '$aiServiceName' created."
         }
         catch {
             # Check if the error is due to soft deletion
@@ -1977,7 +1979,7 @@ function New-MachineLearningWorkspace {
                 --name $aiProjectName `
                 --key-vault $keyVaultName `
                 --storage-account $storageAccountName `
-                --tags "Purpose: Azure AI Hub Project"`
+                --tags "Purpose: Azure AI Hub Project / Machine Learning Workspace"`
                 --output none 2>&1
 
             if ($jsonOutput -match "error") {
@@ -1988,7 +1990,7 @@ function New-MachineLearningWorkspace {
                 $errorCode = $errorInfo["Code"]
                 $errorDetails = $errorInfo["Message"]
 
-                $errorMessage = "Failed to create AI Project '$aiProjectName'. `
+                $errorMessage = "Failed to create AI Project / Machine Learning Workspace '$aiProjectName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
@@ -1999,28 +2001,47 @@ function New-MachineLearningWorkspace {
                     Restore-SoftDeletedResource -resourceName $aiProjectName -resourceType "MachineLearningWorkspace" -location $location -resourceGroupName $resourceGroupName
                 }
                 else {
-                    Write-Error "Failed to create Cognitive Services account '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Cognitive Services account '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    # Commenting out below code until Azure CLI is updated to support AI Hub Projects
+
+                    #Write-Error "Failed to create Cognitive Services account '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    #Write-Log -message "Failed to create Cognitive Services account '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                    Write-Error "Failed to create Machine Learning Workspace '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Machine Learning Workspace '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
                     Write-Host $errorMessage
                     Write-Log -message $errorMessage -logFilePath $global:LogFilePath
                 } 
             }
             else {
-                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
-                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+                # Commenting out below code until Azure CLI is updated to support AI Hub Projects
+
+                #Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
+                #Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+
+                Write-Host "Machine Learning Workspace '$aiProjectName' created."
+                Write-Log -message "Machine Learning Workspace '$aiProjectName' created." -logFilePath $global:LogFilePath
 
                 return $jsonOutput
             }
         }
         catch {
+            # Commenting out below code until Azure CLI is updated to support AI Hub Projects
             Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        
+            Write-Error "Failed to create Machine Learning Workspace '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Machine Learning Workspace '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
     else {
-        Write-Host "AI Project '$aiProjectName' in '$aiHubName' already exists."
-        Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' already exists." -logFilePath $global:LogFilePath
+        # Commenting out below code until Azure CLI is updated to support AI Hub Projects
+
+        #Write-Host "AI Project '$aiProjectName' in '$aiHubName' already exists."
+        #Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' already exists." -logFilePath $global:LogFilePath
+
+        Write-Host "Machine Learning Workspace '$aiProjectName' already exists."
+        Write-Log -message "Machine Learning Workspace '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 }
 # Function to create new OpenAI account
@@ -2301,11 +2322,6 @@ function New-Resources {
     New-OpenAIAccount -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
-    # Deploy Open AI model
-
-    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -resourceGroupName $resourceGroupName -location $location -aiModelType $global:aiModelType -aiModelDeploymentName $global:aiModelDeploymentName -aiModelFormat $aiModelFormat -aiModelVersion $aiModelVersion -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
-    
-    #**********************************************************************************************************************
     # Create Container Registry
 
     New-ContainerRegistry -containerRegistryName $containerRegistryName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
@@ -2319,11 +2335,6 @@ function New-Resources {
     # Create Computer Vision account
 
     New-ComputerVisionAccount -computerVisionName $computerVisionName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
-
-    #**********************************************************************************************************************
-    # Create AI Project
-
-    #New-AIProject -aiProjectName $aiProjectName -subscriptionId $subscriptionId -aiHubName $aiHubName -appInsightsName $appInsightsName -keyVaultName $keyVaultName -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create API Management Service
@@ -2927,7 +2938,9 @@ function New-SubNet {
     $subnetName = $subnet.Name
     $subnetAddressPrefix = $subnet.AddressPrefix
 
-    if ($existingResources -notcontains $subnetName) {
+    $subnetExists = Test-SubnetExists -resourceGroupName $resourceGroupName -vnetName $vnetName -subnetName $subnetName
+
+    if ($subnetExists -eq $false) {
         try {
             az network vnet subnet create --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --address-prefixes $subnetAddressPrefix --delegations Microsoft.Web/hostingEnvironments --output none
             Write-Host "Subnet '$subnetName' created."
@@ -3508,8 +3521,10 @@ function Start-Deployment {
     # Deploy AI Model
     Deploy-OpenAIModel -openAIAccountName $openAIAccountName -aiModelName $global:aiModelName -aiModelType $global:aiModelType -aiModelVersion $global:aiModelVersion -resourceGroupName $resourceGroupName -aiModelFormat $global:aiModelFormat -aiModelSkuName $global:aiModelSkuName -aiModelSkuCapacity $global:aiModelSkuCapacity -aiModelDeploymentName $global:aiModelDeploymentName -existingResources $existingResources
 
+    # Commenting out code below until the CLI is updated to allow Azure AI Studio projects to be created correctly.
     # Create AI Studio AI Project / ML Studio Workspace
-    New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
+    <#
+ # {    New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
         -subscriptionId $global:subscriptionId `
         -aiHubName $aiHubName `
         -storageAccountName $storageAccountName `
@@ -3518,7 +3533,8 @@ function Start-Deployment {
         -appInsightsName $appInsightsName `
         -aiProjectName $aiProjectName `
         -userAssignedIdentityName $userAssignedIdentityName `
-        -location $location
+        -location $location:Enter a comment or description}
+#>
 
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $aiServiceProperties
 
@@ -3708,26 +3724,48 @@ function Test-ResourceExists {
     }
 }
 
+# Function to check if a subnet exists
+function Test-SubnetExists {
+    param (
+        [string]$resourceGroupName,
+        [string]$vnetName,
+        [string]$subnetName
+    )
+
+    try {
+        $subnet = az network vnet subnet show --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --query "name" --output tsv
+        if ($subnet) {
+            return $true
+        }
+        else {
+            return $false
+        }
+    }
+    catch {
+        return $false
+    }
+}
+
+# Function to update the parameters.json file with the latest API versions
 function Update-ParameterFileApiVersions {
+
+    # NOTE: Code below seems to get older API versions for some reason. This function will not be used until I can investigate further.
+
     # Load parameters from the JSON file
     $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
     # Get the latest API versions in order to Update the parameters.json file
     $storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
-    $appServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Web" -resourceType "serverFarms"
+    $openAIApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
     $searchServiceAPIVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
-    $logAnalyticsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.OperationalInsights" -resourceType "workspaces"
-    $cognitiveServicesApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
-    $keyVaultApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.KeyVault" -resourceType "vaults"
-    $appInsightsApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Insights" -resourceType "components"
+    $aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+    $cognitiveServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
 
     $parametersObject.storageApiVersion = $storageApiVersion
-    $parametersObject.appServiceApiVersion = $appServiceApiVersion
+    $parametersObject.openAIApiVersion = $openAIApiVersion
     $parametersObject.searchServiceAPIVersion = $searchServiceAPIVersion
-    $parametersObject.logAnalyticsApiVersion = $logAnalyticsApiVersion
-    $parametersObject.cognitiveServicesApiVersion = $cognitiveServicesApiVersion
-    $parametersObject.keyVaultApiVersion = $keyVaultApiVersion
-    $parametersObject.appInsightsApiVersion = $appInsightsApiVersion
+    $parametersObject.aiServiceApiVersion = $aiServiceApiVersion
+    $parametersObject.cognitiveServiceApiVersion = $cognitiveServiceApiVersion
     
     # Convert the updated parameters object back to JSON and save it to the file
     $parametersObject | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
