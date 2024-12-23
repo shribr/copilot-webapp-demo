@@ -195,7 +195,7 @@ function Deploy-OpenAIModel {
         }
         else {
             # Create the deployment if it does not exist
-            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $aiDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
             
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -2812,6 +2812,8 @@ function New-SearchService {
                 }
 
                 Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+
+                Start-Sleep -Seconds 10
             }
         }
         catch {
@@ -3746,7 +3748,7 @@ function Test-SubnetExists {
     }
 }
 
-# Function to update the parameters.json file with the latest API versions
+# Function to update the parameters.json file with the latest API versions. NOTE: This function is not currently used.
 function Update-ParameterFileApiVersions {
 
     # NOTE: Code below seems to get older API versions for some reason. This function will not be used until I can investigate further.
