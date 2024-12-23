@@ -1,34 +1,56 @@
 {
-  "AZURE_AI_SERVICE_API_KEY": "111f93f5c4ba4fa4aade5af38b9c7164",
-  "AZURE_SEARCH_API_KEY": "120kDAZL3N0aHKcSPjrO01xkxQ6VSKsHabkOhkBhpjAzSeDWDYbM",
+  "AZURE_AI_SERVICE_API_KEY": "5c25eb463aa8431588b6d0f22f0ba417",
+  "AZURE_SEARCH_API_KEY": "kc6lGtZYuJylHzLauqfv5khz4GOqqUIcJOdSmy0Ud7AzSeCvofo8",
   "AZURE_SEARCH_API_VERSION": "2024-11-01-Preview",
-  "AZURE_FUNCTION_API_KEY": "TR7A0Y1xCi7L4kSatzvyCqUeY-7uBO0mj_3-QA8pM4AwAzFuf_yrNA==",
-  "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-001",
-  "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-001.azurewebsites.net",
+  "AZURE_FUNCTION_API_KEY": "NNizFu8loqqGUNlM0Ec4iuSxxMXLk-8nkimls00n-16CAzFuhLkWOg==",
+  "AZURE_FUNCTION_APP_NAME": "func-chat-copilot-demo-002",
+  "AZURE_FUNCTION_APP_URL": "https://func-chat-copilot-demo-002.azurewebsites.net",
   "AZURE_FUNCTION_NAME": "Chat",
-  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-001",
-  "AZURE_RESOURCE_BASE_NAME": "copilot-demo-001",
-  "AZURE_SEARCH_FULL_URL": "https://stcopilotdemo001.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-12-21T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=qfbt&srt=co&sig=FW6%2Bn30jejvh6UBRdaMsMCdWjJo15LWHgq2eYKWQZtg%3D",
-  "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-001",
-  "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-001",
+  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-002",
+  "AZURE_RESOURCE_BASE_NAME": "copilot-demo-002",
+  "AZURE_SEARCH_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-12-21T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbtq&srt=co&sig=%2BDAfEFY3FvZpoSK2tqHaT3IpojMul5dHLD8pseCgldE%3D",
+  "AZURE_SEARCH_INDEX_NAME": "srch-index-copilot-demo-002",
+  "AZURE_SEARCH_INDEXER_NAME": "srch-indexer-copilot-demo-002",
   "AZURE_SEARCH_PUBLIC_INTERNET_RESULTS": true,
-  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-001-semantic-configuration",
-  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-001",
-  "AZURE_SEARCH_VECTOR_INDEX_NAME": "vector-srch-index-copilot-demo-001",
-  "AZURE_SEARCH_VECTOR_INDEXER_NAME": "vector-srch-indexer-copilot-demo-001",
-  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo001",
+  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-002-semantic-configuration",
+  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-002",
+  "AZURE_SEARCH_VECTOR_INDEX_NAME": "vector-srch-index-copilot-demo-002",
+  "AZURE_SEARCH_VECTOR_INDEXER_NAME": "vector-srch-indexer-copilot-demo-002",
+  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo002",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_KEY": "qXBkzrC1rt8VEihLUJKzrgZefj8xm8hSO3dPJxOuxJDm+aQPEk8ARUY+FU+qhZUWokjzf9FpTstl+AStnZ1WEA==",
+  "AZURE_STORAGE_KEY": "WuNmjauaZiOib9XzyFHZ4YlN7PK2TRQMgYnt4ZVLEQHs4+ug416CmSPraRTzEHBsI9eNgFVcEOyj+AStsOMInQ==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
   "DEPLOYMENT_ID": "ai",
   "ICON_COLOR": "true",
-  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-001",
-  "OPENAI_API_KEY": "6d2750b74a414a3897411cc415f1be86",
+  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-002",
+  "OPENAI_API_KEY": "f622a933e72049049ac0af3dcfd90db1",
   "OPENAI_API_VERSION": "2024-08-01-preview",
   "REGION": "eastus",
   "SITE_LOGO": "custom",
+  "AI_MODELS": [
+    {
+      "Type": "gpt-4o",
+      "Format": "OpenAI",
+      "Name": "gpt4o",
+      "Sku": {
+        "Name": "Standard",
+        "Capacity": 100
+      },
+      "Version": "2024-08-06"
+    },
+    {
+      "Type": "text-embedding-3-large",
+      "Format": "OpenAI",
+      "Name": "text-embedding",
+      "Sku": {
+        "Name": "Standard",
+        "Capacity": 100
+      },
+      "Version": "1"
+    }
+  ],
   "ANSWER_GENERATION_CONFIG": {
     "OVERRIDE_PROMPT_TEMPLATE": "false",
     "NUM_DOCS_TO_RETRIEVE": 5,
@@ -51,13 +73,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "qfbt",
+    "SS": "fbtq",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2025-12-21T23:59:59Z",
     "ST": "2024-12-21T23:59:59Z",
     "SPR": "https",
-    "SIG": "FW6%2Bn30jejvh6UBRdaMsMCdWjJo15LWHgq2eYKWQZtg%3D",
+    "SIG": "%2BDAfEFY3FvZpoSK2tqHaT3IpojMul5dHLD8pseCgldE%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -246,6 +268,28 @@
       "SVG": "<svg id=\"supportingContentTabSVG\" class=\"svg-icon\" viewBox=\"0 0 24 24\"><g><title>document</title><g stroke-width=\"0\"></g><g id=\"icon-document-tab\" stroke-linecap= \"round\" stroke-linejoin= \"round\"></g><g id=\"SVGRepo_iconCarrier\"> <path d=\"M9 17H15\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M9 13H15\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M9 9H10\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\"></path> <path d=\"M5 6C5 4.34315 6.34315 3 8 3H13.1716C13.702 3 14.2107 3.21071 14.5858 3.58579L18.4142 7.41421C18.7893 7.78929 19 8.29799 19 8.82843V18C19 19.6569 17.6569 21 16 21H8C6.34315 21 5 19.6569 5 18V6Z\" stroke=\"#000000\" stroke-width=\"2\"></path> <path d=\"M13 3V5C13 7.20914 14.7909 9 17 9H19\" stroke=\"#000000\" stroke-width=\"2\"></path> </g></svg>"
     }
   },
+  "SEARCH_INDEXERS": [
+    {
+      "Name": "srch-indexer-copilot-demo-002",
+      "IndexName": "srch-index-copilot-demo-002",
+      "Schema": "search-indexer-schema.json"
+    },
+    {
+      "Name": "vector-srch-indexer-copilot-demo-002",
+      "IndexName": "vector-srch-index-copilot-demo-002",
+      "Schema": "vector-search-indexer-schema.json"
+    }
+  ],
+  "SEARCH_INDEXES": [
+    {
+      "Name": "srch-index-copilot-demo-002",
+      "Schema": "search-index-schema.json"
+    },
+    {
+      "Name": "vector-srch-index-copilot-demo-002",
+      "Schema": "vector-search-index-schema.json"
+    }
+  ],
   "SIDEBAR_NAV_ITEMS": {
     "ITEM1": {
       "TEXT": "Home",

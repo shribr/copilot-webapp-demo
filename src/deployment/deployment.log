@@ -1,111 +1,364 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 12/23/2024 00:33:09 ***
-2024-12-23 00:33:13 - Resource group 'RG-COPILOT-DEMO-001' created.
-2024-12-23 00:33:18 - User Assigned Identity 'id-copilot-demo-001' created.
-2024-12-23 00:33:35 - Service principal created for identity 'id-copilot-demo-001'.
-2024-12-23 00:33:53 - User 'id-copilot-demo-001' assigned to role: 'Contributor'.
-2024-12-23 00:33:57 - User 'id-copilot-demo-001' assigned to role: 'Cognitive Services OpenAI User'.
-2024-12-23 00:34:01 - User 'id-copilot-demo-001' assigned to role: 'Search Index Data Reader'.
-2024-12-23 00:34:04 - User 'id-copilot-demo-001' assigned to role: 'Storage Blob Data Reader'.
-2024-12-23 00:34:26 - Storage account 'stcopilotdemo001' created.
-2024-12-23 00:34:47 - Virtual Network 'vnet-copilot-demo-001' created.
-2024-12-23 00:35:01 - Subnet 'subnet-copilot-demo-001' created.
-2024-12-23 00:35:16 - App Service Plan 'asp-copilot-demo-001' created.
-2024-12-23 00:35:20 - Cognitive Service 'cog-copilot-demo-001' restored successfully.
-2024-12-23 00:35:28 - Search Service 'srch-copilot-demo-001' created.
-2024-12-23 00:35:35 - Datasource 'srch-datasource-copilot-demo-001' created successfully.
-2024-12-23 00:35:39 - Index 'srch-index-copilot-demo-001' created successfully.
-2024-12-23 00:35:42 - Index 'vector-srch-index-copilot-demo-001' created successfully.
-2024-12-23 00:36:02 - Skillset 'vector-srch-skillset-copilot-demo-001' created successfully.
-2024-12-23 00:36:22 - Search Skill Set 'vector-srch-skillset-copilot-demo-001' already exists.
-2024-12-23 00:36:26 - Search Indexer 'srch-indexer-copilot-demo-001' created successfully.
-2024-12-23 00:36:29 - Search Indexer 'vector-srch-indexer-copilot-demo-001' created successfully.
-2024-12-23 00:36:31 - Failed to create Search Indexer 'srch-index-copilot-demo-001': (Line 2814) : Failed to run Search Indexer 'vector-srch-indexer-copilot-demo-001': (Line 3603) : 
-{
-  "error": {
-    "code": "",
-    "message": "Another indexer invocation is currently in progress; concurrent invocations are not allowed."
-  }
-}
-2024-12-23 00:36:36 - Log Analytics Workspace 'log-copilot-demo-001' created.
-2024-12-23 00:36:41 - Application Insights component 'appi-copilot-demo-001' created.
-2024-12-23 00:36:45 - Azure OpenAI service 'openai-copilot-demo-001' restored successfully.
-2024-12-23 00:36:45 - Azure OpenAI service 'openai-copilot-demo-001' created successfully.
-2024-12-23 00:36:45 - File 'container.registry.yaml' created and populated.
-2024-12-23 00:38:32 - Container Registry 'crcopilotdemo001' created.
-2024-12-23 00:38:40 - Document Intelligence account 'kv-copilot-demo-001' restored successfully.
-2024-12-23 00:38:44 - Computer Vision 'cv-copilot-demo-001' restored successfully.
-2024-12-23 00:38:44 - API Management service 'apim-copilot-demo-001' already exists.
-2024-12-23 00:39:57 - Web app 'app-copilot-demo-001' created. Moving on to deployment.
-2024-12-23 00:39:57 - Skipping deployment for Web app 'app-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-23 00:40:45 - Function app 'func-chat-copilot-demo-001' created. Moving on to deployment.
-2024-12-23 00:40:45 - Skipping deployment for Function app 'func-chat-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-23 00:40:54 - Key Vault: 'kv-copilot-demo-001' created with Vault Access Policies.
-2024-12-23 00:41:07 - RBAC roles assigned to managed identity: 'id-copilot-demo-001'.
-2024-12-23 00:41:08 - Key Vault 'kv-copilot-demo-001' policy permissions set for application: 'id-copilot-demo-001'.
-2024-12-23 00:41:10 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:11 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:12 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:13 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:15 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:16 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:17 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:18 - Secret: 'UseAOAI' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:20 - Secret: 'UseVision' stored in Key Vault: 'kv-copilot-demo-001'.
-2024-12-23 00:41:55 - AI Hub: 'hub-ai-copilot-demo-001' created.
-2024-12-23 00:42:00 - AI Service 'ai-service-copilot-demo-001' restored successfully.
-2024-12-23 00:42:02 - OpenAI model deployment 'ai' already exists.
-2024-12-23 00:42:13 - File 'ai.connection.yaml' created and populated.
-2024-12-23 00:42:20 - Azure AIService 'ai-service-copilot-demo-001' connection for 'hub-ai-copilot-demo-001' created.
-2024-12-23 00:42:26 - File 'storage.connection.yaml' created and populated.
-2024-12-23 00:42:31 - Azure StorageAccount 'stcopilotdemo001' connection for 'hub-ai-copilot-demo-001' created.
-2024-12-23 00:42:35 - File 'search.connection.yaml' created and populated.
-2024-12-23 00:42:40 - Azure SearchService 'srch-copilot-demo-001' connection for 'hub-ai-copilot-demo-001' created.
-2024-12-23 00:42:51 - Config file updated successfully.
-2024-12-23 00:42:53 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
-2024-12-23 00:43:10 - Web app 'app-copilot-demo-001' deployed successfully.
-2024-12-23 00:43:12 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
-2024-12-23 00:43:55 - Function app 'func-chat-copilot-demo-001' deployed successfully.
-2024-12-23 00:43:55 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 10 MIN : 46 SEC : 165 MS ***
+*** SCRIPT START TIME: 12/23/2024 13:14:32 ***
+2024-12-23 13:14:38 - Resource group 'RG-COPILOT-DEMO-002' created.
+2024-12-23 13:14:43 - User Assigned Identity 'id-copilot-demo-002' created.
+2024-12-23 13:15:01 - Service principal created for identity 'id-copilot-demo-002'.
+2024-12-23 13:15:18 - User 'id-copilot-demo-002' assigned to role: 'Contributor'.
+2024-12-23 13:15:22 - User 'id-copilot-demo-002' assigned to role: 'Cognitive Services OpenAI User'.
+2024-12-23 13:15:24 - User 'id-copilot-demo-002' assigned to role: 'Search Index Data Reader'.
+2024-12-23 13:15:28 - User 'id-copilot-demo-002' assigned to role: 'Storage Blob Data Reader'.
+2024-12-23 13:15:54 - Storage account 'stcopilotdemo002' created.
+2024-12-23 13:16:19 - Virtual Network 'vnet-copilot-demo-002' created.
+2024-12-23 13:16:34 - Subnet 'subnet-copilot-demo-002' created.
+2024-12-23 13:16:48 - App Service Plan 'asp-copilot-demo-002' created.
+2024-12-23 13:16:52 - Cognitive Service 'cog-copilot-demo-002' restored successfully.
+2024-12-23 13:17:06 - Search Service 'srch-copilot-demo-002' created.
+2024-12-23 13:17:13 - Datasource 'srch-datasource-copilot-demo-002' created successfully.
+2024-12-23 13:17:17 - Index 'srch-index-copilot-demo-002' created successfully.
+2024-12-23 13:17:20 - Index 'vector-srch-index-copilot-demo-002' created successfully.
+2024-12-23 13:17:41 - Skillset 'vector-srch-skillset-copilot-demo-002' created successfully.
+2024-12-23 13:18:01 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 13:18:05 - Search Indexer 'srch-indexer-copilot-demo-002' created successfully.
+2024-12-23 13:18:08 - Search Indexer 'vector-srch-indexer-copilot-demo-002' created successfully.
+2024-12-23 13:18:09 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 13:18:26 - Log Analytics Workspace 'log-copilot-demo-002' created.
+2024-12-23 13:18:31 - Application Insights component 'appi-copilot-demo-002' created.
+2024-12-23 13:18:36 - Azure OpenAI service 'openai-copilot-demo-002' restored successfully.
+2024-12-23 13:18:36 - Azure OpenAI service 'openai-copilot-demo-002' created successfully.
+2024-12-23 13:18:36 - File 'container.registry.yaml' created and populated.
+2024-12-23 13:20:36 - Container Registry 'crcopilotdemo002' created.
+2024-12-23 13:20:43 - Document Intelligence account 'kv-copilot-demo-002' restored successfully.
+2024-12-23 13:20:47 - Computer Vision 'cv-copilot-demo-002' restored successfully.
+2024-12-23 13:20:47 - API Management service 'apim-copilot-demo-002' already exists.
+2024-12-23 13:22:00 - Web app 'app-copilot-demo-002' created. Moving on to deployment.
+2024-12-23 13:22:00 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 13:22:40 - Function app 'func-chat-copilot-demo-002' created. Moving on to deployment.
+2024-12-23 13:22:40 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 13:22:49 - Key Vault: 'kv-copilot-demo-002' created with Vault Access Policies.
+2024-12-23 13:23:01 - RBAC roles assigned to managed identity: 'id-copilot-demo-002'.
+2024-12-23 13:23:03 - Key Vault 'kv-copilot-demo-002' policy permissions set for application: 'id-copilot-demo-002'.
+2024-12-23 13:23:05 - Secret: 'AzureOpenAiChatGptDeployment' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:06 - Secret: 'AzureOpenAiEmbeddingDeployment' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:08 - Secret: 'AzureOpenAiServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:09 - Secret: 'AzureSearchIndex' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:11 - Secret: 'AzureSearchServiceEndpoint' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:12 - Secret: 'AzureStorageAccountEndpoint' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:13 - Secret: 'AzureStorageContainer' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:14 - Secret: 'UseAOAI' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:15 - Secret: 'UseVision' stored in Key Vault: 'kv-copilot-demo-002'.
+2024-12-23 13:23:51 - AI Hub: 'hub-ai-copilot-demo-002' created.
+2024-12-23 13:23:55 - AI Service 'ai-service-copilot-demo-002' restored successfully.
+2024-12-23 13:24:26 - Failed to deploy AI Model 'ai-model-copilot-demo-002'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-23 13:24:27 - File 'ml.workspace.yaml' created and populated.
+2024-12-23 13:24:56 - Machine Learning Workspace 'project-ai-copilot-demo-002' restored successfully.
+2024-12-23 13:25:03 - File 'ai.connection.yaml' created and populated.
+2024-12-23 13:25:08 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 13:25:13 - File 'storage.connection.yaml' created and populated.
+2024-12-23 13:25:19 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 13:25:24 - File 'search.connection.yaml' created and populated.
+2024-12-23 13:25:29 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 13:25:34 - Machine Learning Workspace '' deleted.
+2024-12-23 13:25:46 - Config file updated successfully.
+2024-12-23 13:25:48 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 13:26:05 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-23 13:26:09 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 13:26:53 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-12-23 13:26:53 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 12 MIN : 21 SEC : 536 MS ***
 
 *** LOG SEQUENCE: 2 ***
-*** SCRIPT START TIME: 12/23/2024 00:45:24 ***
-2024-12-23 00:45:25 - Resource Group 'RG-COPILOT-DEMO-001' already exists.
-2024-12-23 00:45:26 - Identity 'id-copilot-demo-001' already exists.
-2024-12-23 00:45:26 - Storage account 'stcopilotdemo001' already exists.
-2024-12-23 00:45:28 - Subnet 'subnet-copilot-demo-001' already exists.
-2024-12-23 00:45:28 - App Service Plan 'asp-copilot-demo-001' already exists.
-2024-12-23 00:45:28 - Cognitive Service 'cog-copilot-demo-001' already exists.
-2024-12-23 00:45:29 - Search Service 'srch-copilot-demo-001' already exists.
-2024-12-23 00:45:51 - Search Skill Set 'vector-srch-skillset-copilot-demo-001' already exists.
-2024-12-23 00:45:53 - Search Indexer '@{Name=srch-indexer-copilot-demo-001; IndexName=srch-index-copilot-demo-001; Schema=search-indexer-schema.json}' already exists.
-2024-12-23 00:45:54 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-001; IndexName=vector-srch-index-copilot-demo-001; Schema=vector-search-indexer-schema.json}' already exists.
-2024-12-23 00:46:13 - Search Indexer 'vector-srch-indexer-copilot-demo-001' ran successfully.
-2024-12-23 00:46:38 - Log Analytics workspace 'log-copilot-demo-001' already exists.
-2024-12-23 00:46:38 - Application Insights 'appi-copilot-demo-001' already exists.
-2024-12-23 00:46:38 - Azure OpenAI service 'openai-copilot-demo-001' already exists.
-2024-12-23 00:46:38 - Container Registry 'crcopilotdemo001' already exists.
-2024-12-23 00:46:39 - Document Intelligence Service 'docintel-copilot-demo-001' already exists.
-2024-12-23 00:46:39 - Computer Vision Service 'cv-copilot-demo-001' already exists.
-2024-12-23 00:46:41 - API Management service 'apim-copilot-demo-001' created.
-2024-12-23 00:46:44 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
-2024-12-23 00:46:44 - Skipping deployment for Web app 'app-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-23 00:46:46 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
-2024-12-23 00:46:46 - Skipping deployment for Function app 'func-chat-copilot-demo-001'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-23 00:46:47 - Key Vault 'kv-copilot-demo-001' already exists.
-2024-12-23 00:46:47 - AI Hub 'hub-ai-copilot-demo-001' already exists.
-2024-12-23 00:46:47 - AI Service 'ai-service-copilot-demo-001' already exists.
-2024-12-23 00:46:48 - OpenAI model deployment 'ai' already exists.
-2024-12-23 00:46:54 - File 'ai.connection.yaml' created and populated.
-2024-12-23 00:47:01 - Azure AIService 'ai-service-copilot-demo-001' connection for 'hub-ai-copilot-demo-001' created.
-2024-12-23 00:47:07 - File 'storage.connection.yaml' created and populated.
-2024-12-23 00:47:12 - Azure StorageAccount 'stcopilotdemo001' connection for 'hub-ai-copilot-demo-001' created.
-2024-12-23 00:47:17 - File 'search.connection.yaml' created and populated.
-2024-12-23 00:47:22 - Azure SearchService 'srch-copilot-demo-001' connection for 'hub-ai-copilot-demo-001' created.
-2024-12-23 00:47:33 - Config file updated successfully.
-2024-12-23 00:47:36 - Web app 'app-copilot-demo-001' already exists. Moving on to deployment.
-2024-12-23 00:47:51 - Web app 'app-copilot-demo-001' deployed successfully.
-2024-12-23 00:47:55 - Function app 'func-chat-copilot-demo-001' already exists. Moving on to deployment.
-2024-12-23 00:48:55 - Function app 'func-chat-copilot-demo-001' deployed successfully.
-2024-12-23 00:48:55 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 30 SEC : 746 MS ***
+*** SCRIPT START TIME: 12/23/2024 13:35:40 ***
+2024-12-23 13:35:43 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-23 13:35:44 - Identity 'id-copilot-demo-002' already exists.
+2024-12-23 13:35:44 - Storage account 'stcopilotdemo002' already exists.
+2024-12-23 13:35:49 - Subnet 'subnet-copilot-demo-002' already exists.
+2024-12-23 13:35:49 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-23 13:35:49 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-23 13:35:50 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-23 13:36:13 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 13:36:14 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-23 13:36:16 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-002; IndexName=vector-srch-index-copilot-demo-002; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-23 13:36:17 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 13:36:27 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-23 13:36:27 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-23 13:36:27 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2024-12-23 13:36:27 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-23 13:36:27 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-23 13:36:27 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-23 13:36:32 - API Management service 'apim-copilot-demo-002' created.
+2024-12-23 13:36:35 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 13:36:35 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 13:36:39 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 13:36:39 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 13:36:39 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-23 13:36:39 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 13:36:39 - AI Service 'ai-service-copilot-demo-002' already exists.
+2024-12-23 13:37:23 - Failed to deploy AI Model 'ai-model-copilot-demo-002'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-23 13:37:24 - File 'ml.workspace.yaml' created and populated.
+2024-12-23 13:38:02 - Machine Learning Workspace 'project-ai-copilot-demo-002' restored successfully.
+2024-12-23 13:38:08 - File 'ai.connection.yaml' created and populated.
+2024-12-23 13:38:14 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 13:38:18 - File 'storage.connection.yaml' created and populated.
+2024-12-23 13:38:23 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 13:38:28 - File 'search.connection.yaml' created and populated.
+2024-12-23 13:38:33 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 13:39:41 - Machine Learning Workspace '' deleted.
+2024-12-23 13:40:21 - Config file updated successfully.
+2024-12-23 13:40:23 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 13:40:36 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-23 13:40:39 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 13:41:15 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-12-23 13:41:15 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 05 MIN : 34 SEC : 590 MS ***
+
+*** LOG SEQUENCE: 3 ***
+*** SCRIPT START TIME: 12/23/2024 14:20:30 ***
+2024-12-23 14:20:33 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-23 14:20:34 - Identity 'id-copilot-demo-002' already exists.
+2024-12-23 14:20:34 - Storage account 'stcopilotdemo002' already exists.
+2024-12-23 14:20:39 - Subnet 'subnet-copilot-demo-002' already exists.
+2024-12-23 14:20:39 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-23 14:20:39 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-23 14:20:40 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-23 14:21:04 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 14:21:05 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-23 14:21:06 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-002; IndexName=vector-srch-index-copilot-demo-002; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-23 14:21:08 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 14:21:18 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-23 14:21:18 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-23 14:21:18 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2024-12-23 14:21:18 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-23 14:21:18 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-23 14:21:18 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-23 14:21:21 - API Management service 'apim-copilot-demo-002' created.
+2024-12-23 14:21:25 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 14:21:25 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 14:21:28 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 14:21:28 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 14:21:28 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-23 14:21:28 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 14:21:28 - AI Service 'ai-service-copilot-demo-002' already exists.
+2024-12-23 14:21:41 - Failed to deploy AI Model 'ai-model-copilot-demo-002'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-23 14:21:42 - File 'ml.workspace.yaml' created and populated.
+2024-12-23 14:24:38 - Machine Learning Workspace 'project-ai-copilot-demo-002' restored successfully.
+2024-12-23 14:24:45 - File 'ai.connection.yaml' created and populated.
+2024-12-23 14:24:51 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 14:24:56 - File 'storage.connection.yaml' created and populated.
+2024-12-23 14:25:01 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 14:25:07 - File 'search.connection.yaml' created and populated.
+2024-12-23 14:25:12 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 14:25:31 - Machine Learning Workspace 'project-ai-copilot-demo-002' deleted.
+2024-12-23 14:39:20 - Config file updated successfully.
+2024-12-23 14:39:30 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 14:39:51 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-23 14:39:55 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 14:40:41 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-12-23 14:40:41 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 20 MIN : 10 SEC : 879 MS ***
+
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 12/23/2024 15:00:55 ***
+2024-12-23 15:00:57 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-23 15:00:58 - Identity 'id-copilot-demo-002' already exists.
+2024-12-23 15:00:58 - Storage account 'stcopilotdemo002' already exists.
+2024-12-23 15:01:03 - Subnet 'subnet-copilot-demo-002' already exists.
+2024-12-23 15:01:03 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-23 15:01:03 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-23 15:01:04 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-23 15:01:26 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 15:01:28 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-23 15:01:29 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-002; IndexName=vector-srch-index-copilot-demo-002; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-23 15:01:30 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 15:01:40 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-23 15:01:40 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-23 15:01:40 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2024-12-23 15:01:40 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-23 15:01:40 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-23 15:01:40 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-23 15:01:42 - API Management service 'apim-copilot-demo-002' created.
+2024-12-23 15:01:47 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:01:47 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 15:01:50 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:01:50 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 15:01:50 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-23 15:01:50 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 15:01:50 - AI Service 'ai-service-copilot-demo-002' already exists.
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 12/23/2024 15:06:50 ***
+2024-12-23 15:06:51 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-23 15:06:53 - Identity 'id-copilot-demo-002' already exists.
+2024-12-23 15:06:53 - Storage account 'stcopilotdemo002' already exists.
+2024-12-23 15:06:55 - Subnet 'subnet-copilot-demo-002' already exists.
+2024-12-23 15:06:55 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-23 15:06:55 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-23 15:06:56 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-23 15:07:19 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 15:07:21 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-23 15:07:22 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-002; IndexName=vector-srch-index-copilot-demo-002; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-23 15:07:24 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 15:07:34 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-23 15:07:34 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-23 15:07:34 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2024-12-23 15:07:34 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-23 15:07:34 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-23 15:07:34 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-23 15:07:35 - API Management service 'apim-copilot-demo-002' created.
+2024-12-23 15:07:38 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:07:38 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 15:07:41 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:07:41 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 15:07:41 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-23 15:07:41 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 15:07:41 - AI Service 'ai-service-copilot-demo-002' already exists.
+2024-12-23 15:08:23 - Failed to deploy AI Model 'ai-model-copilot-demo-002'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-23 15:08:24 - File 'ml.workspace.yaml' created and populated.
+2024-12-23 15:14:21 - Machine Learning Workspace 'project-ai-copilot-demo-002' restored successfully.
+2024-12-23 15:14:29 - File 'ai.connection.yaml' created and populated.
+2024-12-23 15:14:37 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 15:14:43 - File 'storage.connection.yaml' created and populated.
+2024-12-23 15:14:48 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' created.
+2024-12-23 15:14:55 - File 'search.connection.yaml' created and populated.
+2024-12-23 15:15:02 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created.
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 12/23/2024 15:15:59 ***
+2024-12-23 15:16:00 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-23 15:16:01 - Identity 'id-copilot-demo-002' already exists.
+2024-12-23 15:16:02 - Storage account 'stcopilotdemo002' already exists.
+2024-12-23 15:16:04 - Subnet 'subnet-copilot-demo-002' already exists.
+2024-12-23 15:16:04 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-23 15:16:04 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-23 15:16:05 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-23 15:16:28 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 15:16:29 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-23 15:16:30 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-002; IndexName=vector-srch-index-copilot-demo-002; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-23 15:16:32 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 15:16:42 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-23 15:16:42 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-23 15:16:42 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2024-12-23 15:16:42 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-23 15:16:42 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-23 15:16:42 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-23 15:16:44 - API Management service 'apim-copilot-demo-002' created.
+2024-12-23 15:16:48 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:16:48 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 15:16:51 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:16:51 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 15:16:51 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-23 15:16:51 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 15:16:51 - AI Service 'ai-service-copilot-demo-002' already exists.
+2024-12-23 15:16:53 - Failed to deploy AI Model 'ai-model-copilot-demo-002'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 0. The current quota usage is 150 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-23 15:16:54 - File 'ml.workspace.yaml' created and populated.
+2024-12-23 15:17:32 - Machine Learning Workspace 'project-ai-copilot-demo-002' created.
+2024-12-23 15:17:36 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 15:17:41 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 15:17:46 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 15:17:59 - Config file updated successfully.
+2024-12-23 15:18:02 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:18:23 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-23 15:18:26 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 15:19:08 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-12-23 15:19:08 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 09 SEC : 181 MS ***
+
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 12/23/2024 16:32:03 ***
+2024-12-23 16:32:06 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-23 16:32:07 - Identity 'id-copilot-demo-002' already exists.
+2024-12-23 16:32:07 - Storage account 'stcopilotdemo002' already exists.
+2024-12-23 16:32:12 - Subnet 'subnet-copilot-demo-002' already exists.
+2024-12-23 16:32:12 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-23 16:32:12 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-23 16:32:13 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-23 16:32:36 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 16:32:37 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-23 16:32:38 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-002; IndexName=vector-srch-index-copilot-demo-002; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-23 16:32:39 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 16:32:49 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-23 16:32:49 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-23 16:32:49 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2024-12-23 16:32:49 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-23 16:32:49 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-23 16:32:49 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-23 16:32:52 - API Management service 'apim-copilot-demo-002' created.
+2024-12-23 16:32:57 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:32:57 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 16:33:00 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:33:00 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 16:33:00 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-23 16:33:00 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:33:00 - AI Service 'ai-service-copilot-demo-002' already exists.
+2024-12-23 16:47:38 - Failed to deploy AI Model 'gpt4o'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 1. The current quota usage is 149 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 1. The current quota usage is 149 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-23 16:47:54 - Failed to deploy AI Model 'text-embedding'. 
+        Error: (InsufficientQuota) This operation require 1000 new capacity in quota Tokens Per Minute (thousands) - text-embedding-3-large, which is bigger than the current available capacity 230. The current quota usage is 120 and the quota limit is 350 for quota Tokens Per Minute (thousands) - text-embedding-3-large. 
+        Code: InsufficientQuota 
+        Message: This operation require 1000 new capacity in quota Tokens Per Minute (thousands) - text-embedding-3-large, which is bigger than the current available capacity 230. The current quota usage is 120 and the quota limit is 350 for quota Tokens Per Minute (thousands) - text-embedding-3-large.
+2024-12-23 16:47:55 - File 'ml.workspace.yaml' created and populated.
+2024-12-23 16:48:45 - Machine Learning Workspace 'project-ai-copilot-demo-002' created.
+2024-12-23 16:48:51 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:48:56 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:49:01 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:50:03 - Config file updated successfully.
+2024-12-23 16:50:14 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:50:36 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-23 16:50:40 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:51:16 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-12-23 16:51:16 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 19 MIN : 12 SEC : 814 MS ***
+
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 12/23/2024 16:54:09 ***
+2024-12-23 16:54:11 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-23 16:54:12 - Identity 'id-copilot-demo-002' already exists.
+2024-12-23 16:54:12 - Storage account 'stcopilotdemo002' already exists.
+2024-12-23 16:54:22 - Subnet 'subnet-copilot-demo-002' already exists.
+2024-12-23 16:54:22 - App Service Plan 'asp-copilot-demo-002' already exists.
+2024-12-23 16:54:22 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2024-12-23 16:54:24 - Search Service 'srch-copilot-demo-002' already exists.
+2024-12-23 16:54:51 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2024-12-23 16:54:52 - Search Indexer '@{Name=srch-indexer-copilot-demo-002; IndexName=srch-index-copilot-demo-002; Schema=search-indexer-schema.json}' already exists.
+2024-12-23 16:54:53 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-002; IndexName=vector-srch-index-copilot-demo-002; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-23 16:54:55 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2024-12-23 16:55:05 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2024-12-23 16:55:05 - Application Insights 'appi-copilot-demo-002' already exists.
+2024-12-23 16:55:05 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2024-12-23 16:55:05 - Container Registry 'crcopilotdemo002' already exists.
+2024-12-23 16:55:05 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2024-12-23 16:55:05 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2024-12-23 16:55:07 - API Management service 'apim-copilot-demo-002' created.
+2024-12-23 16:55:12 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:55:12 - Skipping deployment for Web app 'app-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 16:55:15 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:55:15 - Skipping deployment for Function app 'func-chat-copilot-demo-002'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-23 16:55:15 - Key Vault 'kv-copilot-demo-002' already exists.
+2024-12-23 16:55:15 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:55:15 - AI Service 'ai-service-copilot-demo-002' already exists.
+2024-12-23 16:55:18 - Failed to deploy AI Model 'gpt4o'. 
+        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 1. The current quota usage is 149 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
+        Code: InsufficientQuota 
+        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 1. The current quota usage is 149 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
+2024-12-23 16:55:20 - OpenAI model '' deployed successfully.
+2024-12-23 16:55:21 - File 'ml.workspace.yaml' created and populated.
+2024-12-23 16:55:59 - Machine Learning Workspace 'project-ai-copilot-demo-002' created.
+2024-12-23 16:56:05 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:56:10 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:56:15 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2024-12-23 16:56:26 - Config file updated successfully.
+2024-12-23 16:56:29 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:56:43 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-23 16:56:50 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-23 16:57:28 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+2024-12-23 16:57:28 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 03 MIN : 19 SEC : 608 MS ***
 

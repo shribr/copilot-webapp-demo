@@ -661,7 +661,11 @@ async function getAnswersFromAzureSearch(userInput) {
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
 
-    const embeddings = await generateEmbeddingAsync(userInput, apiKey, deploymentId);
+    const aiModels = config.AI_MODELS;
+
+    const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
+
+    const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.Version, aiEmbeddingModel.ApiKey, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
 
     //need to add code to handle error if embeddings are null
 
@@ -755,12 +759,12 @@ async function getAnswersFromAzureSearch(userInput) {
 }
 
 // Function to generate embeddings
-async function generateEmbeddingAsync(text, apiKey, deploymentId) {
+async function generateEmbeddingAsync(text, apiKey, apiVersion, modelName, modelType) {
 
     try {
-        const endpoint = "https://eastus.api.cognitive.microsoft.com/openai/deployments/ai/chat/completions?api-version=2024-08-01-preview";
+        const endpoint = `https://eastus.api.cognitive.microsoft.com/openai/deployments/${modelName}/embeddings?api-version=${apiVersion}`;
 
-        const response = await fetch(`${endpoint}/openai/deployments/${deploymentId}/embeddings`, {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -768,7 +772,7 @@ async function generateEmbeddingAsync(text, apiKey, deploymentId) {
             },
             body: JSON.stringify({
                 input: text,
-                model: 'text-embedding-ada-002' // Example model
+                model: modelType // Example model
             })
         });
 
@@ -1072,7 +1076,7 @@ async function renderDocuments(blobs) {
 }
 
 // Function to run Search Indexer after new file is uploaded
-async function runSearchIndexer() {
+async function runSearchIndexer(searchIndexers) {
 
     const config = await fetchConfig();
 
@@ -1080,23 +1084,34 @@ async function runSearchIndexer() {
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
 
-    const searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
+    // Iterate over the search indexers and run each one
+    searchIndexers.forEach(searchIndexer => {
 
-    // Invoke the REST method to run the search indexer
-    try {
-        fetch(searchIndexerUrl, {
-            method: 'POST',
-            headers: {
-                'api-key': apiKey,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => console.log('Indexer run response:', data))
-            .catch(error => console.error('Error running indexer:', error));
-    } catch (error) {
-        console.error(`Error running search indexer`, error.message);
-    }
+        var searchIndexerName = searchIndexer.Name;
+        //var searchIndexName = searchIndexer.IndexName;
+        //var searchIndexerSchema = searchIndexer.Schema;
+
+        var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
+
+        var headers = {
+            'api-key': apiKey,
+            'Content-Type': 'application/json',
+            'mode': 'no-cors',
+        };
+
+        // Invoke the REST method to run the search indexer
+        try {
+            fetch(searchIndexerUrl, {
+                method: 'POST',
+                headers: headers
+            })
+                .then(response => response.json())
+                .then(data => console.log('Indexer run response:', data))
+                .catch(error => console.error('Error running indexer:', error));
+        } catch (error) {
+            console.error(`Error running search indexer`, error.message);
+        }
+    });
 }
 
 // Function to sort documents
@@ -1204,6 +1219,7 @@ async function uploadFilesToAzure(files) {
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
+    const searchIndexers = config.SEARCH_INDEXERS;
     const fileTypes = config.FILE_TYPES;
 
     // Construct the SAS token from the individual components
@@ -1247,7 +1263,7 @@ async function uploadFilesToAzure(files) {
     // Clear the file input after successful upload
     clearFileInput();
 
-    runSearchIndexer();
+    await runSearchIndexer(searchIndexers);
 }
 
 //code to clear file input

@@ -177,6 +177,7 @@ function Deploy-OpenAIModel {
     param (
         [string]$resourceGroupName,
         [string]$openAIAccountName,
+        [string]$aiModelName,
         [string]$aiModelType,
         [string]$aiModelVersion,
         [string]$aiModelFormat,
@@ -187,7 +188,7 @@ function Deploy-OpenAIModel {
 
     try {
         # Check if the deployment already exists
-        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $openAIAccountName --query "[?name=='$aiModelDeploymentName']" --output tsv
+        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $aiModelName --query "[?name=='$aiModelDeploymentName']" --output tsv
 
         if ($deploymentExists) {
             Write-Host "OpenAI model deployment '$aiModelDeploymentName' already exists."
@@ -195,7 +196,7 @@ function Deploy-OpenAIModel {
         }
         else {
             # Create the deployment if it does not exist
-            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $openAIAccountName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $aiModelName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
             
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -216,8 +217,8 @@ function Deploy-OpenAIModel {
                 Write-Log -message $errorMessage -logFilePath $global:LogFilePath
             }
             else {
-                Write-Host "OpenAI model '$deploymentName' deployed successfully."
-                Write-Log -message "OpenAI model '$deploymentName' deployed successfully." -logFilePath $global:LogFilePath
+                Write-Host "OpenAI model '$aiModelDeploymentName' deployed successfully."
+                Write-Log -message "OpenAI model '$aiModelDeploymentName' deployed successfully." -logFilePath $global:LogFilePath
             }
 
 
@@ -709,6 +710,7 @@ function Initialize-Parameters {
     $global:aiModelDeploymentName = $parametersObject.aiModelDeploymentName
     $global:aiModelFormat = $parametersObject.aiModelFormat
     $global:aiModelName = $parametersObject.aiModelName
+    $global:aiModels = $parametersObject.aiModels
     $global:aiModelSkuCapacity = $parametersObject.aiModelSkuCapacity
     $global:aiModelSkuName = $parametersObject.aiModelSkuName
     $global:aiModelType = $parametersObject.aiModelType
@@ -717,6 +719,7 @@ function Initialize-Parameters {
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiServiceProperties = $parametersObject.aiServiceProperties
     $global:apiManagementService = $parametersObject.apiManagementService
+    $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appInsightsName = $parametersObject.appInsightsName
     $global:appServiceEnvironmentName = $parametersObject.appServiceEnvironmentName
@@ -843,6 +846,7 @@ function Initialize-Parameters {
         aiModelDeploymentName        = $aiModelDeploymentName
         aiModelFormat                = $aiModelFormat
         aiModelName                  = $aiModelName
+        aiModels                     = $aiModels
         aiModelSkuCapacity           = $aiModelSkuCapacity
         aiModelSkuName               = $aiModelSkuName
         aiModelType                  = $aiModelType
@@ -851,6 +855,7 @@ function Initialize-Parameters {
         aiServiceName                = $aiServiceName
         aiServiceProperties          = $aiServiceProperties
         apiManagementService         = $apiManagementService
+        appDeploymentOnly            = $appDeploymentOnly
         appendUniqueSuffix           = $appendUniqueSuffix
         appInsightsName              = $appInsightsName
         appServiceEnvironmentName    = $appServiceEnvironmentName
@@ -1970,7 +1975,6 @@ function New-MachineLearningWorkspace {
 
             #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName --output none 2>&1
             #$jsonOutput = az ml workspace create --file $mlWorkspaceFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityName --kind project --hub-id $aiHubName --output none 2>&1
-
             $jsonOutput = az ml workspace create --resource-group $resourceGroupName `
                 --application-insights $appInsightsName `
                 --description "This configuration specifies a workspace configuration with existing dependent resources" `
@@ -1979,7 +1983,8 @@ function New-MachineLearningWorkspace {
                 --name $aiProjectName `
                 --key-vault $keyVaultName `
                 --storage-account $storageAccountName `
-                --tags "Purpose: Azure AI Hub Project / Machine Learning Workspace"`
+                --tags "Purpose: Azure AI Hub Project or Machine Learning Workspace"`
+                --update-dependent-resources `
                 --output none 2>&1
 
             if ($jsonOutput -match "error") {
@@ -1990,7 +1995,7 @@ function New-MachineLearningWorkspace {
                 $errorCode = $errorInfo["Code"]
                 $errorDetails = $errorInfo["Message"]
 
-                $errorMessage = "Failed to create AI Project / Machine Learning Workspace '$aiProjectName'. `
+                $errorMessage = "Failed to create AI Project or Machine Learning Workspace '$aiProjectName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
@@ -3007,6 +3012,24 @@ function Remove-AzureResourceGroup {
     }
 }
 
+# Function to delete Machine Learning Workspace
+function Remove-MachineLearningWorkspace {
+    param (
+        [string]$resourceGroupName,
+        [string]$aiProjectName
+    )
+
+    try {
+        az ml workspace delete --name $aiProjectName --resource-group $resourceGroupName --yes --output none
+        Write-Host "Machine Learning Workspace '$aiProjectName' deleted."
+        Write-Log -message "Machine Learning Workspace '$aiProjectName' deleted."
+    }
+    catch {
+        Write-Error "Failed to delete Machine Learning Workspace '$aiProjectName'."
+        Write-Log -message "Failed to delete Machine Learning Workspace '$aiProjectName'." -logFilePath
+    }
+}
+
 # Function to reset search indexer
 function Reset-SearchIndexer {
     param (
@@ -3520,13 +3543,28 @@ function Start-Deployment {
     # Create a new AI Service
     New-AIService -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
-    # Deploy AI Model
-    Deploy-OpenAIModel -openAIAccountName $openAIAccountName -aiModelName $global:aiModelName -aiModelType $global:aiModelType -aiModelVersion $global:aiModelVersion -resourceGroupName $resourceGroupName -aiModelFormat $global:aiModelFormat -aiModelSkuName $global:aiModelSkuName -aiModelSkuCapacity $global:aiModelSkuCapacity -aiModelDeploymentName $global:aiModelDeploymentName -existingResources $existingResources
+    # Deploy AI Models
 
-    # Commenting out code below until the CLI is updated to allow Azure AI Studio projects to be created correctly.
+    foreach ($aiModel in $global:aiModels) {
+        $aiModelName = $aiModel.Name
+        $aiModelType = $aiModel.Type
+        $aiModelVersion = $aiModel.Version
+        $aiModelFormat = $aiModel.Format
+        $aiModelSkuName = $aiModel.Sku.Name
+        $aiModelSkuCapacity = $aiModel.Sku.Capacity
+        
+        Deploy-OpenAIModel -aiModelDeploymentName $global:aiModelDeploymentName -openAIAccountName $openAIAccountName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
+    }
+
+    # The CLI needs to be updated to allow Azure AI Studio projects to be created correctly. 
+    # This code will create a new workspace in ML Studio but not in AI Studio. 
+    # I am still having this code execute so that the rest of the script doesn't error out. 
+    # Once the enture script completes the code will delete the ML workspace.
+    # This is admittedly a hack but it is the only way to get the script to work for now.
+
     # Create AI Studio AI Project / ML Studio Workspace
-    <#
- # {    New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
+
+    New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
         -subscriptionId $global:subscriptionId `
         -aiHubName $aiHubName `
         -storageAccountName $storageAccountName `
@@ -3535,8 +3573,9 @@ function Start-Deployment {
         -appInsightsName $appInsightsName `
         -aiProjectName $aiProjectName `
         -userAssignedIdentityName $userAssignedIdentityName `
-        -location $location:Enter a comment or description}
-#>
+        -location $location:Enter a comment or description
+
+    Sleep -Seconds 10
 
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $aiServiceProperties
 
@@ -3546,6 +3585,8 @@ function Start-Deployment {
     # Add search service connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $global:searchServiceName -serviceProperties $searchServiceProperties
 
+    # Remove the Machine Learning Workspace
+    #Remove-MachineLearningWorkspace -resourceGroupName $resourceGroupName -aiProjectName $aiProjectName
 
     # Update configuration file for web frontend
     Update-ConfigFile - configFilePath "app/frontend/config.json" `
@@ -3556,10 +3597,8 @@ function Start-Deployment {
         -openAIAccountName $openAIAccountName `
         -aiServiceName $aiServiceName `
         -functionAppName $functionAppServiceName `
-        -searchIndexerName $global:searchIndexerName `
-        -searchIndexName $global:searchIndexName `
-        -searchVectorIndexName $global:searchVectorIndexName `
-        -searchVectorIndexerName $global:searchVectorIndexerName `
+        -searchIndexers $global:searchIndexers `
+        -searchIndexes $global:searchIndexes `
         -siteLogo $global:siteLogo
     
     # Deploy web app and function app services
@@ -4052,14 +4091,14 @@ function Update-ConfigFile {
     )
 
     try {
-        $storageKey = az storage account keys list --resource-group $resourceGroupName --account-name $storageAccountName --query "[0].value" --output tsv
+        $storageKey = az storage account keys list --resource-group  $global:resourceGroupName --account-name $global:storageAccountName --query "[0].value" --output tsv
         $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
-        $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        $openAIApiKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $global:openAIAccountName --query "key1" --output tsv
-        $aiServiceKey = az cognitiveservices account keys list --resource-group $resourceGroupName --name $aiServiceName --query "key1" --output tsv
-        $functionAppKey = az functionapp keys list --resource-group $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
-        $functionAppUrl = az functionapp show -g $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        $searchApiKey = az search admin-key show --resource-group $global:resourceGroupName --service-name $global:searchServiceName --query "primaryKey" --output tsv
+        $openAIApiKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $global:openAIAccountName --query "key1" --output tsv
+        $aiServiceKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $aiServiceName --query "key1" --output tsv
+        $functionAppKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
+        $functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
         # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
         $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services btfq --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
@@ -4124,36 +4163,77 @@ function Update-ConfigFile {
         $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
     
         # Update the config with the new key-value pair
-        $config.AZURE_RESOURCE_BASE_NAME = $resourceBaseName
-        $config.AZURE_STORAGE_KEY = $storageKey
-        $config.AZURE_STORAGE_API_VERSION = $global:storageApiVersion
-        $config.AZURE_STORAGE_ACCOUNT_NAME = $storageAccountName
-        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
-        $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
-        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
-        $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
-        $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
-        $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
-        $config.AZURE_SEARCH_SERVICE_NAME = $searchServiceName
-        $config.AZURE_SEARCH_API_KEY = $searchApiKey
-        $config.AZURE_SEARCH_FULL_URL = $fulllUrl
-        $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
-        $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
-        $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
-        $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
-        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
-        $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
+        # Update the config with the new key-value pair
         $config.AZURE_AI_SERVICE_API_KEY = $aiServiceKey
-        $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_API_KEY = $functionAppKey
+        $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
+        $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
+        $config.AZURE_SEARCH_API_KEY = $searchApiKey
+        $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
+        $config.AZURE_SEARCH_FULL_URL = $fulllUrl
+        #$config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
+        #$config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
+        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
+        $config.AZURE_SEARCH_SERVICE_NAME = $global:searchServiceName
+        #$config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
+        #$config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
+        $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
+        $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageAccountName
+        $config.AZURE_STORAGE_API_VERSION = $global:storageApiVersion
+        $config.AZURE_STORAGE_KEY = $storageKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
+        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
+        $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
+        $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
+        $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
+        $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
+        $config.OPENAI_ACCOUNT_NAME = $global:openAIAccountName
         $config.OPENAI_API_KEY = $openAIApiKey
         $config.OPENAI_API_VERSION = $global:openAIApiVersion
-        $config.OPENAI_ACCOUNT_NAME = $global:openAIAccountName
-        $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
-        $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
         $config.SITE_LOGO = $global:siteLogo
+
+        # Clear existing values in SEARCH_INDEXES
+        $config.SEARCH_INDEXES = @()
+
+        # Loop through the search indexes collection from global:searchIndexes
+        foreach ($searchIndex in $global:searchIndexes) {
+            $config.SEARCH_INDEXES += $searchIndex
+        }
+
+        # Clear existing values in SEARCH_INDEXERS
+        $config.SEARCH_INDEXERS = @()
+
+        # Loop through the search indexes collection from global:searchIndexes
+        foreach ($searchIndexer in $global:searchIndexers) {
+            $config.SEARCH_INDEXERS += $searchIndexer
+        }
+
+        # Clear existing values in AI_MODELS
+        $config.AI_MODELS = @()
+
+        # Loop through the AI models collection from global:aiModels
+        foreach ($aiModel in $global:aiModels) {
+            $aiModelName = $aiModel.Name
+            $aiModelType = $aiModel.Type
+            $aiModelVersion = $aiModel.Version
+            $aiModelFormat = $aiModel.Format
+            $aiModelSkuName = $aiModel.Sku.Name
+            $aiModelSkuCapacity = $aiModel.Sku.Capacity
+
+            $config.AI_MODELS += @{
+                "Name"    = $aiModelName
+                "Type"    = $aiModelType
+                "Version" = $aiModelVersion
+                "Format"  = $aiModelFormat
+                "Sku"     = @{
+                    "Name"     = $aiModelSkuName
+                    "Capacity" = $aiModelSkuCapacity
+                }
+            }
+        }
 
         #$config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
     
