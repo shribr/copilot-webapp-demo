@@ -1005,6 +1005,8 @@ function New-AIService {
              
             $jsonOutput = az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none 2>&1
 
+            $global:aiServiceProperties.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
+
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
             if ($jsonOutput -match "error") {
@@ -2596,7 +2598,9 @@ function New-SearchService {
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
 
-            #$global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+            $global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+
+            $global:searchServiceProperties.ApiKey = $global:searchServiceApiKey
 
             $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
             $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
@@ -2925,6 +2929,8 @@ function New-StorageAccount {
             # Retrieve the storage account key
             $global:storageServiceAccountKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
         
+            $global:storageServiceProperties.Credentials.AccountKey = $global:storageServiceAccountKey
+            
             # Enable CORS
             az storage cors clear --account-name $storageAccountName --services bfqt
             az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageAccountName --account-key $storageAccessKey
@@ -3598,13 +3604,17 @@ function Start-Deployment {
 
     Sleep -Seconds 10
 
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $aiServiceProperties
+    # Add AI Service connection to AI Hub
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiServiceProperties
+
+    # Add OpenAI Service connection to AI Hub
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "OpenAIService" -serviceName $global:openAIAccountName -serviceProperties $global:openAIServiceProperties
 
     # Add storage account connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageAccountName -serviceProperties $storageServiceProperties
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageAccountName -serviceProperties $global:storageServiceProperties
         
     # Add search service connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $global:searchServiceName -serviceProperties $searchServiceProperties
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $global:searchServiceName -serviceProperties $global:searchServiceProperties
 
     # Remove the Machine Learning Workspace
     #Remove-MachineLearningWorkspace -resourceGroupName $resourceGroupName -aiProjectName $aiProjectName
@@ -3834,6 +3844,17 @@ function Update-ParameterFileApiVersions {
     
 }
 
+# Function to update Azure service properties
+function Update-AzureServiceProperties {
+    params(
+        [string]$resourceGroupName,
+        [string]$resourceType,
+        [string]$serviceName,
+        [string]$serviceProperties
+    )
+
+}
+
 # Function to update ML workspace connection file
 function Update-ContainerRegistryFile {
     param (
@@ -3964,7 +3985,6 @@ function Update-AIConnectionFile {
 
     $filePath = "$rootPath/$yamlFileName"
 
-    
     switch ($resourceType) {
         "AIService" {
             $endpoint = "https://$serviceName.cognitiveservices.azure.com"
@@ -3978,7 +3998,18 @@ endpoint: $endpoint
 api_key: $apiKey
 ai_services_resource_id: $resourceId
 "@
+        }
+        "OpenAIService" {
+            $endpoint = "https://$serviceName.openai.azure.com"
+            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:openAIAccountName
 
+            $content = @"
+            name: $serviceName
+type: azure_open_ai
+azure_endpoint: https://eastus.api.cognitive.microsoft.com/
+api_key: $apiKey
+"@
         }
         "SearchService" {
             $endpoint = "https://$serviceName.search.windows.net"
