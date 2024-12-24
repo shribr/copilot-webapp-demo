@@ -409,13 +409,13 @@ For a more in-depth understanding of the chat workflow click [here](./README_CHA
 There are several manual steps which need to be performed for a variety of reasons but mainly because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed fully. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing.
 
 1. Setting CORS to allow "All" for Azure Storage Service.
-   ![Setting CORS](src/deployment/app/frontend/images/azure-ai-demo-setting-cors.png)
+   ![Setting CORS](src/deployment/app/frontend/images/azure-ai-demo-storage-cors-config.png)
 2. Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed.
-   ![Managed Identity](src/deployment/app/frontend/images/azure-ai-demo-managed-identity.png)
+   ![Managed Identity](src/deployment/app/frontend/images/azure-ai-demo-search-datasource-managed-identity-config.png)
 3. Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix.
-   ![Multi-Service Account](src/deployment/app/frontend/images/azure-ai-demo-multi-service-account.png)
+   ![Multi-Service Account](src/deployment/app/frontend/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png)
 4. Azure AI Project / Machine Learning Workspace:
-   ![Machine Learning Workspace](src/deployment/app/frontend/images/azure-ai-demo-machine-learning-workspace.png)
+   ![Machine Learning Workspace](src/deployment/app/frontend/images/azure-ai-demo-manage-hubs-and-projects.png)
 
 Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
 
