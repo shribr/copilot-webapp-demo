@@ -750,6 +750,7 @@ function Initialize-Parameters {
     $global:openAIAccountName = $parametersObject.openAIAccountName
     $global:openAIApiKey = $parametersObject.openAIApiKey
     $global:openAIApiVersion = $parametersObject.openAIApiVersion
+    $global:openAIServiceProperties = $parametersObject.openAIServiceProperties
     $global:portalDashboardName = $parametersObject.portalDashboardName
     $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
     $global:privateEndPointName = $parametersObject.privateEndPointName
@@ -885,8 +886,9 @@ function Initialize-Parameters {
         managedIdentityName          = $managedIdentityName
         objectId                     = $objectId
         openAIAccountName            = $openAIAccountName
-        openAI                       = $openAIApiKey
+        openAIKey                    = $openAIApiKey
         openAIApiVersion             = $openAIApiVersion
+        openAIServiceProperties      = $openAIServiceProperties
         parameters                   = $parametersObject
         portalDashboardName          = $portalDashboardName
         previousResourceBaseName     = $previousResourceBaseName
@@ -4005,7 +4007,7 @@ ai_services_resource_id: $resourceId
             $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:openAIAccountName
 
             $content = @"
-            name: $serviceName
+name: $serviceName
 type: azure_open_ai
 azure_endpoint: https://eastus.api.cognitive.microsoft.com/
 api_key: $apiKey

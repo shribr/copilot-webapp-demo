@@ -1,5 +1,3 @@
-#AzureOpenAIConnection.yml
-
 name: openai-copilot-demo-002
 type: azure_open_ai
 azure_endpoint: https://eastus.api.cognitive.microsoft.com/

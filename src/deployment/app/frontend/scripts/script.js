@@ -667,7 +667,9 @@ async function getAnswersFromAzureSearch(userInput) {
 
     const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
 
-    const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.Version, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
+    //Commenting out for now until I can figure out how to get the embeddings to work
+    //const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.Version, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
+    const embeddings = null;
 
     //need to add code to handle error if embeddings are null
 
@@ -914,7 +916,7 @@ async function getDocuments() {
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     //const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
-    const storageUrl = config.AZURE_SEARCH_FULL_URL;
+    const storageUrl = config.AZURE_STORAGE_FULL_URL;
 
     try {
         const response = await fetch(`${storageUrl}`, {
