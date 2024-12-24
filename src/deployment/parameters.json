@@ -83,7 +83,7 @@
   ],
   "aiModels": [
     {
-      "Name": "gpt4o",
+      "Name": "gpt-4o",
       "Type": "gpt-4o",
       "Version": "2024-08-06",
       "ApiKey": "xxx",
@@ -107,6 +107,7 @@
   ],
   "aiServiceProperties": {
     "Name": "ai-service-copilot-demo-002",
+    "ServiceName": "ai-service-copilot-demo-002",
     "Type": "azure_ai_services",
     "Endpoint": "https://ai-service-copilot-demo-002.cognitiveservices.azure.com/",
     "ApiKey": "5c25eb463aa8431588b6d0f22f0ba417",
@@ -262,6 +263,7 @@
   },
   "openAIServiceProperties": {
     "Name": "ai-service-copilot-demo-002_aoai",
+    "ServiceName": "ai-service-copilot-demo-002",
     "Type": "azure_open_ai",
     "Endpoint": "https://ai-service-copilot-demo-002.openai.azure.com/",
     "ApiKey": "f622a933e72049049ac0af3dcfd90db1",

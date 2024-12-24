@@ -176,7 +176,7 @@ function ConvertTo-ProperCase {
 function Deploy-OpenAIModel {
     param (
         [string]$resourceGroupName,
-        [string]$openAIAccountName,
+        [string]$aiServiceName,
         [string]$aiModelName,
         [string]$aiModelType,
         [string]$aiModelVersion,
@@ -188,15 +188,15 @@ function Deploy-OpenAIModel {
 
     try {
         # Check if the deployment already exists
-        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $aiModelName --query "[?name=='$aiModelDeploymentName']" --output tsv
+        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $aiServiceName --query "[?name=='$aiModelDeploymentName']" --output tsv
 
         if ($deploymentExists) {
-            Write-Host "OpenAI model deployment '$aiModelDeploymentName' already exists."
-            Write-Log -message "OpenAI model deployment '$aiModelDeploymentName' already exists."
+            Write-Host "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
+            Write-Log -message "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
         }
         else {
             # Create the deployment if it does not exist
-            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $aiModelName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
+            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $aiServiceName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
             
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -208,7 +208,7 @@ function Deploy-OpenAIModel {
                 $errorCode = $errorInfo["Code"]
                 $errorDetails = $errorInfo["Message"]
 
-                $errorMessage = "Failed to deploy AI Model '$aiModelName'. `
+                $errorMessage = "Failed to deploy Model '$aiModelName' for '$aiServiceName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
@@ -217,16 +217,16 @@ function Deploy-OpenAIModel {
                 Write-Log -message $errorMessage -logFilePath $global:LogFilePath
             }
             else {
-                Write-Host "OpenAI model '$aiModelDeploymentName' deployed successfully."
-                Write-Log -message "OpenAI model '$aiModelDeploymentName' deployed successfully." -logFilePath $global:LogFilePath
+                Write-Host "Mdel '$aiModelDeploymentName' for '$aiServiceName' deployed successfully."
+                Write-Log -message "Model '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -logFilePath $global:LogFilePath
             }
 
 
         }
     }
     catch {
-        Write-Error "Failed to create OpenAI model deployment '$deploymentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create OpenAI model deployment '$deploymentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Error "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
@@ -3578,11 +3578,12 @@ function Start-Deployment {
         $aiModelName = $aiModel.Name
         $aiModelType = $aiModel.Type
         $aiModelVersion = $aiModel.Version
+        $aiServiceName = $global:aiServiceName
         $aiModelFormat = $aiModel.Format
         $aiModelSkuName = $aiModel.Sku.Name
         $aiModelSkuCapacity = $aiModel.Sku.Capacity
         
-        Deploy-OpenAIModel -aiModelDeploymentName $global:aiModelDeploymentName -openAIAccountName $openAIAccountName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
+        Deploy-OpenAIModel -aiModelDeploymentName $aiModelName -aiServiceName $aiServiceName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
     }
 
     # The CLI needs to be updated to allow Azure AI Studio projects to be created correctly. 

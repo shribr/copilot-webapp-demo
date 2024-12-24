@@ -18,7 +18,7 @@
   "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo002",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-12-22T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbtq&srt=co&sig=nKZUIrlvx91vxJ/72wsNJJpUot5ZbNaEqTmJxJCfIw8%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2025-12-22T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tbqf&srt=co&sig=VVP8q/dDa3JPG0IUdrKgVfkI1ZIMKqmYfNmlTPtIOBE%3D",
   "AZURE_STORAGE_KEY": "WuNmjauaZiOib9XzyFHZ4YlN7PK2TRQMgYnt4ZVLEQHs4+ug416CmSPraRTzEHBsI9eNgFVcEOyj+AStsOMInQ==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -38,7 +38,7 @@
         "Name": "Standard",
         "Capacity": 100
       },
-      "Name": "gpt4o",
+      "Name": "gpt-4o",
       "Version": "2024-08-06"
     },
     {
@@ -75,13 +75,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "fbtq",
+    "SS": "tbqf",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2025-12-22T23:59:59Z",
     "ST": "2024-12-22T23:59:59Z",
     "SPR": "https",
-    "SIG": "nKZUIrlvx91vxJ/72wsNJJpUot5ZbNaEqTmJxJCfIw8%3D",
+    "SIG": "VVP8q/dDa3JPG0IUdrKgVfkI1ZIMKqmYfNmlTPtIOBE%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
