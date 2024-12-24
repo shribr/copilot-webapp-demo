@@ -53,7 +53,7 @@ Below is a list of these functions and their purposes:
 - `getQueryParam`: Gets a query parameter from the URL.
 - `showToastNotification`: Shows a toast notification.
 
-## Azure OpenAI Service Functions
+#### Azure OpenAI Service Functions
 
 - `generateEmbeddingAsync`: Generates embeddings using Azure OpenAI Service.
 - `getAnswersFromAzureSearch`: Gets answers from Azure Search.
@@ -61,23 +61,23 @@ Below is a list of these functions and their purposes:
 - `rephraseResponseFromAzureOpenAI`: Rephrases text using Azure OpenAI Service.
 - `rephraseResponseText`: Rephrases text using Azure OpenAI Service.
 
-## Azure Key Vault Functions
+#### Azure Key Vault Functions
 
 - `getSasToken`: Gets a SAS token from Azure Key Vault.
 
-## Azure Function App Functions
+#### Azure Function App Functions
 
 - `getSasTokenOld`: Gets a SAS token from an Azure Function App.
 
-## Search Indexer Functions
+#### Search Indexer Functions
 
 - `runSearchIndexer`: Runs the search indexer after a new file is uploaded.
 
-## Question Handling Functions
+#### Question Handling Functions
 
 - `isQuestion`: Checks if a text is a question.
 
-## Answer Handling Functions
+#### Answer Handling Functions
 
 - `sortAnswers`: Sorts answers based on their keys.
 
