@@ -1,5 +1,51 @@
 ### Technical Details
 
+The `script.js` file contains various functions that handle different aspects of the web application's functionality. Some of those tasks include:
+
+- Clearing the chat display and file input.
+- Creating side navigation links and tab contents for displaying responses.
+- Deleting documents and fetching configuration from a `config.json` file.
+- Converting bytes to KB/MB.
+- Generating embeddings and getting answers using Azure OpenAI Service and Azure Search.
+- Fetching documents from Azure Storage and getting SAS tokens from Azure Key Vault and an Azure Function App.
+- Checking if a text is a question and posting questions to the chat display.
+- Rephrasing text using Azure OpenAI Service.
+
+Below is a list of these functions and their purposes:
+
+- `clearChatDisplay`: Clears the chat display.
+- `clearFileInput`: Clears the file input.
+- `createSidenavLinks`: Creates side navigation links based on the configuration.
+- `createTabContent`: Creates tab contents for displaying responses.
+- `createTabs`: Creates tabs for displaying responses.
+- `deleteDocuments`: Deletes documents.
+- `fetchConfig`: Fetches the configuration from the `config.json` file.
+- `formatBytes`: Converts bytes to KB/MB.
+- `generateEmbeddingAsync`: Generates embeddings using Azure OpenAI Service.
+- `getAnswersFromAzureSearch`: Gets answers from Azure Search.
+- `getAnswersFromPublicInternet`: Gets answers from the public internet using Azure OpenAI Service.
+- `getDocuments`: Fetches documents from Azure Storage.
+- `getQueryParam`: Gets a query parameter from the URL.
+- `getSasToken`: Gets a SAS token from Azure Key Vault.
+- `getSasTokenOld`: Gets a SAS token from an Azure Function App.
+- `isQuestion`: Checks if a text is a question.
+- `postQuestion`: Posts a question to the chat display.
+- `rephraseResponseFromAzureOpenAI`: Rephrases text using Azure OpenAI Service.
+- `rephraseResponseText`: Rephrases text using Azure OpenAI Service.
+- `renderDocuments`: Renders documents in the document list.
+- `runSearchIndexer`: Runs the search indexer after a new file is uploaded.
+- `setChatDisplayHeight`: Sets the height of the chat display container.
+- `setSiteLogo`: Sets the site logo based on the configuration.
+- `showResponse`: Shows responses to questions.
+- `showToastNotification`: Shows a toast notification.
+- `sortAnswers`: Sorts answers based on their keys.
+- `sortDocuments`: Sorts documents based on the specified criteria.
+- `toggleAllCheckboxes`: Toggles all checkboxes in the document list.
+- `toggleDisplay`: Toggles between chat and document screens.
+- `updateFileCount`: Updates the file count display.
+- `updatePlaceholder`: Updates the placeholder text for the file input.
+- `uploadFilesToAzure`: Uploads files to Azure Storage.
+
 1. **User Input**:
 
    - The user types a question into the chat input textbox (`<input type="text" id="chat-input" />`) and clicks the "Send" button (`<button id="send-button">Send</button>`).
@@ -204,43 +250,6 @@
 
 7. **Render Response**:
    - The response from the AI service is rendered in a new chat bubble with tabs for different types of content (e.g., answer, thought process, supporting content).
-
-### JavaScript Functions
-
-The `script.js` file contains various functions that handle different aspects of the web application's functionality. Below is a list of these functions and their purposes:
-
-- `clearChatDisplay`: Clears the chat display.
-- `clearFileInput`: Clears the file input.
-- `createSidenavLinks`: Creates side navigation links based on the configuration.
-- `createTabContent`: Creates tab contents for displaying responses.
-- `createTabs`: Creates tabs for displaying responses.
-- `deleteDocuments`: Deletes documents.
-- `fetchConfig`: Fetches the configuration from the `config.json` file.
-- `formatBytes`: Converts bytes to KB/MB.
-- `generateEmbeddingAsync`: Generates embeddings using Azure OpenAI Service.
-- `getAnswersFromAzureSearch`: Gets answers from Azure Search.
-- `getAnswersFromPublicInternet`: Gets answers from the public internet using Azure OpenAI Service.
-- `getDocuments`: Fetches documents from Azure Storage.
-- `getQueryParam`: Gets a query parameter from the URL.
-- `getSasToken`: Gets a SAS token from Azure Key Vault.
-- `getSasTokenOld`: Gets a SAS token from an Azure Function App.
-- `isQuestion`: Checks if a text is a question.
-- `postQuestion`: Posts a question to the chat display.
-- `rephraseResponseFromAzureOpenAI`: Rephrases text using Azure OpenAI Service.
-- `rephraseResponseText`: Rephrases text using Azure OpenAI Service.
-- `renderDocuments`: Renders documents in the document list.
-- `runSearchIndexer`: Runs the search indexer after a new file is uploaded.
-- `setChatDisplayHeight`: Sets the height of the chat display container.
-- `setSiteLogo`: Sets the site logo based on the configuration.
-- `showResponse`: Shows responses to questions.
-- `showToastNotification`: Shows a toast notification.
-- `sortAnswers`: Sorts answers based on their keys.
-- `sortDocuments`: Sorts documents based on the specified criteria.
-- `toggleAllCheckboxes`: Toggles all checkboxes in the document list.
-- `toggleDisplay`: Toggles between chat and document screens.
-- `updateFileCount`: Updates the file count display.
-- `updatePlaceholder`: Updates the placeholder text for the file input.
-- `uploadFilesToAzure`: Uploads files to Azure Storage.
 
 ### Summary
 
