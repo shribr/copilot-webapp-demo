@@ -759,7 +759,7 @@ async function getAnswersFromAzureSearch(userInput) {
 }
 
 // Function to generate embeddings
-async function generateEmbeddingAsync(text, apiKey, apiVersion, modelName, modelType) {
+async function generateEmbeddingAsync(text, apiKey, apiVersion, modelType, modelName) {
 
     try {
         const endpoint = `https://eastus.api.cognitive.microsoft.com/openai/deployments/${modelName}/embeddings?api-version=${apiVersion}`;
