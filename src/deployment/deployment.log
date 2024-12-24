@@ -383,3 +383,10 @@
 2024-12-23 22:37:38 - Web app 'app-copilot-demo-002' deployed successfully.
 2024-12-23 22:37:41 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
 2024-12-23 22:38:17 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 12 ***
+*** SCRIPT START TIME: 12/24/2024 00:11:19 ***
+2024-12-24 00:11:20 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2024-12-24 00:11:26 - Web app 'app-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-24 00:11:48 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-24 00:11:52 - Function app 'func-chat-copilot-demo-002' already exists. Moving on to deployment.
+2024-12-24 00:12:34 - Function app 'func-chat-copilot-demo-002' deployed successfully.

@@ -1958,16 +1958,18 @@ function New-MachineLearningWorkspace {
             # https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-openai?view=azureml-api-2
             # "While the az ml connection commands can be used to manage both Azure Machine Learning and Azure AI Studio connections, the OpenAI connection is specific to Azure AI Studio."
 
-            $mlWorkspaceFile = Update-MLWorkspaceFile `
-                -aiProjectName $aiProjectName `
-                -resourceGroupName $resourceGroupName `
-                -appInsightsName $appInsightsName `
-                -keyVaultName $keyVaultName `
-                -location $location `
-                -subscriptionId $subscriptionId `
-                -storageAccountName $storageAccountName `
-                -containerRegistryName $containerRegistryName `
-                -userAssignedIdentityName $userAssignedIdentityName 2>&1
+            <#
+            # {            $mlWorkspaceFile = Update-MLWorkspaceFile `
+                            -aiProjectName $aiProjectName `
+                            -resourceGroupName $resourceGroupName `
+                            -appInsightsName $appInsightsName `
+                            -keyVaultName $keyVaultName `
+                            -location $location `
+                            -subscriptionId $subscriptionId `
+                            -storageAccountName $storageAccountName `
+                            -containerRegistryName $containerRegistryName `
+                            -userAssignedIdentityName $userAssignedIdentityName 2>&1:Enter a comment or description}
+            #>
             
             #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
@@ -2594,7 +2596,7 @@ function New-SearchService {
             Write-Host "Search Service '$searchServiceName' created."
             Write-Log -message "Search Service '$searchServiceName' created."
 
-            $global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+            #$global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
 
             $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
             $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
@@ -2606,33 +2608,37 @@ function New-SearchService {
             try {
                 $ErrorActionPreference = 'Continue'
                 
-                $body = @{
-                    location   = $location.Replace(" ", "")
-                    sku        = @{
-                        name = "basic"
-                    }
-                    properties = @{
-                        replicaCount   = 1
-                        partitionCount = 1 
-                        hostingMode    = "default"
-                    }
-                    identity   = @{
-                        type                   = "UserAssigned, SystemAssigned"
-                        userAssignedIdentities = @{
-                            "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
-                        }
-                    }
-                }
+                <#
+                # {                $body = @{
+                                    location   = $location.Replace(" ", "")
+                                    sku        = @{
+                                        name = "basic"
+                                    }
+                                    properties = @{
+                                        replicaCount   = 1
+                                        partitionCount = 1 
+                                        hostingMode    = "default"
+                                    }
+                                    identity   = @{
+                                        type                   = "UserAssigned, SystemAssigned"
+                                        userAssignedIdentities = @{
+                                            "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+                                        }
+                                    }
+                                }:Enter a comment or description}
+                #>
             
                 # Convert the body hashtable to JSON
-                $jsonBody = $body | ConvertTo-Json -Depth 10
-    
-                $accessToken = (az account get-access-token --query accessToken -o tsv)
-    
-                $headers = @{
-                    "api-key"       = $searchServiceApiKey
-                    "Authorization" = "Bearer $accessToken"  # Add the authorization header
-                }
+                <#
+                # {                $jsonBody = $body | ConvertTo-Json -Depth 10
+                    
+                                $accessToken = (az account get-access-token --query accessToken -o tsv)
+                    
+                                $headers = @{
+                                    "api-key"       = $searchServiceApiKey
+                                    "Authorization" = "Bearer $accessToken"  # Add the authorization header
+                                }:Enter a comment or description}
+                #>
     
                 #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
                 #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
@@ -2722,7 +2728,7 @@ function New-SearchService {
         #az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
         #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
 
-        $global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        #$global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
         
         $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
         $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
@@ -2730,33 +2736,37 @@ function New-SearchService {
         try {
             $ErrorActionPreference = 'Continue'
 
-            $body = @{
-                location   = $location.Replace(" ", "")
-                sku        = @{
-                    name = "basic"
-                }
-                properties = @{
-                    replicaCount   = 1
-                    partitionCount = 1 
-                    hostingMode    = "default"
-                }
-                identity   = @{
-                    type                   = "UserAssigned, SystemAssigned"
-                    userAssignedIdentities = @{
-                        "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
-                    }
-                }
-            }
+            <#
+            # {            $body = @{
+                            location   = $location.Replace(" ", "")
+                            sku        = @{
+                                name = "basic"
+                            }
+                            properties = @{
+                                replicaCount   = 1
+                                partitionCount = 1 
+                                hostingMode    = "default"
+                            }
+                            identity   = @{
+                                type                   = "UserAssigned, SystemAssigned"
+                                userAssignedIdentities = @{
+                                    "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+                                }
+                            }
+                        }:Enter a comment or description}
+            #>
             
             # Convert the body hashtable to JSON
-            $jsonBody = $body | ConvertTo-Json -Depth 10
-    
-            $accessToken = (az account get-access-token --query accessToken -o tsv)
-    
-            $headers = @{
-                "api-key"       = $searchServiceApiKey
-                "Authorization" = "Bearer $accessToken"  # Add the authorization header
-            }
+            <#
+            # {            $jsonBody = $body | ConvertTo-Json -Depth 10
+                
+                        $accessToken = (az account get-access-token --query accessToken -o tsv)
+                
+                        $headers = @{
+                            "api-key"       = $searchServiceApiKey
+                            "Authorization" = "Bearer $accessToken"  # Add the authorization header
+                        }:Enter a comment or description}
+            #>
     
             #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
             # Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
@@ -4133,7 +4143,7 @@ function Update-ConfigFile {
 
         #Write-Output "Modified SAS Token: $storageSAS"
 
-        $fulllUrl = "https://$storageAccountName.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
+        $storageUrl = "https://$storageAccountName.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
 
         # Extract the 'sig' parameter value from the SAS token
         if ($storageSAS -match "sig=([^&]+)") {
@@ -4183,7 +4193,6 @@ function Update-ConfigFile {
         $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
         $config.AZURE_SEARCH_API_KEY = $searchApiKey
         $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
-        $config.AZURE_SEARCH_FULL_URL = $fulllUrl
         #$config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
         #$config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
         $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
@@ -4193,6 +4202,7 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageAccountName
         $config.AZURE_STORAGE_API_VERSION = $global:storageApiVersion
+        $config.AZURE_STORAGE_FULL_URL = $storageUrl
         $config.AZURE_STORAGE_KEY = $storageKey
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
@@ -4225,7 +4235,7 @@ function Update-ConfigFile {
         # Clear existing values in AI_MODELS
         $config.AI_MODELS = @()
 
-        $aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+        #$aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
         $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
 
         # Loop through the AI models collection from global:aiModels
