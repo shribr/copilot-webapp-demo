@@ -13,7 +13,7 @@ The `script.js` file contains various functions that handle different aspects of
 
 Below is a list of these functions and their purposes:
 
-## Chat Display Functions
+#### Chat Display Functions
 
 - `clearChatDisplay`: Clears the chat display.
 - `postQuestion`: Posts a question to the chat display.
@@ -21,20 +21,20 @@ Below is a list of these functions and their purposes:
 - `showResponse`: Shows responses to questions.
 - `toggleDisplay`: Toggles between chat and document screens.
 
-## File Input Functions
+#### File Input Functions
 
 - `clearFileInput`: Clears the file input.
 - `updateFileCount`: Updates the file count display.
 - `updatePlaceholder`: Updates the placeholder text for the file input.
 - `uploadFilesToAzure`: Uploads files to Azure Storage.
 
-## Navigation and Tab Functions
+#### Navigation and Tab Functions
 
 - `createSidenavLinks`: Creates side navigation links based on the configuration.
 - `createTabContent`: Creates tab contents for displaying responses.
 - `createTabs`: Creates tabs for displaying responses.
 
-## Document Management Functions
+#### Document Management Functions
 
 - `deleteDocuments`: Deletes documents.
 - `getDocuments`: Fetches documents from Azure Storage.
@@ -42,12 +42,12 @@ Below is a list of these functions and their purposes:
 - `sortDocuments`: Sorts documents based on the specified criteria.
 - `toggleAllCheckboxes`: Toggles all checkboxes in the document list.
 
-## Configuration Functions
+#### Configuration Functions
 
 - `fetchConfig`: Fetches the configuration from the `config.json` file.
 - `setSiteLogo`: Sets the site logo based on the configuration.
 
-## Utility Functions
+#### Utility Functions
 
 - `formatBytes`: Converts bytes to KB/MB.
 - `getQueryParam`: Gets a query parameter from the URL.
