@@ -13,38 +13,73 @@ The `script.js` file contains various functions that handle different aspects of
 
 Below is a list of these functions and their purposes:
 
+## Chat Display Functions
+
 - `clearChatDisplay`: Clears the chat display.
-- `clearFileInput`: Clears the file input.
-- `createSidenavLinks`: Creates side navigation links based on the configuration.
-- `createTabContent`: Creates tab contents for displaying responses.
-- `createTabs`: Creates tabs for displaying responses.
-- `deleteDocuments`: Deletes documents.
-- `fetchConfig`: Fetches the configuration from the `config.json` file.
-- `formatBytes`: Converts bytes to KB/MB.
-- `generateEmbeddingAsync`: Generates embeddings using Azure OpenAI Service.
-- `getAnswersFromAzureSearch`: Gets answers from Azure Search.
-- `getAnswersFromPublicInternet`: Gets answers from the public internet using Azure OpenAI Service.
-- `getDocuments`: Fetches documents from Azure Storage.
-- `getQueryParam`: Gets a query parameter from the URL.
-- `getSasToken`: Gets a SAS token from Azure Key Vault.
-- `getSasTokenOld`: Gets a SAS token from an Azure Function App.
-- `isQuestion`: Checks if a text is a question.
 - `postQuestion`: Posts a question to the chat display.
-- `rephraseResponseFromAzureOpenAI`: Rephrases text using Azure OpenAI Service.
-- `rephraseResponseText`: Rephrases text using Azure OpenAI Service.
-- `renderDocuments`: Renders documents in the document list.
-- `runSearchIndexer`: Runs the search indexer after a new file is uploaded.
 - `setChatDisplayHeight`: Sets the height of the chat display container.
-- `setSiteLogo`: Sets the site logo based on the configuration.
 - `showResponse`: Shows responses to questions.
-- `showToastNotification`: Shows a toast notification.
-- `sortAnswers`: Sorts answers based on their keys.
-- `sortDocuments`: Sorts documents based on the specified criteria.
-- `toggleAllCheckboxes`: Toggles all checkboxes in the document list.
 - `toggleDisplay`: Toggles between chat and document screens.
+
+## File Input Functions
+
+- `clearFileInput`: Clears the file input.
 - `updateFileCount`: Updates the file count display.
 - `updatePlaceholder`: Updates the placeholder text for the file input.
 - `uploadFilesToAzure`: Uploads files to Azure Storage.
+
+## Navigation and Tab Functions
+
+- `createSidenavLinks`: Creates side navigation links based on the configuration.
+- `createTabContent`: Creates tab contents for displaying responses.
+- `createTabs`: Creates tabs for displaying responses.
+
+## Document Management Functions
+
+- `deleteDocuments`: Deletes documents.
+- `getDocuments`: Fetches documents from Azure Storage.
+- `renderDocuments`: Renders documents in the document list.
+- `sortDocuments`: Sorts documents based on the specified criteria.
+- `toggleAllCheckboxes`: Toggles all checkboxes in the document list.
+
+## Configuration Functions
+
+- `fetchConfig`: Fetches the configuration from the `config.json` file.
+- `setSiteLogo`: Sets the site logo based on the configuration.
+
+## Utility Functions
+
+- `formatBytes`: Converts bytes to KB/MB.
+- `getQueryParam`: Gets a query parameter from the URL.
+- `showToastNotification`: Shows a toast notification.
+
+## Azure OpenAI Service Functions
+
+- `generateEmbeddingAsync`: Generates embeddings using Azure OpenAI Service.
+- `getAnswersFromAzureSearch`: Gets answers from Azure Search.
+- `getAnswersFromPublicInternet`: Gets answers from the public internet using Azure OpenAI Service.
+- `rephraseResponseFromAzureOpenAI`: Rephrases text using Azure OpenAI Service.
+- `rephraseResponseText`: Rephrases text using Azure OpenAI Service.
+
+## Azure Key Vault Functions
+
+- `getSasToken`: Gets a SAS token from Azure Key Vault.
+
+## Azure Function App Functions
+
+- `getSasTokenOld`: Gets a SAS token from an Azure Function App.
+
+## Search Indexer Functions
+
+- `runSearchIndexer`: Runs the search indexer after a new file is uploaded.
+
+## Question Handling Functions
+
+- `isQuestion`: Checks if a text is a question.
+
+## Answer Handling Functions
+
+- `sortAnswers`: Sorts answers based on their keys.
 
 1. **User Input**:
 
