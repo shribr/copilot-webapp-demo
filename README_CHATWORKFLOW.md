@@ -65,10 +65,6 @@ Below is a list of these functions and their purposes:
 
 - `getSasToken`: Gets a SAS token from Azure Key Vault.
 
-#### Azure Function App Functions
-
-- `getSasTokenOld`: Gets a SAS token from an Azure Function App.
-
 #### Search Indexer Functions
 
 - `runSearchIndexer`: Runs the search indexer after a new file is uploaded.
