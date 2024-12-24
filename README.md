@@ -441,43 +441,6 @@ A perfect example is the Azure [Search Service API](https://learn.microsoft.com/
 
 Lucky for you this solution defines all of the API versions in the parameters.json file. When newer versions of a particular API are resleased, you just need to update that file and redeploy the web application. The PowerShell script regenerates the config.json file that is deployed as part of the web application zip package using the new values defined in the parameters.json file.
 
-### JavaScript Functions
-
-The `script.js` file contains various functions that handle different aspects of the web application's functionality. Below is a list of these functions and their purposes:
-
-- `clearChatDisplay`: Clears the chat display.
-- `clearFileInput`: Clears the file input.
-- `createSidenavLinks`: Creates side navigation links based on the configuration.
-- `createTabContent`: Creates tab contents for displaying responses.
-- `createTabs`: Creates tabs for displaying responses.
-- `deleteDocuments`: Deletes documents.
-- `fetchConfig`: Fetches the configuration from the `config.json` file.
-- `formatBytes`: Converts bytes to KB/MB.
-- `generateEmbeddingAsync`: Generates embeddings using Azure OpenAI Service.
-- `getAnswersFromAzureSearch`: Gets answers from Azure Search.
-- `getAnswersFromPublicInternet`: Gets answers from the public internet using Azure OpenAI Service.
-- `getDocuments`: Fetches documents from Azure Storage.
-- `getQueryParam`: Gets a query parameter from the URL.
-- `getSasToken`: Gets a SAS token from Azure Key Vault.
-- `getSasTokenOld`: Gets a SAS token from an Azure Function App.
-- `isQuestion`: Checks if a text is a question.
-- `postQuestion`: Posts a question to the chat display.
-- `rephraseResponseFromAzureOpenAI`: Rephrases text using Azure OpenAI Service.
-- `rephraseResponseText`: Rephrases text using Azure OpenAI Service.
-- `renderDocuments`: Renders documents in the document list.
-- `runSearchIndexer`: Runs the search indexer after a new file is uploaded.
-- `setChatDisplayHeight`: Sets the height of the chat display container.
-- `setSiteLogo`: Sets the site logo based on the configuration.
-- `showResponse`: Shows responses to questions.
-- `showToastNotification`: Shows a toast notification.
-- `sortAnswers`: Sorts answers based on their keys.
-- `sortDocuments`: Sorts documents based on the specified criteria.
-- `toggleAllCheckboxes`: Toggles all checkboxes in the document list.
-- `toggleDisplay`: Toggles between chat and document screens.
-- `updateFileCount`: Updates the file count display.
-- `updatePlaceholder`: Updates the placeholder text for the file input.
-- `uploadFilesToAzure`: Uploads files to Azure Storage.
-
 ### Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
