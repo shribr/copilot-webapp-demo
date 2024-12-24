@@ -1,4 +1,4 @@
-name: openai-copilot-demo-002
+name: openai-copilot-demo-003
 type: azure_open_ai
 azure_endpoint: https://eastus.api.cognitive.microsoft.com/
-api_key: f622a933e72049049ac0af3dcfd90db1
+api_key: 88ab1b9350754d5191211f4324f41df8

@@ -1400,7 +1400,7 @@ function New-AppServiceEnvironment {
 :Enter a comment or description}
 #>
             Write-Host "Waiting for App Service Environment '$appServiceEnvironmentName' to be created before creating app service plan and app services."
-            Sleep -Seconds 30
+            Start-Sleep -Seconds 20
 
             #az appservice ase create --name $appServiceEnvironmentName --resource-group $resourceGroupName --location $location --vnet-name $vnetName --subnet $subnetName --subscription $subscriptionId --output none
             Write-Host "App Service Environment '$appServiceEnvironmentName' created."
@@ -3605,7 +3605,7 @@ function Start-Deployment {
         -userAssignedIdentityName $userAssignedIdentityName `
         -location $location:Enter a comment or description
 
-    Sleep -Seconds 10
+    Start-Sleep -Seconds 10
 
     # Add AI Service connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiServiceProperties
