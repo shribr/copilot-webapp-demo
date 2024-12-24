@@ -659,7 +659,9 @@ async function getAnswersFromAzureSearch(userInput) {
     const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
     const apiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
+    const storageContainerName = config.AZURE_STORAGE_CONTAINER_NAME;
+
+    const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/${storageContainerName}/search?api-version=${apiVersion}`;
 
     const aiModels = config.AI_MODELS;
 
