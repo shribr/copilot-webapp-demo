@@ -180,6 +180,7 @@ function Deploy-OpenAIModel {
         [string]$aiModelName,
         [string]$aiModelType,
         [string]$aiModelVersion,
+        [string]$aiModelApiVersion,
         [string]$aiModelFormat,
         [string]$aiModelSkuName,
         [string]$aiModelSkuCapacity,
@@ -3572,20 +3573,6 @@ function Start-Deployment {
     # Create a new AI Service
     New-AIService -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
-    # Deploy AI Models
-
-    foreach ($aiModel in $global:aiModels) {
-        $aiModelName = $aiModel.Name
-        $aiModelType = $aiModel.Type
-        $aiModelVersion = $aiModel.Version
-        $aiServiceName = $global:aiServiceName
-        $aiModelFormat = $aiModel.Format
-        $aiModelSkuName = $aiModel.Sku.Name
-        $aiModelSkuCapacity = $aiModel.Sku.Capacity
-        
-        Deploy-OpenAIModel -aiModelDeploymentName $aiModelName -aiServiceName $aiServiceName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
-    }
-
     # The CLI needs to be updated to allow Azure AI Studio projects to be created correctly. 
     # This code will create a new workspace in ML Studio but not in AI Studio. 
     # I am still having this code execute so that the rest of the script doesn't error out. 
@@ -3603,9 +3590,25 @@ function Start-Deployment {
         -appInsightsName $appInsightsName `
         -aiProjectName $aiProjectName `
         -userAssignedIdentityName $userAssignedIdentityName `
-        -location $location:Enter a comment or description
+        -location $location `
+        -existingResources $existingResources
 
     Start-Sleep -Seconds 10
+
+    # Deploy AI Models
+
+    foreach ($aiModel in $global:aiModels) {
+        $aiModelName = $aiModel.Name
+        $aiModelType = $aiModel.Type
+        $aiModelVersion = $aiModel.Version
+        $aiModelApiVersion = $aiModel.ApiVersion
+        $aiServiceName = $global:aiServiceName
+        $aiModelFormat = $aiModel.Format
+        $aiModelSkuName = $aiModel.Sku.Name
+        $aiModelSkuCapacity = $aiModel.Sku.Capacity
+        
+        Deploy-OpenAIModel -aiModelDeploymentName $aiModelName -aiServiceName $aiServiceName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiModelApiVersion $aiModelApiVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
+    }
 
     # Add AI Service connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiServiceProperties
@@ -4277,17 +4280,19 @@ function Update-ConfigFile {
             $aiModelName = $aiModel.Name
             $aiModelType = $aiModel.Type
             $aiModelVersion = $aiModel.Version
+            $aiModelApiVersion = $aiModel.ApiVersion
             $aiModelFormat = $aiModel.Format
             $aiModelSkuName = $aiModel.Sku.Name
             $aiModelSkuCapacity = $aiModel.Sku.Capacity
 
             $config.AI_MODELS += @{
-                "Name"    = $aiModelName
-                "Type"    = $aiModelType
-                "Version" = $aiModelVersion
-                "ApiKey"  = $apiKey
-                "Format"  = $aiModelFormat
-                "Sku"     = @{
+                "Name"         = $aiModelName
+                "Type"         = $aiModelType
+                "ModelVersion" = $aiModelVersion
+                "ApiKey"       = $apiKey
+                "ApiVersion"   = $aiModelApiVersion
+                "Format"       = $aiModelFormat
+                "Sku"          = @{
                     "Name"     = $aiModelSkuName
                     "Capacity" = $aiModelSkuCapacity
                 }

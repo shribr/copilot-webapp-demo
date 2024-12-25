@@ -668,7 +668,7 @@ async function getAnswersFromAzureSearch(userInput) {
     const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
 
     //Commenting out for now until I can figure out how to get the embeddings to work
-    //const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.Version, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
+    //const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.ApiVersion, aiEmbeddingModel.ModelVersion, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
     const embeddings = null;
 
     //need to add code to handle error if embeddings are null
@@ -763,7 +763,7 @@ async function getAnswersFromAzureSearch(userInput) {
 }
 
 // Function to generate embeddings
-async function generateEmbeddingAsync(text, apiKey, apiVersion, modelType, modelName) {
+async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, modelType, modelName) {
 
     try {
         const endpoint = `https://eastus.api.cognitive.microsoft.com/openai/deployments/${modelName}/embeddings?api-version=${apiVersion}`;

@@ -75,6 +75,9 @@
       "Name": "AIService"
     },
     {
+      "Name": "OpenAIService"
+    },
+    {
       "Name": "StorageAccount"
     },
     {
@@ -85,8 +88,9 @@
     {
       "Name": "gpt-4o",
       "Type": "gpt-4o",
-      "Version": "2024-08-06",
+      "ModelVersion": "2024-11-20",
       "ApiKey": "xxx",
+      "ApiVersion": "2024-08-01-preview",
       "Format": "OpenAI",
       "Sku": {
         "Name": "Standard",
@@ -96,8 +100,9 @@
     {
       "Name": "text-embedding",
       "Type": "text-embedding-3-large",
-      "Version": "2023-05-15",
+      "ModelVersion": "1",
       "ApiKey": "xxx",
+      "ApiVersion": "2023-05-15",
       "Format": "OpenAI",
       "Sku": {
         "Name": "Standard",
