@@ -473,7 +473,9 @@ async function rephraseResponseText(searchAnswers, docMap) {
             if (correspondingDoc) {
 
                 try {
-                    const rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
+                    // Haven't figured out how to get the embeddings to work yet so commenting out
+                    //const rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
+                    const rephrasedResponseText = "error";
 
                     if (rephrasedResponseText == "error") {
                         answers.push({
@@ -502,6 +504,19 @@ async function rephraseResponseText(searchAnswers, docMap) {
 
 // Function to rephrase text using Azure OpenAI Service
 async function rephraseResponseFromAzureOpenAI(text) {
+
+    const config = await fetchConfig();
+
+    const apiVersion = config.OPENAI_API_VERSION;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const apiKey = aiGPTModel.ApiKey;
+    const deploymentName = aiGPTModel.Name;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+
+    const answers = [];
+
     const payload = {
         "messages": [
             {
@@ -858,6 +873,10 @@ async function createTabs() {
 async function createTabContent(docStorageResponse, supportingContent, answerContent) {
 
     const config = await fetchConfig();
+
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
 

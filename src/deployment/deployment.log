@@ -207,3 +207,31 @@
 2024-12-25 01:48:39 - Web app 'app-copilot-demo-003' deployed successfully.
 2024-12-25 01:48:42 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
 2024-12-25 01:49:21 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 16 ***
+*** SCRIPT START TIME: 12/25/2024 11:17:33 ***
+2024-12-25 11:17:35 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2024-12-25 11:17:41 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:18:03 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-25 11:18:06 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:18:45 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 17 ***
+*** SCRIPT START TIME: 12/25/2024 11:26:28 ***
+2024-12-25 11:26:30 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2024-12-25 11:26:37 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:26:59 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-25 11:27:02 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:27:44 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 18 ***
+*** SCRIPT START TIME: 12/25/2024 11:31:26 ***
+2024-12-25 11:31:27 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2024-12-25 11:31:31 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:31:45 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-25 11:31:48 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:32:28 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 19 ***
+*** SCRIPT START TIME: 12/25/2024 11:33:22 ***
+2024-12-25 11:33:23 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2024-12-25 11:33:27 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:33:40 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-25 11:33:45 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-25 11:34:20 - Function app 'func-chat-copilot-demo-003' deployed successfully.
