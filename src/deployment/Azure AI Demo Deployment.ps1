@@ -3600,7 +3600,7 @@ function Start-Deployment {
     foreach ($aiModel in $global:aiModels) {
         $aiModelName = $aiModel.Name
         $aiModelType = $aiModel.Type
-        $aiModelVersion = $aiModel.Version
+        $aiModelVersion = $aiModel.ModelVersion
         $aiModelApiVersion = $aiModel.ApiVersion
         $aiServiceName = $global:aiServiceName
         $aiModelFormat = $aiModel.Format
@@ -4230,12 +4230,12 @@ function Update-ConfigFile {
         $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
         $config.AZURE_SEARCH_API_KEY = $searchApiKey
         $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
-        #$config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
-        #$config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
+        $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
+        $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
         $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
         $config.AZURE_SEARCH_SERVICE_NAME = $global:searchServiceName
-        #$config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
-        #$config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
+        $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
+        $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
         $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageAccountName
         $config.AZURE_STORAGE_API_VERSION = $global:storageApiVersion

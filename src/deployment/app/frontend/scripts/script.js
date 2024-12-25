@@ -451,14 +451,16 @@ async function showResponse(questionBubble) {
 }
 
 // Function to rephrase text
-async function rephraseResponseText(searchAnswers) {
+async function rephraseResponseText(searchAnswers, docMap) {
     const config = await fetchConfig();
 
-    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiVersion = config.OPENAI_API_VERSION;
-    const deploymentId = config.DEPLOYMENT_ID;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const apiKey = aiGPTModel.ApiKey;
+    const deploymentName = aiGPTModel.Name;
     const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
     const answers = [];
 
@@ -532,6 +534,8 @@ async function rephraseResponseFromAzureOpenAI(text) {
 
     const jsonString = JSON.stringify(payload)
 
+    //Need to add endpoint
+    ß
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -601,10 +605,12 @@ async function getAnswersFromPublicInternet(userInput) {
 
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiVersion = config.OPENAI_API_VERSION;
-    const deploymentId = config.DEPLOYMENT_ID;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const deploymentName = aiGPTModel.Name;
     const openAIRequestBody = config.OPENAI_REQUEST_BODY;
     const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
     const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
     userMessageContent.text = userInput;
@@ -653,17 +659,21 @@ async function getAnswersFromAzureSearch(userInput) {
     if (!userInput) return;
 
     const config = await fetchConfig();
-
+    const aiModels = config.AI_MODELS;
     const apiKey = config.AZURE_SEARCH_API_KEY;
-    const deploymentId = config.DEPLOYMENT_ID;
-    const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const deploymentName = aiGPTModel.Name;
+    //const deploymentId = config.DEPLOYMENT_ID;
+    const indexes = config.AZURE_SEARCH_INDEXES;
+    const indexers = config.AZURE_SEARCH_INDEXERS;
     const apiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const storageContainerName = config.AZURE_STORAGE_CONTAINER_NAME;
 
-    const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
+    //const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0];
+    const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
 
-    const aiModels = config.AI_MODELS;
+    const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
 
     const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
 
@@ -724,7 +734,8 @@ async function getAnswersFromAzureSearch(userInput) {
             headers: {
                 'Content-Type': 'application/json',
                 'api-key': `${apiKey}`,
-                'http2': 'true'
+                'http2': 'true',
+                'mode': 'no-cors'
             },
             body: jsonString
         });
@@ -852,7 +863,7 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
 
         // Create a map of documents using their key
         const docMap = new Map();
-        docResponse.value.forEach(doc => {
+        docStorageResponse.value.forEach(doc => {
             //var key = "Page " + doc.chunk_id.split('_pages_')[1];
             var key = doc.chunk_id;
 
@@ -861,7 +872,7 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
 
         const sortedAnswers = sortAnswers(docMap);
 
-        const answers = await rephraseResponseText(docStorageResponse["@search.answers"]);
+        const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
 
         var answerResults = "";
         var supportingContentLink = "";
