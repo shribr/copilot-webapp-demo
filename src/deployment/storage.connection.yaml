@@ -1,5 +1,5 @@
-name: stcopilotdemo003
+name: stcopilotdemo001
 type: azure_blob
-url: https://stcopilotdemo003.blob.core.windows.net/azureml
+url: https://stcopilotdemo001.blob.core.windows.net/azureml
 container_name: azureml
-account_name: stcopilotdemo003
+account_name: stcopilotdemo001

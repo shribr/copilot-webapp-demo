@@ -42,7 +42,7 @@
   "openAIApiVersion": "2024-08-01-preview",
   "openAIAccountName": "openai-copilot-demo-003",
   "portalDashboardName": "portaldash-copilot-demo-003",
-  "previousResourceBaseName": "copilot-demo-002",
+  "previousResourceBaseName": "copilot-demo-001",
   "redeployResources": false,
   "redisCacheName": "redis-copilot-demo-003",
   "resourceBaseName": "copilot-demo-003",

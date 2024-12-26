@@ -1,237 +1,48 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 12/24/2024 23:36:29 ***
-2024-12-24 23:36:30 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-24 23:36:31 - Identity 'id-copilot-demo-003' already exists.
-2024-12-24 23:36:31 - Storage account 'stcopilotdemo003' already exists.
-2024-12-24 23:36:33 - Subnet 'subnet-copilot-demo-003' already exists.
-2024-12-24 23:36:33 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-24 23:36:33 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-24 23:36:34 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-24 23:36:54 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-24 23:36:55 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema.json}' already exists.
-2024-12-24 23:36:57 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema.json}' already exists.
-2024-12-24 23:36:58 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
-2024-12-24 23:37:08 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-24 23:37:08 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-24 23:37:08 - Azure OpenAI service 'openai-copilot-demo-003' already exists.
-2024-12-24 23:37:08 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-24 23:37:08 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-24 23:37:08 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-24 23:37:10 - API Management service 'apim-copilot-demo-003' created.
-2024-12-24 23:37:13 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-24 23:37:13 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-24 23:37:15 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-24 23:37:15 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-24 23:37:15 - Key Vault 'kv-copilot-demo-003' already exists.
-2024-12-24 23:37:15 - AI Hub 'hub-ai-copilot-demo-003' already exists.
-2024-12-24 23:37:15 - AI Service 'ai-service-copilot-demo-003' already exists.
-2024-12-24 23:37:15 - Machine Learning Workspace 'project-ai-copilot-demo-003' already exists.
-2024-12-24 23:38:14 - Failed to deploy Model 'gpt-4o' for 'ai-service-copilot-demo-003'. 
-        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 2. The current quota usage is 148 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
-        Code: InsufficientQuota 
-        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 2. The current quota usage is 148 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
-*** LOG SEQUENCE: 2 ***
-*** SCRIPT START TIME: 12/24/2024 23:53:11 ***
-2024-12-24 23:53:12 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-24 23:53:13 - Identity 'id-copilot-demo-003' already exists.
-2024-12-24 23:53:13 - Storage account 'stcopilotdemo003' already exists.
-2024-12-24 23:53:15 - Subnet 'subnet-copilot-demo-003' already exists.
-2024-12-24 23:53:15 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-24 23:53:15 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-24 23:53:16 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-24 23:53:36 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-24 23:53:37 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema.json}' already exists.
-2024-12-24 23:53:39 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema.json}' already exists.
-2024-12-24 23:53:40 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
-2024-12-24 23:53:50 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-24 23:53:50 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-24 23:53:50 - Azure OpenAI service 'openai-copilot-demo-003' already exists.
-2024-12-24 23:53:50 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-24 23:53:50 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-24 23:53:50 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-24 23:53:52 - API Management service 'apim-copilot-demo-003' created.
-2024-12-24 23:53:55 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-24 23:53:55 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-24 23:53:57 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-24 23:53:57 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-24 23:53:57 - Key Vault 'kv-copilot-demo-003' already exists.
-2024-12-24 23:53:57 - AI Hub 'hub-ai-copilot-demo-003' already exists.
-2024-12-24 23:53:57 - AI Service 'ai-service-copilot-demo-003' already exists.
-2024-12-24 23:53:57 - Machine Learning Workspace 'project-ai-copilot-demo-003' already exists.
-2024-12-24 23:57:04 - Failed to deploy Model 'gpt-4o' for 'ai-service-copilot-demo-003'. 
-        Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 2. The current quota usage is 148 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o. 
-        Code: InsufficientQuota 
-        Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - gpt-4o, which is bigger than the current available capacity 2. The current quota usage is 148 and the quota limit is 150 for quota Tokens Per Minute (thousands) - gpt-4o.
-2024-12-24 23:58:09 - Model deployment 'text-embedding' for 'ai-service-copilot-demo-003' already exists.
-2024-12-24 23:58:15 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-24 23:58:20 - Azure OpenAIService 'openai-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-24 23:58:24 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-24 23:58:29 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
-2024-12-24 23:58:41 - Config file updated successfully.
-2024-12-24 23:58:44 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-24 23:59:03 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-24 23:59:08 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-24 23:59:50 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-2024-12-24 23:59:50 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 06 MIN : 38 SEC : 960 MS ***
+*** SCRIPT START TIME: 12/26/2024 16:35:59 ***
+2024-12-26 16:36:00 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2024-12-26 16:36:01 - Identity 'id-copilot-demo-003' already exists.
+2024-12-26 16:36:01 - Storage account 'stcopilotdemo003' already exists.
+2024-12-26 16:36:03 - Subnet 'subnet-copilot-demo-003' already exists.
+2024-12-26 16:36:03 - App Service Plan 'asp-copilot-demo-003' already exists.
+2024-12-26 16:36:03 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2024-12-26 16:36:04 - Search Service 'srch-copilot-demo-003' already exists.
+2024-12-26 16:36:24 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2024-12-26 16:36:25 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema.json}' already exists.
+2024-12-26 16:36:27 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema.json}' already exists.
+2024-12-26 16:36:28 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2024-12-26 16:36:38 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2024-12-26 16:36:38 - Application Insights 'appi-copilot-demo-003' already exists.
+2024-12-26 16:36:38 - Azure OpenAI service 'openai-copilot-demo-003' already exists.
+2024-12-26 16:36:38 - Container Registry 'crcopilotdemo003' already exists.
+2024-12-26 16:36:38 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2024-12-26 16:36:38 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2024-12-26 16:36:38 - API Management service 'apim-copilot-demo-003' already exists.
+2024-12-26 16:36:41 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-26 16:36:41 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-26 16:36:44 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-26 16:36:44 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2024-12-26 16:36:44 - Key Vault 'kv-copilot-demo-003' already exists.
+2024-12-26 16:36:44 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2024-12-26 16:36:44 - AI Service 'ai-service-copilot-demo-003' already exists.
+2024-12-26 16:36:44 - Machine Learning Workspace 'project-ai-copilot-demo-003' already exists.
+2024-12-26 16:36:55 - Model deployment 'gpt-4o' for 'ai-service-copilot-demo-003' already exists.
+2024-12-26 16:36:56 - Model deployment 'text-embedding' for 'ai-service-copilot-demo-003' already exists.
+2024-12-26 16:37:01 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-26 16:37:06 - Azure OpenAIService 'openai-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-26 16:37:10 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-26 16:37:14 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2024-12-26 16:37:25 - Config file updated successfully.
+2024-12-26 16:37:28 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-26 16:37:40 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-26 16:37:43 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-26 16:38:24 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+2024-12-26 16:38:24 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 25 SEC : 129 MS ***
 
-*** LOG SEQUENCE: 3 ***
-*** SCRIPT START TIME: 12/25/2024 00:12:22 ***
-2024-12-25 00:12:24 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 00:12:25 - Identity 'id-copilot-demo-003' already exists.
-2024-12-25 00:12:25 - Storage account 'stcopilotdemo003' already exists.
-2024-12-25 00:12:27 - Subnet 'subnet-copilot-demo-003' already exists.
-2024-12-25 00:12:27 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-25 00:12:27 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-25 00:12:28 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-25 00:12:48 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-25 00:12:50 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema.json}' already exists.
-2024-12-25 00:12:51 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema.json}' already exists.
-2024-12-25 00:12:52 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
-2024-12-25 00:13:02 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-25 00:13:02 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-25 00:13:02 - Azure OpenAI service 'openai-copilot-demo-003' already exists.
-2024-12-25 00:13:02 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-25 00:13:02 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-25 00:13:02 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-25 00:13:04 - API Management service 'apim-copilot-demo-003' created.
-2024-12-25 00:13:07 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:13:07 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-25 00:13:11 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:13:11 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-25 00:13:11 - Key Vault 'kv-copilot-demo-003' already exists.
-2024-12-25 00:13:11 - AI Hub 'hub-ai-copilot-demo-003' already exists.
-2024-12-25 00:13:11 - AI Service 'ai-service-copilot-demo-003' already exists.
-2024-12-25 00:13:11 - Machine Learning Workspace 'project-ai-copilot-demo-003' already exists.
-*** LOG SEQUENCE: 4 ***
-*** SCRIPT START TIME: 12/25/2024 00:19:42 ***
-2024-12-25 00:19:43 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 00:19:44 - Identity 'id-copilot-demo-003' already exists.
-2024-12-25 00:19:44 - Storage account 'stcopilotdemo003' already exists.
-2024-12-25 00:19:46 - Subnet 'subnet-copilot-demo-003' already exists.
-2024-12-25 00:19:46 - App Service Plan 'asp-copilot-demo-003' already exists.
-2024-12-25 00:19:46 - Cognitive Service 'cog-copilot-demo-003' already exists.
-2024-12-25 00:19:47 - Search Service 'srch-copilot-demo-003' already exists.
-2024-12-25 00:20:08 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
-2024-12-25 00:20:10 - Search Indexer '@{Name=srch-indexer-copilot-demo-003; IndexName=srch-index-copilot-demo-003; Schema=search-indexer-schema.json}' already exists.
-2024-12-25 00:20:11 - Search Indexer '@{Name=vector-srch-indexer-copilot-demo-003; IndexName=vector-srch-index-copilot-demo-003; Schema=vector-search-indexer-schema.json}' already exists.
-2024-12-25 00:20:13 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
-2024-12-25 00:20:23 - Log Analytics workspace 'log-copilot-demo-003' already exists.
-2024-12-25 00:20:23 - Application Insights 'appi-copilot-demo-003' already exists.
-2024-12-25 00:20:23 - Azure OpenAI service 'openai-copilot-demo-003' already exists.
-2024-12-25 00:20:23 - Container Registry 'crcopilotdemo003' already exists.
-2024-12-25 00:20:23 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
-2024-12-25 00:20:23 - Computer Vision Service 'cv-copilot-demo-003' already exists.
-2024-12-25 00:20:25 - API Management service 'apim-copilot-demo-003' created.
-2024-12-25 00:20:27 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:20:27 - Skipping deployment for Web app 'app-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-25 00:20:30 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:20:31 - Skipping deployment for Function app 'func-chat-copilot-demo-003'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
-2024-12-25 00:20:31 - Key Vault 'kv-copilot-demo-003' already exists.
-2024-12-25 00:20:31 - AI Hub 'hub-ai-copilot-demo-003' already exists.
-2024-12-25 00:20:31 - AI Service 'ai-service-copilot-demo-003' already exists.
-2024-12-25 00:20:31 - Machine Learning Workspace 'project-ai-copilot-demo-003' already exists.
-*** LOG SEQUENCE: 5 ***
-*** SCRIPT START TIME: 12/25/2024 00:23:20 ***
-2024-12-25 00:23:21 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 00:23:25 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:23:45 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 00:23:48 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:24:23 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 6 ***
-*** SCRIPT START TIME: 12/25/2024 00:26:14 ***
-2024-12-25 00:26:15 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 00:26:19 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:26:31 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 00:26:35 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:27:17 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 7 ***
-*** SCRIPT START TIME: 12/25/2024 00:35:56 ***
-2024-12-25 00:35:57 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 00:36:03 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:36:17 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 00:36:20 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:36:59 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 8 ***
-*** SCRIPT START TIME: 12/25/2024 00:37:26 ***
-2024-12-25 00:37:27 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 00:37:31 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:37:44 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 00:37:47 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:38:28 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 9 ***
-*** SCRIPT START TIME: 12/25/2024 00:54:58 ***
-2024-12-25 00:54:59 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 00:55:09 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:55:22 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 00:55:24 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 00:56:00 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 10 ***
-*** SCRIPT START TIME: 12/25/2024 01:02:00 ***
-2024-12-25 01:02:01 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 01:02:06 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:02:18 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 01:02:21 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:03:02 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 11 ***
-*** SCRIPT START TIME: 12/25/2024 01:14:26 ***
-2024-12-25 01:14:27 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 01:14:31 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:14:51 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 01:14:54 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:16:00 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 12 ***
-*** SCRIPT START TIME: 12/25/2024 01:29:18 ***
-2024-12-25 01:29:19 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 01:29:24 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:29:37 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 01:29:40 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:30:33 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 13 ***
-*** SCRIPT START TIME: 12/25/2024 01:34:10 ***
-2024-12-25 01:34:11 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 01:34:15 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:34:30 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 01:34:33 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:35:25 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 14 ***
-*** SCRIPT START TIME: 12/25/2024 01:38:38 ***
-2024-12-25 01:38:39 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 01:38:43 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:38:56 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 01:38:59 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:39:37 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 15 ***
-*** SCRIPT START TIME: 12/25/2024 01:48:21 ***
-2024-12-25 01:48:22 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 01:48:26 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:48:39 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 01:48:42 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 01:49:21 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 16 ***
-*** SCRIPT START TIME: 12/25/2024 11:17:33 ***
-2024-12-25 11:17:35 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 11:17:41 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:18:03 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 11:18:06 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:18:45 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 17 ***
-*** SCRIPT START TIME: 12/25/2024 11:26:28 ***
-2024-12-25 11:26:30 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 11:26:37 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:26:59 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 11:27:02 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:27:44 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 18 ***
-*** SCRIPT START TIME: 12/25/2024 11:31:26 ***
-2024-12-25 11:31:27 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 11:31:31 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:31:45 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 11:31:48 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:32:28 - Function app 'func-chat-copilot-demo-003' deployed successfully.
-*** LOG SEQUENCE: 19 ***
-*** SCRIPT START TIME: 12/25/2024 11:33:22 ***
-2024-12-25 11:33:23 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
-2024-12-25 11:33:27 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:33:40 - Web app 'app-copilot-demo-003' deployed successfully.
-2024-12-25 11:33:45 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
-2024-12-25 11:34:20 - Function app 'func-chat-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 2 ***
+*** SCRIPT START TIME: 12/26/2024 16:43:40 ***
+2024-12-26 16:43:41 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2024-12-26 16:43:46 - Web app 'app-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-26 16:44:01 - Web app 'app-copilot-demo-003' deployed successfully.
+2024-12-26 16:44:04 - Function app 'func-chat-copilot-demo-003' already exists. Moving on to deployment.
+2024-12-26 16:44:38 - Function app 'func-chat-copilot-demo-003' deployed successfully.

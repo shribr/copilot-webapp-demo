@@ -947,6 +947,11 @@ label[for="chat-input"] {
   cursor: pointer;
 }
 
+#azureStorageResults {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
 .tab.active svg {
   fill: #fff;
 }

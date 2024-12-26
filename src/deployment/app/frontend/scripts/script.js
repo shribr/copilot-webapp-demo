@@ -5,17 +5,6 @@ let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
 
-//const { DefaultAzureCredential } = require('@azure/identity');
-//const { SecretClient } = require('@azure/keyvault-secrets');
-
-// Function to fetch the configuration
-async function fetchConfig() {
-
-    const response = await fetch('../config.json');
-    const config = await response.json();
-    return config;
-}
-
 $(document).ready(function () {
 
     setChatDisplayHeight();
@@ -231,375 +220,156 @@ $(document).ready(function () {
     });
 });
 
-// Function to set the site logo
-async function setSiteLogo() {
-    const siteLogo = document.getElementById('site-logo');
-    const siteLogoText = document.getElementById('site-logo-text');
-    const siteLogoTextCopy = document.getElementById('site-logo-text-copy');
-
-    const config = await fetchConfig();
-
-    if (config.SITE_LOGO == "default" || getQueryParam('sitelogo') == "default") {
-        siteLogo.src = "images/site-logo-default.png";
-        siteLogo.classList.remove('site-logo-custom');
-        siteLogo.classList.add('site-logo-default');
-    }
-    else {
-        siteLogo.src = "images/site-logo-custom.png";
-        siteLogo.classList.remove('site-logo-default');
-        siteLogo.classList.add('site-logo-custom');
-    }
-}
-
-// Function to toggle all checkboxes
-function toggleAllCheckboxes() {
-
-    const allCheckbox = document.getElementById('datasource-all');
-    const datasourceCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="datasource-"]:not(#datasource-all)');
-
-    datasourceCheckboxes.forEach(checkbox => {
-        checkbox.checked = allCheckbox.checked;
-    });
-}
-
 // Function to clear the chat display
 function clearChatDisplay() {
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.innerHTML = ''; // Clear all content
 
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
-    chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
+    chatCurrentQuestionContainer.innerHTML = '<div class="loading-animation" style="display: none;"><div class="spinner"></div> Fetching results...</div>';
 }
 
-// Function to set the height of the chat display container
-function setChatDisplayHeight() {
-    const chatDisplayContainer = document.getElementById('chat-display-container');
-    const chatInfoTextCopy = document.getElementById('chat-info-text-copy');
+//code to clear file input
+function clearFileInput() {
+    const fileInput = document.getElementById('file-input');
+    fileInput.value = ''; // Clear the file input
 
-    const windowHeight = window.innerHeight - (chatInfoTextCopy.offsetHeight + 200);
-
-    // Calculate the desired height (e.g., 80% of the window height)
-    const desiredHeight = windowHeight * 0.65;
-
-    // Set the height of the chat-display-container
-    chatDisplayContainer.style.height = `${desiredHeight}px`;
+    const selectedFilesDiv = document.getElementById('file-list');
+    selectedFilesDiv.innerHTML = ''; // Clear the list of selected files
+    updatePlaceholder(); // Update the placeholder text
 }
 
-// Function to post a question to the chat display
-async function postQuestion() {
+//function to create side navigation links
+async function createSidenavLinks() {
+    try {
+        const config = await fetchConfig();
 
-    const config = await fetchConfig();
-    let chatInput = document.getElementById('chat-input').value;
-    const chatDisplay = document.getElementById('chat-display');
-    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
-    const dateTimestamp = new Date().toLocaleString();
+        const sidenav = document.getElementById('nav-container').querySelector('nav ul');
+        const sidenavLinks = Object.values(config.SIDEBAR_NAV_ITEMS);
 
-    // Check if chatInput ends with a question mark, if not, add one
-    if (!chatInput.trim().endsWith('?') && isQuestion(chatInput)) {
-        chatInput += '?';
-    }
+        // Debugging: Log the sidenavLinks to check its type and content
+        console.log('sidenavLinks:', sidenavLinks);
 
-    // Capitalize the first letter if it is not already capitalized
-    if (chatInput.length > 0 && chatInput[0] !== chatInput[0].toUpperCase()) {
-        chatInput = chatInput[0].toUpperCase() + chatInput.slice(1);
-    }
+        // Validate that sidenavLinks is an array
+        if (Array.isArray(sidenavLinks)) {
+            for (const [key, value] of Object.entries(config.SIDEBAR_NAV_ITEMS)) {
+                const sidenavItem = document.createElement('li');
+                const sidenavLink = document.createElement('a');
 
-    // Create a new div for the chat bubble
-    const questionBubble = document.createElement('div');
-    questionBubble.setAttribute('class', 'question-bubble fade-in'); // Add fade-in class
+                sidenavLink.href = value.URL;
+                sidenavLink.setAttribute('aria-label', value.TEXT);
+                sidenavLink.setAttribute('title', value.TEXT);
+                sidenavLink.setAttribute('data-tooltip', value.TEXT);
+                sidenavLink.setAttribute('id', `sidenav-item-${key}`);
+                sidenavLink.innerHTML = `${value.SVG} ${value.TEXT}`;
 
-    const svg = document.createElement("div");
-    svg.className = 'question-bubble-svg';
-    svg.innerHTML = config.ICONS.QUESTION_MARK.SVG;
+                sidenavItem.appendChild(sidenavLink);
+                sidenav.appendChild(sidenavItem);
 
-    const questionText = document.createElement("div");
-    questionText.className = "question-bubble-text";
-    questionText.innerHTML = `Question: "${chatInput}"`;
-
-    const dateText = document.createElement("div");
-    dateText.className = "question-bubble-date";
-    dateText.innerHTML = `Date: ${dateTimestamp}`;
-
-    questionBubble.appendChild(svg);
-    questionBubble.appendChild(questionText);
-    questionBubble.appendChild(dateText);
-
-    questionBubble.style.display = 'none'; // Hide the question bubble initially
-
-    // Append the chat bubble to the chat-info div
-    chatDisplay.appendChild(questionBubble);
-
-    const chatCurrentQuestionBubble = questionBubble.cloneNode(true);
-    chatCurrentQuestionBubble.style.display = 'block'; // Show the current question bubble
-
-    chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
-    chatCurrentQuestionContainer.appendChild(chatCurrentQuestionBubble);
-
-    // Scroll to the position right above the newest questionBubble
-    const questionBubbleTop = questionBubble.offsetTop;
-    chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
-
-    showResponse(questionBubble);
-}
-
-// Function to check if a text is a question
-function isQuestion(text) {
-    const questionWords = ['who', 'what', 'where', 'when', 'why', 'how'];
-    const words = text.trim().toLowerCase().split(/\s+/);
-    return questionWords.includes(words[0]);
-}
-
-// Function to show responses to questions
-async function showResponse(questionBubble) {
-
-    const config = await fetchConfig();
-
-    const chatInput = document.getElementById('chat-input').value.trim();
-    const chatDisplay = document.getElementById('chat-display');
-    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
-
-    //const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
-
-    // Construct the SAS token from the individual components
-    //const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-
-    // Show the loading animation
-    const loadingAnimation = document.querySelector('.loading-animation');
-    loadingAnimation.style.display = 'flex';
-
-    if (chatInput) {
-
-        // Get answers from Azure Search
-        const docStorageResponse = await getAnswersFromAzureSearch(chatInput);
-
-        // Get answers from public internet
-        const publicInternetResponse = await getAnswersFromPublicInternet(chatInput);
-
-        // Hide the loading animation once results are returned
-        loadingAnimation.style.display = 'none';
-
-        // Create a new chat bubble element
-        const chatResponse = document.createElement('div');
-        chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
-
-        // Create tabs
-        const tabs = await createTabs();
-
-        const thoughtProcessContent = document.createElement('div');
-        thoughtProcessContent.className = 'tab-content';
-        thoughtProcessContent.style.fontStyle = 'italic';
-
-        const supportingContent = document.createElement('div');
-        supportingContent.className = 'tab-content';
-        supportingContent.style.fontStyle = 'italic';
-
-        const answerContent = document.createElement('div');
-        answerContent.className = 'tab-content active';
-        answerContent.style.fontStyle = 'italic';
-
-        if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == true) {
-            answerContent.textContent = publicInternetResponse.choices[0].message.content;
-
-            //thoughtProcessContent.textContent = 'Thought process content goes here.';
-            //supportingContent.textContent = 'Supporting content goes here.';
-        }
-
-        // Create tab contents
-        createTabContent(docStorageResponse, answerContent, supportingContent);
-
-        // Append tabs and contents to chat bubble
-        chatResponse.appendChild(tabs);
-        chatResponse.appendChild(answerContent);
-        chatResponse.appendChild(thoughtProcessContent);
-        chatResponse.appendChild(supportingContent);
-
-        // Append the chat bubble to the chat-display div
-        chatDisplay.appendChild(chatResponse);
-
-        // Clear the input field
-        chatInput.value = '';
-
-        // Scroll to the position right above the newest questionBubble
-        const questionBubbleTop = chatResponse.offsetTop;
-        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
-
-        // Add event listeners to tabs
-        const tabElements = tabs.querySelectorAll('.tab');
-        const tabContents = chatResponse.querySelectorAll('.tab-content');
-
-        tabElements.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                tabElements.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(tc => tc.classList.remove('active'));
-
-                tab.classList.add('active');
-                tabContents[index].classList.add('active');
-            });
-        });
-
-        questionBubble.style.display = 'block'; // Show the question bubble
-
-        // Scroll to the position right above the newest questionBubble
-        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
-
-        chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
-
-    }
-    else {
-        loadingAnimation.style.display = 'none';
-    }
-}
-
-// Function to rephrase text
-async function rephraseResponseText(searchAnswers, docMap) {
-    const config = await fetchConfig();
-
-    const apiVersion = config.OPENAI_API_VERSION;
-    const aiModels = config.AI_MODELS;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const apiKey = aiGPTModel.ApiKey;
-    const deploymentName = aiGPTModel.Name;
-    const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
-
-    const answers = [];
-
-    // Iterate over the answers and cross-reference with documents
-    searchAnswers.forEach(async answer => {
-        var answerText = answer.text;
-        answerText = answerText.replace("  ", " ");
-        if (answer.text) {
-            const correspondingDoc = docMap.get(answer.key);
-            if (correspondingDoc) {
-
-                try {
-                    // Haven't figured out how to get the embeddings to work yet so commenting out
-                    //const rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
-                    const rephrasedResponseText = "error";
-
-                    if (rephrasedResponseText == "error") {
-                        answers.push({
-                            answerText: answer.text,
-                            document: correspondingDoc
-                        });
-                    }
-                    else {
-                        answers.push({
-                            answerText: rephrasedResponseText,
-                            document: correspondingDoc
-                        });
-                    }
-                } catch (error) {
-                    answers.push({
-                        answerText: answer.text,
-                        document: correspondingDoc
-                    });
-                }
+                console.log(`Key: ${key}, Text: ${value.TEXT}`);
             }
+        } else {
+            console.error('sidenavLinks is not an array:', sidenavLinks);
         }
+    } catch (error) {
+        console.error('Failed to create sidenav links:', error);
+    }
+}
+
+// Function to create tabs
+async function createTabs() {
+
+    const config = await fetchConfig();
+
+    const tabs = document.createElement('div');
+    tabs.className = 'tabs';
+
+    // Loop through CHAT_TABS to create tabs dynamically
+    Object.entries(config.RESPONSE_TABS).forEach(([key, value], index) => {
+        const tab = document.createElement('div');
+        tab.className = `tab ${index === 0 ? 'active' : ''}`;
+        tab.innerHTML = `${value.SVG} ${value.TEXT}`;
+        tabs.appendChild(tab);
     });
 
-    return answers;
+    return tabs;
 }
 
-// Function to rephrase text using Azure OpenAI Service
-async function rephraseResponseFromAzureOpenAI(text) {
+// Function to create tab contents
+async function createTabContent(docStorageResponse, supportingContent, answerContent) {
 
     const config = await fetchConfig();
 
-    const apiVersion = config.OPENAI_API_VERSION;
-    const aiModels = config.AI_MODELS;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const apiKey = aiGPTModel.ApiKey;
-    const deploymentName = aiGPTModel.Name;
-    const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
-    const answers = [];
+    if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
 
-    const payload = {
-        "messages": [
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "You are an AI assistant that helps people find information."
-                    }
-                ]
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": `Rephrase the following text to sound more human: '${text}'`
-                    }
-                ]
-            }
-        ],
-        "temperature": 0.7,
-        "top_p": 0.95,
-        "frequency_penalty": 0,
-        "presence_penalty": 0,
-        "max_tokens": 800,
-        "stop": null,
-        "stream": false
-    };
+        // Create a map of documents using their key
+        const docMap = new Map();
+        docStorageResponse.value.forEach(doc => {
+            //var key = "Page " + doc.chunk_id.split('_pages_')[1];
+            var key = doc.chunk_id;
 
-    const jsonString = JSON.stringify(payload)
-
-    //Need to add endpoint
-    ß
-    try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': apiKey
-            },
-            body: jsonString
+            docMap.set(key, doc);
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Error: ${errorData.error.message}`);
+        const sortedAnswers = sortAnswers(docMap);
+
+        const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
+
+        var answerResults = "";
+        var supportingContentLink = "";
+        var answerNumber = 1;
+        var sourceNumber = 1;
+
+        // Initialize a Set to store unique document paths
+        const listedPaths = new Set();
+
+        answers.forEach(answer => {
+            if (answer.answerText) {
+                const path = `${answer.document.metadata_storage_path}?${sasToken}`;
+
+                supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
+                answerResults += answerNumber + ". " + answer.answerText + '\n\n';
+                answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
+
+                if (!listedPaths.has(path)) {
+                    listedPaths.add(path);
+
+                    supportingContent.innerHTML += 'Source #' + sourceNumber + ': ' + supportingContentLink + '\n\n';
+                    sourceNumber++;
+                } else {
+                    console.log(`Document already listed: ${path}`);
+                }
+
+                answerNumber++;
+            }
+        });
+
+        if (answerResults != "") {
+            answerContent.innerHTML += '<div id="azureStorageResults">Azure Storage Results</div>' + answerResults;
         }
 
-        const data = await response.json();
-        return data.choices[0].message.content.trim();
-    } catch (error) {
-        console.error('Error rephrasing text:', error);
-        return "error";
-        //throw error;
+        console.log('Cross-referenced answers:', answers);
     }
+
+    return answerContent;
 }
 
-// Function to sort answers
-function sortAnswers(docMap) {
-    try {
-        // Convert Map to an array for sorting
-        const docArray = Array.from(docMap.values());
+// function to delete documents
+function deleteDocuments() {
+    //code to delete documents
 
-        docArray.sort((a, b) => {
-            if (a.key < b.key) {
-                return -1;
-            }
-            if (a.key > b.key) {
-                return 1;
-            }
-            return 0;
-        });
+}
 
-        // Convert sorted array back to Map
-        const sortedDocMap = new Map(docArray.map(doc => [doc.chunk_id, doc]));
+// Function to fetch the configuration
+async function fetchConfig() {
 
-        return sortedDocMap;
-
-    }
-    catch (error) {
-        return "error";
-    }
+    const response = await fetch('../config.json');
+    const config = await response.json();
+    return config;
 }
 
 // Function to convert bytes to KB/MB
@@ -609,66 +379,30 @@ function formatBytes(bytes) {
     else return (bytes / 1048576).toFixed(2) + ' MB';
 }
 
-//code to send chat message to Azure Copilot
-async function getAnswersFromPublicInternet(userInput) {
-
-    if (!userInput) return;
-
-    //$('#user-input').val('');
-
-    const config = await fetchConfig();
-
-    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
-    const apiVersion = config.OPENAI_API_VERSION;
-    const aiModels = config.AI_MODELS;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const deploymentName = aiGPTModel.Name;
-    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
-    const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
-
-    const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
-    userMessageContent.text = userInput;
-
-    const jsonString = JSON.stringify(openAIRequestBody);
+// Function to generate embeddings
+async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, modelType, modelName) {
 
     try {
+        const endpoint = `https://eastus.api.cognitive.microsoft.com/openai/deployments/${modelName}/embeddings?api-version=${apiVersion}`;
+
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': `${apiKey}`,
-                'http2': 'true'
+                'api-key': apiKey
             },
-            body: jsonString
+            body: JSON.stringify({
+                input: text,
+                model: modelType // Example model
+            })
         });
 
         const data = await response.json();
-
-        // Extract the source documents from the response
-        try {
-            const sourceDocuments = data.choices[0].message.metadata.sources;
-        }
-        catch (error) {
-            console.error('Error extracting source documents:', error);
-        }
-
-
-        return data;
-    }
-    catch (error) {
-        if (error.code == 429) {
-
-            const data = { error: 'Token rate limit exceeded. Please try again later.' };
-            return data;
-        }
-        else {
-            const data = { error: 'An error occurred. Please try again later.' };
-            return data;
-        }
+        return data.data[0].embedding;
+    } catch (error) {
+        return null;
     }
 }
-
 //code to send message to Azure Search via Azure Function
 async function getAnswersFromAzureSearch(userInput) {
     if (!userInput) return;
@@ -788,148 +522,73 @@ async function getAnswersFromAzureSearch(userInput) {
     }
 }
 
-// Function to generate embeddings
-async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, modelType, modelName) {
+//code to send chat message to Azure Copilot
+async function getAnswersFromPublicInternet(userInput) {
+
+    if (!userInput) return;
+
+    //$('#user-input').val('');
+
+    const config = await fetchConfig();
+
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    const apiVersion = config.OPENAI_API_VERSION;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const deploymentName = aiGPTModel.Name;
+    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+
+    const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
+    userMessageContent.text = userInput;
+
+    const jsonString = JSON.stringify(openAIRequestBody);
 
     try {
-        const endpoint = `https://eastus.api.cognitive.microsoft.com/openai/deployments/${modelName}/embeddings?api-version=${apiVersion}`;
-
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': apiKey
+                'api-key': `${apiKey}`,
+                'http2': 'true'
             },
-            body: JSON.stringify({
-                input: text,
-                model: modelType // Example model
-            })
+            body: jsonString
         });
 
         const data = await response.json();
-        return data.data[0].embedding;
-    } catch (error) {
-        return null;
-    }
-}
 
-//function to create side navigation links
-async function createSidenavLinks() {
-    try {
-        const config = await fetchConfig();
+        // Extract the source documents from the response
+        try {
+            var sourceDocuments = "";
 
-        const sidenav = document.getElementById('nav-container').querySelector('nav ul');
-        const sidenavLinks = Object.values(config.SIDEBAR_NAV_ITEMS);
-
-        // Debugging: Log the sidenavLinks to check its type and content
-        console.log('sidenavLinks:', sidenavLinks);
-
-        // Validate that sidenavLinks is an array
-        if (Array.isArray(sidenavLinks)) {
-            for (const [key, value] of Object.entries(config.SIDEBAR_NAV_ITEMS)) {
-                const sidenavItem = document.createElement('li');
-                const sidenavLink = document.createElement('a');
-
-                sidenavLink.href = value.URL;
-                sidenavLink.setAttribute('aria-label', value.TEXT);
-                sidenavLink.setAttribute('title', value.TEXT);
-                sidenavLink.setAttribute('data-tooltip', value.TEXT);
-                sidenavLink.setAttribute('id', `sidenav-item-${key}`);
-                sidenavLink.innerHTML = `${value.SVG} ${value.TEXT}`;
-
-                sidenavItem.appendChild(sidenavLink);
-                sidenav.appendChild(sidenavItem);
-
-                console.log(`Key: ${key}, Text: ${value.TEXT}`);
+            if (data.choices[0].message.metadata == undefined) {
+                sourceDocuments = "No source documents found.";
             }
-        } else {
-            console.error('sidenavLinks is not an array:', sidenavLinks);
+            else {
+                sourceDocuments = data.choices[0].message.metadata.sources;
+            }
+
+
         }
-    } catch (error) {
-        console.error('Failed to create sidenav links:', error);
-    }
-}
-
-// Function to create tabs
-async function createTabs() {
-
-    const config = await fetchConfig();
-
-    const tabs = document.createElement('div');
-    tabs.className = 'tabs';
-
-    // Loop through CHAT_TABS to create tabs dynamically
-    Object.entries(config.RESPONSE_TABS).forEach(([key, value], index) => {
-        const tab = document.createElement('div');
-        tab.className = `tab ${index === 0 ? 'active' : ''}`;
-        tab.innerHTML = `${value.SVG} ${value.TEXT}`;
-        tabs.appendChild(tab);
-    });
-
-    return tabs;
-}
-
-// Function to create tab contents
-async function createTabContent(docStorageResponse, supportingContent, answerContent) {
-
-    const config = await fetchConfig();
-
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-
-    if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
-
-        // Create a map of documents using their key
-        const docMap = new Map();
-        docStorageResponse.value.forEach(doc => {
-            //var key = "Page " + doc.chunk_id.split('_pages_')[1];
-            var key = doc.chunk_id;
-
-            docMap.set(key, doc);
-        });
-
-        const sortedAnswers = sortAnswers(docMap);
-
-        const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
-
-        var answerResults = "";
-        var supportingContentLink = "";
-        var answerNumber = 1;
-        var sourceNumber = 1;
-
-        // Initialize a Set to store unique document paths
-        const listedPaths = new Set();
-
-        answers.forEach(answer => {
-            if (answer.answerText) {
-                const path = `${answer.document.metadata_storage_path}?${sasToken}`;
-
-                supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
-                answerResults += answerNumber + ". " + answer.answerText + '\n\n';
-                answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
-
-                if (!listedPaths.has(path)) {
-                    listedPaths.add(path);
-
-                    supportingContent.innerHTML += 'Source #' + sourceNumber + ': ' + supportingContentLink + '\n\n';
-                    sourceNumber++;
-                } else {
-                    console.log(`Document already listed: ${path}`);
-                }
-
-                answerNumber++;
-            }
-        });
-
-        if (answerResults != "") {
-            answerContent.innerHTML += answerResults;
+        catch (error) {
+            console.error('Error extracting source documents:', error);
         }
 
-        console.log('Cross-referenced answers:', answers);
-    }
 
-    return answerContent;
+        return data;
+    }
+    catch (error) {
+        if (error.code == 429) {
+
+            const data = { error: 'Token rate limit exceeded. Please try again later.' };
+            return data;
+        }
+        else {
+            const data = { error: 'An error occurred. Please try again later.' };
+            return data;
+        }
+    }
 }
 
 //code to get documents from Azure Storage
@@ -972,6 +631,97 @@ async function getDocuments() {
     } catch (error) {
         console.error('Error fetching documents:', error);
     }
+}
+
+// Function to get SAS token from Azure Key Vault
+async function getSasToken() {
+
+    const config = await fetchConfig();
+
+    const credential = new DefaultAzureCredential();
+    const vaultName = config.KEY_VAULT_NAME;
+    const url = `https://${vaultName}.vault.azure.net`;
+    const client = new SecretClient(url, credential);
+
+    const sasTokenConfig = {};
+    const secretNames = ['SV', 'INCLUDE', 'SS', 'SRT', 'SP', 'SE', 'SPR', 'SIG'];
+
+    for (const name of secretNames) {
+        const secret = await client.getSecret(`AZURE_STORAGE_SAS_TOKEN_${name}`);
+        sasTokenConfig[name] = secret.value;
+    }
+
+    return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+}
+
+//code to toggle between chat and document screens
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+// Function to check if a text is a question
+function isQuestion(text) {
+    const questionWords = ['who', 'what', 'where', 'when', 'why', 'how'];
+    const words = text.trim().toLowerCase().split(/\s+/);
+    return questionWords.includes(words[0]);
+}
+
+// Function to post a question to the chat display
+async function postQuestion() {
+
+    const config = await fetchConfig();
+    let chatInput = document.getElementById('chat-input').value;
+    const chatDisplay = document.getElementById('chat-display');
+    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
+    const dateTimestamp = new Date().toLocaleString();
+
+    // Check if chatInput ends with a question mark, if not, add one
+    if (!chatInput.trim().endsWith('?') && isQuestion(chatInput)) {
+        chatInput += '?';
+    }
+
+    // Capitalize the first letter if it is not already capitalized
+    if (chatInput.length > 0 && chatInput[0] !== chatInput[0].toUpperCase()) {
+        chatInput = chatInput[0].toUpperCase() + chatInput.slice(1);
+    }
+
+    // Create a new div for the chat bubble
+    const questionBubble = document.createElement('div');
+    questionBubble.setAttribute('class', 'question-bubble fade-in'); // Add fade-in class
+
+    const svg = document.createElement("div");
+    svg.className = 'question-bubble-svg';
+    svg.innerHTML = config.ICONS.QUESTION_MARK.SVG;
+
+    const questionText = document.createElement("div");
+    questionText.className = "question-bubble-text";
+    questionText.innerHTML = `Question: "${chatInput}"`;
+
+    const dateText = document.createElement("div");
+    dateText.className = "question-bubble-date";
+    dateText.innerHTML = `Date: ${dateTimestamp}`;
+
+    questionBubble.appendChild(svg);
+    questionBubble.appendChild(questionText);
+    questionBubble.appendChild(dateText);
+
+    questionBubble.style.display = 'none'; // Hide the question bubble initially
+
+    // Append the chat bubble to the chat-info div
+    chatDisplay.appendChild(questionBubble);
+
+    const chatCurrentQuestionBubble = questionBubble.cloneNode(true);
+    chatCurrentQuestionBubble.style.display = 'block'; // Show the current question bubble
+
+    chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
+    chatCurrentQuestionContainer.appendChild(chatCurrentQuestionBubble);
+
+    // Scroll to the position right above the newest questionBubble
+    const questionBubbleTop = questionBubble.offsetTop;
+    chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+    showResponse(questionBubble);
 }
 
 // Function to render documents
@@ -1109,6 +859,131 @@ async function renderDocuments(blobs) {
     }
 }
 
+// Function to rephrase text
+async function rephraseResponseText(searchAnswers, docMap) {
+    const config = await fetchConfig();
+
+    const apiVersion = config.OPENAI_API_VERSION;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const apiKey = aiGPTModel.ApiKey;
+    const deploymentName = aiGPTModel.Name;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+
+    const answers = [];
+
+    // Iterate over the answers and cross-reference with documents
+    searchAnswers.forEach(async answer => {
+        var answerText = answer.text;
+        answerText = answerText.replace("  ", " ");
+        if (answer.text) {
+            const correspondingDoc = docMap.get(answer.key);
+            if (correspondingDoc) {
+
+                try {
+                    // Haven't figured out how to get the embeddings to work yet so commenting out
+                    //const rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
+                    const rephrasedResponseText = "error";
+
+                    if (rephrasedResponseText == "error") {
+                        answers.push({
+                            answerText: answer.text,
+                            document: correspondingDoc
+                        });
+                    }
+                    else {
+                        answers.push({
+                            answerText: rephrasedResponseText,
+                            document: correspondingDoc
+                        });
+                    }
+                } catch (error) {
+                    answers.push({
+                        answerText: answer.text,
+                        document: correspondingDoc
+                    });
+                }
+            }
+        }
+    });
+
+    return answers;
+}
+
+// Function to rephrase text using Azure OpenAI Service
+async function rephraseResponseFromAzureOpenAI(text) {
+
+    const config = await fetchConfig();
+
+    const apiVersion = config.OPENAI_API_VERSION;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const apiKey = aiGPTModel.ApiKey;
+    const deploymentName = aiGPTModel.Name;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+
+    const answers = [];
+
+    const payload = {
+        "messages": [
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "You are an AI assistant that helps people find information."
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": `Rephrase the following text to sound more human: '${text}'`
+                    }
+                ]
+            }
+        ],
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "max_tokens": 800,
+        "stop": null,
+        "stream": false
+    };
+
+    const jsonString = JSON.stringify(payload)
+
+    //Need to add endpoint
+    ß
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': apiKey
+            },
+            body: jsonString
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error: ${errorData.error.message}`);
+        }
+
+        const data = await response.json();
+        return data.choices[0].message.content.trim();
+    } catch (error) {
+        console.error('Error rephrasing text:', error);
+        return "error";
+        //throw error;
+    }
+}
+
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
@@ -1148,6 +1023,206 @@ async function runSearchIndexer(searchIndexers) {
     });
 }
 
+// Function to set the height of the chat display container
+function setChatDisplayHeight() {
+    const chatDisplayContainer = document.getElementById('chat-display-container');
+    const chatInfoTextCopy = document.getElementById('chat-info-text-copy');
+
+    const windowHeight = window.innerHeight - (chatInfoTextCopy.offsetHeight + 200);
+
+    // Calculate the desired height (e.g., 80% of the window height)
+    const desiredHeight = windowHeight * 0.65;
+
+    // Set the height of the chat-display-container
+    chatDisplayContainer.style.height = `${desiredHeight}px`;
+}
+
+// Function to set the site logo
+async function setSiteLogo() {
+    const siteLogo = document.getElementById('site-logo');
+    const siteLogoText = document.getElementById('site-logo-text');
+    const siteLogoTextCopy = document.getElementById('site-logo-text-copy');
+
+    const config = await fetchConfig();
+
+    if (config.SITE_LOGO == "default" || getQueryParam('sitelogo') == "default") {
+        siteLogo.src = "images/site-logo-default.png";
+        siteLogo.classList.remove('site-logo-custom');
+        siteLogo.classList.add('site-logo-default');
+    }
+    else {
+        siteLogo.src = "images/site-logo-custom.png";
+        siteLogo.classList.remove('site-logo-default');
+        siteLogo.classList.add('site-logo-custom');
+    }
+}
+
+// Function to show responses to questions
+async function showResponse(questionBubble) {
+
+    const config = await fetchConfig();
+
+    const chatInput = document.getElementById('chat-input').value.trim();
+    const chatDisplay = document.getElementById('chat-display');
+    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
+
+    //const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+
+    // Construct the SAS token from the individual components
+    //const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+
+    // Show the loading animation
+    const loadingAnimation = document.querySelector('.loading-animation');
+    loadingAnimation.style.display = 'flex';
+
+    if (chatInput) {
+
+        // Get answers from Azure Search
+        const docStorageResponse = await getAnswersFromAzureSearch(chatInput);
+
+        // Get answers from public internet
+        const publicInternetResponse = await getAnswersFromPublicInternet(chatInput);
+
+        // Hide the loading animation once results are returned
+        loadingAnimation.style.display = 'none';
+
+        // Create a new chat bubble element
+        const chatResponse = document.createElement('div');
+        chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
+
+        // Create tabs
+        const tabs = await createTabs();
+
+        const thoughtProcessContent = document.createElement('div');
+        thoughtProcessContent.className = 'tab-content';
+        thoughtProcessContent.style.fontStyle = 'italic';
+
+        const supportingContent = document.createElement('div');
+        supportingContent.className = 'tab-content';
+        supportingContent.style.fontStyle = 'italic';
+
+        const answerContent = document.createElement('div');
+        answerContent.className = 'tab-content active';
+        answerContent.style.fontStyle = 'italic';
+
+        if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == true) {
+            answerContent.textContent = publicInternetResponse.choices[0].message.content;
+
+            //thoughtProcessContent.textContent = 'Thought process content goes here.';
+            //supportingContent.textContent = 'Supporting content goes here.';
+        }
+
+        // Create tab contents
+        createTabContent(docStorageResponse, answerContent, supportingContent);
+
+        // Append tabs and contents to chat bubble
+        chatResponse.appendChild(tabs);
+        chatResponse.appendChild(answerContent);
+        chatResponse.appendChild(thoughtProcessContent);
+        chatResponse.appendChild(supportingContent);
+
+        // Append the chat bubble to the chat-display div
+        chatDisplay.appendChild(chatResponse);
+
+        // Clear the input field
+        chatInput.value = '';
+
+        // Scroll to the position right above the newest questionBubble
+        const questionBubbleTop = chatResponse.offsetTop;
+        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+        // Add event listeners to tabs
+        const tabElements = tabs.querySelectorAll('.tab');
+        const tabContents = chatResponse.querySelectorAll('.tab-content');
+
+        tabElements.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                tabElements.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                tab.classList.add('active');
+                tabContents[index].classList.add('active');
+            });
+        });
+
+        questionBubble.style.display = 'block'; // Show the question bubble
+
+        // Scroll to the position right above the newest questionBubble
+        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+        chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
+
+    }
+    else {
+        loadingAnimation.style.display = 'none';
+    }
+}
+
+// Function to show a toast notification
+function showToastNotification(message, isSuccess) {
+    // Remove existing toast notifications
+    const existingToasts = document.querySelectorAll('.toast-notification');
+    existingToasts.forEach(toast => toast.remove());
+
+    // Create a new div for the toast notification
+    const toastNotification = document.createElement('div');
+    toastNotification.setAttribute('class', 'toast-notification fade-in');
+    toastNotification.style.backgroundColor = isSuccess ? 'rgba(34, 139, 34, 0.9)' : 'rgb(205, 92, 92, 0.9)';
+
+    // Create a close button
+    const closeButton = document.createElement('span');
+    closeButton.setAttribute('class', 'close-button');
+    closeButton.innerHTML = '&times;';
+    closeButton.onclick = function () {
+        toastNotification.style.display = 'none';
+    };
+
+    // Create the message text
+    const messageText = document.createElement('div');
+    messageText.setAttribute('class', 'toast-message');
+    messageText.innerHTML = message;
+
+    // Append the close button and message text to the toast notification
+
+    toastNotification.appendChild(messageText);
+    toastNotification.appendChild(closeButton);
+
+    // Append the toast notification to the body
+    document.body.appendChild(toastNotification);
+
+    // Automatically remove the toast notification after 5 seconds
+    setTimeout(() => {
+        toastNotification.style.display = 'none';
+    }, 5000);
+}
+
+// Function to sort answers
+function sortAnswers(docMap) {
+    try {
+        // Convert Map to an array for sorting
+        const docArray = Array.from(docMap.values());
+
+        docArray.sort((a, b) => {
+            if (a.key < b.key) {
+                return -1;
+            }
+            if (a.key > b.key) {
+                return 1;
+            }
+            return 0;
+        });
+
+        // Convert sorted array back to Map
+        const sortedDocMap = new Map(docArray.map(doc => [doc.chunk_id, doc]));
+
+        return sortedDocMap;
+
+    }
+    catch (error) {
+        return "error";
+    }
+}
+
 // Function to sort documents
 function sortDocuments(criteria) {
     const sortDirection = currentSortColumn === criteria && currentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1175,11 +1250,17 @@ function sortDocuments(criteria) {
     renderDocuments(sortedBlobs);
 }
 
-//code to toggle between chat and document screens
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
+// Function to toggle all checkboxes
+function toggleAllCheckboxes() {
+
+    const allCheckbox = document.getElementById('datasource-all');
+    const datasourceCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="datasource-"]:not(#datasource-all)');
+
+    datasourceCheckboxes.forEach(checkbox => {
+        checkbox.checked = allCheckbox.checked;
+    });
 }
+
 
 //code to toggle between chat and document screens
 function toggleDisplay(screen) {
@@ -1239,11 +1320,6 @@ function updatePlaceholder() {
     }
 }
 
-function deleteDocuments() {
-    //code to delete documents
-
-}
-
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
     const config = await fetchConfig();
@@ -1298,87 +1374,4 @@ async function uploadFilesToAzure(files) {
     clearFileInput();
 
     await runSearchIndexer(searchIndexers);
-}
-
-//code to clear file input
-function clearFileInput() {
-    const fileInput = document.getElementById('file-input');
-    fileInput.value = ''; // Clear the file input
-
-    const selectedFilesDiv = document.getElementById('file-list');
-    selectedFilesDiv.innerHTML = ''; // Clear the list of selected files
-    updatePlaceholder(); // Update the placeholder text
-}
-
-//code to upload files to Azure Storage using Azure Storage JavaScript library
-async function getSasTokenOld() {
-
-    const config = await fetchConfig();
-
-    const sasFunctionAppUrl = config.AZURE_FUNCTION_APP_URL;
-    const response = await fetch(`${sasFunctionAppUrl}`); // Assuming the Azure Function App endpoint is /api/getSasToken
-    if (!response.ok) {
-        throw new Error('Failed to fetch SAS token');
-    }
-    const data = await response.json();
-    return data.sasToken;
-}
-
-// Function to get SAS token from Azure Key Vault
-async function getSasToken() {
-
-    const config = await fetchConfig();
-
-    const credential = new DefaultAzureCredential();
-    const vaultName = config.KEY_VAULT_NAME;
-    const url = `https://${vaultName}.vault.azure.net`;
-    const client = new SecretClient(url, credential);
-
-    const sasTokenConfig = {};
-    const secretNames = ['SV', 'INCLUDE', 'SS', 'SRT', 'SP', 'SE', 'SPR', 'SIG'];
-
-    for (const name of secretNames) {
-        const secret = await client.getSecret(`AZURE_STORAGE_SAS_TOKEN_${name}`);
-        sasTokenConfig[name] = secret.value;
-    }
-
-    return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-}
-
-// Function to show a toast notification
-function showToastNotification(message, isSuccess) {
-    // Remove existing toast notifications
-    const existingToasts = document.querySelectorAll('.toast-notification');
-    existingToasts.forEach(toast => toast.remove());
-
-    // Create a new div for the toast notification
-    const toastNotification = document.createElement('div');
-    toastNotification.setAttribute('class', 'toast-notification fade-in');
-    toastNotification.style.backgroundColor = isSuccess ? 'rgba(34, 139, 34, 0.9)' : 'rgb(205, 92, 92, 0.9)';
-
-    // Create a close button
-    const closeButton = document.createElement('span');
-    closeButton.setAttribute('class', 'close-button');
-    closeButton.innerHTML = '&times;';
-    closeButton.onclick = function () {
-        toastNotification.style.display = 'none';
-    };
-
-    // Create the message text
-    const messageText = document.createElement('div');
-    messageText.setAttribute('class', 'toast-message');
-    messageText.innerHTML = message;
-
-    // Append the close button and message text to the toast notification
-
-    toastNotification.appendChild(messageText);
-    toastNotification.appendChild(closeButton);
-
-    // Append the toast notification to the body
-    document.body.appendChild(toastNotification);
-
-    // Automatically remove the toast notification after 5 seconds
-    setTimeout(() => {
-        toastNotification.style.display = 'none';
-    }, 5000);
 }

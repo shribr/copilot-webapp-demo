@@ -1188,7 +1188,7 @@ function New-ApiManagementService {
     
     $apiManagementServiceName = $apiManagementService.Name
 
-    if ($existingResources -notcontains $appServiceEnvirontmentName) {
+    if ($existingResources -notcontains $apiManagementServiceName) {
         try {
             $ErrorActionPreference = 'Stop'
             $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait
