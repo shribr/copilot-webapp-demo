@@ -340,8 +340,9 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
                 const path = `${answer.document.metadata_storage_path}?${sasToken}`;
 
                 supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
-                answerResults += answerNumber + ". " + answer.answerText + '\n\n';
-                answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '\n\n\n';
+                //answerResults += "<li>" + answerNumber + ". " + answer.answerText.replace(" **", "") + '</li>';
+                answerResults += '<li>' + answer.answerText.replace(" **", "") + '\n\n\n';
+                answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '</li>';
 
                 if (!listedPaths.has(path)) {
                     listedPaths.add(path);
@@ -357,7 +358,7 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
         });
 
         if (answerResults != "") {
-            answerContent.innerHTML += '<div id="azureStorageResults">Azure Storage Results</div>' + answerResults;
+            answerContent.innerHTML += '<div id="azureStorageResults">Azure Storage Results</div>' + '<ol>' + answerResults + '</ol>';
         }
 
         console.log('Cross-referenced answers:', answers);
@@ -387,6 +388,21 @@ function formatBytes(bytes) {
     else return (bytes / 1048576).toFixed(2) + ' MB';
 }
 
+// Function to format response as bulleted list
+function formatReponseAsBulletedList(text) {
+    try {
+        const lines = text.split('\n');
+        const bulletedList = lines.map(line => {
+            // Remove standalone numbers and replace them with <li> elements
+            return line.replace(/\b\d+\b(?!<\/li>)/g, '').replace(" **", "<li>").replace("**:", "</li>");
+        }).join('');
+        return `<ol>${bulletedList}</ol>`;
+    } catch (error) {
+        console.error('Error formatting response as bulleted list:', error);
+        return text;
+    }
+}
+
 // Function to generate embeddings
 async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, modelType, modelName) {
 
@@ -411,6 +427,7 @@ async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, mo
         return null;
     }
 }
+
 //code to send message to Azure Search via Azure Function
 async function getAnswersFromAzureSearch(userInput) {
     if (!userInput) return;
@@ -421,14 +438,14 @@ async function getAnswersFromAzureSearch(userInput) {
     const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
     const deploymentName = aiGPTModel.Name;
     //const deploymentId = config.DEPLOYMENT_ID;
-    const indexes = config.AZURE_SEARCH_INDEXES;
-    const indexers = config.AZURE_SEARCH_INDEXERS;
+    const indexes = config.SEARCH_INDEXES;
+    const indexers = config.SEARCH_INDEXERS;
     const apiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const storageContainerName = config.AZURE_STORAGE_CONTAINER_NAME;
 
-    //const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0];
-    const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
+    const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+    //const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
 
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
 
@@ -1116,8 +1133,8 @@ async function showResponse(questionBubble) {
         answerContent.style.fontStyle = 'italic';
 
         if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == true) {
-            answerContent.textContent = publicInternetResponse.choices[0].message.content;
-
+            //answerContent.innerHTML += formatReponseAsBulletedList(publicInternetResponse.choices[0].message.content);
+            answerContent.innerText += publicInternetResponse.choices[0].message.content
             //thoughtProcessContent.textContent = 'Thought process content goes here.';
             //supportingContent.textContent = 'Supporting content goes here.';
         }
