@@ -162,18 +162,22 @@ $(document).ready(function () {
         event.preventDefault();
 
         const settingsDialog = document.getElementById('settings-dialog');
+        const settingsOverlay = document.getElementById('settings-overlay');
+
         if (settingsDialog.style.display === 'none' || settingsDialog.style.display === '') {
             settingsDialog.style.display = 'block';
+            settingsOverlay.style.display = 'block';
         } else {
             settingsDialog.style.display = 'none';
+            settingsOverlay.style.display = 'none';
         }
 
         // Handle settings click
         console.log('Settings clicked');
-
-
     });
 
+    /*
+    COMMENTING OUT FOR NOW
     document.getElementById('toggle-icons').addEventListener('change', function () {
         const iconElements = document.getElementsByClassName('iconify');
         const iconColorElements = document.getElementsByClassName('iconify-color');
@@ -189,7 +193,7 @@ $(document).ready(function () {
 
         toggleDisplay(iconElements);
         toggleDisplay(iconColorElements);
-    });
+    });*/
 
     document.getElementById('link-profile').addEventListener('click', function (event) {
         event.preventDefault();
@@ -205,6 +209,7 @@ $(document).ready(function () {
 
     document.getElementById('close-settings-dialog').addEventListener('click', function () {
         document.getElementById('settings-dialog').style.display = 'none';
+        document.getElementById('settings-overlay').style.display = 'none';
     });
 
     document.getElementById('datasources-header').addEventListener('click', function () {
@@ -1262,7 +1267,6 @@ function toggleAllCheckboxes() {
         checkbox.checked = allCheckbox.checked;
     });
 }
-
 
 //code to toggle between chat and document screens
 function toggleDisplay(screen) {

@@ -36,7 +36,7 @@
                         <div id="chat-info-text-copy">
                             <h2>Chat with your data</h2>
                             <p>Examples of questions you can ask:</p>
-                            <ul>
+                            <ul id="chat_examples">
                                 <li>What is the summary of the document?</li>
                                 <li>Can you extract key points from the document?</li>
                                 <li>What are the main topics covered?</li>
@@ -195,7 +195,10 @@
     </div>
     </div>
     </div>
-
+    <div id="settings-overlay"
+        class="mud-overlay mud-drawer-overlay mud-overlay-drawer mud-drawer-pos-right mud-drawer-overlay--open mud-drawer-overlay-temporary mud-drawer-overlay-md">
+        <div id="settings-overlay-dark" class="mud-overlay-scrim mud-overlay-dark settings-overlay"></div>
+    </div>
     <!-- Settings Dialog HTML -->
     <div id="settings-dialog">
         <!-- Close Button SVG -->

@@ -7,6 +7,12 @@ body {
   flex-direction: column;
   height: 100vh;
   background-color: #f4f4f9;
+  line-height: 1.5 !important;
+  -webkit-font-smoothing: auto !important;
+}
+
+* {
+  -webkit-font-smoothing: auto !important;
 }
 
 a {
@@ -70,7 +76,8 @@ code {
   padding-right: 20px;
 }
 
-#file_types {
+#file_types,
+#chat_examples {
   border: 1px solid #e6e6e6;
   padding-top: 15px !important;
   padding-bottom: 15px !important;
@@ -317,6 +324,7 @@ label[for="chat-input"] {
 
 #chat-info-text-copy {
   padding: 10px;
+  width: 500px;
 }
 
 #chat-info-top {
@@ -358,6 +366,17 @@ label[for="chat-input"] {
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   padding: 20px;
   overflow-y: auto;
+  z-index: 1000;
+}
+
+#settings-overlay {
+  display: none;
+  z-index: 1000;
+}
+
+#settings-overlay-dark {
+  background-color: rgba(33, 33, 33, 0.4980392156862745);
+  z-index: 1;
 }
 
 #close-settings-dialog {
@@ -381,6 +400,8 @@ label[for="chat-input"] {
 .form-group textarea {
   width: 100%;
   box-sizing: border-box;
+  border-width: 1px !important;
+  padding: 2px !important;
 }
 
 .form-group input[type="checkbox"],
@@ -531,7 +552,7 @@ label[for="chat-input"] {
   text-align: left;
   color: #444 !important;
   white-space: nowrap;
-  font-size: 12px !important;
+  font-size: 14px !important;
 }
 
 .preview {
@@ -957,6 +978,10 @@ REMOVING BANDED ROWS FOR NOW
   overflow: visible;
   width: 28px;
   height: 28px;
+}
+
+.edit-icon {
+  padding-bottom: 4px;
 }
 
 .action-container {
