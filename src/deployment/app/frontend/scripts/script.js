@@ -347,7 +347,7 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
                 if (!listedPaths.has(path)) {
                     listedPaths.add(path);
 
-                    supportingContent.innerHTML += 'Source #' + sourceNumber + ': ' + supportingContentLink + '\n\n';
+                    supportingContent.innerHTML += '\n\nSource #' + sourceNumber + ': ' + supportingContentLink;
                     sourceNumber++;
                 } else {
                     console.log(`Document already listed: ${path}`);
@@ -358,7 +358,7 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
         });
 
         if (answerResults != "") {
-            answerContent.innerHTML += '<div id="azureStorageResults">Azure Storage Results</div>' + '<ol>' + answerResults + '</ol>';
+            answerContent.innerHTML += '<div id="azureStorageResults">Azure Storage Results</div>' + '<ol>' + answerResults + '</ol><br/>';
         }
 
         console.log('Cross-referenced answers:', answers);
