@@ -230,8 +230,11 @@ function clearChatDisplay() {
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.innerHTML = ''; // Clear all content
 
-    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
-    chatCurrentQuestionContainer.innerHTML = '<div class="loading-animation" style="display: none;"><div class="spinner"></div> Fetching results...</div>';
+    const loadingAnimation = document.createElement('div');
+    loadingAnimation.setAttribute('class', 'loading-animation');
+    loadingAnimation.innerHTML = '<div class="spinner"></div> Fetching results...';
+    loadingAnimation.style.display = 'none'; // Hide it initially
+    chatDisplay.appendChild(loadingAnimation);
 }
 
 //code to clear file input
