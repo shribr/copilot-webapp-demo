@@ -790,8 +790,7 @@ async function renderDocuments(blobs) {
             const previewCell = document.createElement('div');
             previewCell.className = 'document-cell preview';
 
-            previewCell.innerHTML = `<a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.COLOR}${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a>`;
-
+            previewCell.innerHTML = `<span class="mud-fab-label" style="display: flex !important"><button class="magnifyButton mud-button-root mud-fab mud-fab-primary mud-fab-size-small mud-ripple"><a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.COLOR}${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a></button></span>`;
 
             const statusCell = document.createElement('div');
             statusCell.className = 'document-cell preview';
@@ -812,7 +811,8 @@ async function renderDocuments(blobs) {
             for (const [key, value] of Object.entries(fileTypes)) {
                 const svgStyle = iconStyle === 'color' ? `${value.SVG_COLOR}` : `${value.SVG}`;
                 if (value.EXTENSION.some(ext => blobName.toLowerCase().endsWith(ext))) {
-                    contentTypeCell.innerHTML = `${value.SVG}${value.SVG_COLOR} ${contentType}`;
+                    //contentTypeCell.innerHTML = `${value.SVG}${value.SVG_COLOR} ${contentType}`;
+                    contentTypeCell.innerHTML = `<code>${contentType}</code>`;
                     fileTypeFound = true;
                     break;
                 }
@@ -820,13 +820,15 @@ async function renderDocuments(blobs) {
 
             if (!fileTypeFound) {
                 const svgStyle = iconStyle === 'color' ? `${fileTypes.TXT.SVG_COLOR}` : `${fileTypes.TXT.SVG}`;
-                contentTypeCell.innerHTML = `${fileTypes.TXT.SVG}${fileTypes.TXT.SVG_COLOR} ${contentType}`;
+                //contentTypeCell.innerHTML = `${fileTypes.TXT.SVG}${fileTypes.TXT.SVG_COLOR} ${contentType}`;
+                contentTypeCell.innerHTML = `<code>${contentType}</code>`;
                 //contentTypeCell.textContent = contentType;
             }
 
             const fileSizeCell = document.createElement('div');
-            fileSizeCell.className = 'document-cell file-size';
-            fileSizeCell.textContent = blobSize;
+            //fileSizeCell.className = 'document-cell file-size';
+            fileSizeCell.className = 'document-cell';
+            fileSizeCell.innerHTML = `<div class="file-size mud-chip mud-chip-filled mud-chip-size-small mud-chip-color-default"><span class="mud-chip-content">${blobSize}</span></div>`;
 
             const lastModifiedCell = document.createElement('div');
             lastModifiedCell.className = 'document-cell';

@@ -13,6 +13,13 @@ a {
   color: rgba(13, 12, 52, 1);
 }
 
+code {
+  color: #444;
+  background: #f3f3f3;
+  padding: 0 0.2rem;
+  border-radius: 0.2rem;
+}
+
 /* Add this to your CSS file */
 @keyframes fadeIn {
   from {
@@ -65,9 +72,11 @@ a {
 
 #file_types {
   border: 1px solid #e6e6e6;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
   background-color: white;
+  padding-inline-start: 40px;
+  list-style: disc !important;
 }
 
 /* Ensure the body takes the full viewport height and uses Flexbox */
@@ -437,6 +446,7 @@ label[for="chat-input"] {
 .accordion-content .form-group label {
   margin-bottom: 0;
 }
+
 #send-button {
   padding: 10px 20px;
   background-color: #0078d4;
@@ -517,8 +527,11 @@ label[for="chat-input"] {
 .document-cell {
   display: table-cell;
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 8px !important;
   text-align: left;
+  color: #444 !important;
+  white-space: nowrap;
+  font-size: 12px !important;
 }
 
 .preview {
@@ -534,9 +547,12 @@ label[for="chat-input"] {
   font-weight: bold;
 }
 
+/*
+REMOVING BANDED ROWS FOR NOW
 .document-row:nth-child(even) {
   background-color: #f9f9f9;
 }
+*/
 
 .document-row:hover {
   background-color: #f1f1f1;
@@ -581,6 +597,10 @@ label[for="chat-input"] {
   padding-top: 4px;
 }
 
+.file-size {
+  background-color: #f3f3f3 !important;
+}
+
 #file-upload {
   display: flex;
   align-items: center;
@@ -597,12 +617,20 @@ label[for="chat-input"] {
   margin-top: 10px;
 }
 
+.magnifyButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50% !important;
+  background-color: rgba(13, 12, 52, 1) !important;
+  color: white !important;
+}
+
 .iconify {
-  display: none;
+  display: inline;
 }
 
 .iconify-color {
-  display: inline;
+  display: none;
 }
 
 .file-label {
@@ -1045,4 +1073,43 @@ label[for="chat-input"] {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.mud-icon-default {
+  color: var(--mud-palette-text-secondary);
+}
+
+.mud-disabled .mud-icon-root,
+.mud-disabled .mud-svg-icon,
+.mud-disabled .mud-icon-default {
+  color: var(--mud-palette-text-disabled);
+}
+
+/* CSS FROM BLAZOR FRAMEWORK */
+.mud-icon-root {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  flex-shrink: 0;
+}
+
+.mud-icon-root:focus {
+  outline: 0;
+}
+
+.mud-icon-root.mud-svg-icon {
+  fill: currentColor;
+}
+
+.mud-icon-size-small {
+  font-size: 1.25rem;
+}
+
+.mud-icon-size-medium {
+  font-size: 1.5rem;
+}
+
+.mud-icon-size-large {
+  font-size: 2.25rem;
 }

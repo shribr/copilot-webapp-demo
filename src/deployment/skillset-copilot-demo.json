@@ -119,7 +119,7 @@
   ],
   "cognitiveServices": {
     "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
-    "key": "eeb704d91b40455593faf4bdfb4d7c45"
+    "key": "8ec0aaf0e39e41bf87b481ca8899dc59"
   },
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "indexProjections": {
