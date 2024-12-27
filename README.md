@@ -413,7 +413,7 @@ There are several manual steps which need to be performed for a variety of reaso
 2. Setting CORS to whatever your web app URL is for the Vector Search Index.
 3. Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed.
    <img width="1164" alt="Managed Identity" src="src/deployment/app/frontend/images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888;">
-
+4. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001). 
 4. Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix.
    <img width="1164" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888;">
 5. Azure AI Project / Machine Learning Workspace:
