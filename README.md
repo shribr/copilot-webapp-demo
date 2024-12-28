@@ -170,7 +170,7 @@ The image below shows a diagram of the deployed resources:
      - `New-DocumentIntelligenceAccount`: Creates new Document Intelligence account.
      - `New-KeyVault`: Creates a Key Vault and sets access policies.
      - `New-LogAnalyticsWorkspace`: Creates new Log Analytics Workspace.
-     - `New-MachineLearningWorkspace`: Creates new Machine Learning Workspace. This will ultimately be deleted and replaced with a manual step detailed [below](#Azure AI Project).
+     - `New-MachineLearningWorkspace`: Creates new Machine Learning Workspace. This will ultimately be deleted and replaced with a manual step detailed [below](#azure_ai_machine_learning_workspace).
      - `New-ManagedIdentity`: Creates a new managed identity.
      - `New-PrivateEndPoint`: Creates a new private endpoint.
      - `New-ResourceGroup`: Creates a new resource group.
@@ -432,7 +432,7 @@ There are several manual steps which need to be performed for a variety of reaso
    - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. <sup>[5](#search_service_index_vectorizer_multi_service_account)</sup>
 3. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
 4. **Azure AI Project / Machine Learning Workspace:**
-   <img width="600" alt="Machine Learning Workspace" src="src/deployment/app/frontend/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+   <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/app/frontend/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
 
