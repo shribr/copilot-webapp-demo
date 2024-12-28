@@ -303,12 +303,12 @@ async function createTabs() {
     return tabs;
 }
 
-// Function to create tab contents
-function createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken) {
+// Function to create tab contents for supporting content results returned from Azure Search
+function createTabContentSupportingContent(answers, docStorageResponse, supportingContent, sasToken) {
 
     if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
 
-        var answerResults = "";
+        //var answerResults = "";
         var citationContentResults = "";
         var supportingContentResults = "";
         var answerNumber = 1;
@@ -322,16 +322,16 @@ function createTabContent(answers, docStorageResponse, answerContent, supporting
                 const path = `${answer.document.metadata_storage_path}?${sasToken}`;
                 const footNoteLink = `<sup class="answer_citations"><a href="#citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
 
-                const supportingContentLink = `<a class="answer_citations" href="${path}" style="text-decoration: underline" target="_blank">${answer.document.title}</a>`;
-
-                answerResults += '<li class="answer_results">' + answer.answerText.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
+                //answerResults += '<li class="answer_results">' + answer.answerText.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
+                supportingContentResults += '<li class="answer_results">' + answer.answerText.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
 
                 if (!listedPaths.has(path)) {
                     listedPaths.add(path);
 
-                    supportingContentResults = `<div class="answer_citations">${sourceNumber}. ${supportingContentLink}</div>`;
-                    supportingContent.innerHTML += supportingContentResults;
-                    citationContentResults += `<div id="citation-link-${sourceNumber}">${supportingContentResults}</div>`;
+                    const supportingContentLink = `<a class="answer_citations" href="${path}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
+
+                    //supportingContentResults += `<div class="answer_citations">${sourceNumber}. ${supportingContentLink}</div>`;
+                    citationContentResults += `<div id="citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
                     sourceNumber++;
                 } else {
@@ -342,19 +342,26 @@ function createTabContent(answers, docStorageResponse, answerContent, supporting
             }
         });
 
-        if (answerResults != "") {
-            answerContent.innerHTML += '<div id="azureStorageResults">Results from Azure Storage</div>' + '<ol id="supporting_content_results">' + answerResults + '</ol><br/>';
-            answerContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Citations:</h6>${citationContentResults}</div>`;
-
-            //supportingContent.innerHTML += supportingContentResults;
-
+        if (supportingContentResults != "") {
+            supportingContent.innerHTML += '<div id="azureStorageResultsContainer"><div id="azureStorageResults">Supporting Content from Azure Storage</div>' + '<ol id="supporting_content_results">' + supportingContentResults + '</ol><br/>';
+            supportingContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
         }
 
         console.log('Cross-referenced answers:', answers);
     }
 
-    return answerContent;
+    return supportingContent;
 }
+
+// Function to create tab contents for answer results returned from Azure OpenAI LLM
+function createTabContentAnswerResults() {
+
+}
+
+// Function to create tab contents for answer results returned from Azure Search and enhanced with Azure OpenAI LLM 
+function createTabContentAnswerResultsAIEnhanced(answers, docStorageResponse, answerResults, sasToken) {
+}
+
 
 // function to delete documents
 function deleteDocuments() {
@@ -536,12 +543,79 @@ async function getAnswersFromAzureSearch(userInput) {
     }
 }
 
-//code to send chat message to Azure Copilot
-async function getAnswersFromPublicInternet(userInput) {
+//code to send chat message to Azure OpenAI model
+async function getAnswersFromAzureOpenAIModel(userInput) {
 
     if (!userInput) return;
 
     //$('#user-input').val('');
+
+    const config = await fetchConfig();
+
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    const apiVersion = config.OPENAI_API_VERSION;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const deploymentName = aiGPTModel.Name;
+    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+
+    const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
+    userMessageContent.text = userInput;
+
+    const jsonString = JSON.stringify(openAIRequestBody);
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            },
+            body: jsonString
+        });
+
+        const data = await response.json();
+
+        // Extract the source documents from the response
+        try {
+            var sourceDocuments = "";
+
+            if (data.choices[0].message.metadata == undefined) {
+                sourceDocuments = "No source documents found.";
+            }
+            else {
+                sourceDocuments = data.choices[0].message.metadata.sources;
+            }
+
+
+        }
+        catch (error) {
+            console.error('Error extracting source documents:', error);
+        }
+
+
+        return data;
+    }
+    catch (error) {
+        if (error.code == 429) {
+
+            const data = { error: 'Token rate limit exceeded. Please try again later.' };
+            return data;
+        }
+        else {
+            const data = { error: 'An error occurred. Please try again later.' };
+            return data;
+        }
+    }
+}
+
+//code to send chat message to Bing Search API (still under development)
+async function getAnswersFromPublicInternet(userInput) {
+
+    if (!userInput) return;
 
     const config = await fetchConfig();
 
@@ -1085,12 +1159,6 @@ async function showResponse(questionBubble) {
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
-
-    //const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
-
-    // Construct the SAS token from the individual components
-    //const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
     loadingAnimation.style.display = 'flex';
@@ -1101,7 +1169,7 @@ async function showResponse(questionBubble) {
         const docStorageResponse = await getAnswersFromAzureSearch(chatInput);
 
         // Get answers from public internet
-        const publicInternetResponse = await getAnswersFromPublicInternet(chatInput);
+        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput);
 
         // Hide the loading animation once results are returned
         loadingAnimation.style.display = 'none';
@@ -1115,7 +1183,7 @@ async function showResponse(questionBubble) {
 
         const thoughtProcessContent = document.createElement('div');
         thoughtProcessContent.className = 'tab-content';
-        thoughtProcessContent.style.fontStyle = 'italic';
+        //thoughtProcessContent.style.fontStyle = 'italic';
 
         const supportingContent = document.createElement('div');
         supportingContent.className = 'tab-content';
@@ -1125,11 +1193,15 @@ async function showResponse(questionBubble) {
         answerContent.className = 'tab-content active';
         answerContent.style.fontStyle = 'italic';
 
-        if (config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS == true) {
+        if (config.AZURE_SEARCH_OPENAI_MODEL == true) {
             //answerContent.innerHTML += formatReponseAsBulletedList(publicInternetResponse.choices[0].message.content);
-            answerContent.innerText += publicInternetResponse.choices[0].message.content
-            //thoughtProcessContent.textContent = 'Thought process content goes here.';
-            //supportingContent.textContent = 'Supporting content goes here.';
+            answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Open AI LLM</div>';
+            answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults.choices[0].message.content}</div>`;
+
+            const codeContent = document.createElement('div');
+            codeContent.className = 'code-content';
+            codeContent.innerHTML = 'Thought process content goes here.';
+            thoughtProcessContent.appendChild(codeContent);
         }
 
         try {
@@ -1149,7 +1221,8 @@ async function showResponse(questionBubble) {
             const sortedAnswers = sortAnswers(docMap);
 
             // Create tab contents
-            createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken);
+            //createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken);
+            createTabContentSupportingContent(answers, docStorageResponse, supportingContent, sasToken);
 
         } catch (error) {
             console.error('Error processing search results:', error);

@@ -56,6 +56,7 @@
   "searchIndexName": "srch-index-copilot-demo-002",
   "searchIndexerName": "srch-indexer-copilot-demo-002",
   "searchPublicInternetResults": true,
+  "searchOpenAIModel": true,
   "searchServiceApiVersion": "2024-11-01-Preview",
   "searchServiceName": "srch-copilot-demo-002",
   "searchSkillSetName": "vector-srch-skillset-copilot-demo-002",

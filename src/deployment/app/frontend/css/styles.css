@@ -77,9 +77,16 @@ code {
 }
 
 #file_types,
-#chat_examples,
-#supporting_content_results {
+#chat_examples {
   border: 1px solid #e6e6e6;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  background-color: white;
+  padding-inline-start: 40px;
+  list-style: disc !important;
+}
+
+#supporting_content_results {
   padding-top: 15px !important;
   padding-bottom: 15px !important;
   background-color: white;
@@ -106,6 +113,17 @@ code {
   margin-left: 8px;
   margin-bottom: 2px;
   top: 0px;
+}
+
+#openai-model-results-header {
+  padding-bottom: 8px;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#openai-model-results {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e6e6e6;
 }
 
 .answer_results {
@@ -869,8 +887,8 @@ REMOVING BANDED ROWS FOR NOW
 
 .question-bubble-svg {
   position: relative;
-  top: -10px;
-  right: 20px;
+  top: -25px;
+  right: 25px;
 }
 
 .question-bubble-date {
@@ -1030,11 +1048,31 @@ REMOVING BANDED ROWS FOR NOW
   /*margin-top: 2px;*/
 }
 
+#thought-process-content {
+  font-family: monospace !important;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  background-color: #e6e6e6 !important;
+  padding-inline-start: 40px;
+}
+
+.code-content {
+  font-family: monospace !important;
+  background-color: #f5f5f5 !important;
+  color: #333 !important;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin: 6px;
+  border-radius: 4px;
+  white-space: pre;
+  overflow-x: auto;
+}
+
 #azureStorageResults {
   text-decoration: underline;
   font-weight: bold;
-  margin-bottom: 4px;
-  margin-top: 12px;
+  margin-bottom: 14px;
+  margin-top: 24px;
 }
 
 .tab.active svg {
