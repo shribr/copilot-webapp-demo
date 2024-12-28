@@ -304,7 +304,7 @@ async function createTabs() {
 }
 
 // Function to create tab contents
-function createTabContent(answers, docStorageResponse, supportingContent, answerContent, sasToken) {
+function createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken) {
 
     if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
 
@@ -330,7 +330,7 @@ function createTabContent(answers, docStorageResponse, supportingContent, answer
                     listedPaths.add(path);
 
                     supportingContentResults = `<div class="answer_citations">${sourceNumber}. ${supportingContentLink}</div>`;
-
+                    supportingContent.innerHTML += supportingContentResults;
                     citationContentResults += `<div id="citation-link-${sourceNumber}">${supportingContentResults}</div>`;
 
                     sourceNumber++;
@@ -346,7 +346,7 @@ function createTabContent(answers, docStorageResponse, supportingContent, answer
             answerContent.innerHTML += '<div id="azureStorageResults">Results from Azure Storage</div>' + '<ol id="supporting_content_results">' + answerResults + '</ol><br/>';
             answerContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Citations:</h6>${citationContentResults}</div>`;
 
-            supportingContent.innertHTML += supportingContentResults;
+            //supportingContent.innerHTML += supportingContentResults;
 
         }
 

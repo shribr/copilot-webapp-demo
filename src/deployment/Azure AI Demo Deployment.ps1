@@ -2689,9 +2689,9 @@ function New-SearchService {
 
             $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
 
-            Start-Sleep -Seconds 15
-
             if ($searchSkillSetExists -eq $false) {
+
+                Start-Sleep -Seconds 30
                 New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
             }
             else {

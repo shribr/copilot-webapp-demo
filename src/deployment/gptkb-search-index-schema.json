@@ -1,0 +1,128 @@
+{
+  "name": "gptkb-search-index-schema.json",
+  "fields": [
+    {
+      "name": "id",
+      "type": "Edm.String",
+      "key": true,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": true,
+      "sortable": true,
+      "facetable": true,
+      "synonymMaps": []
+    },
+    {
+      "name": "content",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": false,
+      "sortable": false,
+      "facetable": false,
+      "analyzer": "en.microsoft",
+      "synonymMaps": []
+    },
+    {
+      "name": "category",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": false,
+      "filterable": false,
+      "sortable": false,
+      "facetable": true,
+      "synonymMaps": []
+    },
+    {
+      "name": "sourcepage",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": false,
+      "filterable": false,
+      "sortable": false,
+      "facetable": true,
+      "synonymMaps": []
+    },
+    {
+      "name": "sourcefile",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": false,
+      "filterable": false,
+      "sortable": false,
+      "facetable": true,
+      "synonymMaps": []
+    },
+    {
+      "name": "embedding",
+      "type": "Collection(Edm.Single)",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": false,
+      "sortable": false,
+      "facetable": false,
+      "synonymMaps": [],
+      "dimensions": 1536,
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-001-text-profile"
+    }
+  ],
+  "scoringProfiles": [],
+  "suggesters": [],
+  "analyzers": [],
+  "tokenizers": [],
+  "tokenFilters": [],
+  "charFilters": [],
+  "normalizers": [],
+  "similarity": {
+    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
+  },
+  "semantic": {
+    "configurations": [
+      {
+        "name": "default",
+        "prioritizedFields": {
+          "prioritizedContentFields": [
+            {
+              "fieldName": "content"
+            }
+          ],
+          "prioritizedKeywordsFields": []
+        }
+      }
+    ]
+  },
+  "vectorSearch": {
+    "algorithms": [
+      {
+        "name": "vector-config-srch-index-copilot-demo-001-algorithm",
+        "kind": "hnsw",
+        "hnswParameters": {
+          "m": 4,
+          "efConstruction": 400,
+          "efSearch": 500,
+          "metric": "cosine"
+        }
+      }
+    ],
+    "profiles": [
+      {
+        "name": "vector-profile-srch-index-copilot-demo-001-text-profile",
+        "algorithm": "vector-profile-srch-index-copilot-demo-001-text-vectorizer"
+      }
+    ],
+    "vectorizers": [],
+    "compressions": []
+  },
+  "@odata.etag": "\"0x8DCC32DEA5FDE3A\""
+}

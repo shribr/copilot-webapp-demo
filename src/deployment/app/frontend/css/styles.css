@@ -87,6 +87,15 @@ code {
   list-style: disc !important;
 }
 
+#why_copilot {
+  border: 0px;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  background-color: white;
+  padding-inline-start: 40px;
+  list-style: disc !important;
+}
+
 .answer_citations {
   color: rgba(33, 150, 243, 1);
   background-color: rgba(33, 150, 243, 0.058823529411764705);
@@ -1017,10 +1026,15 @@ REMOVING BANDED ROWS FOR NOW
   cursor: pointer;
 }
 
+#get_started {
+  margin-top: 2px;
+}
+
 #azureStorageResults {
   text-decoration: underline;
   font-weight: bold;
   margin-bottom: 4px;
+  margin-top: 12px;
 }
 
 .tab.active svg {
