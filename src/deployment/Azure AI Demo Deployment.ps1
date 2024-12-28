@@ -768,6 +768,7 @@ function Initialize-Parameters {
     $global:searchIndexerName = $parametersObject.searchIndexerName
     $global:searchIndexers = $parametersObject.searchIndexers
     $global:searchIndexes = $parametersObject.searchIndexes
+    $global:searchOpenAIModel = $parametersObject.searchOpenAIModel
     $global:searchPublicInternetResults = $parametersObject.searchPublicInternetResults
     $global:searchServiceApiVersion = $parametersObject.searchServiceApiVersion
     $global:searchServiceName = $parametersObject.searchServiceName
@@ -909,6 +910,7 @@ function Initialize-Parameters {
         searchIndexerName            = $searchIndexerName
         searchIndexes                = $searchIndexes
         searchIndexers               = $searchIndexers
+        searchOpenAIModel            = $searchOpenAIModel
         searchPublicInternetResults  = $searchPublicInternetResults
         searchServiceApiVersion      = $searchServiceApiVersion
         searchServiceName            = $searchServiceName
@@ -4252,6 +4254,8 @@ function Update-ConfigFile {
         $config.OPENAI_ACCOUNT_NAME = $global:openAIAccountName
         $config.OPENAI_API_KEY = $openAIApiKey
         $config.OPENAI_API_VERSION = $global:openAIApiVersion
+        $config.SEARCH_OPENAI_MODEL = $global:searchOpenAIModel
+        $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.SITE_LOGO = $global:siteLogo
 
         # Clear existing values in SEARCH_INDEXES
