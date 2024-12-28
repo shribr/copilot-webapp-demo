@@ -408,14 +408,13 @@ For a more in-depth understanding of the chat workflow click [here](./README_CHA
 
 There are several manual steps which need to be performed for a variety of reasons but mainly because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed fully. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing.
 
-1. **Storage Service CORS**
-2. There could be any number of reasons why the Search Service doesn't work properly. It seems to be very tempermental. I've come up with a few things to try to get it working but if none of these work you may just need to scrap your existing Resource Group and redeploy from scratch. <sup>[1](#storage_service_cors)</sup>
-   - **CORS:** Setting CORS to whatever your web app URL is for the Vector Search Index. It is not enough just to leave it open to "ALL". That will not work. Trust me. This was a nightmare to figure out and I learned a lot more about CORS than I ever really wanted to. In short, your web browser will enforce the SAME ORIGIN policy regardless of whether you want it to or not. So if your search service is **srch-copilot-demo-001.azurewebsites.net** and your app service is **app-copilot-demo-001.azurewebsites.net** then you will get a `Could not complete vectorization action. The vectorization endpoint returned status code '401' (Unauthorized).` error. You will NOT get this error when using a program like Postman because Postman is not a web browser so there is nothing to interfere with your http request. When the CORS setting is set to "All" then the Search Service basically doesn't send anything so your browser assumes that the two services communicating with one another are required to be of the same orgin (i.e. same FQDN). Now, to be fair, your web browser is kinda/sorta doing this for your own protection but it's still kind of annoying when you're trying to troubleshoot stuff. <sup>[2](#search_index_cors)</sup>
-   - **Redacted API Key for Search Index:** Remove the apiKey `<redacted>` entry from the vector search index json if it exists. Don't just remove the value `<redacted>`. Remove the entire property. <sup>[3](#redacted_api_key_search_index)</sup>
-   - **Managed Identity for Search Service Datasource:** Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed. You may need to remove and re-add the managed identity user to the Search service in order to run the indexer too.
-   - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[4](#search_skillset_connect_ai_service)</sup>
-   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. <sup>[5](#search_index_vectorizer_multi_service_account)</sup>
-   
+1. **Storage Service CORS:** Make sure to set the CORS value for the Storage Service to "ALL". <sup>[1](#storage_service_cors)</sup>
+2. **Search Service:** There could be any number of reasons why the Search Service doesn't work properly. It seems to be very tempermental. I've come up with a few things to try to get it working but if none of these work you may just need to scrap your existing Resource Group and redeploy from scratch.
+   - **Search Service Index CORS:** Setting CORS to whatever your web app URL is for the Vector Search Index. It is not enough just to leave it open to "ALL". That will not work. Trust me. This was a nightmare to figure out and I learned a lot more about CORS than I ever really wanted to. In short, your web browser will enforce the SAME ORIGIN policy regardless of whether you want it to or not. So if your search service is **srch-copilot-demo-001.azurewebsites.net** and your app service is **app-copilot-demo-001.azurewebsites.net** then you will get a `Could not complete vectorization action. The vectorization endpoint returned status code '401' (Unauthorized).` error. You will NOT get this error when using a program like Postman because Postman is not a web browser so there is nothing to interfere with your http request. When the CORS setting is set to "All" then the Search Service basically doesn't send anything so your browser assumes that the two services communicating with one another are required to be of the same orgin (i.e. same FQDN). Now, to be fair, your web browser is kinda/sorta doing this for your own protection but it's still kind of annoying when you're trying to troubleshoot stuff. <sup>[2](#search_service_index_cors)</sup>
+   - **Search Service Index Redacted API Key:** Remove the apiKey `<redacted>` entry from the vector search index json if it exists. Don't just remove the value `<redacted>`. Remove the entire property. <sup>[3](#search_service_index_redacted_api_key)</sup>
+   - **Search Service Datasource Managed Identity:** Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed. You may need to remove and re-add the managed identity user to the Search service in order to run the indexer too.
+   - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[4](#search_service_skillset_connect_ai_service)</sup>
+   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. <sup>[5](#search_service_index_vectorizer_multi_service_account)</sup>
 3. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
 4. **Azure AI Project / Machine Learning Workspace:**
    <img width="600" alt="Machine Learning Workspace" src="src/deployment/app/frontend/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
@@ -453,18 +452,21 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 ### Storage Service CORS
 <img id="storage_service_cors" width="600" alt="Setting CORS" src="src/deployment/app/frontend/images/azure-ai-demo-storage-cors-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Datasource Managed Identity
-<img id="search_datasource_managed_identity" width="600" alt="Managed Identity" src="src/deployment/app/frontend/images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+### Search Service Index CORS
+<img id="search_service_index_cors" width="600" alt="Search Index CORS Config" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Index CORS
-<img id="search_index_cors" width="600" alt="Search Index CORS Config" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+### Search Service Index Vectorizer Api-Key Redacted
+<img id="search_service_index_redacted_api_key" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-apikey-redacted.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Index Vectorizer Multi-Service Account
-<img id="search_index_vectorizer_multi_service_account" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+### Search Service Datasource Managed Identity
+<img id="search_service_datasource_managed_identity" width="600" alt="Managed Identity" src="src/deployment/app/frontend/images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Index Vectorizer Api-Key Redacted
-<img id="search_index_vectorizer_apikey_redacted" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-apikey-redacted.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-     
+### Search Service Skillset Connect to AI Service
+<img id="search_service_skillset_connect_ai_service" width="600" alt="Managed Identity" src="src/deployment/app/frontend/images/azure-ai-demo-search-skillset-connect-ai-service.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+### Search Service Index Vectorizer Multi-Service Account
+<img id="search_service_index_vectorizer_multi_service_account" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
 ### Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
