@@ -11,7 +11,7 @@
   "aiProjectName": "project-ai-copilot-demo-002",
   "aiServiceName": "ai-service-copilot-demo-002",
   "aiServiceApiVersion": "2024-08-01-preview",
-  "appDeploymentOnly": true,
+  "appDeploymentOnly": false,
   "appendUniqueSuffix": false,
   "appInsightsName": "appi-copilot-demo-002",
   "appServiceEnvironmentName": "ase-copilot-demo-002",
@@ -50,13 +50,13 @@
   "resourceSuffix": 1,
   "restoreSoftDeletedResources": true,
   "searchApiVersion": "2024-11-01-preview",
+  "searchAzureOpenAIModel": true,
   "searchDataSourceName": "srch-datasource-copilot-demo-002",
   "searchEndpoint": "https://srch-copilot-demo-002.search.windows.net",
   "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",
   "searchIndexName": "srch-index-copilot-demo-002",
   "searchIndexerName": "srch-indexer-copilot-demo-002",
   "searchPublicInternetResults": true,
-  "searchOpenAIModel": true,
   "searchServiceApiVersion": "2024-11-01-Preview",
   "searchServiceName": "srch-copilot-demo-002",
   "searchSkillSetName": "srch-skillset-copilot-demo-002",
@@ -339,6 +339,11 @@
       "Name": "vector-srch-indexer-copilot-demo-002",
       "IndexName": "vector-srch-index-copilot-demo-002",
       "Schema": "vector-search-indexer-schema.json"
+    },
+    {
+      "Name": "embeddings-srch-indexer-copilot-demo-002",
+      "IndexName": "embeddings-srch-index-copilot-demo-002",
+      "Schema": "embeddings-search-indexer-schema.json"
     }
   ],
   "searchServiceProperties": {

@@ -768,7 +768,7 @@ function Initialize-Parameters {
     $global:searchIndexerName = $parametersObject.searchIndexerName
     $global:searchIndexers = $parametersObject.searchIndexers
     $global:searchIndexes = $parametersObject.searchIndexes
-    $global:searchOpenAIModel = $parametersObject.searchOpenAIModel
+    $global:searchAzureOpenAIModel = $parametersObject.searchAzureOpenAIModel
     $global:searchPublicInternetResults = $parametersObject.searchPublicInternetResults
     $global:searchServiceApiVersion = $parametersObject.searchServiceApiVersion
     $global:searchServiceName = $parametersObject.searchServiceName
@@ -910,7 +910,7 @@ function Initialize-Parameters {
         searchIndexerName            = $searchIndexerName
         searchIndexes                = $searchIndexes
         searchIndexers               = $searchIndexers
-        searchOpenAIModel            = $searchOpenAIModel
+        searchAzureOpenAIModel       = $searchAzureOpenAIModel
         searchPublicInternetResults  = $searchPublicInternetResults
         searchServiceApiVersion      = $searchServiceApiVersion
         searchServiceName            = $searchServiceName
@@ -4239,7 +4239,6 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_SERVICE_NAME = $global:searchServiceName
         $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
         $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
-        $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageAccountName
         $config.AZURE_STORAGE_API_VERSION = $global:storageApiVersion
         $config.AZURE_STORAGE_FULL_URL = $storageUrl
@@ -4254,8 +4253,8 @@ function Update-ConfigFile {
         $config.OPENAI_ACCOUNT_NAME = $global:openAIAccountName
         $config.OPENAI_API_KEY = $openAIApiKey
         $config.OPENAI_API_VERSION = $global:openAIApiVersion
-        $config.SEARCH_OPENAI_MODEL = $global:searchOpenAIModel
-        $config.AZURE_SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
+        $config.SEARCH_AZURE_OPENAI_MODEL = $global:searchAzureOpenAIModel
+        $config.SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.SITE_LOGO = $global:siteLogo
 
         # Clear existing values in SEARCH_INDEXES

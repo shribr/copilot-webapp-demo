@@ -437,7 +437,7 @@ async function getAnswersFromAzureSearch(userInput, useEmbeddings) {
     var embeddings = null;
 
     if (useEmbeddings) {
-        indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+        indexName = indexes.filter(item => /embeddings-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
 
         const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
 
@@ -450,7 +450,7 @@ async function getAnswersFromAzureSearch(userInput, useEmbeddings) {
 
     }
     else {
-        indexName = indexes.filter(item => /embeddings-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+        indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
     }
 
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
@@ -1165,11 +1165,11 @@ async function showResponse(questionBubble) {
     if (chatInput) {
 
         // Get answers from Azure Search
-        const docStorageResponse = await getAnswersFromAzureSearch(chatInput);
+        const docStorageResponse = await getAnswersFromAzureSearch(chatInput, false);
 
         //const docStorageResponseOpenAIEnhanced = await getAzureSearchResultsAIEnhanced(docStorageResponse);
 
-        // Get answers from public internet
+        // Get answers from Azure OpenAI model
         const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput);
 
         // Hide the loading animation once results are returned
@@ -1194,7 +1194,7 @@ async function showResponse(questionBubble) {
         answerContent.className = 'tab-content active';
         answerContent.style.fontStyle = 'italic';
 
-        if (config.AZURE_SEARCH_OPENAI_MODEL == true) {
+        if (config.SEARCH_AZURE_OPENAI_MODEL == true) {
             answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Open AI LLM</div>';
             answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults.choices[0].message.content}</div>`;
 
@@ -1224,7 +1224,9 @@ async function showResponse(questionBubble) {
         }
 
         try {
-            const aiEnhancedAnswers = await mapAnswersToDocSources(docStorageResponse["@search.answers"], docMap, true);
+            // Get answers from Azure Search with embeddings
+            const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, true);
+            const aiEnhancedAnswers = await mapAnswersToDocSources(docStorageResponseWithEmbeddings["@search.answers"], docMap, true);
         }
         catch (error) {
             console.error('Error processing search results:', error);
