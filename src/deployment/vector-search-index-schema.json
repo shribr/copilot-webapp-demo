@@ -98,7 +98,7 @@
       "sortable": false,
       "facetable": false,
       "synonymMaps": [],
-      "dimensions": 1024,
+      "dimensions": 3072,
       "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-001-text-profile"
     },
     {
@@ -112,15 +112,13 @@
       "sortable": false,
       "facetable": false,
       "synonymMaps": [],
-      "dimensions": 1024,
+      "dimensions": 3072,
       "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-001-image-profile"
     }
   ],
   "scoringProfiles": [],
   "corsOptions": {
-    "allowedOrigins": [
-      "*"
-    ],
+    "allowedOrigins": ["*"],
     "maxAgeInSeconds": 300
   },
   "suggesters": [],

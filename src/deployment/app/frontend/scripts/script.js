@@ -476,9 +476,9 @@ async function getAnswersFromAzureSearch(userInput) {
             count: true,
             vectorQueries: [
                 {
-                    kind: "text",
-                    text: userInput,
-                    value: embeddings,
+                    kind: "vector",
+                    vector: embeddings,
+                    k: 7,
                     fields: "text_vector,image_vector"
                 }
             ],
@@ -1132,23 +1132,28 @@ async function showResponse(questionBubble) {
             //supportingContent.textContent = 'Supporting content goes here.';
         }
 
-        const citationLinkContent = document.createElement('div');
+        try {
+            const citationLinkContent = document.createElement('div');
 
-        // Create a map of documents using their key
-        const docMap = new Map();
-        docStorageResponse.value.forEach(doc => {
-            //var key = "Page " + doc.chunk_id.split('_pages_')[1];
-            var key = doc.chunk_id;
+            // Create a map of documents using their key
+            const docMap = new Map();
+            docStorageResponse.value.forEach(doc => {
+                //var key = "Page " + doc.chunk_id.split('_pages_')[1];
+                var key = doc.chunk_id;
 
-            docMap.set(key, doc);
-        });
+                docMap.set(key, doc);
+            });
 
-        const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
+            const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
 
-        const sortedAnswers = sortAnswers(docMap);
+            const sortedAnswers = sortAnswers(docMap);
 
-        // Create tab contents
-        createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken);
+            // Create tab contents
+            createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken);
+
+        } catch (error) {
+            console.error('Error processing search results:', error);
+        }
 
         // Append tabs and contents to chat bubble
         chatResponse.appendChild(tabs);
