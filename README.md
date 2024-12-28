@@ -194,14 +194,14 @@ The image below shows a diagram of the deployed resources:
      - `Get-DataSources`: Tests if a datasource exists.
      - `Get-LatestApiVersion`: Gets the latest API version for a resource type.
      - `Get-LatestDotNetRuntime`: Gets the latest .NET runtime version.
-     - `Get-RandomInt`: Generates a random integer.
      - `Get-Parameters-Sorted`: Alphabetizes the parameters object.
+     - `Get-RandomInt`: Generates a random integer.
      - `Get-SearchIndexes`, `Get-SearchIndexers`, `Get-SearchSkillSets`: Check if a search index, indexer, or skillset exists.
      - `Get-UniqueSuffix`: Finds a unique suffix for resource names.
      - `Get-ValidServiceName`: Ensures the service name is valid.
+     - `Initialize-Parameters`: Initializes the parameters.
      - `Install-Extensions`: Installs Visual Studio Code extensions.
      - `Invoke-AzureRestMethod`: Invokes an Azure REST API method.
-     - `Initialize-Parameters`: Initializes the parameters.
      - `New-RandomPassword`: Generates a random password.
      - `Remove-AzureResourceGroup`: Deletes Azure resource groups.
      - `Remove-MachineLearningWorkspace`: Deletes a Machine Learning Workspace.
@@ -216,13 +216,13 @@ The image below shows a diagram of the deployed resources:
      - `Test-DirectoryExists`: Checks if a directory exists and creates it if not.
      - `Test-ResourceGroupExists`, `Test-ResourceExists`: Check if a resource group or resource exists.
      - `Test-SubnetExists`: Checks if a subnet exists.
-     - `Update-ParameterFileApiVersions`: Updates the `parameters.json` file with the latest API versions for Azure resources.
-     - `Update-ContainerRegistryFile`: Updates the container registry configuration file with new settings.
-     - `Update-MLWorkspaceFile`: Updates the machine learning workspace configuration file with new parameters.
      - `Update-AIConnectionFile`: Updates the AI connection configuration file with new connection details.
-     - `Update-SearchIndexFiles`: Updates the search index configuration files with new index settings.
      - `Update-AIProjectFile`: Updates the AI project configuration file with new project details.
      - `Update-ConfigFile`: Update configuration files to be used by front-end JavaScript code. This includes all of the service names, urls and any newly generated API keys.
+     - `Update-ContainerRegistryFile`: Updates the container registry configuration file with new settings.
+     - `Update-MLWorkspaceFile`: Updates the machine learning workspace configuration file with new parameters.
+     - `Update-ParameterFileApiVersions`: Updates the `parameters.json` file with the latest API versions for Azure resources.
+     - `Update-SearchIndexFiles`: Updates the search index configuration files with new index settings.
      - `Write-Log`: Writes messages to a log file.
 
 5. **Main Script Execution:**
