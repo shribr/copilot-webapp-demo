@@ -988,93 +988,6 @@ function New-AIHub {
     }
 }
 
-# Function to create a new AI Service
-function New-AIService {
-    param (
-        [string]$aiServiceName,
-        [string]$resourceGroupName,
-        [string]$location,
-        [array]$existingResources
-    )
-
-    # Create AI Service
-    if ($existingResources -notcontains $aiServiceName) {
-        try {
-            $ErrorActionPreference = 'Stop'
-            
-            #$aiServicesUrl = "$aiServiceName.openai.azure.com"
-
-            #az resource show --resource-group "$resourceGroupName" --name "$aiServiceName" --resource-type accounts --namespace Microsoft.CognitiveServices
-             
-            $jsonOutput = az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none 2>&1
-
-            $global:aiServiceProperties.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
-
-            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
-
-            if ($jsonOutput -match "error") {
-
-                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
-
-                $errorName = $errorInfo["Error"]
-                $errorCode = $errorInfo["Code"]
-                $errorDetails = $errorInfo["Message"]
-
-                $errorMessage = "Failed to create AI Services account '$aiServiceName'. `
-        Error: $errorName `
-        Code: $errorCode `
-        Message: $errorDetails"
-               
-                # Check if the error is due to soft deletion
-                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
-                    try {
-                        # Attempt to restore the soft-deleted Cognitive Services account
-                        Restore-SoftDeletedResource -resourceName $aiServiceName -resourceType "AIServices" -location $location -resourceGroupName $resourceGroupName
-                    }
-                    catch {
-                        Write-Error "Failed to restore AI Services account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                        Write-Log -message "Failed to restore AI Services account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    }
-                }
-                else {
-                    Write-Error "Failed to create AI Service account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create AI Service account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-
-                    Write-Host $errorMessage
-                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
-                } 
-            }
-            else {
-                Write-Host "AI Service account '$aiServiceName' created."
-                Write-Log -message "AI Service account '$aiServiceName' created." 
-            }
-
-            #Write-Host "AI Service: '$aiServiceName' created."
-            #Write-Log -message "AI Service: '$aiServiceName' created."
-        }
-        catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
-                try {
-                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -location $location -resourceType "AIService"    
-                }
-                catch {
-                    Write-Error "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
-                }
-            }
-            else {
-                Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
-            }    
-        }
-    }
-    else {
-        Write-Host "AI Service '$aiServiceName' already exists."
-        Write-Log -message "AI Service '$aiServiceName' already exists." -logFilePath $global:LogFilePath
-    }
-}
-
 # Function to create a new AI Hub connection
 function New-AIHubConnection {
     param (
@@ -1175,6 +1088,93 @@ function New-AIProject {
     }
 }
 
+# Function to create a new AI Service
+function New-AIService {
+    param (
+        [string]$aiServiceName,
+        [string]$resourceGroupName,
+        [string]$location,
+        [array]$existingResources
+    )
+
+    # Create AI Service
+    if ($existingResources -notcontains $aiServiceName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            
+            #$aiServicesUrl = "$aiServiceName.openai.azure.com"
+
+            #az resource show --resource-group "$resourceGroupName" --name "$aiServiceName" --resource-type accounts --namespace Microsoft.CognitiveServices
+             
+            $jsonOutput = az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none 2>&1
+
+            $global:aiServiceProperties.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
+
+            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+
+            if ($jsonOutput -match "error") {
+
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create AI Services account '$aiServiceName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+               
+                # Check if the error is due to soft deletion
+                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
+                    try {
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        Restore-SoftDeletedResource -resourceName $aiServiceName -resourceType "AIServices" -location $location -resourceGroupName $resourceGroupName
+                    }
+                    catch {
+                        Write-Error "Failed to restore AI Services account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore AI Services account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    }
+                }
+                else {
+                    Write-Error "Failed to create AI Service account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create AI Service account '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                } 
+            }
+            else {
+                Write-Host "AI Service account '$aiServiceName' created."
+                Write-Log -message "AI Service account '$aiServiceName' created." 
+            }
+
+            #Write-Host "AI Service: '$aiServiceName' created."
+            #Write-Log -message "AI Service: '$aiServiceName' created."
+        }
+        catch {
+            # Check if the error is due to soft deletion
+            if ($_ -match "has been soft-deleted" && $restoreSoftDeletedResource) {
+                try {
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -location $location -resourceType "AIService"    
+                }
+                catch {
+                    Write-Error "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore soft-deleted AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+                }
+            }
+            else {
+                Write-Error "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create AI Service '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            }    
+        }
+    }
+    else {
+        Write-Host "AI Service '$aiServiceName' already exists."
+        Write-Log -message "AI Service '$aiServiceName' already exists." -logFilePath $global:LogFilePath
+    }
+}
+
 # Function to create and deploy Api Management service
 function New-ApiManagementService {
     param (
@@ -1207,6 +1207,37 @@ function New-ApiManagementService {
     else {
         Write-Host "API Management service '$apiManagementServiceName' already exists."
         Write-Log -message "API Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
+    }
+}
+
+function New-ApplicationInsights {
+    param (
+        [string]$appInsightsName,
+        [string]$location,
+        [string]$resourceGroupName,
+        [array]$existingResources
+    )
+    
+    if ($existingResources -notcontains $appInsightsName) {
+
+
+        $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
+
+        # Try to create an Application Insights component
+        try {
+            $ErrorActionPreference = 'Stop'
+            az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
+            Write-Host "Application Insights component '$appInsightsName' created."
+            Write-Log -message "Application Insights component '$appInsightsName' created."
+        }
+        catch {
+            Write-Error "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "Application Insights '$appInsightsName' already exists."
+        Write-Log -message "Application Insights '$appInsightsName' already exists."
     }
 }
 
@@ -1336,37 +1367,6 @@ function New-AppService {
     }
 
     Set-DirectoryPath -targetDirectory $global:deploymentPath
-}
-
-function New-ApplicationInsights {
-    param (
-        [string]$appInsightsName,
-        [string]$location,
-        [string]$resourceGroupName,
-        [array]$existingResources
-    )
-    
-    if ($existingResources -notcontains $appInsightsName) {
-
-
-        $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
-
-        # Try to create an Application Insights component
-        try {
-            $ErrorActionPreference = 'Stop'
-            az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
-            Write-Host "Application Insights component '$appInsightsName' created."
-            Write-Log -message "Application Insights component '$appInsightsName' created."
-        }
-        catch {
-            Write-Error "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
-    }
-    else {
-        Write-Host "Application Insights '$appInsightsName' already exists."
-        Write-Log -message "Application Insights '$appInsightsName' already exists."
-    }
 }
 
 # Function to create a new App Service Environment (ASE)
@@ -2056,6 +2056,7 @@ function New-MachineLearningWorkspace {
         Write-Log -message "Machine Learning Workspace '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 }
+
 # Function to create new OpenAI account
 function New-OpenAIAccount {
     param (
