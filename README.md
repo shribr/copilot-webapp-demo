@@ -172,10 +172,13 @@ The image below shows a diagram of the deployed resources:
      - `New-LogAnalyticsWorkspace`: Creates new Log Analytics Workspace.
      - `New-MachineLearningWorkspace`: Creates new Machine Learning Workspace. This will ultimately be deleted and replaced with a manual step detailed [below](#azure_ai_machine_learning_workspace).
      - `New-ManagedIdentity`: Creates a new managed identity.
+     - `New-OpenAIAccount`: Creates a new OpenAI Account.
      - `New-PrivateEndPoint`: Creates a new private endpoint.
      - `New-ResourceGroup`: Creates a new resource group.
      - `New-Resources`: Creates multiple Azure resources like storage accounts, app service plans, search services, etc.
-     - `New-SearchDataSource`, `New-SearchIndex`, `New-SearchIndexer`: Create search-related resources.
+     - `New-SearchDataSource`, `New-SearchIndex`, `New-SearchIndexer`, `New-SearchService` and `New-SearchSkillSet`: Create search-related resources.
+     - `New-StorageAccount`: Creates a new Storage Account.
+     - `New-SubNet`: Creates a new SubNet.
      - `New-VirtualNetwork`, `New-SubNet`: Create virtual network and subnets.
 
      - `New-ApiManagementService`: Creates and deploys API Management service.
