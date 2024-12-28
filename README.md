@@ -160,14 +160,19 @@ The image below shows a diagram of the deployed resources:
      - `New-AIHub`: Creates AI Hub and AI Model.
      - `New-AIService`: Creates AI service.
      - `New-ApiManagementService`: - Creates new Api Management service.
+     - `New-ApplicationInsights`: Creates new Application Insights service.
      - `New-AppService`: Creates and deploys app services (web apps or function apps).
      - `New-AppServiceEnvironment`: Creates new App Service Environment.
-     - `New-ApplicationInsights`: Creates new Application Insights service.
-     - `New-ResourceGroup`: Creates a new resource group.
-     - `New-Resources`: Creates multiple Azure resources like storage accounts, app service plans, search services, etc.
+     - `New-AppServicePlanInASE`: Creates new App Service Plan in the ASE.
+     - `New-CognitiveServicesAccount`: Creates new Cognitive Services account.
+     - `New-ComputerVisionAccount`: Creates new Computer Vision account.
+     - `New-ContainerRegistry`: Creates new Container Registry.
+     - `New-DocumentIntelligenceAccount`: Creates new Document Intelligence account.
      - `New-KeyVault`: Creates a Key Vault and sets access policies.
      - `New-ManagedIdentity`: Creates a new managed identity.
      - `New-PrivateEndPoint`: Creates a new private endpoint.
+     - `New-ResourceGroup`: Creates a new resource group.
+     - `New-Resources`: Creates multiple Azure resources like storage accounts, app service plans, search services, etc.
      - `New-SearchDataSource`, `New-SearchIndex`, `New-SearchIndexer`: Create search-related resources.
      - `New-VirtualNetwork`, `New-SubNet`: Create virtual network and subnets.
 
