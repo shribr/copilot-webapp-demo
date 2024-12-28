@@ -98,7 +98,7 @@
       "sortable": false,
       "facetable": false,
       "synonymMaps": [],
-      "dimensions": 3072,
+      "dimensions": 1024,
       "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-001-text-profile"
     },
     {
@@ -112,7 +112,7 @@
       "sortable": false,
       "facetable": false,
       "synonymMaps": [],
-      "dimensions": 3072,
+      "dimensions": 1024,
       "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-001-image-profile"
     }
   ],
