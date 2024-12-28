@@ -1,17 +1,17 @@
 {
   "@odata.context": "https://srch-copilot-demo-002.search.windows.net/indexers?api-version=2024-11-01-Preview",
-  "@odata.etag": "\"0x8DCEFF89EE80374\"",
-  "name": "srch-indexer-copilot-demo-002",
-  "description": "",
+  "@odata.etag": "\"0x8DD102F99E2BC2D\"",
+  "name": "embeddings-srch-indexer-copilot-demo-002",
+  "description": null,
   "dataSourceName": "srch-datasource-copilot-demo-002",
-  "skillsetName": "srch-skillset-copilot-demo-002",
-  "targetIndexName": "srch-index-copilot-demo-002",
+  "skillsetName": "srch-skillset-copilot-demo-002.",
+  "targetIndexName": "embeddings-srch-index-copilot-demo-002",
   "disabled": null,
   "schedule": null,
   "parameters": {
     "batchSize": null,
-    "maxFailedItems": 0,
-    "maxFailedItemsPerBatch": 0,
+    "maxFailedItems": null,
+    "maxFailedItemsPerBatch": null,
     "base64EncodeKeys": null,
     "configuration": {
       "dataToExtract": "contentAndMetadata",
@@ -22,12 +22,9 @@
   },
   "fieldMappings": [
     {
-      "sourceFieldName": "metadata_storage_path",
-      "targetFieldName": "metadata_storage_path",
-      "mappingFunction": {
-        "name": "base64Encode",
-        "parameters": null
-      }
+      "sourceFieldName": "metadata_storage_name",
+      "targetFieldName": "title",
+      "mappingFunction": null
     }
   ],
   "outputFieldMappings": [],

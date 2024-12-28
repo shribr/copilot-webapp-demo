@@ -11,7 +11,7 @@
   "aiProjectName": "project-ai-copilot-demo-002",
   "aiServiceName": "ai-service-copilot-demo-002",
   "aiServiceApiVersion": "2024-08-01-preview",
-  "appDeploymentOnly": false,
+  "appDeploymentOnly": true,
   "appendUniqueSuffix": false,
   "appInsightsName": "appi-copilot-demo-002",
   "appServiceEnvironmentName": "ase-copilot-demo-002",
@@ -59,8 +59,8 @@
   "searchOpenAIModel": true,
   "searchServiceApiVersion": "2024-11-01-Preview",
   "searchServiceName": "srch-copilot-demo-002",
-  "searchSkillSetName": "vector-srch-skillset-copilot-demo-002",
-  "searchSkillSetSchema": "skillset-copilot-demo.json",
+  "searchSkillSetName": "srch-skillset-copilot-demo-002",
+  "searchSkillSetSchema": "search-skillset-copilot-demo.json",
   "searchVectorIndexName": "vector-srch-index-copilot-demo-002",
   "searchVectorIndexerName": "vector-srch-indexer-copilot-demo-002",
   "serviceBusNamespaceName": "sb-copilot-demo-002",
@@ -323,6 +323,10 @@
     {
       "Name": "vector-srch-index-copilot-demo-002",
       "Schema": "vector-search-index-schema.json"
+    },
+    {
+      "Name": "embeddings-srch-index-copilot-demo-002",
+      "Schema": "embeddings-search-index-schema.json"
     }
   ],
   "searchIndexers": [

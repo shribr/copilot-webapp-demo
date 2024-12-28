@@ -4,7 +4,7 @@
   "name": "vector-srch-indexer-copilot-demo-004",
   "description": null,
   "dataSourceName": "srch-datasource-copilot-demo-004.",
-  "skillsetName": "vector-srch-skillset-copilot-demo-004.",
+  "skillsetName": "srch-skillset-copilot-demo-004.",
   "targetIndexName": "vector-srch-index-copilot-demo-004.",
   "disabled": null,
   "schedule": null,

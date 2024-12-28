@@ -1,5 +1,5 @@
 {
-  "name": "gptkb-search-index-schema.json",
+  "name": "embeddings-search-index-schema.json",
   "fields": [
     {
       "name": "id",

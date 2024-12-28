@@ -322,7 +322,6 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
                 const path = `${answer.document.metadata_storage_path}?${sasToken}`;
                 const footNoteLink = `<sup class="answer_citations"><a href="#citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
 
-                //answerResults += '<li class="answer_results">' + answer.answerText.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
                 supportingContentResults += '<li class="answer_results">' + answer.answerText.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
 
                 if (!listedPaths.has(path)) {
@@ -330,7 +329,6 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
 
                     const supportingContentLink = `<a class="answer_citations" href="${path}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
 
-                    //supportingContentResults += `<div class="answer_citations">${sourceNumber}. ${supportingContentLink}</div>`;
                     citationContentResults += `<div id="citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
                     sourceNumber++;
@@ -357,11 +355,6 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
 function createTabContentAnswerResults() {
 
 }
-
-// Function to create tab contents for answer results returned from Azure Search and enhanced with Azure OpenAI LLM 
-function createTabContentAnswerResultsAIEnhanced(answers, docStorageResponse, answerResults, sasToken) {
-}
-
 
 // function to delete documents
 function deleteDocuments() {
@@ -425,7 +418,7 @@ async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, mo
 }
 
 //code to send message to Azure Search via Azure Function
-async function getAnswersFromAzureSearch(userInput) {
+async function getAnswersFromAzureSearch(userInput, useEmbeddings) {
     if (!userInput) return;
 
     const config = await fetchConfig();
@@ -440,26 +433,31 @@ async function getAnswersFromAzureSearch(userInput) {
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const storageContainerName = config.AZURE_STORAGE_CONTAINER_NAME;
 
-    const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
-    //const indexName = config.AZURE_SEARCH_VECTOR_INDEX_NAME;
+    var indexName = "";
+    var embeddings = null;
+
+    if (useEmbeddings) {
+        indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+
+        const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
+
+        try {
+            embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.ApiVersion, aiEmbeddingModel.ModelVersion, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
+        } catch (error) {
+            embeddings = null;
+            console.error('Error generating embeddings:', error);
+        }
+
+    }
+    else {
+        indexName = indexes.filter(item => /embeddings-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+    }
 
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
 
-    const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
-
-    //Commenting out for now until I can figure out how to get the embeddings to work
-    //const embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.ApiVersion, aiEmbeddingModel.ModelVersion, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
-    const embeddings = null;
-
-    //need to add code to handle error if embeddings are null
-
     var searchQuery = {};
 
-    if (embeddings === null) {
-        console.error('Error: Embeddings are null. Using fallback search query.');
-    }
-
-    if (embeddings == null) {
+    if (!useEmbeddings || embeddings == null) {
         searchQuery = {
             search: userInput,
             count: true,
@@ -755,6 +753,56 @@ function isQuestion(text) {
     return questionWords.includes(words[0]);
 }
 
+// Function to rephrase text
+async function mapAnswersToDocSources(searchAnswers, docMap, openAIEnhanced) {
+    const config = await fetchConfig();
+
+    const apiVersion = config.OPENAI_API_VERSION;
+    const aiModels = config.AI_MODELS;
+    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
+    const apiKey = aiGPTModel.ApiKey;
+    const deploymentName = aiGPTModel.Name;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+
+    const answers = [];
+
+    // Iterate over the answers and cross-reference with documents
+    searchAnswers.forEach(async answer => {
+        var answerText = answer.text;
+        var rephrasedResponseText = "";
+
+        answerText = answerText.replace("  ", " ");
+        if (answer.text) {
+            const correspondingDoc = docMap.get(answer.key);
+            if (correspondingDoc) {
+
+                try {
+                    // Haven't figured out how to get the embeddings to work yet so commenting out
+                    if (openAIEnhanced) {
+                        rephrasedResponseText = await await rephraseResponseFromAzureOpenAI(answer.text);
+                    }
+                    else {
+                        rephrasedResponseText = answer.text;
+                    }
+
+                    answers.push({
+                        answerText: rephrasedResponseText,
+                        document: correspondingDoc
+                    });
+                } catch (error) {
+                    answers.push({
+                        answerText: answer.text,
+                        document: correspondingDoc
+                    });
+                }
+            }
+        }
+    });
+
+    return answers;
+}
+
 // Function to post a question to the chat display
 async function postQuestion() {
 
@@ -949,58 +997,6 @@ async function renderDocuments(blobs) {
     }
 }
 
-// Function to rephrase text
-async function rephraseResponseText(searchAnswers, docMap) {
-    const config = await fetchConfig();
-
-    const apiVersion = config.OPENAI_API_VERSION;
-    const aiModels = config.AI_MODELS;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const apiKey = aiGPTModel.ApiKey;
-    const deploymentName = aiGPTModel.Name;
-    const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
-
-    const answers = [];
-
-    // Iterate over the answers and cross-reference with documents
-    searchAnswers.forEach(async answer => {
-        var answerText = answer.text;
-        answerText = answerText.replace("  ", " ");
-        if (answer.text) {
-            const correspondingDoc = docMap.get(answer.key);
-            if (correspondingDoc) {
-
-                try {
-                    // Haven't figured out how to get the embeddings to work yet so commenting out
-                    //const rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
-                    const rephrasedResponseText = "error";
-
-                    if (rephrasedResponseText == "error") {
-                        answers.push({
-                            answerText: answer.text,
-                            document: correspondingDoc
-                        });
-                    }
-                    else {
-                        answers.push({
-                            answerText: rephrasedResponseText,
-                            document: correspondingDoc
-                        });
-                    }
-                } catch (error) {
-                    answers.push({
-                        answerText: answer.text,
-                        document: correspondingDoc
-                    });
-                }
-            }
-        }
-    });
-
-    return answers;
-}
-
 // Function to rephrase text using Azure OpenAI Service
 async function rephraseResponseFromAzureOpenAI(text) {
 
@@ -1159,6 +1155,9 @@ async function showResponse(questionBubble) {
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
+    // Create a map of documents using their key
+    const docMap = new Map();
+
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
     loadingAnimation.style.display = 'flex';
@@ -1167,6 +1166,8 @@ async function showResponse(questionBubble) {
 
         // Get answers from Azure Search
         const docStorageResponse = await getAnswersFromAzureSearch(chatInput);
+
+        //const docStorageResponseOpenAIEnhanced = await getAzureSearchResultsAIEnhanced(docStorageResponse);
 
         // Get answers from public internet
         const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput);
@@ -1194,7 +1195,6 @@ async function showResponse(questionBubble) {
         answerContent.style.fontStyle = 'italic';
 
         if (config.AZURE_SEARCH_OPENAI_MODEL == true) {
-            //answerContent.innerHTML += formatReponseAsBulletedList(publicInternetResponse.choices[0].message.content);
             answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Open AI LLM</div>';
             answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults.choices[0].message.content}</div>`;
 
@@ -1205,10 +1205,6 @@ async function showResponse(questionBubble) {
         }
 
         try {
-            const citationLinkContent = document.createElement('div');
-
-            // Create a map of documents using their key
-            const docMap = new Map();
             docStorageResponse.value.forEach(doc => {
                 //var key = "Page " + doc.chunk_id.split('_pages_')[1];
                 var key = doc.chunk_id;
@@ -1216,16 +1212,23 @@ async function showResponse(questionBubble) {
                 docMap.set(key, doc);
             });
 
-            const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
+            const rawAnswers = await mapAnswersToDocSources(docStorageResponse["@search.answers"], docMap, false);
 
             const sortedAnswers = sortAnswers(docMap);
 
-            // Create tab contents
-            //createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken);
-            createTabContentSupportingContent(answers, docStorageResponse, supportingContent, sasToken);
+            // Create tab contents for supporting content
+            createTabContentSupportingContent(rawAnswers, docStorageResponse, supportingContent, sasToken);
 
         } catch (error) {
             console.error('Error processing search results:', error);
+        }
+
+        try {
+            const aiEnhancedAnswers = await mapAnswersToDocSources(docStorageResponse["@search.answers"], docMap, true);
+        }
+        catch (error) {
+            console.error('Error processing search results:', error);
+
         }
 
         // Append tabs and contents to chat bubble

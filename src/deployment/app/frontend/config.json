@@ -258,6 +258,11 @@
       "Name": "vector-srch-indexer-copilot-demo-002",
       "IndexName": "vector-srch-index-copilot-demo-002",
       "Schema": "vector-search-indexer-schema.json"
+    },
+    {
+      "Name": "embeddings-srch-indexer-copilot-demo-002",
+      "IndexName": "embeddings-srch-index-copilot-demo-002",
+      "Schema": "embeddings-search-indexer-schema.json"
     }
   ],
   "SEARCH_INDEXES": [
@@ -268,6 +273,10 @@
     {
       "Name": "vector-srch-index-copilot-demo-002",
       "Schema": "vector-search-index-schema.json"
+    },
+    {
+      "Name": "embeddings-srch-index-copilot-demo-002",
+      "Schema": "embeddings-search-index-schema.json"
     }
   ],
   "SIDEBAR_NAV_ITEMS": {
