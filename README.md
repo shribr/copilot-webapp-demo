@@ -169,6 +169,8 @@ The image below shows a diagram of the deployed resources:
      - `New-ContainerRegistry`: Creates new Container Registry.
      - `New-DocumentIntelligenceAccount`: Creates new Document Intelligence account.
      - `New-KeyVault`: Creates a Key Vault and sets access policies.
+     - `New-LogAnalyticsWorkspace`: Creates new Log Analytics Workspace.
+     - `New-MachineLearningWorkspace`: Creates new Machine Learning Workspace. (This will ultimately be deleted and replaced with a manual step detailed [below](#Azure AI Project / Machine Learning Workspace))
      - `New-ManagedIdentity`: Creates a new managed identity.
      - `New-PrivateEndPoint`: Creates a new private endpoint.
      - `New-ResourceGroup`: Creates a new resource group.
