@@ -123,8 +123,8 @@ Once the deployment script completes the following resources should have been cr
 - Azure AI Services
 - Azure AI Services Multi-Service Account
 - Azure Machine Learning Registry
-- Azure Machine Learning Workspace
 - Azure OpenAI
+- Computer Vision
 - Document Intelligence
 - Function App
 - Key Vault
@@ -133,6 +133,7 @@ Once the deployment script completes the following resources should have been cr
 - Search Service
 - Smart Detector Alert Rule
 - Storage Account
+- Virtual Network
 
 The image below shows a diagram of the deployed resources:
 
