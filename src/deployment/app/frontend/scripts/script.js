@@ -343,7 +343,7 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
         });
 
         if (supportingContentResults != "") {
-            supportingContent.innerHTML += '<div id="azureStorageResultsContainer"><div id="azureStorageResults">Supporting Content from Azure Storage</div>' + '<ol id="supporting_content_results">' + supportingContentResults + '</ol><br/>';
+            supportingContent.innerHTML += '<div id="azure-storage-results-container"><div id="azure-storage-results-header">Supporting Content from Azure Storage</div>' + '<ol id="supporting_content_results">' + supportingContentResults + '</ol><br/>';
             supportingContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
         }
 
