@@ -115,6 +115,7 @@ The main PowerShell script [Azure AI Demo Deployment.ps1](./src/deployment/Azure
 
 Once the deployment script completes the following resources should have been created in the resource group:
 
+- Api Management Service (optional)
 - App Service
 - App Service Plan
 - Application Insights
@@ -156,15 +157,20 @@ The image below shows a diagram of the deployed resources:
 3. **Resource Creation Functions:**
 
    - The script defines multiple functions to create various Azure resources, such as:
+     - `New-AIHub`: Creates AI Hub and AI Model.
+     - `New-AIService`: Creates AI service.
+     - `New-ApiManagementService`: - Creates new Api Management service.
+     - `New-AppService`: Creates and deploys app services (web apps or function apps).
+     - `New-AppServiceEnvironment`: Creates new App Service Environment.
+     - `New-ApplicationInsights`: Creates new Application Insights service.
      - `New-ResourceGroup`: Creates a new resource group.
      - `New-Resources`: Creates multiple Azure resources like storage accounts, app service plans, search services, etc.
-     - `New-AppService`: Creates and deploys app services (web apps or function apps).
      - `New-KeyVault`: Creates a Key Vault and sets access policies.
      - `New-ManagedIdentity`: Creates a new managed identity.
      - `New-PrivateEndPoint`: Creates a new private endpoint.
      - `New-SearchDataSource`, `New-SearchIndex`, `New-SearchIndexer`: Create search-related resources.
      - `New-VirtualNetwork`, `New-SubNet`: Create virtual network and subnets.
-     - `New-AIHubAndModel`: Creates AI Hub and AI Model.
+
      - `New-ApiManagementService`: Creates and deploys API Management service.
 
 4. **Helper Functions:**
