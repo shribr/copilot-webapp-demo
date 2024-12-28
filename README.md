@@ -461,6 +461,9 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 
 ### Search Index Vectorizer Multi-Service Account
 <img id="search_index_vectorizer_multi_service_account" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+### Search Index Vectorizer Api-Key Redacted
+<img id="search_index_vectorizer_apikey_redacted" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-apikey-redacted.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
      
 ### Contributing
 
