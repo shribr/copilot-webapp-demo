@@ -85,9 +85,9 @@ This project is a web application that allows users to chat with Azure Copilot. 
 1. Clone the repository:
 
    ```
-   git clone https://github.com/your-username/azure-ai-demo.git
+   git clone https://github.com/your-username/copilot-webapp-demo.git
 
-   cd azure-ai-demo
+   cd copilot-webapp-demo
 
    ```
 
