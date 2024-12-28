@@ -119,6 +119,7 @@ Once the deployment script completes the following resources should have been cr
 - App Service Plan
 - Application Insights
 - Azure AI Hub
+- Azure AI Project
 - Azure AI Services
 - Azure AI Services Multi-Service Account
 - Azure Machine Learning Registry
