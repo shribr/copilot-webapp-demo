@@ -304,31 +304,13 @@ async function createTabs() {
 }
 
 // Function to create tab contents
-async function createTabContent(docStorageResponse, supportingContent, answerContent) {
-
-    const config = await fetchConfig();
-
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+function createTabContent(answers, docStorageResponse, supportingContent, answerContent, sasToken) {
 
     if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
 
-        // Create a map of documents using their key
-        const docMap = new Map();
-        docStorageResponse.value.forEach(doc => {
-            //var key = "Page " + doc.chunk_id.split('_pages_')[1];
-            var key = doc.chunk_id;
-
-            docMap.set(key, doc);
-        });
-
-        const sortedAnswers = sortAnswers(docMap);
-
-        const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
-
         var answerResults = "";
-        var supportingContentLink = "";
+        var citationContentResults = "";
+        var supportingContentResults = "";
         var answerNumber = 1;
         var sourceNumber = 1;
 
@@ -338,16 +320,19 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
         answers.forEach(answer => {
             if (answer.answerText) {
                 const path = `${answer.document.metadata_storage_path}?${sasToken}`;
+                const footNoteLink = `<sup class="answer_citations"><a href="#citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
 
-                supportingContentLink = '<a href="' + path + '" style="text-decoration: underline" target="_blank">' + answer.document.title + '</a>';
-                //answerResults += "<li>" + answerNumber + ". " + answer.answerText.replace(" **", "") + '</li>';
-                answerResults += '<li>' + answer.answerText.replace(" **", "") + '\n\n\n';
-                answerResults += 'Source #' + answerNumber + ': ' + supportingContentLink + '</li>';
+                const supportingContentLink = `<a class="answer_citations" href="${path}" style="text-decoration: underline" target="_blank">${answer.document.title}</a>`;
+
+                answerResults += '<li class="answer_results">' + answer.answerText.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
 
                 if (!listedPaths.has(path)) {
                     listedPaths.add(path);
 
-                    supportingContent.innerHTML += '\n\nSource #' + sourceNumber + ': ' + supportingContentLink;
+                    supportingContentResults = `<div class="answer_citations">${sourceNumber}. ${supportingContentLink}</div>`;
+
+                    citationContentResults += `<div id="citation-link-${sourceNumber}">${supportingContentResults}</div>`;
+
                     sourceNumber++;
                 } else {
                     console.log(`Document already listed: ${path}`);
@@ -358,7 +343,11 @@ async function createTabContent(docStorageResponse, supportingContent, answerCon
         });
 
         if (answerResults != "") {
-            answerContent.innerHTML += '<div id="azureStorageResults">Azure Storage Results</div>' + '<ol>' + answerResults + '</ol><br/>';
+            answerContent.innerHTML += '<div id="azureStorageResults">Results from Azure Storage</div>' + '<ol id="supporting_content_results">' + answerResults + '</ol><br/>';
+            answerContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Citations:</h6>${citationContentResults}</div>`;
+
+            supportingContent.innertHTML += supportingContentResults;
+
         }
 
         console.log('Cross-referenced answers:', answers);
@@ -1092,6 +1081,10 @@ async function showResponse(questionBubble) {
     const chatInput = document.getElementById('chat-input').value.trim();
     const chatDisplay = document.getElementById('chat-display');
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+
 
     //const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
 
@@ -1139,12 +1132,28 @@ async function showResponse(questionBubble) {
             //supportingContent.textContent = 'Supporting content goes here.';
         }
 
+        const citationLinkContent = document.createElement('div');
+
+        // Create a map of documents using their key
+        const docMap = new Map();
+        docStorageResponse.value.forEach(doc => {
+            //var key = "Page " + doc.chunk_id.split('_pages_')[1];
+            var key = doc.chunk_id;
+
+            docMap.set(key, doc);
+        });
+
+        const answers = await rephraseResponseText(docStorageResponse["@search.answers"], docMap);
+
+        const sortedAnswers = sortAnswers(docMap);
+
         // Create tab contents
-        createTabContent(docStorageResponse, answerContent, supportingContent);
+        createTabContent(answers, docStorageResponse, answerContent, supportingContent, citationLinkContent, sasToken);
 
         // Append tabs and contents to chat bubble
         chatResponse.appendChild(tabs);
         chatResponse.appendChild(answerContent);
+        //chatResponse.appendChild(citationLinkContent);
         chatResponse.appendChild(thoughtProcessContent);
         chatResponse.appendChild(supportingContent);
 

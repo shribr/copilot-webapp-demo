@@ -77,13 +77,30 @@ code {
 }
 
 #file_types,
-#chat_examples {
+#chat_examples,
+#supporting_content_results {
   border: 1px solid #e6e6e6;
   padding-top: 15px !important;
   padding-bottom: 15px !important;
   background-color: white;
   padding-inline-start: 40px;
   list-style: disc !important;
+}
+
+.answer_citations {
+  color: rgba(33, 150, 243, 1);
+  background-color: rgba(33, 150, 243, 0.058823529411764705);
+  border-radius: 4px;
+  height: 32px;
+  font-size: 14px;
+  padding: 4px;
+  margin-left: 8px;
+  margin-bottom: 2px;
+  top: 0px;
+}
+
+.answer_results {
+  padding-bottom: 8px;
 }
 
 /* Ensure the body takes the full viewport height and uses Flexbox */
@@ -843,7 +860,7 @@ REMOVING BANDED ROWS FOR NOW
 
 .question-bubble-svg {
   position: relative;
-  top: -20px;
+  top: -10px;
   right: 20px;
 }
 
@@ -1003,6 +1020,7 @@ REMOVING BANDED ROWS FOR NOW
 #azureStorageResults {
   text-decoration: underline;
   font-weight: bold;
+  margin-bottom: 4px;
 }
 
 .tab.active svg {
