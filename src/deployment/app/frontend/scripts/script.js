@@ -1,21 +1,20 @@
-
-
 var iconStyle = "color";
 let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
 let answerResponseNumber = 1;
+let chatHistory = [];
 
 //const config = await fetchConfig();
 
 $(document).ready(function () {
 
-    setChatDisplayHeight(true);
+    setChatDisplayHeight();
 
     setSiteLogo();
 
     // Add an event listener to adjust the height on window resize
-    window.addEventListener('resize', setChatDisplayHeight);
+    //window.addEventListener('resize', setChatDisplayHeight);
 
     getDocuments();
 
@@ -229,6 +228,24 @@ $(document).ready(function () {
     renderChatPersonas();
 });
 
+// Function to build chat history
+function buildChatHistory(answerResponseNumber, question, answer, persona, dateTimestamp) {
+
+    const chatEntry = {
+        responseNum: `response-${answerResponseNumber}`,
+        details: {
+            question: question,
+            answer: answer,
+            persona: persona,
+            dateTimestamp: dateTimestamp
+        }
+    };
+
+    chatHistory.push(chatEntry);
+
+    console.log(chatHistory);
+}
+
 // Function to clear the chat display
 function clearChatDisplay() {
     const chatDisplay = document.getElementById('chat-display');
@@ -239,6 +256,9 @@ function clearChatDisplay() {
     loadingAnimation.innerHTML = '<div class="spinner"></div> Fetching results...';
     loadingAnimation.style.display = 'none'; // Hide it initially
     chatDisplay.appendChild(loadingAnimation);
+
+    document.getElementById('expand-chat-svg-container').style.display = 'none';
+    document.getElementById('jump-to-top-arrow').style.display = 'none';
 }
 
 //code to clear file input
@@ -1115,7 +1135,7 @@ async function runSearchIndexer(searchIndexers) {
 }
 
 // Function to set the height of the chat display container
-function setChatDisplayHeight(initialLoad) {
+function setChatDisplayHeight() {
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatInfoTextCopy = document.getElementById('chat-info-text-copy');
 
@@ -1124,7 +1144,7 @@ function setChatDisplayHeight(initialLoad) {
     // Calculate the desired height (e.g., 80% of the window height)
     const desiredHeight = windowHeight * 0.65;
 
-    if (chatDisplayContainer.style.height == "" || initialLoad) {
+    if (chatDisplayContainer.style.height == "") {
         // Set the height of the chat-display-container
         chatDisplayContainer.style.height = `${desiredHeight}px`;
     }
@@ -1197,7 +1217,7 @@ async function showResponse(questionBubble) {
 
         // Get answers from Azure OpenAI model
         var openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
-        openAIModelResults = openAIModelResults.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
+        openAIModelResults = openAIModelResults.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1</b>:');
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -1266,6 +1286,9 @@ async function showResponse(questionBubble) {
             var aiEnhancedAnswers = "";
             var sourceNumber = 0;
             var citationContentResults = "";
+            var dateTimestamp = new Date().toLocaleString();
+
+            var aiEnhancedAnswersArray = rawAnswers;
 
             // Initialize a Set to store unique document paths
             const listedPaths = new Set();
@@ -1291,10 +1314,17 @@ async function showResponse(questionBubble) {
                 aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
                 aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
 
+                aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
+
                 const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
 
                 const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
                 aiEnhancedAnswers += aiEnhancedAnswerHtml;
+            }
+
+            // Build chat history
+            if (aiEnhancedAnswersArray.length > 0) {
+                buildChatHistory(answerResponseNumber, chatInput, aiEnhancedAnswersArray, persona, dateTimestamp);
             }
 
             answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Search Results from Azure OpenAI</div>';
@@ -1356,6 +1386,9 @@ async function showResponse(questionBubble) {
     else {
         loadingAnimation.style.display = 'none';
     }
+
+    document.getElementById('expand-chat-svg-container').style.display = 'block';
+    document.getElementById('jump-to-top-arrow').style.display = 'block';
 
     answerResponseNumber++;
 }
