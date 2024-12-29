@@ -10,7 +10,7 @@ let answerResponseNumber = 1;
 
 $(document).ready(function () {
 
-    setChatDisplayHeight();
+    setChatDisplayHeight(true);
 
     setSiteLogo();
 
@@ -550,6 +550,7 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona) {
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
     const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
+    const getThoughtProcess = "Provide a step-by-step thought process for your answer. Results for the answer should be separate from your original response and surrounded by triple brackets.";
 
     userMessageContent.text = userInput;
 
@@ -1114,7 +1115,7 @@ async function runSearchIndexer(searchIndexers) {
 }
 
 // Function to set the height of the chat display container
-function setChatDisplayHeight() {
+function setChatDisplayHeight(initialLoad) {
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatInfoTextCopy = document.getElementById('chat-info-text-copy');
 
@@ -1123,7 +1124,7 @@ function setChatDisplayHeight() {
     // Calculate the desired height (e.g., 80% of the window height)
     const desiredHeight = windowHeight * 0.65;
 
-    if (chatDisplayContainer.style.height == "") {
+    if (chatDisplayContainer.style.height == "" || initialLoad) {
         // Set the height of the chat-display-container
         chatDisplayContainer.style.height = `${desiredHeight}px`;
     }
