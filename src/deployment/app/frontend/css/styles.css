@@ -86,7 +86,9 @@ code {
   list-style: disc !important;
 }
 
-#supporting_content_results {
+#supporting_content_results,
+#azure_openai_content_results,
+#ai_enhanced_answer_results {
   padding-top: 15px !important;
   padding-bottom: 15px !important;
   background-color: white;
@@ -117,6 +119,8 @@ code {
 
 #openai-model-results-header {
   padding-bottom: 8px;
+  margin-top: 8px;
+  padding-top: 16px;
   font-weight: bold;
   text-decoration: underline;
 }

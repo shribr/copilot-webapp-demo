@@ -323,11 +323,11 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
         const listedPaths = new Set();
 
         answers.forEach(answer => {
-            if (answer.answerText) {
+            if (answer.text) {
                 const path = `${answer.document.metadata_storage_path}?${sasToken}`;
                 const footNoteLink = `<sup class="answer_citations"><a href="#citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
 
-                supportingContentResults += '<li class="answer_results">' + answer.answerText.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
+                supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
 
                 if (!listedPaths.has(path)) {
                     listedPaths.add(path);
@@ -354,11 +354,6 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
     }
 
     return supportingContent;
-}
-
-// Function to create tab contents for answer results returned from Azure OpenAI LLM
-function createTabContentAnswerResults() {
-
 }
 
 // function to delete documents
@@ -771,19 +766,19 @@ async function mapAnswersToDocSources(searchAnswers, docMap, aiModelName, openAI
                 try {
                     if (openAIEnhanced) {
                         //rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text, aiModel);
-                        rephrasedResponseText = await getAnswersFromAzureOpenAIModel(`Rephrase the following text to sound more human: '${answer.text}'`, aiModel.Name);
+                        rephrasedResponseText = await rephraseResponseFromAzureOpenAI(`Rephrase the following text to sound more human: '${answer.text}'`, aiModel);
                     }
                     else {
                         rephrasedResponseText = answer.text;
                     }
 
                     answers.push({
-                        answerText: rephrasedResponseText,
+                        text: rephrasedResponseText,
                         document: correspondingDoc
                     });
                 } catch (error) {
                     answers.push({
-                        answerText: answer.text,
+                        text: answer.text,
                         document: correspondingDoc
                     });
                 }
@@ -991,53 +986,24 @@ async function renderDocuments(blobs) {
 }
 
 // Function to rephrase text using Azure OpenAI Service
-async function rephraseResponseFromAzureOpenAI(text, aiModelName) {
+async function rephraseResponseFromAzureOpenAI(userInput, aiModel) {
 
     const config = await fetchConfig();
 
     const apiVersion = config.OPENAI_API_VERSION;
     const aiModels = config.AI_MODELS;
-    //const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding");
-    const apiKey = aiEmbeddingModel.ApiKey;
-    const deploymentName = aiModelName;
+    const apiKey = aiModel.ApiKey;
+    const deploymentName = aiModel.Name;
+    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
+    const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
+    userMessageContent.text = userInput;
+
     const answers = [];
 
-    const payload = {
-        "messages": [
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "You are an AI assistant that helps people find information."
-                    }
-                ]
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": `Rephrase the following text to sound more human: '${text}'`
-                    }
-                ]
-            }
-        ],
-        "temperature": 0.7,
-        "top_p": 0.95,
-        "frequency_penalty": 0,
-        "presence_penalty": 0,
-        "max_tokens": 800,
-        "stop": null,
-        "stream": false
-    };
-
-    const jsonString = JSON.stringify(payload)
-
-    //Need to add endpoint
+    const jsonString = JSON.stringify(openAIRequestBody)
 
     try {
         const response = await fetch(endpoint, {
@@ -1158,6 +1124,7 @@ async function showResponse(questionBubble) {
 
     var indexName = "";
     var searchAnswers = [];
+    var rawAnswers = [];
 
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
@@ -1216,7 +1183,8 @@ async function showResponse(questionBubble) {
 
             //This call to mapAnswersToDocSources is for the raw answers from Azure Search and used to populate the supporting content tab. It needs to be the same data returned from the Azure Search call above completely untouched.
             searchAnswers = docStorageResponse["@search.answers"];
-            const rawAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", false);
+
+            rawAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", false);
 
             const sortedAnswers = sortAnswers(docMap);
 
@@ -1237,12 +1205,31 @@ async function showResponse(questionBubble) {
             searchAnswers = docStorageResponseWithEmbeddings["@search.answers"];
 
             //This call to mapAnswersToDocSources is for the AI enhanced answers from Azure Search and used to populate the answer content tab.
-            const aiEnhancedAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", true);
+            //I believe the reason this is not working is because the async operation that executes to rephrase the text is not completing before the next line of code executes in order to populate the answers array with the updated text.
+            //const aiEnhancedAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", true);
 
-            answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Azure Search Results from Azure OpenAI</div>';
+            var aiEnhancedAnswers = "";
+            var sourceNumber = 1;
+
+            for (const answer of rawAnswers) {
+
+                const path = `${answer.document.title}?${sasToken}`;
+
+                aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`Rephrase the following text to sound more human and use complete sentences only. Be specific and reference the specific document ${answer.document.title}. talk like a teenage girl: '${answer.text}'`, "gpt-4o");
+
+
+                const footNoteLink = `<sup class="answer_citations"><a title="${path}" href="#citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+
+                const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
+                aiEnhancedAnswers += aiEnhancedAnswerHtml;
+
+                sourceNumber++;
+            }
+
+            answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Search Results from Azure OpenAI</div>';
 
             if (aiEnhancedAnswers.length > 0) {
-                answerContent.innerHTML += `<div id="openai-model-results">${aiEnhancedAnswers.choices[0].message.content}</div>`;
+                answerContent.innerHTML += `<div id="openai-model-results"><ol id="ai_enhanced_answer_results">${aiEnhancedAnswers}</ol></div>`;
             }
             else {
                 answerContent.innerHTML += `<div id="openai-model-results">No results found.</div>`;
