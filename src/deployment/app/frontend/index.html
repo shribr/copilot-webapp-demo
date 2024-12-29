@@ -42,19 +42,32 @@
                     <div id="chat-info-top">
                         <div id="chat-info-text-copy">
                             <h2>Chat with your data</h2>
-                            <p>Examples of questions you can ask:</p>
-                            <ul id="chat_examples">
-                                <li>What is the summary of the document?</li>
-                                <li>Can you extract key points from the document?</li>
-                                <li>What are the main topics covered?</li>
-                            </ul>
+                            <div id="chat-examples-container">
+                                <p>Examples of questions you can ask:</p>
+                                <ul id="chat_examples">
+                                    <li>What is the summary of the document?</li>
+                                    <li>Can you extract key points from the document?</li>
+                                    <li>What are the main topics covered?</li>
+                                </ul>
+                            </div>
                         </div>
                         <div id="chat-info-current-question-container">
                         </div>
                     </div>
+                    <div id="expand-chat-svg-container">
+                        <svg id="svg-expander" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4H10V6H6V10H4V4Z" fill="currentColor" />
+                            <path d="M14 4H20V10H18V6H14V4Z" fill="currentColor" />
+                            <path d="M4 14H6V18H10V20H4V14Z" fill="currentColor" />
+                            <path d="M18 14H20V20H14V18H18V14Z" fill="currentColor" />
+                        </svg>
+                    </div>
                     <div id="chat-display-container">
                         <div id="chat-display"></div>
                     </div>
+                    <div id="jump-to-top-arrow"><span class="accordion-arrow">&#9650;</span></div>
+
                     <div id="chat-input-container">
                         <div id="chat-input-prompt-label"><label for="chat-input">Prompt:</label></div>
                         <div id="chat-input-prompt-textbox">

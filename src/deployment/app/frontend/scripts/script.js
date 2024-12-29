@@ -4,7 +4,7 @@ var iconStyle = "color";
 let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
-let answerResultsNumber = 1;
+let answerResponseNumber = 1;
 
 //const config = await fetchConfig();
 
@@ -56,6 +56,8 @@ $(document).ready(function () {
     document.getElementById('header-name').addEventListener('click', () => sortDocuments('Name'));
     document.getElementById('header-date').addEventListener('click', () => sortDocuments('Last-Modified'));
     document.getElementById('header-status').addEventListener('click', () => sortDocuments('Content-Type'));
+
+    document.getElementById('svg-expander').addEventListener('click', setChatDisplayHeight);
 
     // Add event listener to the file input
     document.getElementById('file-input').addEventListener('change', function (event) {
@@ -196,6 +198,10 @@ $(document).ready(function () {
         document.getElementById('settings-overlay').style.display = 'none';
     });
 
+    document.getElementById('jump-to-top-arrow').addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
     document.getElementById('datasources-header').addEventListener('click', function () {
         const content = document.getElementById('datasources-container');
         const arrow = document.querySelector('#datasources-header .accordion-arrow');
@@ -323,8 +329,8 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
                 const docPath = `${answer.document.metadata_storage_path}?${sasToken}`;
                 const docTitle = answer.document.title;
 
-                const footNoteLink = `<sup class="answer_citations"><a href="#citation-link-${answerResultsNumber}-${sourceNumber}">${sourceNumber}</a></sup>`;
-                const docLink = ` <a href="${docPath}" title="${docTitle}" target="_blank">(${docTitle})</a>`;
+                const footNoteLink = `<sup class="answer_citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                const docLink = ` <a href="${docPath}" class="supporting_content_link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
                 //supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
                 supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + docLink + '</li>';
                 if (!listedPaths.has(docPath)) {
@@ -1117,8 +1123,13 @@ function setChatDisplayHeight() {
     // Calculate the desired height (e.g., 80% of the window height)
     const desiredHeight = windowHeight * 0.65;
 
-    // Set the height of the chat-display-container
-    chatDisplayContainer.style.height = `${desiredHeight}px`;
+    if (chatDisplayContainer.style.height == "") {
+        // Set the height of the chat-display-container
+        chatDisplayContainer.style.height = `${desiredHeight}px`;
+    }
+    else {
+        chatDisplayContainer.style.height = "";
+    }
 }
 
 // Function to set the site logo
@@ -1174,6 +1185,9 @@ async function showResponse(questionBubble) {
 
     if (chatInput) {
 
+        const chatExamplesContainer = document.getElementById('chat-examples-container');
+        chatExamplesContainer.style.display = 'none';
+
         // Get answers from Azure Search
         indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
         const docStorageResponse = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
@@ -1181,7 +1195,8 @@ async function showResponse(questionBubble) {
         //const docStorageResponseOpenAIEnhanced = await getAzureSearchResultsAIEnhanced(docStorageResponse);
 
         // Get answers from Azure OpenAI model
-        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
+        var openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
+        openAIModelResults = openAIModelResults.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -1248,7 +1263,7 @@ async function showResponse(questionBubble) {
             //const aiEnhancedAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", true);
 
             var aiEnhancedAnswers = "";
-            var sourceNumber = 1;
+            var sourceNumber = 0;
             var citationContentResults = "";
 
             // Initialize a Set to store unique document paths
@@ -1258,25 +1273,27 @@ async function showResponse(questionBubble) {
                 const docPath = `${answer.document.title}?${sasToken}`;
                 const docTitle = answer.document.title;
 
-                //aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`${chatPersonaPrompt} Rephrase the following text and use complete sentences only. Be specific and reference the specific document ${answer.document.title}: '${answer.text}'`, "gpt-4o");
-                aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
-
-                const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#citation-${answerResultsNumber}-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-
-                const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
-                aiEnhancedAnswers += aiEnhancedAnswerHtml;
-
                 if (!listedPaths.has(docPath)) {
                     listedPaths.add(docPath);
 
+                    sourceNumber++;
+
                     const supportingContentLink = `<a class="answer_citations" title="${docPath}" href="${docPath}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
 
-                    citationContentResults += `<div id="citation-link-${answerResultsNumber}-${sourceNumber}">${supportingContentLink}</div>`;
+                    citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
-                    sourceNumber++;
                 } else {
                     console.log(`Document already listed: ${docPath}`);
                 }
+
+                //aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`${chatPersonaPrompt} Rephrase the following text and use complete sentences only. Be specific and reference the specific document ${answer.document.title}: '${answer.text}'`, "gpt-4o");
+                aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
+                aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
+
+                const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+
+                const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
+                aiEnhancedAnswers += aiEnhancedAnswerHtml;
             }
 
             answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Search Results from Azure OpenAI</div>';
@@ -1339,7 +1356,7 @@ async function showResponse(questionBubble) {
         loadingAnimation.style.display = 'none';
     }
 
-    answerResultsNumber++;
+    answerResponseNumber++;
 }
 
 // Function to show a toast notification

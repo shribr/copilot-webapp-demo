@@ -86,6 +86,14 @@ code {
   list-style: disc !important;
 }
 
+.supporting_content_link {
+  color: rgba(33, 150, 243, 1) !important;
+}
+
+.bullet-title {
+  color: #555;
+}
+
 #supporting_content_results,
 #azure_openai_content_results,
 .ai_enhanced_answer_results {
@@ -347,6 +355,25 @@ label[for="chat-input"] {
   font-weight: bold;
 }
 
+#expand-chat-svg-container {
+  text-align: right;
+  padding-right: 32px;
+  margin-bottom: -24px; /* Adjust this value as needed to position the SVG closer to the chat-display-container */
+  z-index: 2000;
+}
+
+#jump-to-top-arrow {
+  text-align: right;
+  padding-right: 32px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  z-index: 2000;
+}
+
+#svg-expander {
+  cursor: pointer;
+}
+
 #chat-input::placeholder {
   padding: 5px 5px 5px 5px;
   /* Adjust the padding as needed */
@@ -501,6 +528,7 @@ label[for="chat-input"] {
 
 .accordion-arrow {
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .accordion-content {
