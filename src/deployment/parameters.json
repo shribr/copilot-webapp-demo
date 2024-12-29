@@ -318,15 +318,18 @@
   "searchIndexes": [
     {
       "Name": "srch-index-copilot-demo-002",
-      "Schema": "search-index-schema.json"
+      "Schema": "search-index-schema.json",
+      "Model": "gpt-4o"
     },
     {
       "Name": "vector-srch-index-copilot-demo-002",
-      "Schema": "vector-search-index-schema.json"
+      "Schema": "vector-search-index-schema.json",
+      "Model": "gpt-4o"
     },
     {
       "Name": "embeddings-srch-index-copilot-demo-002",
-      "Schema": "embeddings-search-index-schema.json"
+      "Schema": "embeddings-search-index-schema.json",
+      "Model": "text-embedding-3-large"
     }
   ],
   "searchIndexers": [

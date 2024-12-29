@@ -131,26 +131,6 @@ $global:KeyVaultSecrets = @(
     “UseVision”
 )
 
-# Initialize the deployment path
-$global:deploymentPath = Get-Location
-
-# Initialize the deployment path
-$currentLocation = Get-Location
-if ($currentLocation.Path -notlike "*src/deployment*") {
-    $global:deploymentPath = Join-Path -Path $currentLocation -ChildPath "src/deployment"
-}
-else {
-    $global:deploymentPath = $currentLocation
-}
-
-$global:LogFilePath = "$global:deploymentPath/deployment.log"
-$global:ConfigFilePath = "$global:deploymentPath/app/frontend/config.json"
-
-Set-Location -Path $global:deploymentPath
-
-# Initialize the existing resources array
-$global:existingResources = @()
-
 # function to convert string to proper case
 function ConvertTo-ProperCase {
     param (
@@ -170,6 +150,99 @@ function ConvertTo-ProperCase {
     # Join the words back into a single string
     $properCaseString = $properCaseWords -join " "
     return $properCaseString
+}
+
+# Function to deploy an app service
+function Deploy-AppService {
+    param (
+        [array]$appService,
+        [string]$resourceGroupName,
+        [string]$storageAccountName,
+        [bool]$deployZipResources,
+        [array]$existingResources
+    )
+
+    $appExists = @()
+
+    $ErrorActionPreference = 'Stop'
+    
+    # Making sure we are in the correct folder depending on the app type
+    #Set-DirectoryPath -targetDirectory $appService.Path
+
+    $currentLocation = Reset-DeploymentPath
+
+    $appServiceType = $appService.Type
+    $appServiceName = $appService.Name
+    $deployZipPackage = $appService.DeployZipPackage
+
+    $appExists = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "name" --output tsv
+
+    if ($appExists) {
+        if ($deployZipResources -eq $true -and $deployZipPackage -eq $true) {
+            try {
+
+                #$appRoot = Find-AppRoot -currentDirectory $currentLocation
+
+                $appRoot = Join-Path -Path $currentLocation -ChildPath "app"
+                $tempPath = Join-Path -Path $appRoot -ChildPath "temp"
+
+                if (-not (Test-Path $tempPath)) {
+                    New-Item -Path $tempPath -ItemType Directory
+                }
+
+                # Compress the function app code
+                $zipFilePath = "$tempPath/$appServiceType-$appServiceName.zip"
+
+                if (Test-Path $zipFilePath) {
+                    Remove-Item $zipFilePath
+                }
+                
+                $appPath = Join-Path -Path $currentLocation -ChildPath $appService.Path
+                Set-Location $appPath
+
+                # compress the app code
+                zip -r $zipFilePath * .env
+
+                if ($appService.Type -eq "Web") {
+                    # Deploy the web app
+                    #az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                    az webapp deploy --src-path $zipFilePath --name $appServiceName --resource-group $resourceGroupName --type zip
+                }
+                else {
+                    # Deploy the function app
+                    az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
+                        
+                    $searchServiceKeys = az search admin-key show --resource-group $resourceGroupName --service-name $global:searchServiceName --query "primaryKey" --output tsv
+                    $searchServiceApiKey = $searchServiceKeys
+
+                    $envVariables = @(
+                        @{ name = "AZURE_SEARCH_API_KEY"; value = $searchServiceApiKey },
+                        @{ name = "AZURE_SEARCH_SERVICE_NAME"; value = $searchServiceName },
+                        @{ name = "AZURE_SEARCH_INDEX"; value = $searchIndexerName }
+                    )
+                        
+                    foreach ($envVar in $envVariables) {
+                        az functionapp config appsettings set --name $appServiceName --resource-group $resourceGroupName --settings "$($envVar.name)=$($envVar.value)"
+                    }
+                }
+
+                Write-Host "$appServiceType app '$appServiceName' deployed successfully."
+                Write-Log -message "$appServiceType app '$appServiceName' deployed successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            }
+        }
+        else {       
+            Write-Host "Skipping deployment for $appServiceType app '$appServiceName'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script."
+            Write-Log -message "Skipping deployment for $appServiceType app '$appServiceName'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script." -logFilePath $global:LogFilePath
+        }
+    }
+    else {
+        Write-Host "App '$appServiceName' does not exist. Please create the app before deploying."
+        Write-Log -message "App '$appServiceName' does not exist. Please create the app before deploying." -logFilePath $global:LogFilePath
+    }
 }
 
 # Function to deploy an Azure AI model
@@ -1301,62 +1374,7 @@ function New-AppService {
                 Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath $global:LogFilePath
             }
 
-            if ($deployZipResources -eq $true -and $deployZipPackage -eq $true) {
-                try {
-
-                    $appRoot = Find-AppRoot -currentDirectory (Get-Location).Path
-
-                    $tempPath = Join-Path -Path $appRoot -ChildPath "temp"
-
-                    if (-not (Test-Path $tempPath)) {
-                        New-Item -Path $tempPath -ItemType Directory
-                    }
-
-                    # Compress the function app code
-                    $zipFilePath = "$tempPath/$appServiceType-$appServiceName.zip"
-
-                    if (Test-Path $zipFilePath) {
-                        Remove-Item $zipFilePath
-                    }
-                    
-                    # compress the function app code
-                    zip -r $zipFilePath * .env
-
-                    if ($appService.Type -eq "Web") {
-                        # Deploy the web app
-                        #az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
-                        az webapp deploy --src-path $zipFilePath --name $appServiceName --resource-group $resourceGroupName --type zip
-                    }
-                    else {
-                        # Deploy the function app
-                        az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
-                        
-                        $searchServiceKeys = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-                        $searchServiceApiKey = $searchServiceKeys
-
-                        $envVariables = @(
-                            @{ name = "AZURE_SEARCH_API_KEY"; value = $searchServiceApiKey },
-                            @{ name = "AZURE_SEARCH_SERVICE_NAME"; value = $searchServiceName },
-                            @{ name = "AZURE_SEARCH_INDEX"; value = $searchIndexerName }
-                        )
-                        
-                        foreach ($envVar in $envVariables) {
-                            az functionapp config appsettings set --name $appServiceName --resource-group $resourceGroupName --settings "$($envVar.name)=$($envVar.value)"
-                        }
-                    }
-
-                    Write-Host "$appServiceType app '$appServiceName' deployed successfully."
-                    Write-Log -message "$appServiceType app '$appServiceName' deployed successfully." -logFilePath $global:LogFilePath
-                }
-                catch {
-                    Write-Error "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to deploy $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
-                }
-            }
-            else {
-                Write-Host "Skipping deployment for $appServiceType app '$appServiceName'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script."
-                Write-Log -message "Skipping deployment for $appServiceType app '$appServiceName'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script." -logFilePath $global:LogFilePath
-            }
+            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -deployZipResources $deployZipResources -appService $appService -deployZipPackage $deployZipPackage
         }
         catch {
             Write-Error "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3060,6 +3078,28 @@ function Remove-MachineLearningWorkspace {
     }
 }
 
+# Function to reset deployment path
+function Reset-DeploymentPath {
+
+    $currentLocation = Get-Location
+    $currentDirectory = Split-Path $currentLocation.Path -Leaf
+
+    if ($currentDirectory -eq "deployment") {
+        return $currentLocation.Path
+    }
+
+    do {
+        Set-Location ../
+        $currentLocation = Get-Location
+        $currentDirectory = Split-Path $currentLocation.Path -Leaf
+    } while (
+        $currentDirectory -ne "deployment"
+    )
+    
+    return $currentLocation.Path
+
+}
+
 # Function to reset search indexer
 function Reset-SearchIndexer {
     param (
@@ -3434,6 +3474,19 @@ function Start-Deployment {
 
     $resourceGroupName = $global:resourceGroupName
 
+    $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
+
+    if ($global:appDeploymentOnly -eq $true) {
+        # Deploy web app and function app services
+        foreach ($appService in $appServices) {
+            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $global:storageAccountName -deployZipResources $true
+        }
+
+        return
+    }
+
+    Reset-DeploymentPath
+
     if ($appendUniqueSuffix -eq $true) {
         $resourceGroupName = "$resourceGroupName$resourceSuffix"
     }
@@ -3458,19 +3511,6 @@ function Start-Deployment {
     #return 
     
     $userPrincipalName = "$($parameters.userPrincipalName)"
-
-    $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
-
-    if ($global:appDeploymentOnly -eq $true) {
-        # Deploy web app and function app services
-        foreach ($appService in $appServices) {
-            if ($existingResources -notcontains $appService) {
-                New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
-            }
-        }
-
-        return
-    }
 
     #**********************************************************************************************************************
     # Create User Assigned Identity
@@ -4355,6 +4395,17 @@ function Write-Log {
 $ErrorActionPreference = 'Stop'
 
 #$global:subscriptionId = az account show --query "{Id:id}" --output tsv
+
+# Initialize the deployment path
+$global:deploymentPath = Reset-DeploymentPath
+
+$global:LogFilePath = "$global:deploymentPath/deployment.log"
+$global:ConfigFilePath = "$global:deploymentPath/app/frontend/config.json"
+
+Set-Location -Path $global:deploymentPath
+
+# Initialize the existing resources array
+$global:existingResources = @()
 
 # Initialize parameters
 $initParams = Initialize-Parameters -parametersFile $parametersFile

@@ -5,6 +5,8 @@ let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
 
+//const config = await fetchConfig();
+
 $(document).ready(function () {
 
     setChatDisplayHeight();
@@ -249,8 +251,11 @@ function clearFileInput() {
 
 //function to create side navigation links
 async function createSidenavLinks() {
+
+    const config = await fetchConfig();
+
     try {
-        const config = await fetchConfig();
+
 
         const sidenav = document.getElementById('nav-container').querySelector('nav ul');
         const sidenavLinks = Object.values(config.SIDEBAR_NAV_ITEMS);
@@ -393,16 +398,18 @@ function formatReponseAsBulletedList(text) {
 }
 
 // Function to generate embeddings
-async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, modelType, modelName) {
+async function generateEmbeddingAsync(text, model) {
+
+    const config = await fetchConfig();
 
     try {
-        const endpoint = `https://eastus.api.cognitive.microsoft.com/openai/deployments/${modelName}/embeddings?api-version=${apiVersion}`;
+        const endpoint = `https://eastus.api.cognitive.microsoft.com/openai/deployments/${model.Name}/embeddings?api-version=${model.ApiVersion}`;
 
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': apiKey
+                'api-key': model.ApiKey
             },
             body: JSON.stringify({
                 input: text,
@@ -418,39 +425,27 @@ async function generateEmbeddingAsync(text, apiKey, apiVersion, modelVersion, mo
 }
 
 //code to send message to Azure Search via Azure Function
-async function getAnswersFromAzureSearch(userInput, useEmbeddings) {
+async function getAnswersFromAzureSearch(userInput, aiModelName, indexName, useEmbeddings) {
     if (!userInput) return;
 
     const config = await fetchConfig();
+
     const aiModels = config.AI_MODELS;
     const apiKey = config.AZURE_SEARCH_API_KEY;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const deploymentName = aiGPTModel.Name;
-    //const deploymentId = config.DEPLOYMENT_ID;
-    const indexes = config.SEARCH_INDEXES;
-    const indexers = config.SEARCH_INDEXERS;
+    const aiModel = aiModels.find(item => item.Name === aiModelName);
     const apiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const storageContainerName = config.AZURE_STORAGE_CONTAINER_NAME;
 
-    var indexName = "";
     var embeddings = null;
 
     if (useEmbeddings) {
-        indexName = indexes.filter(item => /embeddings-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
-
-        const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding")
-
         try {
-            embeddings = await generateEmbeddingAsync(userInput, aiEmbeddingModel.ApiKey, aiEmbeddingModel.ApiVersion, aiEmbeddingModel.ModelVersion, aiEmbeddingModel.Type, aiEmbeddingModel.Name);
+            embeddings = await generateEmbeddingAsync(userInput, aiModel);
         } catch (error) {
             embeddings = null;
             console.error('Error generating embeddings:', error);
         }
 
-    }
-    else {
-        indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
     }
 
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
@@ -542,19 +537,15 @@ async function getAnswersFromAzureSearch(userInput, useEmbeddings) {
 }
 
 //code to send chat message to Azure OpenAI model
-async function getAnswersFromAzureOpenAIModel(userInput) {
+async function getAnswersFromAzureOpenAIModel(userInput, aiModelName) {
 
     if (!userInput) return;
-
-    //$('#user-input').val('');
 
     const config = await fetchConfig();
 
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiVersion = config.OPENAI_API_VERSION;
-    const aiModels = config.AI_MODELS;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const deploymentName = aiGPTModel.Name;
+    const deploymentName = aiModelName;
     const openAIRequestBody = config.OPENAI_REQUEST_BODY;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
@@ -587,15 +578,13 @@ async function getAnswersFromAzureOpenAIModel(userInput) {
             else {
                 sourceDocuments = data.choices[0].message.metadata.sources;
             }
-
-
         }
         catch (error) {
             console.error('Error extracting source documents:', error);
         }
 
 
-        return data;
+        return data.choices[0].message.content.trim();
     }
     catch (error) {
         if (error.code == 429) {
@@ -679,6 +668,7 @@ async function getAnswersFromPublicInternet(userInput) {
 
 //code to get documents from Azure Storage
 async function getDocuments() {
+
     const config = await fetchConfig();
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
@@ -754,14 +744,15 @@ function isQuestion(text) {
 }
 
 // Function to rephrase text
-async function mapAnswersToDocSources(searchAnswers, docMap, openAIEnhanced) {
+async function mapAnswersToDocSources(searchAnswers, docMap, aiModelName, openAIEnhanced) {
+
     const config = await fetchConfig();
 
     const apiVersion = config.OPENAI_API_VERSION;
     const aiModels = config.AI_MODELS;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const apiKey = aiGPTModel.ApiKey;
-    const deploymentName = aiGPTModel.Name;
+    const aiModel = aiModels.find(item => item.Name === aiModelName);
+    const apiKey = aiModel.ApiKey;
+    const deploymentName = aiModel.Name;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
@@ -778,9 +769,9 @@ async function mapAnswersToDocSources(searchAnswers, docMap, openAIEnhanced) {
             if (correspondingDoc || openAIEnhanced) {
 
                 try {
-                    // Haven't figured out how to get the embeddings to work yet so commenting out
                     if (openAIEnhanced) {
-                        rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
+                        //rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text, aiModel);
+                        rephrasedResponseText = await getAnswersFromAzureOpenAIModel(`Rephrase the following text to sound more human: '${answer.text}'`, aiModel.Name);
                     }
                     else {
                         rephrasedResponseText = answer.text;
@@ -807,6 +798,7 @@ async function mapAnswersToDocSources(searchAnswers, docMap, openAIEnhanced) {
 async function postQuestion() {
 
     const config = await fetchConfig();
+
     let chatInput = document.getElementById('chat-input').value;
     const chatDisplay = document.getElementById('chat-display');
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
@@ -862,6 +854,7 @@ async function postQuestion() {
 
 // Function to render documents
 async function renderDocuments(blobs) {
+
     const config = await fetchConfig();
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
@@ -998,15 +991,15 @@ async function renderDocuments(blobs) {
 }
 
 // Function to rephrase text using Azure OpenAI Service
-async function rephraseResponseFromAzureOpenAI(text) {
+async function rephraseResponseFromAzureOpenAI(text, aiModelName) {
 
     const config = await fetchConfig();
 
     const apiVersion = config.OPENAI_API_VERSION;
     const aiModels = config.AI_MODELS;
-    const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding");
+    //const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding");
     const apiKey = aiEmbeddingModel.ApiKey;
-    const deploymentName = aiEmbeddingModel.Name;
+    const deploymentName = aiModelName;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
@@ -1125,11 +1118,14 @@ function setChatDisplayHeight() {
 
 // Function to set the site logo
 async function setSiteLogo() {
+
+    const config = await fetchConfig();
+
     const siteLogo = document.getElementById('site-logo');
     const siteLogoText = document.getElementById('site-logo-text');
     const siteLogoTextCopy = document.getElementById('site-logo-text-copy');
 
-    const config = await fetchConfig();
+
 
     if (config.SITE_LOGO == "default" || getQueryParam('sitelogo') == "default") {
         siteLogo.src = "images/site-logo-default.png";
@@ -1152,11 +1148,16 @@ async function showResponse(questionBubble) {
     const chatDisplay = document.getElementById('chat-display');
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const indexes = config.SEARCH_INDEXES;
+
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     // Create a map of documents using their key
     const docMap = new Map();
+
+    var indexName = "";
+    var searchAnswers = [];
 
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
@@ -1165,12 +1166,13 @@ async function showResponse(questionBubble) {
     if (chatInput) {
 
         // Get answers from Azure Search
-        const docStorageResponse = await getAnswersFromAzureSearch(chatInput, false);
+        indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+        const docStorageResponse = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
 
         //const docStorageResponseOpenAIEnhanced = await getAzureSearchResultsAIEnhanced(docStorageResponse);
 
         // Get answers from Azure OpenAI model
-        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput);
+        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o");
 
         // Hide the loading animation once results are returned
         loadingAnimation.style.display = 'none';
@@ -1196,7 +1198,7 @@ async function showResponse(questionBubble) {
 
         if (config.SEARCH_AZURE_OPENAI_MODEL == true) {
             answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Open AI LLM</div>';
-            answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults.choices[0].message.content}</div>`;
+            answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults}</div>`;
 
             const codeContent = document.createElement('div');
             codeContent.className = 'code-content';
@@ -1212,7 +1214,9 @@ async function showResponse(questionBubble) {
                 docMap.set(key, doc);
             });
 
-            const rawAnswers = await mapAnswersToDocSources(docStorageResponse["@search.answers"], docMap, false);
+            //This call to mapAnswersToDocSources is for the raw answers from Azure Search and used to populate the supporting content tab. It needs to be the same data returned from the Azure Search call above completely untouched.
+            searchAnswers = docStorageResponse["@search.answers"];
+            const rawAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", false);
 
             const sortedAnswers = sortAnswers(docMap);
 
@@ -1225,12 +1229,21 @@ async function showResponse(questionBubble) {
 
         try {
             // Get answers from Azure Search with embeddings
-            const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, true);
-            const aiEnhancedAnswers = await mapAnswersToDocSources(docStorageResponseWithEmbeddings["@search.answers"], docMap, true);
+            //indexName = indexes.filter(item => /embeddings-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+
+            //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "text-embedding-3-large", indexName, true);
+            const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
+
+            searchAnswers = docStorageResponseWithEmbeddings["@search.answers"];
+
+            //This call to mapAnswersToDocSources is for the AI enhanced answers from Azure Search and used to populate the answer content tab.
+            const aiEnhancedAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", true);
+
+            answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Azure Search Results from Azure OpenAI</div>';
+            answerContent.innerHTML += `<div id="openai-model-results">${aiEnhancedAnswers.choices[0].message.content}</div>`;
         }
         catch (error) {
             console.error('Error processing search results:', error);
-
         }
 
         // Append tabs and contents to chat bubble
@@ -1440,6 +1453,7 @@ function updatePlaceholder() {
 
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
+
     const config = await fetchConfig();
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
