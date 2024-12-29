@@ -1240,7 +1240,13 @@ async function showResponse(questionBubble) {
             const aiEnhancedAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", true);
 
             answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Azure Search Results from Azure OpenAI</div>';
-            answerContent.innerHTML += `<div id="openai-model-results">${aiEnhancedAnswers.choices[0].message.content}</div>`;
+
+            if (aiEnhancedAnswers.length > 0) {
+                answerContent.innerHTML += `<div id="openai-model-results">${aiEnhancedAnswers.choices[0].message.content}</div>`;
+            }
+            else {
+                answerContent.innerHTML += `<div id="openai-model-results">No results found.</div>`;
+            }
         }
         catch (error) {
             console.error('Error processing search results:', error);
