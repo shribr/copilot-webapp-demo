@@ -775,12 +775,12 @@ async function mapAnswersToDocSources(searchAnswers, docMap, openAIEnhanced) {
         answerText = answerText.replace("  ", " ");
         if (answer.text) {
             const correspondingDoc = docMap.get(answer.key);
-            if (correspondingDoc) {
+            if (correspondingDoc || openAIEnhanced) {
 
                 try {
                     // Haven't figured out how to get the embeddings to work yet so commenting out
                     if (openAIEnhanced) {
-                        rephrasedResponseText = await await rephraseResponseFromAzureOpenAI(answer.text);
+                        rephrasedResponseText = await rephraseResponseFromAzureOpenAI(answer.text);
                     }
                     else {
                         rephrasedResponseText = answer.text;
@@ -1004,9 +1004,9 @@ async function rephraseResponseFromAzureOpenAI(text) {
 
     const apiVersion = config.OPENAI_API_VERSION;
     const aiModels = config.AI_MODELS;
-    const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
-    const apiKey = aiGPTModel.ApiKey;
-    const deploymentName = aiGPTModel.Name;
+    const aiEmbeddingModel = aiModels.find(item => item.Name === "text-embedding");
+    const apiKey = aiEmbeddingModel.ApiKey;
+    const deploymentName = aiEmbeddingModel.Name;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
@@ -1045,7 +1045,7 @@ async function rephraseResponseFromAzureOpenAI(text) {
     const jsonString = JSON.stringify(payload)
 
     //Need to add endpoint
-    ß
+
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
