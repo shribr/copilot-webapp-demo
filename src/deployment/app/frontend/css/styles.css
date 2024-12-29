@@ -88,7 +88,7 @@ code {
 
 #supporting_content_results,
 #azure_openai_content_results,
-#ai_enhanced_answer_results {
+.ai_enhanced_answer_results {
   padding-top: 15px !important;
   padding-bottom: 15px !important;
   background-color: white;

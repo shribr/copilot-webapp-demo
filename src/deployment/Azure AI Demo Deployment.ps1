@@ -359,6 +359,7 @@ function Format-ErrorInfo {
     $errorInfo | Format-List -Property *
 }
 
+# function to generate custom error information from a message
 function Format-CustomErrorInfo {
     param([array]$jsonOutput
     )

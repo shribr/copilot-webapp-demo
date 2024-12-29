@@ -4,6 +4,7 @@ var iconStyle = "color";
 let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
+let answerResultsNumber = 1;
 
 //const config = await fetchConfig();
 
@@ -178,25 +179,6 @@ $(document).ready(function () {
         console.log('Settings clicked');
     });
 
-    /*
-    COMMENTING OUT FOR NOW
-    document.getElementById('toggle-icons').addEventListener('change', function () {
-        const iconElements = document.getElementsByClassName('iconify');
-        const iconColorElements = document.getElementsByClassName('iconify-color');
-
-        iconStyle = iconStyle === 'monotone' ? 'color' : 'monotone';
-        const toggleDisplay = (elements) => {
-            for (let i = 0; i < elements.length; i++) {
-                const element = elements[i];
-                const currentDisplay = window.getComputedStyle(element).display;
-                element.style.display = currentDisplay === 'none' ? 'inline' : 'none';
-            }
-        };
-
-        toggleDisplay(iconElements);
-        toggleDisplay(iconColorElements);
-    });*/
-
     document.getElementById('link-profile').addEventListener('click', function (event) {
         event.preventDefault();
         // Handle profile click
@@ -215,8 +197,8 @@ $(document).ready(function () {
     });
 
     document.getElementById('datasources-header').addEventListener('click', function () {
-        const content = document.getElementById('datasources-content');
-        const arrow = document.querySelector('.accordion-arrow');
+        const content = document.getElementById('datasources-container');
+        const arrow = document.querySelector('#datasources-header .accordion-arrow');
         if (content.style.display === 'none' || content.style.display === '') {
             content.style.display = 'block';
             arrow.innerHTML = '&#9650;'; // Up arrow
@@ -225,6 +207,20 @@ $(document).ready(function () {
             arrow.innerHTML = '&#9660;'; // Down arrow
         }
     });
+
+    document.getElementById('chat-personas-header').addEventListener('click', function () {
+        const content = document.getElementById('chat-personas-container');
+        const arrow = document.querySelector('#chat-personas-header .accordion-arrow');
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            arrow.innerHTML = '&#9650;'; // Up arrow
+        } else {
+            content.style.display = 'none';
+            arrow.innerHTML = '&#9660;'; // Down arrow
+        }
+    });
+
+    renderChatPersonas();
 });
 
 // Function to clear the chat display
@@ -324,21 +320,23 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
 
         answers.forEach(answer => {
             if (answer.text) {
-                const path = `${answer.document.metadata_storage_path}?${sasToken}`;
-                const footNoteLink = `<sup class="answer_citations"><a href="#citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                const docPath = `${answer.document.metadata_storage_path}?${sasToken}`;
+                const docTitle = answer.document.title;
 
-                supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
+                const footNoteLink = `<sup class="answer_citations"><a href="#citation-link-${answerResultsNumber}-${sourceNumber}">${sourceNumber}</a></sup>`;
+                const docLink = ` <a href="${docPath}" title="${docTitle}" target="_blank">(${docTitle})</a>`;
+                //supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
+                supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + docLink + '</li>';
+                if (!listedPaths.has(docPath)) {
+                    listedPaths.add(docPath);
 
-                if (!listedPaths.has(path)) {
-                    listedPaths.add(path);
+                    //const supportingContentLink = `<a class="answer_citations" title="${docPath}" href="${docPath}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${docTitle}</a>`;
 
-                    const supportingContentLink = `<a class="answer_citations" href="${path}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
-
-                    citationContentResults += `<div id="citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+                    //citationContentResults += `<div id="citation-link-${answerResultsNumber}-${sourceNumber}">${supportingContentLink}</div>`;
 
                     sourceNumber++;
                 } else {
-                    console.log(`Document already listed: ${path}`);
+                    console.log(`Document already listed: ${docPath}`);
                 }
 
                 answerNumber++;
@@ -346,8 +344,8 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
         });
 
         if (supportingContentResults != "") {
-            supportingContent.innerHTML += '<div id="azure-storage-results-container"><div id="azure-storage-results-header">Supporting Content from Azure Storage</div>' + '<ol id="supporting_content_results">' + supportingContentResults + '</ol><br/>';
-            supportingContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
+            supportingContent.innerHTML += '<div id="azure-storage-results-container"><div id="azure-storage-results-header">Supporting Content from Azure Storage</div>' + '<ol id="supporting_content_results">' + supportingContentResults + '</ol><br/></div>';
+            //supportingContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
         }
 
         console.log('Cross-referenced answers:', answers);
@@ -532,7 +530,7 @@ async function getAnswersFromAzureSearch(userInput, aiModelName, indexName, useE
 }
 
 //code to send chat message to Azure OpenAI model
-async function getAnswersFromAzureOpenAIModel(userInput, aiModelName) {
+async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona) {
 
     if (!userInput) return;
 
@@ -546,7 +544,11 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName) {
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
     const userMessageContent = openAIRequestBody.messages.find(message => message.role === 'user').content[0];
+
     userMessageContent.text = userInput;
+
+    const systemMessageContent = openAIRequestBody.messages.find(message => message.role === 'system').content[0];
+    systemMessageContent.text = persona;
 
     const jsonString = JSON.stringify(openAIRequestBody);
 
@@ -731,6 +733,15 @@ function getQueryParam(param) {
     return urlParams.get(param);
 }
 
+// Function to get the selected chat persona
+function getSelectedChatPersona() {
+    const selectedRadio = document.querySelector('input[name="chat-persona"]:checked');
+    if (selectedRadio) {
+        return selectedRadio.title;
+    }
+    return null;
+}
+
 // Function to check if a text is a question
 function isQuestion(text) {
     const questionWords = ['who', 'what', 'where', 'when', 'why', 'how'];
@@ -847,6 +858,38 @@ async function postQuestion() {
     showResponse(questionBubble);
 }
 
+// Function to render chat personas
+async function renderChatPersonas() {
+    const config = await fetchConfig();
+
+    const chatPersonas = config.CHAT_PERSONAS;
+
+    const chatPersonasContainer = document.getElementById('chat-personas-container');
+
+    chatPersonas.innerHTML = '';
+
+    chatPersonas.forEach(persona => {
+        const chatPersona = document.createElement('div');
+
+        chatPersona.className = 'chat-persona';
+
+        const chatRadioButtonChecked = persona.Type === 'Default' ? 'checked' : '';
+
+        chatPersona.innerHTML = `<div class="form-group form-group-flex">
+                    <div>
+                        <input type="radio" ${chatRadioButtonChecked} class="chat-persona-radio" name="chat-persona" title="${persona.Prompt}" id="chat-persona-${persona.Type}" />
+                    </div>
+                    <div>
+                        <label for="chat-persona-icons">${persona.Type}</label>
+                    </div>
+                </div>`;
+
+        chatPersonasContainer.appendChild(chatPersona);
+    });
+
+
+}
+
 // Function to render documents
 async function renderDocuments(blobs) {
 
@@ -914,7 +957,7 @@ async function renderDocuments(blobs) {
             const previewCell = document.createElement('div');
             previewCell.className = 'document-cell preview';
 
-            previewCell.innerHTML = `<span class="mud-fab-label" style="display: flex !important"><button class="magnifyButton mud-button-root mud-fab mud-fab-primary mud-fab-size-small mud-ripple"><a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.COLOR}${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a></button></span>`;
+            previewCell.innerHTML = `<span class="mud-fab-label" style="display: flex !important"><button class="magnifyButton mud-button-root mud-fab mud-fab-primary mud-fab-size-small mud-ripple"><a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a></button></span>`;
 
             const statusCell = document.createElement('div');
             statusCell.className = 'document-cell preview';
@@ -935,7 +978,6 @@ async function renderDocuments(blobs) {
             for (const [key, value] of Object.entries(fileTypes)) {
                 const svgStyle = iconStyle === 'color' ? `${value.SVG_COLOR}` : `${value.SVG}`;
                 if (value.EXTENSION.some(ext => blobName.toLowerCase().endsWith(ext))) {
-                    //contentTypeCell.innerHTML = `${value.SVG}${value.SVG_COLOR} ${contentType}`;
                     contentTypeCell.innerHTML = `<code>${contentType}</code>`;
                     fileTypeFound = true;
                     break;
@@ -944,13 +986,10 @@ async function renderDocuments(blobs) {
 
             if (!fileTypeFound) {
                 const svgStyle = iconStyle === 'color' ? `${fileTypes.TXT.SVG_COLOR}` : `${fileTypes.TXT.SVG}`;
-                //contentTypeCell.innerHTML = `${fileTypes.TXT.SVG}${fileTypes.TXT.SVG_COLOR} ${contentType}`;
                 contentTypeCell.innerHTML = `<code>${contentType}</code>`;
-                //contentTypeCell.textContent = contentType;
             }
 
             const fileSizeCell = document.createElement('div');
-            //fileSizeCell.className = 'document-cell file-size';
             fileSizeCell.className = 'document-cell';
             fileSizeCell.innerHTML = `<div class="file-size mud-chip mud-chip-filled mud-chip-size-small mud-chip-color-default"><span class="mud-chip-content">${blobSize}</span></div>`;
 
@@ -1126,6 +1165,9 @@ async function showResponse(questionBubble) {
     var searchAnswers = [];
     var rawAnswers = [];
 
+    var persona = getSelectedChatPersona();
+    persona = persona == null ? "" : persona;
+
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
     loadingAnimation.style.display = 'flex';
@@ -1139,10 +1181,7 @@ async function showResponse(questionBubble) {
         //const docStorageResponseOpenAIEnhanced = await getAzureSearchResultsAIEnhanced(docStorageResponse);
 
         // Get answers from Azure OpenAI model
-        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o");
-
-        // Hide the loading animation once results are returned
-        loadingAnimation.style.display = 'none';
+        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -1210,26 +1249,41 @@ async function showResponse(questionBubble) {
 
             var aiEnhancedAnswers = "";
             var sourceNumber = 1;
+            var citationContentResults = "";
 
+            // Initialize a Set to store unique document paths
+            const listedPaths = new Set();
             for (const answer of rawAnswers) {
 
-                const path = `${answer.document.title}?${sasToken}`;
+                const docPath = `${answer.document.title}?${sasToken}`;
+                const docTitle = answer.document.title;
 
-                aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`Rephrase the following text to sound more human and use complete sentences only. Be specific and reference the specific document ${answer.document.title}. talk like a teenage girl: '${answer.text}'`, "gpt-4o");
+                //aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`${chatPersonaPrompt} Rephrase the following text and use complete sentences only. Be specific and reference the specific document ${answer.document.title}: '${answer.text}'`, "gpt-4o");
+                aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
 
-
-                const footNoteLink = `<sup class="answer_citations"><a title="${path}" href="#citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#citation-${answerResultsNumber}-link-${sourceNumber}">${sourceNumber}</a></sup>`;
 
                 const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
                 aiEnhancedAnswers += aiEnhancedAnswerHtml;
 
-                sourceNumber++;
+                if (!listedPaths.has(docPath)) {
+                    listedPaths.add(docPath);
+
+                    const supportingContentLink = `<a class="answer_citations" title="${docPath}" href="${docPath}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
+
+                    citationContentResults += `<div id="citation-link-${answerResultsNumber}-${sourceNumber}">${supportingContentLink}</div>`;
+
+                    sourceNumber++;
+                } else {
+                    console.log(`Document already listed: ${docPath}`);
+                }
             }
 
             answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Search Results from Azure OpenAI</div>';
 
             if (aiEnhancedAnswers.length > 0) {
-                answerContent.innerHTML += `<div id="openai-model-results"><ol id="ai_enhanced_answer_results">${aiEnhancedAnswers}</ol></div>`;
+                answerContent.innerHTML += `<div id="openai-model-results-container"><div id="openai-model-results"><ol class="ai_enhanced_answer_results">${aiEnhancedAnswers}</ol><br/></div>`;
+                answerContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
             }
             else {
                 answerContent.innerHTML += `<div id="openai-model-results">No results found.</div>`;
@@ -1238,6 +1292,9 @@ async function showResponse(questionBubble) {
         catch (error) {
             console.error('Error processing search results:', error);
         }
+
+        // Hide the loading animation once results are returned
+        loadingAnimation.style.display = 'none';
 
         // Append tabs and contents to chat bubble
         chatResponse.appendChild(tabs);
@@ -1281,6 +1338,8 @@ async function showResponse(questionBubble) {
     else {
         loadingAnimation.style.display = 'none';
     }
+
+    answerResultsNumber++;
 }
 
 // Function to show a toast notification
