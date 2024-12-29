@@ -359,7 +359,7 @@ label[for="chat-input"] {
   text-align: right;
   padding-right: 32px;
   margin-bottom: -24px; /* Adjust this value as needed to position the SVG closer to the chat-display-container */
-  z-index: 2000;
+  z-index: 900;
 }
 
 #jump-to-top-arrow {
@@ -367,7 +367,7 @@ label[for="chat-input"] {
   padding-right: 32px;
   margin-top: 24px;
   margin-bottom: 12px;
-  z-index: 2000;
+  z-index: 900;
 }
 
 #svg-expander {
