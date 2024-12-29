@@ -11,7 +11,7 @@
   "aiProjectName": "project-ai-copilot-demo-002",
   "aiServiceName": "ai-service-copilot-demo-002",
   "aiServiceApiVersion": "2024-08-01-preview",
-  "appDeploymentOnly": false,
+  "appDeploymentOnly": true,
   "appendUniqueSuffix": false,
   "appInsightsName": "appi-copilot-demo-002",
   "appServiceEnvironmentName": "ase-copilot-demo-002",

@@ -1,5 +1,5 @@
 {
-  "name": "embeddings-search-index-schema.json",
+  "name": "embeddings-srch-index-copilot-demo-002",
   "fields": [
     {
       "name": "id",
@@ -32,7 +32,7 @@
       "key": false,
       "retrievable": true,
       "stored": true,
-      "searchable": false,
+      "searchable": true,
       "filterable": false,
       "sortable": false,
       "facetable": true,
@@ -73,11 +73,15 @@
       "sortable": false,
       "facetable": false,
       "synonymMaps": [],
-      "dimensions": 1536,
-      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-001-text-profile"
+      "dimensions": 3072,
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-002-text-profile"
     }
   ],
   "scoringProfiles": [],
+  "corsOptions": {
+    "allowedOrigins": ["*"],
+    "maxAgeInSeconds": 300
+  },
   "suggesters": [],
   "analyzers": [],
   "tokenizers": [],
@@ -90,7 +94,7 @@
   "semantic": {
     "configurations": [
       {
-        "name": "default",
+        "name": "vector-profile-srch-index-copilot-demo-002-semantic-configuration",
         "prioritizedFields": {
           "prioritizedContentFields": [
             {
@@ -105,7 +109,7 @@
   "vectorSearch": {
     "algorithms": [
       {
-        "name": "vector-config-srch-index-copilot-demo-001-algorithm",
+        "name": "vector-config-srch-index-copilot-demo-002-algorithm",
         "kind": "hnsw",
         "hnswParameters": {
           "m": 4,
@@ -117,12 +121,12 @@
     ],
     "profiles": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-001-text-profile",
-        "algorithm": "vector-profile-srch-index-copilot-demo-001-text-vectorizer"
+        "name": "vector-profile-srch-index-copilot-demo-002-text-profile",
+        "algorithm": "vector-config-srch-index-copilot-demo-002-algorithm"
       }
     ],
     "vectorizers": [],
     "compressions": []
   },
-  "@odata.etag": "\"0x8DCC32DEA5FDE3A\""
+  "@odata.etag": "\"0x8DD101A99DFDAE1\""
 }

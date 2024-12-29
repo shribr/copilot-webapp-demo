@@ -2457,7 +2457,7 @@ function New-SearchIndex {
     
         $jsonContent.name = $searchIndexName
     
-        if ($searchIndexName -notlike "*vector*") {
+        if ($searchIndexName -notlike "*vector*" -and $searchIndexName -notlike "*embeddings*") {
             if ($jsonContent.PSObject.Properties.Match('semantic')) {
                 $jsonContent.PSObject.Properties.Remove('semantic')
             }
@@ -2800,6 +2800,14 @@ function New-SearchService {
 
             $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
             $searchIndexExists = $searchIndexes -contains $indexName
+
+            if ($searchIndexExists -eq $false) {
+                New-SearchIndex -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchDatasourceName $searchDatasourceName -searchIndexSchema $indexSchema
+            }
+            else {
+                Write-Host "Search Index '$indexName' already exists."
+                Write-Log -message "Search Index '$indexName' already exists."
+            }
         }
 
         #$searchIndexExists = $searchIndexes -contains $global:searchIndexName

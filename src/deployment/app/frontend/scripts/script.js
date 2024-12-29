@@ -484,7 +484,7 @@ async function getAnswersFromAzureSearch(userInput, useEmbeddings) {
                     kind: "vector",
                     vector: embeddings,
                     k: 7,
-                    fields: "text_vector,image_vector"
+                    fields: "embedding"
                 }
             ],
             queryType: "semantic",
