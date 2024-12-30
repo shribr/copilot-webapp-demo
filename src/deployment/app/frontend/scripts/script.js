@@ -380,6 +380,44 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
     return supportingContent;
 }
 
+// Function to create a new thread for an AI conversation
+async function createThread(message) {
+
+    const config = await fetchConfig();
+    const apiVersion = config.OPENAI_API_VERSION;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+
+    const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads?api-version=${apiVersion}`;
+
+    //https://learn.microsoft.com/en-us/azure/ai-services/openai/assistants-reference-threads?tabs=rest
+
+    //https://eastus.api.cognitive.microsoft.com/openai/threads/thread_hhKYL7GP2vvhM5j8D7TvetGT?api-version=2024-08-01-preview
+
+    const jsonString = JSON.stringify(openAIRequestBody);
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            },
+            body: jsonString
+        });
+
+        const thread = await response.json();
+
+        return thread;
+    }
+    catch (error) {
+        console.log('Error creating thread:', error);
+    }
+
+    return null;
+}
+
 // function to delete documents
 function deleteDocuments() {
     //code to delete documents
@@ -579,6 +617,9 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona) {
 
     const jsonString = JSON.stringify(openAIRequestBody);
 
+    //Create a new thread for the conversation
+    var thread = createThread(jsonString);
+
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -607,7 +648,7 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona) {
             console.error('Error extracting source documents:', error);
         }
 
-
+        //only returning the first response
         return data.choices[0].message.content.trim();
     }
     catch (error) {
@@ -733,6 +774,12 @@ async function getDocuments() {
     }
 }
 
+// Function to get messages from a thread
+async function getMessagesFromThread(threadId) {
+
+    //https://eastus.api.cognitive.microsoft.com/openai/threads/thread_hhKYL7GP2vvhM5j8D7TvetGT/messages?api-version=2024-08-01-preview
+}
+
 // Function to get SAS token from Azure Key Vault
 async function getSasToken() {
 
@@ -752,6 +799,11 @@ async function getSasToken() {
     }
 
     return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+}
+
+// Function to get a thread for an AI conversation
+async function getThread() {
+    //https://eastus.api.cognitive.microsoft.com/openai/threads/thread_hhKYL7GP2vvhM5j8D7TvetGT?api-version=2024-08-01-preview
 }
 
 //code to toggle between chat and document screens
@@ -1275,9 +1327,9 @@ async function showResponse(questionBubble) {
             //indexName = indexes.filter(item => /embeddings-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
 
             //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "text-embedding-3-large", indexName, true);
-            const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
+            //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
 
-            searchAnswers = docStorageResponseWithEmbeddings["@search.answers"];
+            //searchAnswers = docStorageResponseWithEmbeddings["@search.answers"];
 
             //This call to mapAnswersToDocSources is for the AI enhanced answers from Azure Search and used to populate the answer content tab.
             //I believe the reason this is not working is because the async operation that executes to rephrase the text is not completing before the next line of code executes in order to populate the answers array with the updated text.
