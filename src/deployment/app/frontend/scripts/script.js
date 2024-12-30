@@ -4,6 +4,8 @@ let currentSortColumn = '';
 let currentSortDirection = 'asc';
 let answerResponseNumber = 1;
 let chatHistory = [];
+let thread = [];
+let threadId = '';
 
 //const config = await fetchConfig();
 
@@ -228,34 +230,39 @@ $(document).ready(function () {
     renderChatPersonas();
 });
 
-async function addMessageToThread(threadId, message) {
+// Function to add a message to a thread
+async function addMessageToThread(threadId, message, role) {
 
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
-    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+    //const openAIRequestBody = config.OPENAI_REQUEST_BODY;
 
     const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}/messages?api-version=${apiVersion}`;
 
-    const jsonString = JSON.stringify(openAIRequestBody);
+    const jsonMessage = JSON.stringify(message);
+
+    const jsonString = `{ "role": "${role}", "content": ${jsonMessage} }`;
 
     try {
         const response = await fetch(endpoint, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'api-key': `${apiKey}`,
                 'http2': 'true'
             },
-            body: message
+            body: jsonString
         });
 
+        const message = await response.json();
+
+        console.log(`Message added to thread: ${threadId}`, message);
     }
     catch (error) {
-        console.log('Error creating thread:', error);
+        console.log('Error adding message to thread:', error);
     }
 }
-
 
 // Function to build chat history
 function buildChatHistory(answerResponseNumber, question, answer, persona, dateTimestamp) {
@@ -419,24 +426,19 @@ async function createThread() {
 
     const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads?api-version=${apiVersion}`;
 
-    //https://learn.microsoft.com/en-us/azure/ai-services/openai/assistants-reference-threads?tabs=rest
-
-    //https://eastus.api.cognitive.microsoft.com/openai/threads/thread_hhKYL7GP2vvhM5j8D7TvetGT?api-version=2024-08-01-preview
-
-    const jsonString = JSON.stringify(openAIRequestBody);
-
     try {
         const response = await fetch(endpoint, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'api-key': `${apiKey}`,
                 'http2': 'true'
-            },
-            body: jsonString
+            }
         });
 
         const thread = await response.json();
+
+        console.log('Thread created:', thread);
 
         return thread;
     }
@@ -646,17 +648,6 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona, t
 
     const jsonString = JSON.stringify(openAIRequestBody);
 
-    //Create a new thread for the conversation
-    var thread = [];
-
-    thread = await getThread(threadId);
-
-    if (thread == null) {
-        thread = await createThread();
-    }
-
-    threadId = thread.id;
-
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -839,8 +830,33 @@ async function getSasToken() {
 }
 
 // Function to get a thread for an AI conversation
-async function getThread() {
-    //https://eastus.api.cognitive.microsoft.com/openai/threads/thread_hhKYL7GP2vvhM5j8D7TvetGT?api-version=2024-08-01-preview
+async function getThread(threadId) {
+
+    const config = await fetchConfig();
+    const apiVersion = config.OPENAI_API_VERSION;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+
+    const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}?api-version=${apiVersion}`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            }
+        });
+
+        const thread = await response.json();
+
+        return thread;
+    }
+    catch (error) {
+        console.log('Error getting thread:', error);
+    }
+
+    return null;
 }
 
 //code to toggle between chat and document screens
@@ -1289,11 +1305,25 @@ async function showResponse(questionBubble) {
     var persona = getSelectedChatPersona();
     persona = persona == null ? "" : persona;
 
+    try {
+        // First see if there is an existing thread
+        thread = await getThread(threadId);
+
+        if (thread == null || thread == undefined) {
+            thread = await createThread();
+        }
+        threadId = thread.id;
+    } catch (error) {
+        console.log('Error getting thread ID:', error);
+    }
+
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
     loadingAnimation.style.display = 'flex';
 
     if (chatInput) {
+
+        await addMessageToThread(threadId, chatInput, "user");
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
@@ -1301,8 +1331,6 @@ async function showResponse(questionBubble) {
         // Get answers from Azure Search
         indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
         const docStorageResponse = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
-
-        //const docStorageResponseOpenAIEnhanced = await getAzureSearchResultsAIEnhanced(docStorageResponse);
 
         // Get answers from Azure OpenAI model
         var openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
@@ -1361,16 +1389,9 @@ async function showResponse(questionBubble) {
 
         try {
             // Get answers from Azure Search with embeddings
-            //indexName = indexes.filter(item => /embeddings-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
 
             //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "text-embedding-3-large", indexName, true);
             //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
-
-            //searchAnswers = docStorageResponseWithEmbeddings["@search.answers"];
-
-            //This call to mapAnswersToDocSources is for the AI enhanced answers from Azure Search and used to populate the answer content tab.
-            //I believe the reason this is not working is because the async operation that executes to rephrase the text is not completing before the next line of code executes in order to populate the answers array with the updated text.
-            //const aiEnhancedAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", true);
 
             var aiEnhancedAnswers = "";
             var sourceNumber = 0;
@@ -1402,6 +1423,8 @@ async function showResponse(questionBubble) {
                 //aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`${chatPersonaPrompt} Rephrase the following text and use complete sentences only. Be specific and reference the specific document ${answer.document.title}: '${answer.text}'`, "gpt-4o");
                 aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
                 aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
+
+                await addMessageToThread(threadId, aiEnhancedAnswer, "assistant");
 
                 aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
 
@@ -1616,6 +1639,37 @@ function updateFileCount() {
     document.getElementById('file-count').textContent = `Files selected: ${fileCount}`;
 }
 
+async function updateMessage(threadId, messageId, metadata) {
+    const config = await fetchConfig();
+    const apiVersion = config.OPENAI_API_VERSION;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    //const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+
+    const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}/messages/${messageId}?api-version=${apiVersion}`;
+
+    const jsonMetadata = JSON.stringify(metadata);
+    const jsonString = `{ "metadata": ${jsonMetadata} }`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            },
+            body: jsonString
+        });
+
+        const data = await response.json();
+
+        console.log(`Message ${messageId} updated:`, data);
+    }
+    catch (error) {
+        console.log(`Error updating message ${messageId}:`, error);
+    }
+}
+
 //code to update placeholder text
 function updatePlaceholder() {
     const noFilesPlaceholder = document.getElementById('num-files-selected-placeholder');
@@ -1640,6 +1694,40 @@ function updatePlaceholder() {
         noFilesPlaceholder.textContent = `${fileCount} file(s) selected (${totalSizeKB} KB)`;
         noFilesPlaceholder.style.display = 'block';
         uploadButton.disabled = false;
+    }
+}
+
+async function updateThread(threadId, metadata, toolResources) {
+
+    const config = await fetchConfig();
+    const apiVersion = config.OPENAI_API_VERSION;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    //const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+
+    const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}?api-version=${apiVersion}`;
+
+    const jsonMetadata = JSON.stringify(metadata);
+    const jsonToolResources = JSON.stringify(toolResources);
+
+    const jsonString = `{ "metadata": ${jsonMetadata}, "tool_resources": ${jsonToolResources} }`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            },
+            body: jsonString
+        });
+
+        const data = await response.json();
+
+        console.log(`Thread: ${threadId} updated.`, data);
+    }
+    catch (error) {
+        console.log(`Error updating thread ${threadId} :`, error);
     }
 }
 
