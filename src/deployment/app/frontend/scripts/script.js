@@ -228,6 +228,35 @@ $(document).ready(function () {
     renderChatPersonas();
 });
 
+async function addMessageToThread(threadId, message) {
+
+    const config = await fetchConfig();
+    const apiVersion = config.OPENAI_API_VERSION;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+
+    const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}/messages?api-version=${apiVersion}`;
+
+    const jsonString = JSON.stringify(openAIRequestBody);
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            },
+            body: message
+        });
+
+    }
+    catch (error) {
+        console.log('Error creating thread:', error);
+    }
+}
+
+
 // Function to build chat history
 function buildChatHistory(answerResponseNumber, question, answer, persona, dateTimestamp) {
 
@@ -381,7 +410,7 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
 }
 
 // Function to create a new thread for an AI conversation
-async function createThread(message) {
+async function createThread() {
 
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
@@ -594,7 +623,7 @@ async function getAnswersFromAzureSearch(userInput, aiModelName, indexName, useE
 }
 
 //code to send chat message to Azure OpenAI model
-async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona) {
+async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona, threadId) {
 
     if (!userInput) return;
 
@@ -618,7 +647,15 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona) {
     const jsonString = JSON.stringify(openAIRequestBody);
 
     //Create a new thread for the conversation
-    var thread = createThread(jsonString);
+    var thread = [];
+
+    thread = await getThread(threadId);
+
+    if (thread == null) {
+        thread = await createThread();
+    }
+
+    threadId = thread.id;
 
     try {
         const response = await fetch(endpoint, {
