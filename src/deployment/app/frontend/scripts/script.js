@@ -417,14 +417,17 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
 }
 
 // Function to create a new thread for an AI conversation
-async function createThread() {
+async function createThread(metadata, toolResources) {
 
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
-    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
 
     const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads?api-version=${apiVersion}`;
+
+    const jsonMetadata = JSON.stringify(metadata);
+    const jsonToolResources = JSON.stringify(toolResources);
+    const jsonString = ` { "metadata": ${jsonMetadata}, "tool_resources": ${jsonToolResources} } `;
 
     try {
         const response = await fetch(endpoint, {
@@ -433,7 +436,8 @@ async function createThread() {
                 'Content-Type': 'application/json',
                 'api-key': `${apiKey}`,
                 'http2': 'true'
-            }
+            },
+            body: jsonString
         });
 
         const thread = await response.json();
@@ -1291,6 +1295,10 @@ async function showResponse(questionBubble) {
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const indexes = config.SEARCH_INDEXES;
+    const searchServiceEndpoint = `https://${config.AZURE_SEARCH_SERVICE_NAME}.search.windows.net`;
+
+    const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+    const metadata = { "user": "John Smith" };
 
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
@@ -1298,21 +1306,33 @@ async function showResponse(questionBubble) {
     // Create a map of documents using their key
     const docMap = new Map();
 
-    var indexName = "";
     var searchAnswers = [];
     var rawAnswers = [];
 
     var persona = getSelectedChatPersona();
     persona = persona == null ? "" : persona;
 
+    const toolResources = {
+        "azure_ai_search": {
+            "indexes": [
+                {
+                    "index_connection_id": searchServiceEndpoint,
+                    "index_name": indexName
+                }
+            ]
+        }
+    };
+
     try {
         // First see if there is an existing thread
-        thread = await getThread(threadId);
-
-        if (thread == null || thread == undefined) {
-            thread = await createThread();
+        if (threadId == null || threadId == undefined || threadId == "") {
+            thread = await createThread(metadata, toolResources);
+            threadId = thread.id;
         }
-        threadId = thread.id;
+        else {
+            thread = await getThread(threadId);
+        }
+
     } catch (error) {
         console.log('Error getting thread ID:', error);
     }
@@ -1329,7 +1349,7 @@ async function showResponse(questionBubble) {
         chatExamplesContainer.style.display = 'none';
 
         // Get answers from Azure Search
-        indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+
         const docStorageResponse = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
 
         // Get answers from Azure OpenAI model
