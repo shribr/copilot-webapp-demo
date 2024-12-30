@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
     <link rel="stylesheet" href="css/styles.css" type="text/css" />
-    <link rel="stylesheet" href="css/MudBlazor.min.css" type="text/css" />
+    <!-- <link rel="stylesheet" href="css/MudBlazor.min.css" type="text/css" /> -->
 
     <script type="text/javascript">var appInsights = window.appInsights || function (config) { function r(config) { t[config] = function () { var i = arguments; t.queue.push(function () { t[config].apply(t, i) }) } } var t = { config: config }, u = document, e = window, o = "script", s = u.createElement(o), i, f; s.src = config.url || "//az416426.vo.msecnd.net/scripts/a/ai.0.js"; u.getElementsByTagName(o)[0].parentNode.appendChild(s); try { t.cookie = u.cookie } catch (h) { } for (t.queue = [], i = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; i.length;)r("track" + i.pop()); return r("setAuthenticatedUserContext"), r("clearAuthenticatedUserContext"), config.disableExceptionTracking || (i = "onerror", r("_" + i), f = e[i], e[i] = function (config, r, u, e, o) { var s = f && f(config, r, u, e, o); return s !== !0 && t["_" + i](config, r, u, e, o), s }), t }
             ({
@@ -20,6 +20,47 @@
 </head>
 
 <body class="flex-container">
+    <!-- <header class="mud-appbar mud-appbar-fixed-top mud-elevation-20">
+        <div class="mud-toolbar mud-toolbar-gutters mud-toolbar-appbar">
+            <button id="nav-toggle" type="button" title="Toggle navigation sidebar"
+                class="mud-button-root mud-icon-button mud-inherit-text hover:mud-inherit-hover mud-ripple mud-ripple-icon mud-icon-button-size-large mud-icon-button-edge-start"
+                _bl_4="" style="--mud-ripple-offset-x: -3px; --mud-ripple-offset-y: 3px;"><span
+                    class="mud-icon-button-label"><svg class="mud-icon-root mud-svg-icon mud-icon-size-large"
+                        focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+                    </svg></span></button>
+            <div class="mud-tooltip-root mud-tooltip-inline"><button aria-pressed="false"
+                    type="button"
+                    class="mud-button-root mud-icon-button mud-inherit-text hover:mud-inherit-hover mud-ripple mud-ripple-icon mud-icon-button-size-large"
+                    _bl_34="" style="--mud-ripple-offset-x: 0px; --mud-ripple-offset-y: -8px;"><span
+                        class="mud-icon-button-label"><svg
+                            class="mud-icon-root mud-svg-icon mud-icon-size-large" focusable="false" viewBox="0 0 24 24"
+                            aria-hidden="true">
+                            <g>
+                                <rect fill="none" height="24" width="24"></rect>
+                                <path
+                                    d="M12,4c4.41,0,8,3.59,8,8s-3.59,8-8,8s-8-3.59-8-8S7.59,4,12,4 M12,2C6.48,2,2,6.48,2,12c0,5.52,4.48,10,10,10 c5.52,0,10-4.48,10-10C22,6.48,17.52,2,12,2L12,2z M13,12l0-4h-2l0,4H8l4,4l4-4H13z">
+                                </path>
+                            </g>
+                        </svg></span></button>
+                <div id="popover-1ad3ec3e-073c-4b85-9dd3-a1df3bae88e0" class="mud-popover-cascading-value"></div>
+            </div>
+            <div class="flex-grow-1"></div><button type="button"
+                title="Open the developer settings side panel"
+                class="mud-button-root mud-icon-button mud-inherit-text hover:mud-inherit-hover mud-ripple mud-ripple-icon mud-icon-button-size-large"
+                _bl_33="" style="--mud-ripple-offset-x: 4px; --mud-ripple-offset-y: 5px;"><span
+                    class="mud-icon-button-label"><svg class="mud-icon-root mud-svg-icon mud-icon-size-large"
+                        focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+                        <g>
+                            <path d="M0,0h24v24H0V0z" fill="none"></path>
+                            <path
+                                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z">
+                            </path>
+                        </g>
+                    </svg></span></button>
+        </div>
+    </header> -->
     <div id="top-navigation-toolbar">
         <div><img src="images/site-logo-default.png" id="site-logo" class="site-logo-default" alt="Site Logo"></div>
         <div id="main-header-title">Chat with Azure Copilot</div>
@@ -56,18 +97,20 @@
                         </div>
                         <div id="chat-info-current-question-container">
                         </div>
+                        <div id="expand-chat-svg-container">
+                            <svg id="svg-expander" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 4H10V6H6V10H4V4Z" fill="currentColor" />
+                                <path d="M14 4H20V10H18V6H14V4Z" fill="currentColor" />
+                                <path d="M4 14H6V18H10V20H4V14Z" fill="currentColor" />
+                                <path d="M18 14H20V20H14V18H18V14Z" fill="currentColor" />
+                            </svg>
+                        </div>
                     </div>
-                    <div id="expand-chat-svg-container">
-                        <svg id="svg-expander" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 4H10V6H6V10H4V4Z" fill="currentColor" />
-                            <path d="M14 4H20V10H18V6H14V4Z" fill="currentColor" />
-                            <path d="M4 14H6V18H10V20H4V14Z" fill="currentColor" />
-                            <path d="M18 14H20V20H14V18H18V14Z" fill="currentColor" />
-                        </svg>
-                    </div>
+
                     <div id="chat-display-container">
                         <div id="chat-display"></div>
+
                     </div>
                     <div id="jump-to-top-arrow"><span class="accordion-arrow">&#9650;</span></div>
 

@@ -40,6 +40,23 @@ code {
   animation: fadeIn 1s ease-in-out;
 }
 
+/* Media query for larger screens */
+@media (min-width: 768px) {
+  #content-container {
+    flex-direction: row;
+  }
+
+  #left-nav-container {
+    display: block;
+    width: 200px;
+  }
+
+  #main-content {
+    flex: 1;
+    padding: 20px;
+  }
+}
+
 /* Add this to your CSS file */
 @keyframes slideUp {
   from {
@@ -181,11 +198,13 @@ code {
   text-align: right;
   white-space: nowrap;
   padding: 12px;
+  color: white;
 }
 
 /* Content container styles */
 #content-container {
   display: flex;
+  flex-direction: column;
   flex: 1;
   margin-top: 120px;
   z-index: 50;
@@ -255,6 +274,7 @@ code {
 
 /* Navigation styles */
 #left-nav-container {
+  display: none;
   background-color: #ffffff;
   color: #333;
   padding: 20px;
@@ -353,8 +373,6 @@ nav ul li a:hover {
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /*width: 100%;*/
-  display: flex;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -370,6 +388,8 @@ nav ul li a:hover {
 }
 
 #chat-input {
+  flex: 1;
+  margin-right: 10px;
   width: calc(100% - 82px);
   padding: 10px;
   border: 1px solid #ddd;
@@ -604,14 +624,16 @@ label[for="chat-input"] {
 
 /* Document container styles */
 #document-container {
+  flex: 1;
   display: none;
   padding: 20px;
   margin-left: 200px;
+  margin-right: 20px;
   background-color: #ffffff;
   border-radius: 8px;
   border: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
+  /* width: 100%; */
 }
 
 #clear-filter-button {
@@ -688,7 +710,7 @@ REMOVING BANDED ROWS FOR NOW
 }
 
 .document-cell button {
-  padding: 5px 10px;
+  /* padding: 5px 10px; */
   margin-right: 5px;
   border: none;
   border-radius: 4px;
@@ -732,7 +754,8 @@ REMOVING BANDED ROWS FOR NOW
 
 #file-upload {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 20px;
   padding: 10px;
   border: 1px solid #ddd;
@@ -880,6 +903,7 @@ REMOVING BANDED ROWS FOR NOW
 
 #filter-container {
   display: flex;
+  flex-direction: row;
   align-items: center;
   margin-left: auto;
   padding-bottom: 6px;
@@ -887,10 +911,11 @@ REMOVING BANDED ROWS FOR NOW
 }
 
 #filter-input {
+  flex: 1;
   padding: 5px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-right: 4px;
+  margin-right: 10px;
   /* Add 4px of padding between the input and the button */
 }
 
@@ -1057,6 +1082,22 @@ REMOVING BANDED ROWS FOR NOW
   border: 1px solid #ddd;
   border-radius: 5px;
   margin-right: 10px;
+}
+
+.accordion-arrow {
+  width: 32px;
+  cursor: pointer;
+  display: none;
+}
+
+.download-chat-results-button {
+  cursor: pointer;
+  width: 32px;
+}
+.download-chat-results-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
 #chat-input-prompt-label {
@@ -1234,13 +1275,13 @@ REMOVING BANDED ROWS FOR NOW
 }
 
 .mud-icon-default {
-  color: var(--mud-palette-text-secondary);
+  color: white;
 }
 
 .mud-disabled .mud-icon-root,
 .mud-disabled .mud-svg-icon,
 .mud-disabled .mud-icon-default {
-  color: var(--mud-palette-text-disabled);
+  color: #e6e6e6;
 }
 
 /* CSS FROM BLAZOR FRAMEWORK */
@@ -1257,7 +1298,7 @@ REMOVING BANDED ROWS FOR NOW
 }
 
 .mud-icon-root.mud-svg-icon {
-  fill: currentColor;
+  fill: white;
 }
 
 .mud-icon-size-small {
