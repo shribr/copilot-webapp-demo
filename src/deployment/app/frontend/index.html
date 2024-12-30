@@ -20,17 +20,20 @@
 </head>
 
 <body class="flex-container">
-    <div id="toolbar">
+    <div id="top-navigation-toolbar">
         <div><img src="images/site-logo-default.png" id="site-logo" class="site-logo-default" alt="Site Logo"></div>
-        <div class="title">Chat with Azure Copilot</div>
-        <div class="links">
-            <a id="link-settings" href="#settings" onclick="event.preventDefault();">Settings</a>
-            <a id="link-profile" href="#profile" onclick="event.preventDefault();">Profile</a>
-            <a id="link-help" href="#help" onclick="event.preventDefault();">Help</a>
+        <div id="main-header-title">Chat with Azure Copilot</div>
+        <div id="top-navigation-toolbar-link-container">
+            <a id="link-settings" class="top-navigation-toolbar-link" href="#settings"
+                onclick="event.preventDefault();">Settings</a>
+            <a id="link-profile" class="top-navigation-toolbar-link" href="#profile"
+                onclick="event.preventDefault();">Profile</a>
+            <a id="link-help" class="top-navigation-toolbar-link" href="#help"
+                onclick="event.preventDefault();">Help</a>
         </div>
     </div>
     <div id="content-container">
-        <div id="nav-container">
+        <div id="left-nav-container">
             <nav>
                 <ul>
                 </ul>

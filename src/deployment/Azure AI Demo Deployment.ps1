@@ -116,6 +116,7 @@ $global:ResourceTypes = @(
     "microsoft.insights/actiongroups"
 )
 
+# Mapping of global AI Hub connected resources
 $global:AIHubConnectedResources = @()
 
 # List of all KeyVault secret keys
@@ -131,7 +132,7 @@ $global:KeyVaultSecrets = @(
     “UseVision”
 )
 
-# function to convert string to proper case
+# Function to convert string to proper case
 function ConvertTo-ProperCase {
     param (
         [string]$inputString

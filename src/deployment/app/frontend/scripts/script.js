@@ -43,7 +43,7 @@ $(document).ready(function () {
     toggleDisplay(screen);
 
     // Add event listeners to navigation links
-    $('#nav-container nav ul li a').on('click', function (event) {
+    $('#left-nav-container nav ul li a').on('click', function (event) {
         event.preventDefault();
         const screen = new URL(this.href).searchParams.get('screen');
         toggleDisplay(screen);
@@ -315,7 +315,7 @@ async function createSidenavLinks() {
     try {
 
 
-        const sidenav = document.getElementById('nav-container').querySelector('nav ul');
+        const sidenav = document.getElementById('left-nav-container').querySelector('nav ul');
         const sidenavLinks = Object.values(config.SIDEBAR_NAV_ITEMS);
 
         // Debugging: Log the sidenavLinks to check its type and content
@@ -1376,7 +1376,7 @@ async function showResponse(questionBubble) {
         answerContent.style.fontStyle = 'italic';
 
         if (config.SEARCH_AZURE_OPENAI_MODEL == true) {
-            answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Open AI LLM</div>';
+            answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Generic OpenAI Model</div>';
             answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults}</div>`;
 
             const codeContent = document.createElement('div');
@@ -1459,7 +1459,7 @@ async function showResponse(questionBubble) {
                 buildChatHistory(answerResponseNumber, chatInput, aiEnhancedAnswersArray, persona, dateTimestamp);
             }
 
-            answerContent.innerHTML += '<div id="openai-model-results-header">Enhanced Search Results from Azure OpenAI</div>';
+            answerContent.innerHTML += '<div id="openai-model-results-header">OpenAI Enhanced Search Results from Azure Storage</div>';
 
             if (aiEnhancedAnswers.length > 0) {
                 answerContent.innerHTML += `<div id="openai-model-results-container"><div id="openai-model-results"><ol class="ai_enhanced_answer_results">${aiEnhancedAnswers}</ol><br/></div>`;
