@@ -99,7 +99,398 @@
 2024-12-31 03:58:29 - Web app 'app-copilot-demo-004' deployed successfully.
 2024-12-31 03:59:16 - Function app 'func-chat-copilot-demo-004' deployed successfully.
 *** LOG SEQUENCE: 21 ***
-*** SCRIPT START TIME: 12/31/2024 04:06:38 ***
-2024-12-31 04:06:41 - Resource Group 'RG-COPILOT-DEMO-004' already exists.
-2024-12-31 04:07:02 - Web app 'app-copilot-demo-004' deployed successfully.
-2024-12-31 04:07:42 - Function app 'func-chat-copilot-demo-004' deployed successfully.
+*** SCRIPT START TIME: 12/29/2024 13:52:25 ***
+2024-12-29 13:53:02 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 13:53:51 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 22 ***
+*** SCRIPT START TIME: 12/29/2024 13:55:49 ***
+2024-12-29 13:56:12 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 13:56:52 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 23 ***
+*** SCRIPT START TIME: 12/29/2024 14:02:26 ***
+2024-12-29 14:02:52 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:03:44 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 24 ***
+*** SCRIPT START TIME: 12/29/2024 14:09:03 ***
+2024-12-29 14:09:25 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:10:29 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 25 ***
+*** SCRIPT START TIME: 12/29/2024 14:12:56 ***
+2024-12-29 14:13:24 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:14:07 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 26 ***
+*** SCRIPT START TIME: 12/29/2024 14:32:21 ***
+2024-12-29 14:33:03 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:33:49 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 27 ***
+*** SCRIPT START TIME: 12/29/2024 14:35:59 ***
+2024-12-29 14:36:22 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:37:09 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 28 ***
+*** SCRIPT START TIME: 12/29/2024 14:40:28 ***
+2024-12-29 14:41:06 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:41:53 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 29 ***
+*** SCRIPT START TIME: 12/29/2024 14:49:49 ***
+2024-12-29 14:50:23 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:51:06 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 30 ***
+*** SCRIPT START TIME: 12/29/2024 14:54:50 ***
+2024-12-29 14:55:17 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 14:56:01 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 31 ***
+*** SCRIPT START TIME: 12/29/2024 15:32:41 ***
+2024-12-29 15:33:23 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 15:34:06 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 32 ***
+*** SCRIPT START TIME: 12/29/2024 15:34:17 ***
+2024-12-29 15:34:45 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 15:35:43 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 33 ***
+*** SCRIPT START TIME: 12/29/2024 15:37:24 ***
+2024-12-29 15:37:46 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 15:38:31 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 34 ***
+*** SCRIPT START TIME: 12/29/2024 15:42:34 ***
+2024-12-29 15:43:00 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 15:44:10 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 35 ***
+*** SCRIPT START TIME: 12/29/2024 15:44:41 ***
+2024-12-29 15:45:11 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 15:45:55 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 36 ***
+*** SCRIPT START TIME: 12/29/2024 15:47:27 ***
+2024-12-29 15:47:50 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 15:48:38 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 37 ***
+*** SCRIPT START TIME: 12/29/2024 16:02:04 ***
+2024-12-29 16:02:41 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 16:03:32 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 38 ***
+*** SCRIPT START TIME: 12/29/2024 16:04:23 ***
+2024-12-29 16:04:44 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 16:05:31 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 39 ***
+*** SCRIPT START TIME: 12/29/2024 16:07:45 ***
+2024-12-29 16:08:10 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 16:09:05 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 40 ***
+*** SCRIPT START TIME: 12/29/2024 16:24:26 ***
+2024-12-29 16:25:28 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 16:26:09 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 41 ***
+*** SCRIPT START TIME: 12/29/2024 16:28:39 ***
+2024-12-29 16:29:04 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 16:29:52 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 42 ***
+*** SCRIPT START TIME: 12/29/2024 16:30:14 ***
+2024-12-29 16:30:38 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 16:31:27 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 43 ***
+*** SCRIPT START TIME: 12/29/2024 16:33:19 ***
+2024-12-29 16:33:41 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 16:34:28 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 44 ***
+*** SCRIPT START TIME: 12/29/2024 17:31:39 ***
+2024-12-29 17:32:17 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 17:33:06 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 45 ***
+*** SCRIPT START TIME: 12/29/2024 17:34:25 ***
+2024-12-29 17:34:45 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 17:35:42 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 46 ***
+*** SCRIPT START TIME: 12/29/2024 17:39:34 ***
+2024-12-29 17:39:55 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 17:40:50 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 47 ***
+*** SCRIPT START TIME: 12/29/2024 17:41:11 ***
+2024-12-29 17:41:37 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 17:42:22 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 48 ***
+*** SCRIPT START TIME: 12/29/2024 17:45:18 ***
+2024-12-29 17:45:42 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 17:46:29 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 49 ***
+*** SCRIPT START TIME: 12/29/2024 17:48:12 ***
+2024-12-29 17:48:49 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 17:49:42 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 50 ***
+*** SCRIPT START TIME: 12/29/2024 17:57:36 ***
+2024-12-29 17:58:00 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 17:59:05 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 51 ***
+*** SCRIPT START TIME: 12/29/2024 18:04:30 ***
+2024-12-29 18:04:53 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 18:05:46 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 52 ***
+*** SCRIPT START TIME: 12/29/2024 18:15:35 ***
+2024-12-29 18:16:14 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 18:17:02 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 53 ***
+*** SCRIPT START TIME: 12/29/2024 18:49:50 ***
+2024-12-29 18:50:44 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 18:51:29 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 54 ***
+*** SCRIPT START TIME: 12/29/2024 19:56:21 ***
+2024-12-29 19:57:00 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 19:57:44 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 55 ***
+*** SCRIPT START TIME: 12/29/2024 20:14:59 ***
+2024-12-29 20:15:26 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:16:12 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 56 ***
+*** SCRIPT START TIME: 12/29/2024 20:20:28 ***
+2024-12-29 20:20:50 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:21:36 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 57 ***
+*** SCRIPT START TIME: 12/29/2024 20:25:43 ***
+2024-12-29 20:26:06 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:26:48 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 58 ***
+*** SCRIPT START TIME: 12/29/2024 20:29:55 ***
+2024-12-29 20:30:29 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:31:11 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 59 ***
+*** SCRIPT START TIME: 12/29/2024 20:35:15 ***
+2024-12-29 20:35:37 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:36:20 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 60 ***
+*** SCRIPT START TIME: 12/29/2024 20:44:05 ***
+2024-12-29 20:44:34 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:45:34 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 61 ***
+*** SCRIPT START TIME: 12/29/2024 20:52:51 ***
+2024-12-29 20:53:16 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:53:57 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 62 ***
+*** SCRIPT START TIME: 12/29/2024 20:54:17 ***
+2024-12-29 20:54:43 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:55:29 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 63 ***
+*** SCRIPT START TIME: 12/29/2024 20:56:02 ***
+2024-12-29 20:56:24 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:57:06 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 64 ***
+*** SCRIPT START TIME: 12/29/2024 20:57:36 ***
+2024-12-29 20:58:01 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 20:58:55 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 65 ***
+*** SCRIPT START TIME: 12/29/2024 21:40:04 ***
+2024-12-29 21:40:42 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 21:41:36 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 66 ***
+*** SCRIPT START TIME: 12/29/2024 21:45:04 ***
+2024-12-29 21:45:33 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 21:46:45 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 67 ***
+*** SCRIPT START TIME: 12/29/2024 21:46:54 ***
+2024-12-29 21:47:26 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 21:48:15 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 68 ***
+*** SCRIPT START TIME: 12/29/2024 21:51:45 ***
+2024-12-29 21:52:06 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 21:52:56 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 69 ***
+*** SCRIPT START TIME: 12/29/2024 21:54:43 ***
+2024-12-29 21:55:13 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 21:55:55 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 70 ***
+*** SCRIPT START TIME: 12/29/2024 22:00:21 ***
+2024-12-29 22:00:48 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 22:01:37 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 71 ***
+*** SCRIPT START TIME: 12/29/2024 22:02:57 ***
+2024-12-29 22:03:20 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 22:04:08 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 72 ***
+*** SCRIPT START TIME: 12/29/2024 22:45:40 ***
+2024-12-29 22:46:22 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 22:47:09 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 73 ***
+*** SCRIPT START TIME: 12/29/2024 22:54:50 ***
+2024-12-29 22:55:15 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 22:55:56 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 74 ***
+*** SCRIPT START TIME: 12/29/2024 22:58:25 ***
+2024-12-29 22:58:56 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 22:59:43 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 75 ***
+*** SCRIPT START TIME: 12/29/2024 23:00:23 ***
+2024-12-29 23:00:50 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:01:33 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 76 ***
+*** SCRIPT START TIME: 12/29/2024 23:04:22 ***
+2024-12-29 23:04:45 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:05:35 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 77 ***
+*** SCRIPT START TIME: 12/29/2024 23:05:52 ***
+2024-12-29 23:06:19 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:07:07 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 78 ***
+*** SCRIPT START TIME: 12/29/2024 23:13:26 ***
+2024-12-29 23:13:51 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:14:39 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 79 ***
+*** SCRIPT START TIME: 12/29/2024 23:14:48 ***
+2024-12-29 23:15:14 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:16:03 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 80 ***
+*** SCRIPT START TIME: 12/29/2024 23:17:39 ***
+2024-12-29 23:18:01 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:18:52 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 81 ***
+*** SCRIPT START TIME: 12/29/2024 23:19:01 ***
+2024-12-29 23:19:25 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:20:33 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 82 ***
+*** SCRIPT START TIME: 12/29/2024 23:26:47 ***
+2024-12-29 23:27:09 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:27:55 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 83 ***
+*** SCRIPT START TIME: 12/29/2024 23:29:39 ***
+2024-12-29 23:30:23 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:31:07 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 84 ***
+*** SCRIPT START TIME: 12/29/2024 23:31:50 ***
+2024-12-29 23:32:13 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:33:00 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 85 ***
+*** SCRIPT START TIME: 12/29/2024 23:33:22 ***
+2024-12-29 23:33:46 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:34:34 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 86 ***
+*** SCRIPT START TIME: 12/29/2024 23:35:14 ***
+2024-12-29 23:35:39 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:36:26 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 87 ***
+*** SCRIPT START TIME: 12/29/2024 23:38:17 ***
+2024-12-29 23:38:39 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:39:24 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 88 ***
+*** SCRIPT START TIME: 12/29/2024 23:41:14 ***
+2024-12-29 23:41:40 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-29 23:42:26 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 89 ***
+*** SCRIPT START TIME: 12/30/2024 00:18:40 ***
+2024-12-30 00:19:21 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 00:20:16 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 90 ***
+*** SCRIPT START TIME: 12/30/2024 00:26:21 ***
+2024-12-30 00:26:42 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 00:27:37 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 91 ***
+*** SCRIPT START TIME: 12/30/2024 00:28:46 ***
+2024-12-30 00:29:11 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 00:30:02 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 92 ***
+*** SCRIPT START TIME: 12/30/2024 00:41:41 ***
+2024-12-30 00:42:37 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 00:43:28 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 93 ***
+*** SCRIPT START TIME: 12/30/2024 00:56:48 ***
+2024-12-30 00:57:24 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 00:58:10 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 94 ***
+*** SCRIPT START TIME: 12/30/2024 01:11:47 ***
+2024-12-30 01:12:18 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 01:13:08 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 95 ***
+*** SCRIPT START TIME: 12/30/2024 01:13:20 ***
+2024-12-30 01:14:02 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 01:14:49 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 96 ***
+*** SCRIPT START TIME: 12/30/2024 01:15:02 ***
+2024-12-30 01:15:36 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 01:16:23 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 97 ***
+*** SCRIPT START TIME: 12/30/2024 01:35:49 ***
+2024-12-30 01:36:30 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 01:37:18 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 98 ***
+*** SCRIPT START TIME: 12/30/2024 01:47:13 ***
+2024-12-30 01:47:40 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 01:48:26 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 99 ***
+*** SCRIPT START TIME: 12/30/2024 02:02:08 ***
+2024-12-30 02:02:48 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 02:03:41 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 100 ***
+*** SCRIPT START TIME: 12/30/2024 02:05:12 ***
+2024-12-30 02:05:56 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 02:06:50 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 101 ***
+*** SCRIPT START TIME: 12/30/2024 02:08:18 ***
+2024-12-30 02:08:41 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 02:09:25 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 102 ***
+*** SCRIPT START TIME: 12/30/2024 02:17:01 ***
+2024-12-30 02:17:37 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 02:18:28 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 103 ***
+*** SCRIPT START TIME: 12/30/2024 02:18:47 ***
+2024-12-30 02:19:10 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 02:19:52 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 104 ***
+*** SCRIPT START TIME: 12/30/2024 02:20:40 ***
+2024-12-30 02:21:02 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 02:21:54 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 105 ***
+*** SCRIPT START TIME: 12/30/2024 02:23:53 ***
+2024-12-30 02:24:15 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 02:24:59 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 106 ***
+*** SCRIPT START TIME: 12/30/2024 03:03:32 ***
+2024-12-30 03:04:10 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:04:58 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 107 ***
+*** SCRIPT START TIME: 12/30/2024 03:11:11 ***
+2024-12-30 03:11:33 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:12:21 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 108 ***
+*** SCRIPT START TIME: 12/30/2024 03:15:08 ***
+2024-12-30 03:15:35 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:16:25 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 109 ***
+*** SCRIPT START TIME: 12/30/2024 03:17:50 ***
+2024-12-30 03:18:20 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:19:06 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 110 ***
+*** SCRIPT START TIME: 12/30/2024 03:20:52 ***
+2024-12-30 03:21:17 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:22:06 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 111 ***
+*** SCRIPT START TIME: 12/30/2024 03:23:47 ***
+2024-12-30 03:24:09 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:25:02 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 112 ***
+*** SCRIPT START TIME: 12/30/2024 03:33:05 ***
+2024-12-30 03:33:30 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:34:15 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 113 ***
+*** SCRIPT START TIME: 12/30/2024 03:41:18 ***
+2024-12-30 03:41:41 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:42:34 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 114 ***
+*** SCRIPT START TIME: 12/30/2024 03:42:42 ***
+2024-12-30 03:43:15 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:44:04 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 115 ***
+*** SCRIPT START TIME: 12/30/2024 03:44:21 ***
+2024-12-30 03:44:45 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:45:36 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 116 ***
+*** SCRIPT START TIME: 12/30/2024 03:47:14 ***
+2024-12-30 03:47:34 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:48:16 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 117 ***
+*** SCRIPT START TIME: 12/30/2024 03:53:43 ***
+2024-12-30 03:54:04 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 03:54:53 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 118 ***
+*** SCRIPT START TIME: 12/30/2024 04:03:18 ***
+2024-12-30 04:03:44 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 04:04:30 - Function app 'func-chat-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 119 ***
+*** SCRIPT START TIME: 12/30/2024 04:09:32 ***
+2024-12-30 04:09:57 - Web app 'app-copilot-demo-002' deployed successfully.
+2024-12-30 04:10:54 - Function app 'func-chat-copilot-demo-002' deployed successfully.
