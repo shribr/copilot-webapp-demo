@@ -53,11 +53,14 @@ $(document).ready(function () {
     toggleDisplay(screen);
 
     // Add event listeners to navigation links
-    $('#left-nav-container nav ul li a').on('click', function (event) {
-        event.preventDefault();
-        const screen = new URL(this.href).searchParams.get('screen');
-        toggleDisplay(screen);
-        history.pushState(null, '', this.href);
+    $('#left-nav-container nav ul li').on('click', function (event) {
+        const link = $(this).find('a')[0];
+        if (link) {
+            event.preventDefault();
+            const screen = new URL(link.href).searchParams.get('screen');
+            toggleDisplay(screen);
+            history.pushState(null, '', link.href);
+        }
     });
 
     document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
@@ -121,7 +124,7 @@ $(document).ready(function () {
     // Filter existing documents based on the name field
     document.getElementById('filter-input').addEventListener('input', function (event) {
         const filterValue = event.target.value.toLowerCase();
-        const documentRows = document.querySelectorAll('#document-list .document-row:not(.header)');
+        const documentRows = document.querySelectorAll('#document-table .document-row:not(.header)');
         const clearFilterButton = document.getElementById('clear-filter-button');
         const filterButton = document.getElementById('filter-button');
 
@@ -275,13 +278,14 @@ async function addMessageToThread(threadId, message, role) {
 }
 
 // Function to build chat history
-function buildChatHistory(answerResponseNumber, question, answer, persona, dateTimestamp) {
+function buildChatHistory(answerResponseNumber, question, rawAnswers, opentAiRefinedAnswers, persona, dateTimestamp) {
 
     const chatEntry = {
         responseNum: `response-${answerResponseNumber}`,
         details: {
             question: question,
-            answer: answer,
+            rawAnswers: rawAnswers,
+            opentAiRefinedAnswers: opentAiRefinedAnswers,
             persona: persona,
             dateTimestamp: dateTimestamp
         }
@@ -294,6 +298,8 @@ function buildChatHistory(answerResponseNumber, question, answer, persona, dateT
 
 // Function to clear the chat display
 function clearChatDisplay() {
+    const chatDisplayContainer = document.getElementById('chat-display-container');
+
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.innerHTML = ''; // Clear all content
 
@@ -301,7 +307,7 @@ function clearChatDisplay() {
     loadingAnimation.setAttribute('class', 'loading-animation');
     loadingAnimation.innerHTML = '<div class="spinner"></div> Fetching results...';
     loadingAnimation.style.display = 'none'; // Hide it initially
-    chatDisplay.appendChild(loadingAnimation);
+    chatDisplayContainer.appendChild(loadingAnimation);
 
     document.getElementById('expand-chat-svg-container').style.display = 'none';
     document.getElementById('jump-to-top-arrow').style.display = 'none';
@@ -315,6 +321,105 @@ function clearFileInput() {
     const selectedFilesDiv = document.getElementById('file-list');
     selectedFilesDiv.innerHTML = ''; // Clear the list of selected files
     updatePlaceholder(); // Update the placeholder text
+}
+
+// Function to create chat response content
+async function createChatResponseContent(chatInput, rawAnswers, chatResponse, answerContent, sasToken, persona) {
+
+    const config = await fetchConfig();
+
+    const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
+
+    var aiEnhancedAnswers = "";
+    var sourceNumber = 0;
+    var citationContentResults = "";
+    var dateTimestamp = new Date().toLocaleString();
+    var openAIModelResultsId = "";
+
+    var aiEnhancedAnswersArray = rawAnswers;
+
+    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
+    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+
+    // Initialize a Set to store unique document paths
+    const listedPaths = new Set();
+
+    for (const answer of rawAnswers) {
+
+        const docPath = `${answer.document.title}?${sasToken}`;
+        const docTitle = answer.document.title;
+
+        const docUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${docTitle}?${sasToken}`;
+
+        if (!listedPaths.has(docPath)) {
+            listedPaths.add(docPath);
+
+            sourceNumber++;
+
+            const supportingContentLink = `<a class="answer_citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
+
+            citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+
+        } else {
+            console.log(`Document already listed: ${docPath}`);
+        }
+
+        //aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`${chatPersonaPrompt} Rephrase the following text and use complete sentences only. Be specific and reference the specific document ${answer.document.title}: '${answer.text}'`, "gpt-4o");
+        aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
+        aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
+
+        await addMessageToThread(threadId, aiEnhancedAnswer, "assistant");
+
+        aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
+
+        const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+
+        const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
+        aiEnhancedAnswers += aiEnhancedAnswerHtml;
+    }
+
+    // Build chat history
+    if (aiEnhancedAnswersArray.length > 0) {
+        buildChatHistory(answerResponseNumber, chatInput, rawAnswers, aiEnhancedAnswersArray, persona, dateTimestamp);
+    }
+
+    answerContent.innerHTML += '<div id="openai-model-results-header">OpenAI Enhanced Search Results from Azure Storage</div>';
+
+    //document.getElementById('download-chat-results-button').style.display = 'block';
+    const openAIModelResultsContainerId = `openai-model-results-container-${answerResponseNumber}`;
+    openAIModelResultsId = `openai-model-results-${answerResponseNumber}`;
+
+    if (aiEnhancedAnswers.length > 0) {
+        answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><ol class="ai_enhanced_answer_results">${aiEnhancedAnswers}</ol><br/></div>`;
+        answerContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
+    }
+    else {
+        answerContent.innerHTML += `<div id="${openAIModelResultsId}">No results found.</div>`;
+    }
+
+    chatResponse.appendChild(answerContent);
+
+    // Add download chat results button
+    if (openAIModelResultsId != "" && openAIModelResultsId != undefined) {
+
+        const openAIResultsContainer = document.getElementById(openAIModelResultsId);
+
+        const downloadChatResultsContainer = document.createElement('div');
+        downloadChatResultsContainer.id = `download-chat-results-container-${answerResponseNumber}`;
+        downloadChatResultsContainer.className = 'download-chat-results-container';
+
+        const downloadChatResultsButtonId = `download-chat-results-button-${answerResponseNumber}`;
+
+        const downloadChatResultsButton = `<div id="${downloadChatResultsButtonId}" onclick="downloadChatResults('${openAIModelResultsId}')" class="download-chat-results-button">${downloadChatResultsSVG}</div>`;
+
+        downloadChatResultsContainer.innerHTML = downloadChatResultsButton;
+
+        openAIResultsContainer.appendChild(downloadChatResultsContainer);
+
+        //document.getElementById(downloadChatResultsButtonId).addEventListener('click', downloadChatResults(openAIModelResultsId));
+    }
+
 }
 
 // Function to collect chat results
@@ -711,8 +816,11 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona, t
             console.error('Error extracting source documents:', error);
         }
 
+        var responseText = data.choices[0].message.content.trim();
+        responseText = responseText.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:').trim();
+
         //only returning the first response
-        return data.choices[0].message.content.trim();
+        return responseText;
     }
     catch (error) {
         if (error.code == 429) {
@@ -794,6 +902,190 @@ async function getAnswersFromPublicInternet(userInput) {
     }
 }
 
+// Function to show responses to questions
+async function getChatResponse(questionBubble) {
+
+    const config = await fetchConfig();
+
+    const chatInput = document.getElementById('chat-input').value.trim();
+    const chatDisplay = document.getElementById('chat-display');
+    chatDisplay.style.display = 'none';
+
+    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const indexes = config.SEARCH_INDEXES;
+    const searchServiceEndpoint = `https://${config.AZURE_SEARCH_SERVICE_NAME}.search.windows.net`;
+
+    const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
+    const metadata = { "user": "John Smith" };
+
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+
+    // Create a map of documents using their key
+    const docMap = new Map();
+
+    // Get the selected chat persona
+    const persona = getSelectedChatPersona();
+
+    const toolResources = {
+        "azure_ai_search": {
+            "indexes": [
+                {
+                    "index_connection_id": searchServiceEndpoint,
+                    "index_name": indexName
+                }
+            ]
+        }
+    };
+
+    try {
+        // First see if there is an existing thread
+        if (threadId == null || threadId == undefined || threadId == "") {
+            thread = await createThread(metadata, toolResources);
+            threadId = thread.id;
+        }
+        else {
+            thread = await getThread(threadId);
+        }
+
+    } catch (error) {
+        console.log('Error getting thread ID:', error);
+    }
+
+    // Show the loading animation
+    const loadingAnimation = document.querySelector('.loading-animation');
+    loadingAnimation.style.display = 'flex';
+
+    if (chatInput) {
+
+        await addMessageToThread(threadId, chatInput, "user");
+
+        const chatExamplesContainer = document.getElementById('chat-examples-container');
+        chatExamplesContainer.style.display = 'none';
+
+        // Get answers from Azure Search
+        const docStorageResponse = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
+
+        // Get answers from Azure OpenAI model
+        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
+
+        // Create a new chat bubble element
+        const chatResponse = document.createElement('div');
+        chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
+        chatResponse.setAttribute('id', `chat-response-${answerResponseNumber}`);
+
+        const tabs = await createTabs();
+
+        const thoughtProcessContent = document.createElement('div');
+        thoughtProcessContent.className = 'tab-content';
+        //thoughtProcessContent.style.fontStyle = 'italic';
+
+        const supportingContent = document.createElement('div');
+        supportingContent.className = 'tab-content';
+        supportingContent.style.fontStyle = 'italic';
+
+        const answerContent = document.createElement('div');
+        answerContent.className = 'tab-content active';
+        answerContent.style.fontStyle = 'italic';
+
+        if (config.SEARCH_AZURE_OPENAI_MODEL == true) {
+            answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Generic OpenAI Model</div>';
+            answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults}</div>`;
+
+            const codeContent = document.createElement('div');
+            codeContent.className = 'code-content';
+            codeContent.innerHTML = 'Thought process content goes here.';
+            thoughtProcessContent.appendChild(codeContent);
+        }
+
+        try {
+            docStorageResponse.value.forEach(doc => {
+                //var key = "Page " + doc.chunk_id.split('_pages_')[1];
+                var key = doc.chunk_id;
+
+                docMap.set(key, doc);
+            });
+
+            //This call to mapAnswersToDocSources is for the raw answers from Azure Search and used to populate the supporting content tab. 
+            // //It needs to be the same data returned from the Azure Search call above completely untouched.
+            const searchAnswers = docStorageResponse["@search.answers"];
+
+            const rawAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", false);
+
+            //const sortedAnswers = sortAnswers(docMap);
+
+            // Create tab contents for supporting content
+            createTabContentSupportingContent(rawAnswers, docStorageResponse, supportingContent, sasToken);
+
+            // Get answers from Azure Search with embeddings
+
+            //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "text-embedding-3-large", indexName, true);
+            //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
+
+            // Append tabs and contents to chat bubble
+            chatResponse.appendChild(tabs);
+
+            // Append the chat bubble to the chat-display div
+            chatDisplay.appendChild(chatResponse);
+
+            await createChatResponseContent(chatInput, rawAnswers, chatResponse, answerContent, sasToken, persona);
+
+            chatResponse.appendChild(thoughtProcessContent);
+            chatResponse.appendChild(supportingContent);
+
+            setEqualHeightForTabContents();
+
+            // Add event listeners to tabs
+            const tabElements = tabs.querySelectorAll('.tab');
+            const tabContents = chatResponse.querySelectorAll('.tab-content');
+
+            setEqualHeightForTabContents();
+
+            tabElements.forEach((tab, index) => {
+                tab.addEventListener('click', () => {
+                    tabElements.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+
+                    tab.classList.add('active');
+                    tabContents[index].classList.add('active');
+                });
+            });
+
+            chatDisplay.style.display = 'block';
+
+        } catch (error) {
+            console.error('Error processing search results:', error);
+        }
+
+        // Hide the loading animation once results are returned
+        loadingAnimation.style.display = 'none';
+
+        // Clear the input field
+        chatInput.value = '';
+
+        // Scroll to the position right above the newest questionBubble
+        const questionBubbleTop = chatResponse.offsetTop;
+        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+        questionBubble.style.display = 'block'; // Show the question bubble
+
+        // Scroll to the position right above the newest questionBubble
+        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+        chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
+
+    }
+    else {
+        loadingAnimation.style.display = 'none';
+    }
+
+    document.getElementById('expand-chat-svg-container').style.display = 'block';
+    document.getElementById('jump-to-top-arrow').style.display = 'block';
+
+    answerResponseNumber++;
+}
+
 //code to get documents from Azure Storage
 async function getDocuments() {
 
@@ -828,7 +1120,8 @@ async function getDocuments() {
             blobs = xmlDoc.getElementsByTagName("Blob");
 
             // Render documents
-            renderDocuments(blobs);
+            //renderDocuments(blobs);
+            renderDocumentsHtmlTable(blobs);
         } else {
             console.error('Failed to fetch documents:', response.statusText);
         }
@@ -906,7 +1199,7 @@ function getSelectedChatPersona() {
     if (selectedRadio) {
         return selectedRadio.title;
     }
-    return null;
+    return "";
 }
 
 // Function to check if a text is a question
@@ -1022,7 +1315,7 @@ async function postQuestion() {
     const questionBubbleTop = questionBubble.offsetTop;
     chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
-    showResponse(questionBubble);
+    getChatResponse(questionBubble);
 }
 
 // Function to render chat personas
@@ -1191,6 +1484,136 @@ async function renderDocuments(blobs) {
     }
 }
 
+async function renderDocumentsHtmlTable(blobs) {
+
+    const config = await fetchConfig();
+
+    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
+    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const fileTypes = config.FILE_TYPES;
+
+    const docList = document.getElementById('document-table-body');
+    const sampleRows = document.querySelectorAll('.document-row.sample');
+
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+
+    // Clear existing document rows except the header
+    const existingRows = docList.querySelectorAll('document-table .document-row:not(.header)');
+    existingRows.forEach(row => row.style.display = 'none');
+
+    if (blobs.length === 0) {
+        // Show sample rows if no results
+        sampleRows.forEach(row => row.style.display = '');
+    } else {
+        // Hide sample rows if there are results
+        sampleRows.forEach(row => row.style.display = 'none');
+
+        // Extract blob data into an array of objects
+        const blobData = Array.from(blobs).map(blob => {
+            const blobName = blob.getElementsByTagName("Name")[0].textContent;
+            const lastModified = new Date(blob.getElementsByTagName("Last-Modified")[0].textContent).toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
+            let blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+            blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
+            const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
+            return { blobName, lastModified, contentType, blobUrl, blobSize };
+        });
+
+        // Iterate over the sorted blob data and create document rows
+        blobData.forEach(blob => {
+            // Create the document row
+            const documentRow = document.createElement('tr');
+            documentRow.className = 'document-row';
+
+            const blobName = blob.blobName;
+            const lastModified = blob.lastModified;
+            const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
+            let blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+            //blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
+            const blobSize = blob.blobSize;
+
+            // Create the document cells
+            const previewCell = document.createElement('td');
+            previewCell.className = 'document-cell preview';
+
+            previewCell.innerHTML = `<span class="mud-fab-label" style="display: flex !important"><button class="magnifyButton mud-button-root mud-fab mud-fab-primary mud-fab-size-small mud-ripple"><a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a></button></span>`;
+
+            const statusCell = document.createElement('td');
+            statusCell.className = 'document-cell preview';
+            statusCell.textContent = 'Active';
+
+            const nameCell = document.createElement('td');
+            nameCell.className = 'document-cell';
+            const nameLink = document.createElement('a');
+            nameLink.href = blobUrl;
+            nameLink.textContent = blobName;
+            nameLink.target = '_blank'; // Open link in a new tab
+            nameCell.appendChild(nameLink);
+
+            const contentTypeCell = document.createElement('td');
+            contentTypeCell.className = 'document-cell content-type';
+
+            let fileTypeFound = false;
+            for (const [key, value] of Object.entries(fileTypes)) {
+                const svgStyle = iconStyle === 'color' ? `${value.SVG_COLOR}` : `${value.SVG}`;
+                if (value.EXTENSION.some(ext => blobName.toLowerCase().endsWith(ext))) {
+                    contentTypeCell.innerHTML = `<code>${contentType}</code>`;
+                    fileTypeFound = true;
+                    break;
+                }
+            }
+
+            if (!fileTypeFound) {
+                const svgStyle = iconStyle === 'color' ? `${fileTypes.TXT.SVG_COLOR}` : `${fileTypes.TXT.SVG}`;
+                contentTypeCell.innerHTML = `<code>${contentType}</code>`;
+            }
+
+            const fileSizeCell = document.createElement('td');
+            fileSizeCell.className = 'document-cell';
+            fileSizeCell.innerHTML = `<td class="file-size mud-chip mud-chip-filled mud-chip-size-small mud-chip-color-default"><span class="mud-chip-content">${blobSize}</span></td>`;
+
+            const lastModifiedCell = document.createElement('td');
+            lastModifiedCell.className = 'document-cell';
+            lastModifiedCell.textContent = lastModified;
+
+            const deleteCell = document.createElement('td');
+            deleteCell.className = 'document-cell action-delete';
+            deleteCell.innerHTML = `<a href="#" class="delete-button">${config.ICONS.DELETE.COLOR}${config.ICONS.DELETE.MONOTONE}</a>`;
+
+            const editCell = document.createElement('td');
+            editCell.className = 'document-cell action-edit';
+            editCell.innerHTML = `<a href="#" class="edit-button">${config.ICONS.EDIT.COLOR}${config.ICONS.EDIT.MONOTONE}</a>`;
+
+            const actionCell = document.createElement('td');
+            actionCell.className = 'document-cell action-container';
+            actionCell.appendChild(deleteCell);
+            actionCell.appendChild(editCell);
+
+            // Append cells to the document row
+            documentRow.appendChild(previewCell);
+            documentRow.appendChild(statusCell);
+            documentRow.appendChild(nameCell);
+            documentRow.appendChild(contentTypeCell);
+            documentRow.appendChild(fileSizeCell);
+            documentRow.appendChild(lastModifiedCell);
+            documentRow.appendChild(actionCell);
+            // Append the document row to the document list
+            docList.appendChild(documentRow);
+        });
+    }
+}
+
 // Function to rephrase text using Azure OpenAI Service
 async function rephraseResponseFromAzureOpenAI(userInput, aiModel) {
 
@@ -1293,6 +1716,25 @@ function setChatDisplayHeight() {
     }
 }
 
+// Function to set equal height for all tab-content divs
+function setEqualHeightForTabContents() {
+    const tabContents = document.querySelectorAll('.tab-content');
+    let maxHeight = 0;
+
+    // Calculate the maximum height
+    tabContents.forEach(tabContent => {
+        const height = tabContent.offsetHeight;
+        if (height > maxHeight) {
+            maxHeight = height;
+        }
+    });
+
+    // Set the maximum height to all tab-content divs
+    tabContents.forEach(tabContent => {
+        tabContent.style.height = `${maxHeight}px`;
+    });
+}
+
 // Function to set the site logo
 async function setSiteLogo() {
 
@@ -1314,281 +1756,6 @@ async function setSiteLogo() {
         siteLogo.classList.remove('site-logo-default');
         siteLogo.classList.add('site-logo-custom');
     }
-}
-
-// Function to show responses to questions
-async function showResponse(questionBubble) {
-
-    const config = await fetchConfig();
-
-    const chatInput = document.getElementById('chat-input').value.trim();
-    const chatDisplay = document.getElementById('chat-display');
-    const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
-    const indexes = config.SEARCH_INDEXES;
-    const searchServiceEndpoint = `https://${config.AZURE_SEARCH_SERVICE_NAME}.search.windows.net`;
-
-    const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
-
-    const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
-    const metadata = { "user": "John Smith" };
-
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-
-    // Create a map of documents using their key
-    const docMap = new Map();
-
-    var searchAnswers = [];
-    var rawAnswers = [];
-
-    var persona = getSelectedChatPersona();
-    persona = persona == null ? "" : persona;
-
-    const toolResources = {
-        "azure_ai_search": {
-            "indexes": [
-                {
-                    "index_connection_id": searchServiceEndpoint,
-                    "index_name": indexName
-                }
-            ]
-        }
-    };
-
-    try {
-        // First see if there is an existing thread
-        if (threadId == null || threadId == undefined || threadId == "") {
-            thread = await createThread(metadata, toolResources);
-            threadId = thread.id;
-        }
-        else {
-            thread = await getThread(threadId);
-        }
-
-    } catch (error) {
-        console.log('Error getting thread ID:', error);
-    }
-
-    // Show the loading animation
-    const loadingAnimation = document.querySelector('.loading-animation');
-    loadingAnimation.style.display = 'flex';
-
-    if (chatInput) {
-
-        await addMessageToThread(threadId, chatInput, "user");
-
-        const chatExamplesContainer = document.getElementById('chat-examples-container');
-        chatExamplesContainer.style.display = 'none';
-
-        var openAIResultsContainer = "";
-
-        // Get answers from Azure Search
-
-        const docStorageResponse = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
-
-        // Get answers from Azure OpenAI model
-        var openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
-        openAIModelResults = openAIModelResults.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1</b>:');
-
-        // Create a new chat bubble element
-        const chatResponse = document.createElement('div');
-        chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
-        chatResponse.setAttribute('id', `chat-response-${answerResponseNumber}`);
-
-        // Create tabs
-        const tabs = await createTabs();
-
-        const thoughtProcessContent = document.createElement('div');
-        thoughtProcessContent.className = 'tab-content';
-        //thoughtProcessContent.style.fontStyle = 'italic';
-
-        const supportingContent = document.createElement('div');
-        supportingContent.className = 'tab-content';
-        supportingContent.style.fontStyle = 'italic';
-
-        const answerContent = document.createElement('div');
-        answerContent.className = 'tab-content active';
-        answerContent.style.fontStyle = 'italic';
-
-        if (config.SEARCH_AZURE_OPENAI_MODEL == true) {
-            answerContent.innerHTML += '<div id="openai-model-results-header">Results from Azure Generic OpenAI Model</div>';
-            answerContent.innerHTML += `<div id="openai-model-results">${openAIModelResults}</div>`;
-
-            const codeContent = document.createElement('div');
-            codeContent.className = 'code-content';
-            codeContent.innerHTML = 'Thought process content goes here.';
-            thoughtProcessContent.appendChild(codeContent);
-        }
-
-        try {
-            docStorageResponse.value.forEach(doc => {
-                //var key = "Page " + doc.chunk_id.split('_pages_')[1];
-                var key = doc.chunk_id;
-
-                docMap.set(key, doc);
-            });
-
-            //This call to mapAnswersToDocSources is for the raw answers from Azure Search and used to populate the supporting content tab. It needs to be the same data returned from the Azure Search call above completely untouched.
-            searchAnswers = docStorageResponse["@search.answers"];
-
-            rawAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", false);
-
-            const sortedAnswers = sortAnswers(docMap);
-
-            // Create tab contents for supporting content
-            createTabContentSupportingContent(rawAnswers, docStorageResponse, supportingContent, sasToken);
-
-        } catch (error) {
-            console.error('Error processing search results:', error);
-        }
-
-        try {
-            // Get answers from Azure Search with embeddings
-
-            //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "text-embedding-3-large", indexName, true);
-            //const docStorageResponseWithEmbeddings = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
-
-            var aiEnhancedAnswers = "";
-            var sourceNumber = 0;
-            var citationContentResults = "";
-            var dateTimestamp = new Date().toLocaleString();
-            var openAIModelResultsId = "";
-
-            var aiEnhancedAnswersArray = rawAnswers;
-
-            const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-            const azureStorageUrl = config.AZURE_STORAGE_URL;
-            const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-
-            // Initialize a Set to store unique document paths
-            const listedPaths = new Set();
-            for (const answer of rawAnswers) {
-
-                const docPath = `${answer.document.title}?${sasToken}`;
-                const docTitle = answer.document.title;
-
-                const docUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${docTitle}?${sasToken}`;
-
-                if (!listedPaths.has(docPath)) {
-                    listedPaths.add(docPath);
-
-                    sourceNumber++;
-
-                    const supportingContentLink = `<a class="answer_citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
-
-                    citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
-
-                } else {
-                    console.log(`Document already listed: ${docPath}`);
-                }
-
-                //aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`${chatPersonaPrompt} Rephrase the following text and use complete sentences only. Be specific and reference the specific document ${answer.document.title}: '${answer.text}'`, "gpt-4o");
-                aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
-                aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
-
-                await addMessageToThread(threadId, aiEnhancedAnswer, "assistant");
-
-                aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
-
-                const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-
-                const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
-                aiEnhancedAnswers += aiEnhancedAnswerHtml;
-            }
-
-            // Build chat history
-            if (aiEnhancedAnswersArray.length > 0) {
-                buildChatHistory(answerResponseNumber, chatInput, aiEnhancedAnswersArray, persona, dateTimestamp);
-            }
-
-            answerContent.innerHTML += '<div id="openai-model-results-header">OpenAI Enhanced Search Results from Azure Storage</div>';
-
-            //document.getElementById('download-chat-results-button').style.display = 'block';
-            const openAIModelResultsContainerId = `openai-model-results-container-${answerResponseNumber}`;
-            openAIModelResultsId = `openai-model-results-${answerResponseNumber}`;
-
-            if (aiEnhancedAnswers.length > 0) {
-                answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}"><div id="${openAIModelResultsId}"><ol class="ai_enhanced_answer_results">${aiEnhancedAnswers}</ol><br/></div>`;
-                answerContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
-            }
-            else {
-                answerContent.innerHTML += `<div id="${openAIModelResultsId}">No results found.</div>`;
-            }
-
-            // Append tabs and contents to chat bubble
-            chatResponse.appendChild(tabs);
-            chatResponse.appendChild(answerContent);
-            //chatResponse.appendChild(citationLinkContent);
-            chatResponse.appendChild(thoughtProcessContent);
-            chatResponse.appendChild(supportingContent);
-
-            // Append the chat bubble to the chat-display div
-            chatDisplay.appendChild(chatResponse);
-        }
-        catch (error) {
-            console.error('Error processing search results:', error);
-        }
-
-        // Hide the loading animation once results are returned
-        loadingAnimation.style.display = 'none';
-
-        if (openAIModelResultsId != "" && openAIModelResultsId != undefined) {
-
-            const openAIResultsContainer = document.getElementById(openAIModelResultsId);
-
-            const downloadChatResultsContainer = document.createElement('div');
-            downloadChatResultsContainer.id = `download-chat-results-container-${answerResponseNumber}`;
-            downloadChatResultsContainer.className = 'download-chat-results-container';
-
-            const downloadChatResultsButtonId = `download-chat-results-button-${answerResponseNumber}`;
-
-            const downloadChatResultsButton = `<div id="${downloadChatResultsButtonId}" onclick="downloadChatResults('${openAIModelResultsId}')" class="download-chat-results-button">${downloadChatResultsSVG}</div>`;
-
-            downloadChatResultsContainer.innerHTML = downloadChatResultsButton;
-
-            openAIResultsContainer.appendChild(downloadChatResultsContainer);
-
-            //document.getElementById(downloadChatResultsButtonId).addEventListener('click', downloadChatResults(openAIModelResultsId));
-        }
-
-        // Clear the input field
-        chatInput.value = '';
-
-        // Scroll to the position right above the newest questionBubble
-        const questionBubbleTop = chatResponse.offsetTop;
-        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
-
-        // Add event listeners to tabs
-        const tabElements = tabs.querySelectorAll('.tab');
-        const tabContents = chatResponse.querySelectorAll('.tab-content');
-
-        tabElements.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                tabElements.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(tc => tc.classList.remove('active'));
-
-                tab.classList.add('active');
-                tabContents[index].classList.add('active');
-            });
-        });
-
-        questionBubble.style.display = 'block'; // Show the question bubble
-
-        // Scroll to the position right above the newest questionBubble
-        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
-
-        chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
-
-    }
-    else {
-        loadingAnimation.style.display = 'none';
-    }
-
-    document.getElementById('expand-chat-svg-container').style.display = 'block';
-    document.getElementById('jump-to-top-arrow').style.display = 'block';
-
-    answerResponseNumber++;
 }
 
 // Function to show a toast notification
@@ -1871,5 +2038,6 @@ async function uploadFilesToAzure(files) {
     // Clear the file input after successful upload
     clearFileInput();
 
-    await runSearchIndexer(searchIndexers);
+    //The isn't working yet because of permissions issues
+    //await runSearchIndexer(searchIndexers);
 }
