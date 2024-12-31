@@ -851,6 +851,7 @@ function Initialize-Parameters {
     $global:searchSkillSet = $parametersObject.searchSkillSet
     $global:searchSkillSetName = $parametersObject.searchSkillSetName
     $global:searchSkillSetSchema = $parametersObject.searchSkillSetSchema
+    $global:searchSkillSets = $parametersObject.searchSkillSets
     $global:searchVectorIndexName = $parametersObject.searchVectorIndexName
     $global:searchVectorIndexerName = $parametersObject.searchVectorIndexerName
     $global:serviceBusNamespaceName = $parametersObject.serviceBusNamespaceName
@@ -993,6 +994,7 @@ function Initialize-Parameters {
         searchSkillSet               = $searchSkillSet
         searchSkillSetName           = $searchSkillSetName
         searchSkillSetSchema         = $searchSkillSetSchema
+        searchSkillSets              = $searchSkillSets
         searchVectorIndexName        = $searchVectorIndexName
         searchVectorIndexerName      = $searchVectorIndexerName
         serviceBusNamespaceName      = $serviceBusNamespaceName
@@ -1039,8 +1041,9 @@ function New-AIHub {
         
             az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName --storage-account $storageAccountId --key-vault $keyVaultId
             
-            Write-Host "AI Hub: '$aiHubName' created."
-            Write-Log -message "AI Hub: '$aiHubName' created." -logFilePath $global:LogFilePath
+            $global:resourceCounter += 1
+            Write-Host "AI Hub: '$aiHubName' created successfully. ($global:resourceCounter)"
+            Write-Log -message "AI Hub: '$aiHubName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
         }
         catch {
             # Check if the error is due to soft deletion
@@ -1089,8 +1092,8 @@ function New-AIHubConnection {
 
             az ml connection create --file $aiConnectionFile --resource-group $resourceGroupName --workspace-name $aiProjectName
             
-            Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' created."
-            Write-Log -message  "Azure $resourceType '$serviceName' connection for '$aiHubName' created." -logFilePath $global:LogFilePath
+            Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' created successfully."
+            Write-Log -message  "Azure $resourceType '$serviceName' connection for '$aiHubName' created successfully." -logFilePath $global:LogFilePath
         }
         catch {
 
@@ -1156,8 +1159,9 @@ function New-AIProject {
         az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --hub-id $aiHubResoureceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
         #az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --hub-id $$aiHubResoureceId --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
 
-        Write-Host "AI Project: '$aiProjectName' created."
-        Write-Log -message "AI Project: '$aiProjectName' created." -logFilePath $global:LogFilePath
+        $global:resourceCounter += 1
+        Write-Host "AI Project: '$aiProjectName' created successfully. [$global:resourceCounter]"
+        Write-Log -message "AI Project: '$aiProjectName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
     }
     catch {
         Write-Error "Failed to create AI Project '$aiProjectName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1222,12 +1226,13 @@ function New-AIService {
                 } 
             }
             else {
-                Write-Host "AI Service account '$aiServiceName' created."
-                Write-Log -message "AI Service account '$aiServiceName' created." 
+                $global:resourceCounter += 1
+                Write-Host "AI Service account '$aiServiceName' created successfully. [$global:resourceCounter]"
+                Write-Log -message "AI Service account '$aiServiceName' created successfully. [$global:resourceCounter]" 
             }
 
-            #Write-Host "AI Service: '$aiServiceName' created."
-            #Write-Log -message "AI Service: '$aiServiceName' created."
+            #Write-Host "AI Service: '$aiServiceName' created successfully."
+            #Write-Log -message "AI Service: '$aiServiceName' created successfully."
         }
         catch {
             # Check if the error is due to soft deletion
@@ -1271,9 +1276,10 @@ function New-ApiManagementService {
             $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait
     
             Write-Host $jsonOutput
-    
-            Write-Host "API Management service '$apiManagementServiceName' created."
-            Write-Log -message "API Management service '$apiManagementServiceName' created." -logFilePath $global:LogFilePath
+            
+            $global:resourceCounter += 1
+            Write-Host "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
     
         }
         catch {
@@ -1304,8 +1310,10 @@ function New-ApplicationInsights {
         try {
             $ErrorActionPreference = 'Stop'
             az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
-            Write-Host "Application Insights component '$appInsightsName' created."
-            Write-Log -message "Application Insights component '$appInsightsName' created."
+            
+            $global:resourceCounter += 1
+            Write-Host "Application Insights component '$appInsightsName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "Application Insights component '$appInsightsName' created successfully. [$global:resourceCounter]"
         }
         catch {
             Write-Error "Failed to create Application Insights component '$appInsightsName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1321,7 +1329,7 @@ function New-ApplicationInsights {
 # Function to create and deploy app service (either web app or function app)
 function New-AppService {
     param (
-        [array]$appService,
+        [PSObject]$appService,
         [string]$resourceGroupName,
         [string]$storageAccountName,
         [bool]$deployZipResources,
@@ -1368,8 +1376,9 @@ function New-AppService {
 
             if (-not $appExists) {
 
-                Write-Host "$appServiceType app '$appServiceName' created."
-                Write-Log -message "$appServiceType app '$appServiceName' created. Moving on to deployment." -logFilePath $global:LogFilePath
+                $global:resourceCounter += 1
+                Write-Host "$appServiceType app '$appServiceName' created successfully. Moving on to deployment. [$global:resourceCounter]"
+                Write-Log -message "$appServiceType app '$appServiceName' created successfully. Moving on to deployment. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             else {              
                 Write-Host "$appServiceType app '$appServiceName' already exists. Moving on to deployment."
@@ -1426,8 +1435,8 @@ function New-AppServiceEnvironment {
             Start-Sleep -Seconds 20
 
             #az appservice ase create --name $appServiceEnvironmentName --resource-group $resourceGroupName --location $location --vnet-name $vnetName --subnet $subnetName --subscription $subscriptionId --output none
-            Write-Host "App Service Environment '$appServiceEnvironmentName' created."
-            Write-Log -message "App Service Environment '$appServiceEnvironmentName' created."
+            Write-Host "App Service Environment '$appServiceEnvironmentName' created successfully."
+            Write-Log -message "App Service Environment '$appServiceEnvironmentName' created successfully."
         }
         catch {
             Write-Error "Failed to create App Service Environment '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1456,8 +1465,10 @@ function New-AppServicePlan {
         try {
             $ErrorActionPreference = 'Stop'
             az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku $sku --output none
-            Write-Host "App Service Plan '$appServicePlanName' created."
-            Write-Log -message "App Service Plan '$appServicePlanName' created."
+            
+            $global:resourceCounter += 1
+            Write-Host "App Service Plan '$appServicePlanName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "App Service Plan '$appServicePlanName' created successfully. [$global:resourceCounter]"
         }
         catch {
             Write-Error "Failed to create App Service Plan '$appServicePlanName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1484,8 +1495,10 @@ function New-AppServicePlanInASE {
     try {
         $ErrorActionPreference = 'Stop'
         az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --sku $sku --output none
-        Write-Host "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
-        Write-Log -message "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'."
+        
+        $global:resourceCounter += 1
+        Write-Host "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'. [$global:resourceCounter]"
+        Write-Log -message "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'. [$global:resourceCounter]"
     }
     catch {
         Write-Error "Failed to create App Service Plan '$appServicePlanName' in ASE '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1539,8 +1552,10 @@ function New-CognitiveServicesAccount {
                 } 
             }
             else {
-                Write-Host "Cognitive Services account '$cognitiveServiceName' created."
-                Write-Log -message "Cognitive Services account '$cognitiveServiceName' created." 
+
+                $global:resourceCounter += 1
+                Write-Host "Cognitive Services account '$cognitiveServiceName' created successfully. [$global:resourceCounter]"
+                Write-Log -message "Cognitive Services account '$cognitiveServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
         }
         catch {
@@ -1606,8 +1621,10 @@ function New-ComputerVisionAccount {
                 } 
             }
             else {
-                Write-Host "Computer Vision account '$computerVisionName' created."
-                Write-Log -message "Computer Vision account '$computerVisionName' created."
+                $global:resourceCounter += 1
+
+                Write-Host "Computer Vision account '$computerVisionName' created successfully. [$global:resourceCounter]"
+                Write-Log -message "Computer Vision account '$computerVisionName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
 
                 try {
                     # Assign custom domain
@@ -1681,8 +1698,10 @@ function New-ContainerRegistry {
                 } 
             }
             else {
-                Write-Host "Container Registry '$containerRegistryName' created."
-                Write-Log -message "Container Registry '$containerRegistryName' created."
+                $global:resourceCounter += 1
+
+                Write-Host "Container Registry '$containerRegistryName' created successfully. [$global:resourceCounter]"
+                Write-Log -message "Container Registry '$containerRegistryName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
         }
         catch {
@@ -1742,8 +1761,11 @@ function New-DocumentIntelligenceAccount {
                     }
                 }
                 else {
-                    Write-Host "Document Intelligence account '$documentIntelligenceName' created."
-                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' created." -logFilePath $global:LogFilePath
+
+                    $global:resourceCounter += 1
+
+                    Write-Host "Document Intelligence account '$documentIntelligenceName' created successfully. [$global:resourceCounter]"
+                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
                 }
                 
             }
@@ -1824,15 +1846,19 @@ function New-KeyVault {
             }
             else {
                 if ($useRBAC) {              
-                    Write-Host "Key Vault '$keyVaultName' created with RBAC enabled."
-                    Write-Log -message "Key Vault '$keyVaultName' created with RBAC enabled."
+
+                    $global:resourceCounter += 1
+
+                    Write-Host "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]"
+                    Write-Log -message "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]"
 
                     # Assign RBAC roles to the managed identity
                     Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
                 }
                 else {
-                    Write-Host "Key Vault '$keyVaultName' created with Vault Access Policies."
-                    Write-Log -message "Key Vault '$keyVaultName' created with Vault Access Policies."
+                    $global:resourceCounter += 1
+                    Write-Host "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]"
+                    Write-Log -message "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]"
 
                     # Set vault access policies for user
                     Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
@@ -1880,8 +1906,11 @@ function New-LogAnalyticsWorkspace {
         try {
             $ErrorActionPreference = 'Stop'
             az monitor log-analytics workspace create --workspace-name $logAnalyticsWorkspaceName --resource-group $resourceGroupName --location $location --output none
-            Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
-            Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created."
+
+            $global:resourceCounter += 1
+
+            Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created successfully. [$global:resourceCounter]"
         }
         catch {
             Write-Error "Failed to create Log Analytics Workspace '$logAnalyticsWorkspaceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1907,8 +1936,11 @@ function New-ManagedIdentity {
     try {
         $ErrorActionPreference = 'Stop'
         az identity create --name $userAssignedIdentityName --resource-group $resourceGroupName --location $location --output none
-        Write-Host "User Assigned Identity '$userAssignedIdentityName' created."
-        Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created."
+
+        $global:resourceCounter += 1
+
+        Write-Host "User Assigned Identity '$userAssignedIdentityName' created successfully. [$global:resourceCounter]"
+        Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created successfully. [$global:resourceCounter]"
 
         Start-Sleep -Seconds 15
 
@@ -2050,11 +2082,12 @@ function New-MachineLearningWorkspace {
             else {
                 # Commenting out below code until Azure CLI is updated to support AI Hub Projects
 
-                #Write-Host "AI Project '$aiProjectName' in '$aiHubName' created."
-                #Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created." -logFilePath $global:LogFilePath
+                #Write-Host "AI Project '$aiProjectName' in '$aiHubName' created successfully."
+                #Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created successfully." -logFilePath $global:LogFilePath
+                $global:resourceCounter += 1
 
-                Write-Host "Machine Learning Workspace '$aiProjectName' created."
-                Write-Log -message "Machine Learning Workspace '$aiProjectName' created." -logFilePath $global:LogFilePath
+                Write-Host "Machine Learning Workspace '$aiProjectName' created successfully. [$global:resourceCounter]"
+                Write-Log -message "Machine Learning Workspace '$aiProjectName' created successfullt. [$global:resourceCounter]" -logFilePath $global:LogFilePath
 
                 return $jsonOutput
             }
@@ -2130,12 +2163,14 @@ function New-OpenAIAccount {
                 } 
             }
             else {
-                Write-Host "Azure OpenAI service '$openAIAccountName' created successfully."
-                Write-Log -message "Azure OpenAI service '$openAIAccountName' created successfully." 
+                $global:resourceCounter += 1
+
+                Write-Host "Azure OpenAI service '$openAIAccountName' created successfully. [$global:resourceCounter]"
+                Write-Log -message "Azure OpenAI service '$openAIAccountName' created successfully. [$global:resourceCounter]" 
             }
 
-            Write-Host "Azure OpenAI service '$openAIAccountName' created successfully."
-            Write-Log -message "Azure OpenAI service '$openAIAccountName' created successfully."
+            Write-Host "Azure OpenAI service '$openAIAccountName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "Azure OpenAI service '$openAIAccountName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
         }
         catch {
             # Check if the error is due to soft deletion
@@ -2176,8 +2211,8 @@ function New-PrivateEndPoint {
 
     try {
         az network private-endpoint create --name $privateEndpointName --resource-group $resourceGroupName --vnet-name $virtualNetworkName --subnet $subnetId --private-connection-resource-id $privateLinkServiceId --group-id "sqlServer" --connection-name $privateLinkServiceName --location $location --output none
-        Write-Host "Private endpoint '$privateEndpointName' created."
-        Write-Log -message "Private endpoint '$privateEndpointName' created."
+        Write-Host "Private endpoint '$privateEndpointName' created successfully."
+        Write-Log -message "Private endpoint '$privateEndpointName' created successfully."
     }
     catch {
         Write-Error "Failed to create private endpoint '$privateEndpointName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -2246,8 +2281,11 @@ function New-ResourceGroup {
 
     try {
         az group create --name $resourceGroupName --location $location --output none
-        Write-Host "Resource group '$resourceGroupName' created."
-        Write-Log -message "Resource group '$resourceGroupName' created." -logFilePath $global:LogFilePath
+
+        $global:resourceCounter += 1
+
+        Write-Host "Resource group '$resourceGroupName' created successfully. [$global:resourceCounter]"
+        Write-Log -message "Resource group '$resourceGroupName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
         $resourceGroupExists = $false
     }
     catch {
@@ -2261,33 +2299,33 @@ function New-ResourceGroup {
 # Function to create resources
 function New-Resources {
     param (
-        [string]$storageAccountName,
-        [string]$blobStorageContainerName,
+        [array]$apiManagementService,
         [string]$aiProjectName,
+        [string]$appInsightsName,
+        [string]$appServiceEnvironmentName,
         [string]$appServicePlanName,
         [string]$appServicePlanSku,
-        [string]$appServiceEnvironmentName,
-        [string]$searchServiceName,
-        [string]$searchIndexName,
-        [string]$searchIndexerName,
-        [string]$searchDatasourceName,
-        [string]$searchSkillSetName,
-        [string]$logAnalyticsWorkspaceName,
-        [string]$computerVisionName,
+        [string]$blobStorageContainerName,
         [string]$cognitiveServiceName,
+        [string]$computerVisionName,
+        [string]$containerRegistryName,
+        [string]$documentIntelligenceName,
+        [array]$existingResources,
         [string]$keyVaultName,
-        [string]$appInsightsName,
-        [string]$portalDashboardName,
+        [string]$logAnalyticsWorkspaceName,
         [string]$managedEnvironmentName,
+        [string]$openAIAccountName,
+        [string]$portalDashboardName,
+        [string]$searchDatasourceName,
+        [string]$searchIndexerName,
+        [string]$searchIndexName,
+        [string]$searchServiceName,
+        [array]$searchSkillSets,
+        [string]$storageAccountName,
+        [array]$subNet,
         [string]$userAssignedIdentityName,
         [string]$userPrincipalName,
-        [string]$openAIAccountName,
-        [string]$documentIntelligenceName,
-        [string]$containerRegistryName,
-        [array]$existingResources,
-        [array]$apiManagementService,
-        [array]$virtualNetwork,
-        [array]$subNet
+        [array]$virtualNetwork
     )
 
     # Debug statements to print variable values
@@ -2339,7 +2377,7 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create Search Service
 
-    New-SearchService -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+    New-SearchService -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -location $location -searchSkillSets $searchSkillSets -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Log Analytics Workspace
@@ -2607,6 +2645,7 @@ function New-SearchService {
         [string]$searchServiceName,
         [string]$resourceGroupName,
         [string]$location,
+        [array]$searchSkillSets,
         [array]$existingResources
     )
 
@@ -2621,8 +2660,10 @@ function New-SearchService {
 
             az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
             
-            Write-Host "Search Service '$searchServiceName' created."
-            Write-Log -message "Search Service '$searchServiceName' created."
+            $global:resourceCounter += 1
+
+            Write-Host "Search Service '$searchServiceName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "Search Service '$searchServiceName' created successfully. [$global:resourceCounter]"
 
             $global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
 
@@ -2708,40 +2749,54 @@ function New-SearchService {
                 }
             }
 
-            $searchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+            foreach ($searchSkillSet in $searchSkillSets) {
 
-            $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
+                $searchSkillSetName = $searchSkillSet.Schema.Name
 
-            if ($searchSkillSetExists -eq $false) {
+                $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
 
-                Start-Sleep -Seconds 30
-                New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
-            }
-            else {
-                Write-Host "Search Skill Set '$searchSkillSetName' already exists."
-                Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
-            }
-                
-            if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
-                
-                foreach ($indexer in $global:searchIndexers) {
-                    $indexName = $indexer.IndexName
-                    $indexerName = $indexer.Name
-                    $indexerSchema = $indexer.Schema
+                $searchSkillSetExists = $existingSearchSkillSets -contains $searchSkillSetName
 
-                    $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
-                    $searchIndexerExists = $searchIndexers -contains $indexerName
+                if ($searchSkillSetExists -eq $false) {
 
-                    if ($searchIndexerExists -eq $false) {
-                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillsetName $searchSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
-                    }
-                    else {
-                        Write-Host "Search Indexer '$indexer' already exists."
-                        Write-Log -message "Search Indexer '$indexer' already exists."
-                    }
-
-                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $searchIndexerName
+                    Start-Sleep -Seconds 30
+                    New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
                 }
+                else {
+                    Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                    Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+                }
+            }
+
+            try {
+                if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
+                    
+                    foreach ($indexer in $global:searchIndexers) {
+                        $indexName = $indexer.IndexName
+                        $indexerName = $indexer.Name
+                        $indexerSchema = $indexer.Schema
+                        $indexerSkillSetName = $indexer.SkillSetName
+
+                        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+                        $searchIndexerExists = $searchIndexers -contains $indexerName
+    
+                        if ($searchIndexerExists -eq $false) {
+                            New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
+                        }
+                        else {
+                            Write-Host "Search Indexer '$indexer' already exists."
+                            Write-Log -message "Search Indexer '$indexer' already exists."
+                        }
+                    }
+
+                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+
+                    Start-Sleep -Seconds 10
+                }
+            }
+            catch {
+                Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
         catch {
@@ -2830,18 +2885,25 @@ function New-SearchService {
             }
         }
 
-        #$searchIndexExists = $searchIndexes -contains $global:searchIndexName
-        $searchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
-        $searchSkillSetExists = $searchSkillSets -contains $searchSkillSetName
+        #Start-Sleep -Seconds 15
 
-        Start-Sleep -Seconds 15
+        foreach ($searchSkillSet in $searchSkillSets) {
 
-        if ($searchSkillSetExists -eq $false) {
-            New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName -cognitiveServiceName $cognitiveServiceName
-        }
-        else {
-            Write-Host "Search Skill Set '$searchSkillSetName' already exists."
-            Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+            $searchSkillSetName = $searchSkillSet.Schema.Name
+            
+            $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+
+            $searchSkillSetExists = $existingSearchSkillSets -contains $searchSkillSetName
+
+            if ($searchSkillSetExists -eq $false) {
+
+                Start-Sleep -Seconds 30
+                New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
+            }
+            else {
+                Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+            }
         }
                 
         try {
@@ -2851,20 +2913,22 @@ function New-SearchService {
                     $indexName = $indexer.IndexName
                     $indexerName = $indexer.Name
                     $indexerSchema = $indexer.Schema
-    
+                    $indexerSkillSetName = $indexer.SkillSetName
+
                     $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
                     $searchIndexerExists = $searchIndexers -contains $indexerName
     
                     if ($searchIndexerExists -eq $false) {
-                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $searchSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
+                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
                     }
                     else {
                         Write-Host "Search Indexer '$indexer' already exists."
                         Write-Log -message "Search Indexer '$indexer' already exists."
                     }
-                }
 
-                Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+
+                }
 
                 Start-Sleep -Seconds 10
             }
@@ -2885,10 +2949,10 @@ function New-SearchSkillSet {
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
-        [string]$searchSkillSetName,
+        [psobject]$searchSkillSet,
         [string]$cognitiveServiceName
     )
-
+    
     try {
         $ErrorActionPreference = 'Stop'
 
@@ -2900,12 +2964,12 @@ function New-SearchSkillSet {
 
         $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$global:searchServiceAPiVersion"
 
-        $fileContent = Get-Content -Path $global:searchSkillSetSchema -Raw
+        $fileContent = Get-Content -Path $searchSkillSet.File -Raw
         $updatedContent = $fileContent -replace $previousResourceBaseName, $resourceBaseName
-        Set-Content -Path $global:searchSkillSetSchema -Value $updatedContent
+        Set-Content -Path $searchSkillSet.File -Value $updatedContent
 
         # Convert the body hashtable to JSON
-        $jsonBody = $global:searchSkillSet | ConvertTo-Json -Depth 10
+        $jsonBody = $searchSkillSet.Schema | ConvertTo-Json -Depth 10
         $jsonObject = $jsonBody | ConvertFrom-Json
 
         # Add the cognitive services key to the skillset
@@ -2916,7 +2980,7 @@ function New-SearchSkillSet {
 
         $jsonBody = $jsonObject | ConvertTo-Json -Depth 10
 
-        Set-Content -Path $global:searchSkillSetSchema -Value $jsonBody
+        Set-Content -Path $searchSkillSet.File -Value $jsonBody
 
         try {
             $ErrorActionPreference = 'Continue'
@@ -2957,8 +3021,10 @@ function New-StorageAccount {
         try {
             az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
             
-            Write-Host "Storage account '$storageAccountName' created."
-            Write-Log -message "Storage account '$storageAccountName' created."
+            $global:resourceCounter += 1
+
+            Write-Host "Storage account '$storageAccountName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "Storage account '$storageAccountName' created successfully. [$global:resourceCounter]"
 
             # Retrieve the storage account key
             $global:storageServiceAccountKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
@@ -3000,8 +3066,8 @@ function New-SubNet {
     if ($subnetExists -eq $false) {
         try {
             az network vnet subnet create --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --address-prefixes $subnetAddressPrefix --delegations Microsoft.Web/hostingEnvironments --output none
-            Write-Host "Subnet '$subnetName' created."
-            Write-Log -message "Subnet '$subnetName' created."
+            Write-Host "Subnet '$subnetName' created successfully."
+            Write-Log -message "Subnet '$subnetName' created successfully."
         }
         catch {
             Write-Error "Failed to create Subnet '$subnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3026,8 +3092,11 @@ function New-VirtualNetwork {
     if ($existingResources -notcontains $vnetName) {
         try {
             az network vnet create --resource-group $virtualNetwork.ResourceGroup --name $vnetName --output none
-            Write-Host "Virtual Network '$vnetName' created."
-            Write-Log -message "Virtual Network '$vnetName' created."
+
+            $global:resourceCounter += 1
+
+            Write-Host "Virtual Network '$vnetName' created successfully. [$global:resourceCounter]"
+            Write-Log -message "Virtual Network '$vnetName' created successfully. [$global:resourceCounter]"
         }
         catch {
             Write-Error "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3147,15 +3216,17 @@ function Restore-SoftDeletedResource {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Key Vault
                     az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --output none
-                    Write-Host "Key Vault: '$resourceName' created with Vault Access Policies."
-                    Write-Log -message "Key Vault: '$resourceName' created with Vault Access Policies."
+                    
+                    $global:resourceCounter += 1
+                    Write-Host "Key Vault: '$resourceName' restored with Vault Access Policies. [$global:resourceCounter]"
+                    Write-Log -message "Key Vault: '$resourceName' restored with Vault Access Policies. [$global:resourceCounter]"
 
                     # Assign RBAC roles to the managed identity
                     Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName -userPrincipalName $userPrincipalName -resourceGroupName $resourceGroupName -resourceName $resourceName
                 }
                 catch {
-                    Write-Error "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to restore Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
             else {
@@ -3163,14 +3234,16 @@ function Restore-SoftDeletedResource {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Key Vault
                     az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --output none
-                    Write-Host "Key Vault: '$resourceName' created with Vault Access Policies."
-                    Write-Log -message "Key Vault: '$resourceName' created with Vault Access Policies."
+                    
+                    $global:resourceCounter += 1
+                    Write-Host "Key Vault: '$resourceName' restored with Vault Access Policies. [$global:resourceCounter]"
+                    Write-Log -message "Key Vault: '$resourceName' restored with Vault Access Policies. [$global:resourceCounter]"
 
                     Set-KeyVaultAccessPolicies -keyVaultName $resourceName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
                 }
                 catch {
-                    Write-Error "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to restore Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to restore Key Vault '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
         }
@@ -3189,8 +3262,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring Cognitive Service: $resourceName"
                 az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
-                Write-Host "Cognitive Service '$resourceName' restored successfully."
-                Write-Log -message "Cognitive Service '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "Cognitive Service '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "Cognitive Service '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore Cognitive Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3202,8 +3277,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring Computer Vision Service: $resourceName"
                 az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
-                Write-Host "Computer Vision '$resourceName' restored successfully."
-                Write-Log -message "Computer Vision '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "Computer Vision '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "Computer Vision '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore Computer Vision Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3215,8 +3292,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring AI Hub: $resourceName"
                 az cognitiveservices account recover --name $aiHubName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind AIHub --output none
-                Write-Host "AI Hub '$resourceName' restored successfully."
-                Write-Log -message "AI Hub '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "AI Hub '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "AI Hub '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore AI Hub '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3228,8 +3307,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring OpenAI: $resourceName"
                 az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
-                Write-Host "Azure OpenAI service '$resourceName' restored successfully."
-                Write-Log -message "Azure OpenAI service '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "Azure OpenAI service '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "Azure OpenAI service '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore Azure OpenAI service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3241,8 +3322,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring Container Registry: $resourceName"
                 az ml registry recover --name $resourceName --resource-group $resourceGroupName --output none
-                Write-Host "Container Registry '$resourceName' restored successfully."
-                Write-Log -message "Container Registry '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "Container Registry '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "Container Registry '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore Container Registry '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3254,8 +3337,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring AI Service: $resourceName"
                 az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName  --location $($location.ToUpper() -replace '\s', '') --output none
-                Write-Host "AI Service '$resourceName' restored successfully."
-                Write-Log -message "AI Service '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "AI Service '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "AI Service '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore AI Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3267,8 +3352,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring Document Intelligence: $resourceName"
                 az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --output none
-                Write-Host "Document Intelligence account '$resourceName' restored successfully."
-                Write-Log -message "Document Intelligence account '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "Document Intelligence account '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "Document Intelligence account '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore Document Intelligence '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3280,8 +3367,10 @@ function Restore-SoftDeletedResource {
             try {
                 Write-Output "Restoring Machine Learning Workspace: $resourceName"
                 az ml workspace recover --name $resourceName --resource-group $resourceGroupName --output none
-                Write-Host "Machine Learning Workspace '$resourceName' restored successfully."
-                Write-Log -message "Machine Learning Workspace '$resourceName' restored successfully." -logFilePath $global:LogFilePath
+                
+                $global:resourceCounter += 1
+                Write-Host "Machine Learning Workspace '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "Machine Learning Workspace '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
                 Write-Error "Failed to restore Machine Learning Workspace '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3478,17 +3567,6 @@ function Start-Deployment {
 
     $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
 
-    if ($global:appDeploymentOnly -eq $true) {
-        # Deploy web app and function app services
-        foreach ($appService in $appServices) {
-            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $global:storageAccountName -deployZipResources $true
-        }
-
-        return
-    }
-
-    Reset-DeploymentPath
-
     if ($appendUniqueSuffix -eq $true) {
         $resourceGroupName = "$resourceGroupName$resourceSuffix"
     }
@@ -3512,6 +3590,17 @@ function Start-Deployment {
 
     #return 
     
+    if ($global:appDeploymentOnly -eq $true) {
+        # Deploy web app and function app services
+        foreach ($appService in $appServices) {
+            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $global:storageAccountName -deployZipResources $true
+        }
+
+        return
+    }
+
+    Reset-DeploymentPath
+
     $userPrincipalName = "$($parameters.userPrincipalName)"
 
     #**********************************************************************************************************************
@@ -3530,67 +3619,67 @@ function Start-Deployment {
         # Find a unique suffix
         $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
 
-        New-Resources -storageAccountName $storageAccountName `
-            -blobStorageContainerName $blobStorageContainerName `
-            -aiProjectName $aiProjectName `
+        New-Resources -aiProjectName $aiProjectName `
+            -appInsightsName $appInsightsName `
+            -appServiceEnvironmentName $appServiceEnvironmentName `
             -appServicePlanName $appServicePlanName `
             -appServicePlanSku $appServicePlanSku `
-            -appServiceEnvironmentName $appServiceEnvironmentName `
-            -searchServiceName $searchServiceName `
-            `searchIndexName $searchIndexName `
-            `searchIndexerName $searchIndexerName `
-            -searchDatasourceName $searchDatasourceName `
-            -searchSkillSetName $searchSkillSetName `
-            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
+            -blobStorageContainerName $blobStorageContainerName `
             -cognitiveServiceName $cognitiveServiceName `
             -computerVisionName $computerVisionName `
+            -containerRegistryName $containerRegistryName `
+            -documentIntelligenceName $documentIntelligenceName `
+            -existingResources $existingResources `
             -keyVaultName $keyVaultName `
-            -appInsightsName $appInsightsName `
-            -portalDashboardName $portalDashboardName `
+            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
             -managedEnvironmentName $managedEnvironmentName `
+            -openAIAccountName $openAIAccountName `
+            -portalDashboardName $portalDashboardName `
+            -searchDatasourceName $searchDatasourceName `
+            `searchIndexName $searchIndexName `
+            `searchIndexerName $searchIndexerName `
+            -searchServiceName $searchServiceName `
+            -searchSkillSets $searchSkillSets `
+            -storageAccountName $storageAccountName `
+            -subNet $subNet `
             -userAssignedIdentityName $userAssignedIdentityName `
             -userPrincipalName $userPrincipalName `
-            -openAIAccountName $openAIAccountName `
-            -documentIntelligenceName $documentIntelligenceName `
-            -containerRegistryName $containerRegistryName `
-            -virtualNetwork $virtualNetwork `
-            -subNet $subNet `
-            -existingResources $existingResources
+            -virtualNetwork $virtualNetwork
     }
     else {
 
-        New-Resources -storageAccountName $storageAccountName `
-            -blobStorageContainerName $blobStorageContainerName `
-            -aiProjectName $aiProjectName `
+        New-Resources -aiProjectName $aiProjectName `
+            -apiManagementService $apiManagementService `
+            -appInsightsName $appInsightsName `
+            -appServiceEnvironmentName $appServiceEnvironmentName `
             -appServicePlanName $appServicePlanName `
             -appServicePlanSku $appServicePlanSku `
-            -appServiceEnvironmentName $appServiceEnvironmentName `
-            -searchServiceName $searchServiceName `
-            `searchIndexName $searchIndexName `
-            `searchIndexerName $searchIndexerName `
-            -searchDatasourceName $searchDatasourceName `
-            -searchSkillSetName $searchSkillSetName `
-            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
+            -blobStorageContainerName $blobStorageContainerName `
             -cognitiveServiceName $cognitiveServiceName `
             -computerVisionName $computerVisionName `
+            -containerRegistryName $containerRegistryName `
+            -documentIntelligenceName $documentIntelligenceName `
+            -existingResources $existingResources `
             -keyVaultName $keyVaultName `
-            -appInsightsName $appInsightsName `
-            -portalDashboardName $portalDashboardName `
+            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
             -managedEnvironmentName $managedEnvironmentName `
+            -openAIAccountName $openAIAccountName `
+            -portalDashboardName $portalDashboardName `
+            -searchDatasourceName $searchDatasourceName `
+            `searchIndexName $searchIndexName `
+            `searchIndexerName $searchIndexerName `
+            -searchServiceName $searchServiceName `
+            -searchSkillSets $searchSkillSets `
+            -storageAccountName $storageAccountName `
+            -subNet $subNet `
             -userAssignedIdentityName $userAssignedIdentityName `
             -userPrincipalName $userPrincipalName `
-            -openAIAccountName $openAIAccountName `
-            -documentIntelligenceName $documentIntelligenceName `
-            -apiManagementService $apiManagementService `
-            -containerRegistryName $containerRegistryName `
-            -virtualNetwork $virtualNetwork `
-            -subNet $subNet `
-            -existingResources $existingResources
+            -virtualNetwork $virtualNetwork
     }
 
     # Create new web app and function app services
     foreach ($appService in $appServices) {
-        if ($existingResources -notcontains $appService) {
+        if ($existingResources -notcontains $appService.Name) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $false
         }
     }
@@ -3710,6 +3799,8 @@ function Start-Deployment {
 
     Write-Host $executionTimeMessage
     Write-Log -message $executionTimeMessage -logFilePath $logFilePath
+
+    Write-Host "TOTAL RESOURCES SUCCESSFULLY DEPLOYED: $global:resourceCounter"
 
     # Add a line break
     Add-Content -Path $logFilePath -Value ""
@@ -3877,30 +3968,154 @@ function Test-SubnetExists {
     }
 }
 
-# Function to update the parameters.json file with the latest API versions. NOTE: This function is not currently used.
-function Update-ParameterFileApiVersions {
-
-    # NOTE: Code below seems to get older API versions for some reason. This function will not be used until I can investigate further.
-
-    # Load parameters from the JSON file
-    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
-
-    # Get the latest API versions in order to Update the parameters.json file
-    $storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
-    $openAIApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
-    $searchServiceAPIVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
-    $aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
-    $cognitiveServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
-
-    $parametersObject.storageApiVersion = $storageApiVersion
-    $parametersObject.openAIApiVersion = $openAIApiVersion
-    $parametersObject.searchServiceAPIVersion = $searchServiceAPIVersion
-    $parametersObject.aiServiceApiVersion = $aiServiceApiVersion
-    $parametersObject.cognitiveServiceApiVersion = $cognitiveServiceApiVersion
+# Function to update AI connection file
+function Update-AIConnectionFile {
+    param (
+        [string]$resourceGroupName,
+        [string]$resourceType,
+        [string]$serviceName ,
+        [string]$serviceProperties
+    )
     
-    # Convert the updated parameters object back to JSON and save it to the file
-    $parametersObject | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
+    $rootPath = Get-Item -Path (Get-Location).Path
+
+    # Convert the serviceProperties string to a hashtable
+    $serviceProperties = $serviceProperties.Trim('@{}')
+    $servicePropertiesArray = $serviceProperties -split ';'
+    $servicePropertiesHashtable = @{}
+
+    foreach ($property in $servicePropertiesArray) {
+        if ($property -match '^\s*(\w+)\s*=\s*(.*)\s*$') {
+            $key = $matches[1]
+            $value = $matches[2]
+            $servicePropertiesHashtable[$key] = $value
+        }
+    }
+
+    # Access the YamlFileName property
+    $yamlFileName = $servicePropertiesHashtable['YamlFileName']
+
+    $filePath = "$rootPath/$yamlFileName"
+
+    switch ($resourceType) {
+        "AIService" {
+            $endpoint = "https://$serviceName.cognitiveservices.azure.com"
+            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
     
+            $content = @"
+name: $serviceName
+type: "azure_ai_services"
+endpoint: $endpoint
+api_key: $apiKey
+ai_services_resource_id: $resourceId
+"@
+        }
+        "OpenAIService" {
+            $endpoint = "https://$serviceName.openai.azure.com"
+            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:openAIAccountName
+
+            $content = @"
+name: $serviceName
+type: azure_open_ai
+azure_endpoint: https://eastus.api.cognitive.microsoft.com/
+api_key: $apiKey
+"@
+        }
+        "SearchService" {
+            $endpoint = "https://$serviceName.search.windows.net"
+            #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
+            
+            $content = @"
+name: $serviceName
+type: "azure_ai_search"
+
+endpoint: $endpoint
+api_key: $apiKey
+"@   
+        }
+        "StorageAccount" {
+            $containerName = $servicePropertiesHashtable["ContainerName"]
+            $endpoint = "https://$storageAccountName.blob.core.windows.net/$containerName"
+            #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+
+            <#
+ # {            $storageAccountKey = az storage account keys list `
+                --resource-group $resourceGroupName `
+                --account-name $storageAccountName `
+                --query "[0].value" `
+                --output tsv:Enter a comment or description}
+#>
+
+            $content = @"
+name: $serviceName
+type: azure_blob
+url: $endpoint
+container_name: $containerName
+account_name: $storageAccountName
+"@
+        }
+    }
+
+    try {
+        $content | Out-File -FilePath $yamlFileName -Encoding utf8 -Force
+        Write-Host "File '$yamlFileName' created and populated."
+        Write-Log -message "File '$yamlFileName' created and populated."
+    }
+    catch {
+        Write-Error "Failed to create or write to '$yamlFileName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create or write to '$yamlFileName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+
+    return $filePath
+}
+
+# Function to update the AI project file
+function Update-AIProjectFile {
+    param (
+        [string]$resourceGroupName,
+        [string]$aiProjectName,
+        [string]$appInsightsName,
+        [string]$userAssignedIdentityName,
+        [string]$location,
+        [string]$storageAccountName
+    )
+
+    $rootPath = Get-Item -Path (Get-Location).Path
+
+    $filePath = "$rootPath/ai.project.yaml"
+
+    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName --query 'principalId' --output tsv
+
+    $content = @"
+`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
+name: $aiProjectName
+description: This configuration specifies a workspace configuration with existing dependent resources
+display_name: $aiProjectName
+location: $location
+application_insights: $appInsightsName
+identity:
+  type: user_assigned
+  tenant_id: $global:tenantId
+  principal_id: $assigneePrincipalId
+  user_assigned_identities: 
+    ${userAssignedIdentityName}: {}
+#tags:
+#  purpose: Azure AI Hub Project
+"@
+
+    try {
+        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
+        Write-Host "File 'ai.project.yaml' created and populated."
+        Write-Log -message "File 'ai.project.yaml' created and populated."
+    }
+    catch {
+        Write-Error "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+    return $filePath
+
 }
 
 # Function to update Azure service properties
@@ -4015,110 +4230,33 @@ identity:
     return $filePath
 }
 
-# Function to update AI connection file
-function Update-AIConnectionFile {
-    param (
-        [string]$resourceGroupName,
-        [string]$resourceType,
-        [string]$serviceName ,
-        [string]$serviceProperties
-    )
+# Function to update the parameters.json file with the latest API versions. NOTE: This function is not currently used.
+function Update-ParameterFileApiVersions {
+
+    # NOTE: Code below seems to get older API versions for some reason. This function will not be used until I can investigate further.
+
+    # Load parameters from the JSON file
+    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+
+    # Get the latest API versions in order to Update the parameters.json file
+    $storageApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Storage" -resourceType "storageAccounts"
+    $openAIApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+    $searchServiceAPIVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.Search" -resourceType "searchServices"
+    $aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+    $cognitiveServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+
+    $parametersObject.storageApiVersion = $storageApiVersion
+    $parametersObject.openAIApiVersion = $openAIApiVersion
+    $parametersObject.searchServiceAPIVersion = $searchServiceAPIVersion
+    $parametersObject.aiServiceApiVersion = $aiServiceApiVersion
+    $parametersObject.cognitiveServiceApiVersion = $cognitiveServiceApiVersion
     
-    $rootPath = Get-Item -Path (Get-Location).Path
-
-    # Convert the serviceProperties string to a hashtable
-    $serviceProperties = $serviceProperties.Trim('@{}')
-    $servicePropertiesArray = $serviceProperties -split ';'
-    $servicePropertiesHashtable = @{}
-
-    foreach ($property in $servicePropertiesArray) {
-        if ($property -match '^\s*(\w+)\s*=\s*(.*)\s*$') {
-            $key = $matches[1]
-            $value = $matches[2]
-            $servicePropertiesHashtable[$key] = $value
-        }
-    }
-
-    # Access the YamlFileName property
-    $yamlFileName = $servicePropertiesHashtable['YamlFileName']
-
-    $filePath = "$rootPath/$yamlFileName"
-
-    switch ($resourceType) {
-        "AIService" {
-            $endpoint = "https://$serviceName.cognitiveservices.azure.com"
-            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
-            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
+    # Convert the updated parameters object back to JSON and save it to the file
+    $parametersObject | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
     
-            $content = @"
-name: $serviceName
-type: "azure_ai_services"
-endpoint: $endpoint
-api_key: $apiKey
-ai_services_resource_id: $resourceId
-"@
-        }
-        "OpenAIService" {
-            $endpoint = "https://$serviceName.openai.azure.com"
-            $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
-            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:openAIAccountName
-
-            $content = @"
-name: $serviceName
-type: azure_open_ai
-azure_endpoint: https://eastus.api.cognitive.microsoft.com/
-api_key: $apiKey
-"@
-        }
-        "SearchService" {
-            $endpoint = "https://$serviceName.search.windows.net"
-            #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
-            
-            $content = @"
-name: $serviceName
-type: "azure_ai_search"
-
-endpoint: $endpoint
-api_key: $apiKey
-"@   
-        }
-        "StorageAccount" {
-            $containerName = $servicePropertiesHashtable["ContainerName"]
-            $endpoint = "https://$storageAccountName.blob.core.windows.net/$containerName"
-            #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
-
-            <#
- # {            $storageAccountKey = az storage account keys list `
-                --resource-group $resourceGroupName `
-                --account-name $storageAccountName `
-                --query "[0].value" `
-                --output tsv:Enter a comment or description}
-#>
-
-            $content = @"
-name: $serviceName
-type: azure_blob
-url: $endpoint
-container_name: $containerName
-account_name: $storageAccountName
-"@
-        }
-    }
-
-    try {
-        $content | Out-File -FilePath $yamlFileName -Encoding utf8 -Force
-        Write-Host "File '$yamlFileName' created and populated."
-        Write-Log -message "File '$yamlFileName' created and populated."
-    }
-    catch {
-        Write-Error "Failed to create or write to '$yamlFileName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create or write to '$yamlFileName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-
-    return $filePath
 }
 
-# Function to update search index files
+# Function to update search index files (not currently used)
 function Update-SearchIndexFiles {
 
     $resourceBaseName = $global:resourceBaseName
@@ -4134,53 +4272,6 @@ function Update-SearchIndexFiles {
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
     }
-}
-
-# Function to update the AI project file
-function Update-AIProjectFile {
-    param (
-        [string]$resourceGroupName,
-        [string]$aiProjectName,
-        [string]$appInsightsName,
-        [string]$userAssignedIdentityName,
-        [string]$location,
-        [string]$storageAccountName
-    )
-
-    $rootPath = Get-Item -Path (Get-Location).Path
-
-    $filePath = "$rootPath/ai.project.yaml"
-
-    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName --query 'principalId' --output tsv
-
-    $content = @"
-`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
-name: $aiProjectName
-description: This configuration specifies a workspace configuration with existing dependent resources
-display_name: $aiProjectName
-location: $location
-application_insights: $appInsightsName
-identity:
-  type: user_assigned
-  tenant_id: $global:tenantId
-  principal_id: $assigneePrincipalId
-  user_assigned_identities: 
-    ${userAssignedIdentityName}: {}
-#tags:
-#  purpose: Azure AI Hub Project
-"@
-
-    try {
-        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
-        Write-Host "File 'ai.project.yaml' created and populated."
-        Write-Log -message "File 'ai.project.yaml' created and populated."
-    }
-    catch {
-        Write-Error "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-    return $filePath
-
 }
 
 # Function to update the config file
@@ -4408,6 +4499,8 @@ Set-Location -Path $global:deploymentPath
 
 # Initialize the existing resources array
 $global:existingResources = @()
+
+$global:resourceCounter = 0
 
 # Initialize parameters
 $initParams = Initialize-Parameters -parametersFile $parametersFile
