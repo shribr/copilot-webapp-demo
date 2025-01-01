@@ -33,12 +33,13 @@ $(document).ready(function () {
 
     createSidenavLinks();
 
+    const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatDisplay = document.getElementById('chat-display');
     const loadingAnimation = document.createElement('div');
     loadingAnimation.setAttribute('class', 'loading-animation');
     loadingAnimation.innerHTML = '<div class="spinner"></div> Fetching results...';
     loadingAnimation.style.display = 'none'; // Hide it initially
-    chatDisplay.appendChild(loadingAnimation);
+    chatDisplayContainer.insertBefore(loadingAnimation, chatDisplay);
 
     $('#send-button').on('click', postQuestion);
     $('#clear-button').on('click', async function () { await clearChatDisplay(); });
@@ -75,6 +76,10 @@ $(document).ready(function () {
     });
 
     document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
+
+    $('#delete-all-threads-button').on('click', async function () {
+        await deleteAllThreads();
+    });
 
     // Add event listeners to column headers for sorting
     document.getElementById('header-content-type').addEventListener('click', () => sortDocuments('Size'));
@@ -635,12 +640,27 @@ async function createThread(metadata) {
     return null;
 }
 
+// Function to delete all threads
+async function deleteAllThreads() {
+    const threads = await getAllThreads();
+    if (Array.isArray(threads)) {
+        for (const thread of threads) {
+            await deleteThread(thread.id);
+        }
+        console.log('All threads deleted successfully.');
+    }
+    else {
+        console.log('No threads found.');
+    }
+}
+
 // function to delete documents
 function deleteDocuments() {
     //code to delete documents
 
 }
 
+// Function to delete a thread
 async function deleteThread(threadId) {
 
     const config = await fetchConfig();
@@ -742,6 +762,35 @@ async function generateEmbeddingAsync(text, model) {
         return data.data[0].embedding;
     } catch (error) {
         return null;
+    }
+}
+
+// Function to get all threads
+async function getAllThreads() {
+    try {
+        const config = await fetchConfig();
+        const apiVersion = config.OPENAI_API_VERSION;
+        const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+        const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads?api-version=${apiVersion}`;
+
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`
+            }
+        });
+
+        if (response.ok) {
+            const threads = await response.json();
+            return threads.data || []; // Assuming the response contains a list of threads
+        } else {
+            console.log('Failed to fetch threads.');
+            return [];
+        }
+    } catch (error) {
+        console.log('Error fetching threads:', error);
+        return [];
     }
 }
 
@@ -1011,6 +1060,7 @@ async function getChatResponse(questionBubble) {
     const chatInput = document.getElementById('chat-input').value.trim();
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.style.display = 'none';
+    //chatDisplay.style.opacity = .2;
 
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
@@ -1187,6 +1237,7 @@ async function getChatResponse(questionBubble) {
             });
 
             chatDisplay.style.display = 'block';
+            //chatDisplay.style.opacity = 1;
 
         } catch (error) {
             console.error('Error processing search results:', error);

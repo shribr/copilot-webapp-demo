@@ -517,6 +517,35 @@ label[for="chat-input"] {
   margin-bottom: 20px;
 }
 
+.form-group-delete-all-threads {
+  padding-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: white;
+  margin-top: 24px;
+  border-top: 1px solid black;
+  width: 100%;
+}
+
+#delete-all-threads-button {
+  background-color: firebrick;
+  color: white;
+  border: 1px solid black;
+  cursor: pointer;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 1px 0 #000;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  padding: 12px;
+  width: 100%;
+  text-align: center;
+}
+
+#delete-all-threads-button:hover {
+  background-color: lightcoral;
+}
+
 .form-group label {
   display: block;
   margin-bottom: 5px;
@@ -554,6 +583,11 @@ label[for="chat-input"] {
 
 .form-group-flex > div {
   margin-right: 10px;
+}
+
+.form-group-admin {
+  display: flex;
+  align-items: left;
 }
 
 #color-palette {
@@ -617,10 +651,6 @@ label[for="chat-input"] {
   cursor: pointer;
   transition: background-color 0.3s ease;
   height: 45px;
-}
-
-#send-button:hover {
-  background-color: #004a9e;
 }
 
 /* Document container styles */
