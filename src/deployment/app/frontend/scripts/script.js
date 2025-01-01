@@ -1501,7 +1501,7 @@ async function postQuestion() {
     const questionBubbleTop = questionBubble.offsetTop;
     chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
-    await addMessageToThread(threadId, chatInput, "user");
+    //await addMessageToThread(threadId, chatInput, "user");
 
     getChatResponse(questionBubble);
 }

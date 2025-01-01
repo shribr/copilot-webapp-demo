@@ -1102,11 +1102,10 @@ REMOVING BANDED ROWS FOR NOW
 
 .chat-response {
   /* background-color: #87ceeb; */
-  background-color: white;
+  /* background-color: white;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #ddd; */
   margin: 5px 0px 30px 0px;
-  border-radius: 4px;
   white-space: nowrap;
   position: relative;
   display: flex;
