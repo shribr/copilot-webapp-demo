@@ -307,6 +307,8 @@ async function addMessageToThread(threadId, message, role) {
     catch (error) {
         console.log('Error adding message to thread:', error);
     }
+
+    return threadId;
 }
 
 // Function to build chat history
@@ -360,7 +362,7 @@ function clearFileInput() {
 }
 
 // Function to create chat response content
-async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, chatResponse, answerContent, sasToken, persona) {
+async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, chatResponse, answerContent, sasToken, persona, threadId) {
 
     const config = await fetchConfig();
 
@@ -416,7 +418,7 @@ async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, ch
         Once the result text is sanitized, we add it to the chat history / thread.
         Then we call the Azure OpenAI model again with entire thread to get the final answer.
         */
-        const aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
+        const aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona, threadId);
         //aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
 
         await addMessageToThread(threadId, aiEnhancedAnswer, "assistant");
@@ -765,6 +767,37 @@ async function generateEmbeddingAsync(text, model) {
     }
 }
 
+// Function to get all messages from a thread
+async function getAllMessages(threadId) {
+    const config = await fetchConfig();
+    const apiVersion = config.OPENAI_API_VERSION;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+
+    const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}/messages?api-version=${apiVersion}`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            }
+        });
+
+        const messages = await response.json();
+
+        console.log('Messages retrieved:', messages);
+
+        return messages;
+    }
+    catch (error) {
+        console.log('Error retrieving messages:', error);
+    }
+
+    return null;
+}
+
 // Function to get all threads
 async function getAllThreads() {
     try {
@@ -935,6 +968,15 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona, t
 
     const systemMessageContent = openAIRequestBody.messages.find(message => message.role === 'system').content[0];
     systemMessageContent.text = persona;
+
+    //I am commenting this out for now because I want to see if I can get the chat history to work without it.
+    // const messageList = await getAllMessages(threadId);
+    // const messages = messageList.data.map(message => ({
+    //     role: message.role,
+    //     content: message.content[0].text.value
+    // }));
+
+    // openAIRequestBody.messages = messages;
 
     const jsonString = JSON.stringify(openAIRequestBody);
 
@@ -1112,7 +1154,7 @@ async function getChatResponse(questionBubble) {
     if (chatInput) {
 
         // Add the user's message to the thread
-        await addMessageToThread(threadId, chatInput, "user");
+        threadId = await addMessageToThread(threadId, chatInput, "user");
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
@@ -1121,7 +1163,7 @@ async function getChatResponse(questionBubble) {
         const docStorageResponse = await getAnswersFromAzureSearch(chatInput, "gpt-4o", indexName, false);
 
         // Get answers from Azure OpenAI model
-        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona);
+        const openAIModelResults = await getAnswersFromAzureOpenAIModel(chatInput, "gpt-4o", persona, threadId);
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -1213,7 +1255,7 @@ async function getChatResponse(questionBubble) {
             chatDisplay.appendChild(chatResponse);
 
             //await createChatResponseContent(chatInput, rawAnswers, chatResponse, answerContent, sasToken, persona);
-            await createChatResponseContent(chatInput, mappedAzureSearchAnswers, chatResponse, answerContent, sasToken, persona);
+            await createChatResponseContent(chatInput, mappedAzureSearchAnswers, chatResponse, answerContent, sasToken, persona, threadId);
 
             chatResponse.appendChild(thoughtProcessContent);
             chatResponse.appendChild(supportingContent);
