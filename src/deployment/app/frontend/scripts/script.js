@@ -7,7 +7,18 @@ let chatHistory = [];
 let thread = [];
 let threadId = '';
 
-//const config = await fetchConfig();
+let aiEnhancedAnswersArray = [];
+
+let tool_resources = {
+    "azure_ai_search": {
+        "indexes": [
+            {
+                "index_connection_id": "",
+                "index_name": ""
+            }
+        ]
+    }
+};
 
 $(document).ready(function () {
 
@@ -30,7 +41,7 @@ $(document).ready(function () {
     chatDisplay.appendChild(loadingAnimation);
 
     $('#send-button').on('click', postQuestion);
-    $('#clear-button').on('click', clearChatDisplay);
+    $('#clear-button').on('click', async function () { await clearChatDisplay(); });
 
     $(document).on('keydown', function (event) {
         if (event.key === 'Enter') {
@@ -249,13 +260,29 @@ async function addMessageToThread(threadId, message, role) {
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
-    //const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+    const dateTimestamp = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
+    try {
+        // First see if there is an existing thread
+        if (threadId == null || threadId == undefined || threadId == "") {
+
+            const metadata = { "Created Date/Time": new Date().toLocaleString() };
+
+            thread = await createThread(metadata);
+            threadId = thread.id;
+        }
+        else {
+            thread = await getThread(threadId);
+        }
+
+    } catch (error) {
+        console.log('Error getting thread ID:', error);
+    }
 
     const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}/messages?api-version=${apiVersion}`;
 
     const jsonMessage = JSON.stringify(message);
 
-    const jsonString = `{ "role": "${role}", "content": ${jsonMessage} }`;
+    const jsonString = `{ "role": "${role}", "content": ${jsonMessage}, "metadata": { "dateTimestamp": "${dateTimestamp}" } }`;
 
     try {
         const response = await fetch(endpoint, {
@@ -293,11 +320,11 @@ function buildChatHistory(answerResponseNumber, question, rawAnswers, opentAiRef
 
     chatHistory.push(chatEntry);
 
-    console.log(chatHistory);
+    console.log("Chat History: ", chatHistory);
 }
 
 // Function to clear the chat display
-function clearChatDisplay() {
+async function clearChatDisplay() {
     const chatDisplayContainer = document.getElementById('chat-display-container');
 
     const chatDisplay = document.getElementById('chat-display');
@@ -311,6 +338,10 @@ function clearChatDisplay() {
 
     document.getElementById('expand-chat-svg-container').style.display = 'none';
     document.getElementById('jump-to-top-arrow').style.display = 'none';
+
+    if (threadId != null && threadId != undefined && threadId != "") {
+        await deleteThread(threadId);
+    }
 }
 
 //code to clear file input
@@ -324,7 +355,7 @@ function clearFileInput() {
 }
 
 // Function to create chat response content
-async function createChatResponseContent(chatInput, rawAnswers, chatResponse, answerContent, sasToken, persona) {
+async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, chatResponse, answerContent, sasToken, persona) {
 
     const config = await fetchConfig();
 
@@ -336,7 +367,7 @@ async function createChatResponseContent(chatInput, rawAnswers, chatResponse, an
     var dateTimestamp = new Date().toLocaleString();
     var openAIModelResultsId = "";
 
-    var aiEnhancedAnswersArray = rawAnswers;
+    aiEnhancedAnswersArray = [];
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
@@ -345,43 +376,65 @@ async function createChatResponseContent(chatInput, rawAnswers, chatResponse, an
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
 
-    for (const answer of rawAnswers) {
+    var footNoteLinks = "";
 
-        const docPath = `${answer.document.title}?${sasToken}`;
-        const docTitle = answer.document.title;
+    // Loop through the answers and create the response content      
+    for (const answer of mappedAzureSearchAnswers) {
+        await (async () => {
+            answer.documents.forEach(doc => {
+                const docPath = `${doc.title}?${sasToken}`;
+                const docTitle = doc.title;
 
-        const docUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${docTitle}?${sasToken}`;
+                const docUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${docTitle}?${sasToken}`;
 
-        if (!listedPaths.has(docPath)) {
-            listedPaths.add(docPath);
+                if (!listedPaths.has(docPath)) {
+                    listedPaths.add(docPath);
 
-            sourceNumber++;
+                    sourceNumber++;
 
-            const supportingContentLink = `<a class="answer_citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${answer.document.title}</a>`;
+                    const supportingContentLink = `<a class="answer_citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${doc.title}</a>`;
 
-            citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+                    citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
-        } else {
-            console.log(`Document already listed: ${docPath}`);
-        }
+                    footNoteLinks += `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                }
+                else {
+                    console.log(`Document already listed: ${docPath}`);
+                }
 
-        //aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(`${chatPersonaPrompt} Rephrase the following text and use complete sentences only. Be specific and reference the specific document ${answer.document.title}: '${answer.text}'`, "gpt-4o");
-        aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
-        aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
+            });
+        })();
+
+        /*
+        This first call to Azure OpenAI is not going to be part of the main chat dialog. 
+        What this does is "sanitize" the result text from Azure Search before we add it to the chat history / thread.
+        Once the result text is sanitized, we add it to the chat history / thread.
+        Then we call the Azure OpenAI model again with entire thread to get the final answer.
+        */
+        const aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona);
+        //aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
 
         await addMessageToThread(threadId, aiEnhancedAnswer, "assistant");
 
-        aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
+        //aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
+        aiEnhancedAnswersArray.push(
+            {
+                text: aiEnhancedAnswer,
+                source: answer.source,
+                score: answer.score,
+                documents: answer.documents
+            });
 
-        const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+        //const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
 
-        const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLink + '</li>';
+        const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLinks + '</li>';
         aiEnhancedAnswers += aiEnhancedAnswerHtml;
     }
 
+
     // Build chat history
     if (aiEnhancedAnswersArray.length > 0) {
-        buildChatHistory(answerResponseNumber, chatInput, rawAnswers, aiEnhancedAnswersArray, persona, dateTimestamp);
+        buildChatHistory(answerResponseNumber, chatInput, mappedAzureSearchAnswers, aiEnhancedAnswersArray, persona, dateTimestamp);
     }
 
     answerContent.innerHTML += '<div id="openai-model-results-header">OpenAI Enhanced Search Results from Azure Storage</div>';
@@ -488,7 +541,7 @@ async function createTabs() {
 }
 
 // Function to create tab contents for supporting content results returned from Azure Search
-function createTabContentSupportingContent(answers, docStorageResponse, supportingContent, sasToken) {
+function createTabContentSupportingContent(mappedAzureSearchAnswers, docStorageResponse, supportingContent, sasToken) {
 
     if (docStorageResponse && docStorageResponse["@search.answers"] && docStorageResponse.value && docStorageResponse.value.length > 0) {
 
@@ -501,27 +554,35 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
         // Initialize a Set to store unique document paths
         const listedPaths = new Set();
 
-        answers.forEach(answer => {
-            if (answer.text) {
-                const docPath = `${answer.document.metadata_storage_path}?${sasToken}`;
-                const docTitle = answer.document.title;
+        mappedAzureSearchAnswers.forEach(answer => {
 
-                const footNoteLink = `<sup class="answer_citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                const docLink = ` <a href="${docPath}" class="supporting_content_link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
-                //supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
-                supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + docLink + '</li>';
-                if (!listedPaths.has(docPath)) {
-                    listedPaths.add(docPath);
+            const answerText = answer.text.replace(" **", "").replace(/\s+/g, " ");
 
-                    //const supportingContentLink = `<a class="answer_citations" title="${docPath}" href="${docPath}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${docTitle}</a>`;
+            if (answerText) {
 
-                    //citationContentResults += `<div id="citation-link-${answerResultsNumber}-${sourceNumber}">${supportingContentLink}</div>`;
+                answer.documents.forEach(doc => {
 
-                    sourceNumber++;
-                } else {
-                    console.log(`Document already listed: ${docPath}`);
-                }
 
+                    const docPath = `${doc.metadata_storage_path}?${sasToken}`;
+                    const docTitle = doc.title;
+
+                    const footNoteLink = `<sup class="answer_citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                    const docLink = ` <a href="${docPath}" class="supporting_content_link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
+                    //supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
+                    supportingContentResults += '<li class="answer_results">' + answerText + docLink + '</li>';
+
+                    if (!listedPaths.has(docPath)) {
+                        listedPaths.add(docPath);
+
+                        //const supportingContentLink = `<a class="answer_citations" title="${docPath}" href="${docPath}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${docTitle}</a>`;
+
+                        //citationContentResults += `<div id="citation-link-${answerResultsNumber}-${sourceNumber}">${supportingContentLink}</div>`;
+
+                        sourceNumber++;
+                    } else {
+                        console.log(`Document already listed: ${docPath}`);
+                    }
+                });
                 answerNumber++;
             }
         });
@@ -531,14 +592,14 @@ function createTabContentSupportingContent(answers, docStorageResponse, supporti
             //supportingContent.innerHTML += `<div class="pt-4"><h6 class="mud-typography mud-typography-subtitle2 pb-2">Sources:</h6>${citationContentResults}</div></div>`;
         }
 
-        console.log('Cross-referenced answers:', answers);
+        console.log('Cross-referenced answers:', mappedAzureSearchAnswers);
     }
 
     return supportingContent;
 }
 
 // Function to create a new thread for an AI conversation
-async function createThread(metadata, toolResources) {
+async function createThread(metadata) {
 
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
@@ -547,7 +608,7 @@ async function createThread(metadata, toolResources) {
     const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads?api-version=${apiVersion}`;
 
     const jsonMetadata = JSON.stringify(metadata);
-    const jsonToolResources = JSON.stringify(toolResources);
+    const jsonToolResources = JSON.stringify(tool_resources);
     const jsonString = ` { "metadata": ${jsonMetadata}, "tool_resources": ${jsonToolResources} } `;
 
     try {
@@ -578,6 +639,38 @@ async function createThread(metadata, toolResources) {
 function deleteDocuments() {
     //code to delete documents
 
+}
+
+async function deleteThread(threadId) {
+
+    const config = await fetchConfig();
+    const apiVersion = config.OPENAI_API_VERSION;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+
+    const endpoint = `https://${config.REGION}.api.cognitive.microsoft.com/openai/threads/${threadId}?api-version=${apiVersion}`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            }
+        });
+
+        if (response.ok) {
+            console.log('Thread deleted successfully');
+
+            thread = [];
+            threadId = '';
+        } else {
+            console.log('Error deleting thread:', response.statusText);
+        }
+    }
+    catch (error) {
+        console.log('Error deleting thread:', error);
+    }
 }
 
 // Function to download chat results to a file
@@ -678,6 +771,9 @@ async function getAnswersFromAzureSearch(userInput, aiModelName, indexName, useE
 
     const endpoint = `https://${searchServiceName}.search.windows.net/indexes/${indexName}/docs/search?api-version=${apiVersion}`;
 
+    tool_resources.azure_ai_search.indexes[0].index_connection_id = endpoint;
+    tool_resources.azure_ai_search.indexes[0].index_name = indexName;
+
     var searchQuery = {};
 
     if (!useEmbeddings || embeddings == null) {
@@ -731,33 +827,38 @@ async function getAnswersFromAzureSearch(userInput, aiModelName, indexName, useE
             body: jsonString
         });
 
-        const data = await response.json();
-        console.log(data);
+        const answers = await response.json();
+        console.log("Top 3 answers:", answers);
 
         try {
             // Process the search results to extract relevant chunks
-            const relevantChunks = data.value.map(result => {
+            const searchResults = answers.value.map(result => {
+
+                const pageNumber = result.chunk_id.split('_pages_')[1];
                 return {
                     score: result['@search.score'],
-                    text: result.text,
+                    text: result["@search.captions"][0].text,
+                    document: result.title,
+                    key: result.chunk_id,
+                    page: pageNumber
                     // Add other fields as necessary
                 };
             });
 
             // Sort chunks by score (descending)
-            relevantChunks.sort((a, b) => b.score - a.score);
+            searchResults.sort((a, b) => b.score - a.score);
 
             // Use the top chunks based on your criteria
-            const topChunks = relevantChunks.slice(0, 3); // Example: top 3 chunks
+            const topSearchResults = searchResults.slice(0, 3); // Example: top 3 chunks
 
-            console.log('Top chunks:', topChunks);
+            console.log('Top Search Results:', topSearchResults);
 
         } catch (error) {
             console.error('Error processing search results:', error);
 
         }
 
-        return data;
+        return answers;
     }
     catch (error) {
         console.log('Error fetching answers from Azure Search:', error);
@@ -917,7 +1018,6 @@ async function getChatResponse(questionBubble) {
     const searchServiceEndpoint = `https://${config.AZURE_SEARCH_SERVICE_NAME}.search.windows.net`;
 
     const indexName = indexes.filter(item => /vector-srch-index-copilot-demo-\d{3}/.test(item.Name))[0].Name;
-    const metadata = { "user": "John Smith" };
 
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
@@ -942,7 +1042,9 @@ async function getChatResponse(questionBubble) {
     try {
         // First see if there is an existing thread
         if (threadId == null || threadId == undefined || threadId == "") {
-            thread = await createThread(metadata, toolResources);
+            const metadata = { "thread_name": "User Chat" };
+
+            thread = await createThread(metadata);
             threadId = thread.id;
         }
         else {
@@ -959,6 +1061,7 @@ async function getChatResponse(questionBubble) {
 
     if (chatInput) {
 
+        // Add the user's message to the thread
         await addMessageToThread(threadId, chatInput, "user");
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
@@ -1000,23 +1103,53 @@ async function getChatResponse(questionBubble) {
         }
 
         try {
-            docStorageResponse.value.forEach(doc => {
-                //var key = "Page " + doc.chunk_id.split('_pages_')[1];
-                var key = doc.chunk_id;
-
-                docMap.set(key, doc);
-            });
+            // Process the search results to extract relevant chunks and map them to their respective documents
 
             //This call to mapAnswersToDocSources is for the raw answers from Azure Search and used to populate the supporting content tab. 
-            // //It needs to be the same data returned from the Azure Search call above completely untouched.
-            const searchAnswers = docStorageResponse["@search.answers"];
+            //It needs to be the same data returned from the Azure Search call above completely untouched.
+            //const searchAnswers = docStorageResponse["@search.answers"];
 
-            const rawAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", false);
+            // Create a map of documents using their chunk_id
+            const docMap = new Map();
+            docStorageResponse.value.forEach(doc => {
+                docMap.set(doc.chunk_id, doc);
+            });
+
+            // Process the search answers and map them to their respective documents
+            const rawAzureSearchAnswers = docStorageResponse["@search.answers"];
+            const mappedAzureSearchAnswers = rawAzureSearchAnswers.map(answer => {
+                const pageNumber = answer.key.split('_pages_')[1];
+                const relevantDocs = docStorageResponse.value
+                    .filter(doc => doc.chunk_id === answer.key)
+                    .sort((a, b) => b['@search.score'] - a['@search.score'])
+                    .slice(0, 3); // Take the top 3 results
+
+                //const highestScoringDoc = relevantDocs[0];
+
+                return {
+                    text: answer.text,
+                    score: answer.score,
+                    key: answer.key,
+                    page: pageNumber,
+                    documents: relevantDocs
+                };
+            });
+
+            // Now you can use mappedAnswers to display the answers and their relevant documents
+            mappedAzureSearchAnswers.forEach(mappedAnswer => {
+                // Display the answer and its highest scoring document
+                console.log('text:', mappedAnswer.text);
+                console.log('documents:', mappedAnswer.documents);
+            });
+
+            //This function is no longer necessary.  
+            // The raw answers from Azure Search are now used directly since we are now performing the "sanitation" of the responses in the createChatResponseContent function and we don't need to do it twice.
+            //const rawAnswers = await mapAnswersToDocSources(searchAnswers, docMap, "gpt-4o", false);
 
             //const sortedAnswers = sortAnswers(docMap);
 
             // Create tab contents for supporting content
-            createTabContentSupportingContent(rawAnswers, docStorageResponse, supportingContent, sasToken);
+            createTabContentSupportingContent(mappedAzureSearchAnswers, docStorageResponse, supportingContent, sasToken);
 
             // Get answers from Azure Search with embeddings
 
@@ -1029,7 +1162,8 @@ async function getChatResponse(questionBubble) {
             // Append the chat bubble to the chat-display div
             chatDisplay.appendChild(chatResponse);
 
-            await createChatResponseContent(chatInput, rawAnswers, chatResponse, answerContent, sasToken, persona);
+            //await createChatResponseContent(chatInput, rawAnswers, chatResponse, answerContent, sasToken, persona);
+            await createChatResponseContent(chatInput, mappedAzureSearchAnswers, chatResponse, answerContent, sasToken, persona);
 
             chatResponse.appendChild(thoughtProcessContent);
             chatResponse.appendChild(supportingContent);
@@ -1209,7 +1343,7 @@ function isQuestion(text) {
     return questionWords.includes(words[0]);
 }
 
-// Function to rephrase text
+// Function to map responses from Azure Storage to 
 async function mapAnswersToDocSources(searchAnswers, docMap, aiModelName, openAIEnhanced) {
 
     const config = await fetchConfig();
@@ -1266,6 +1400,7 @@ async function postQuestion() {
     const config = await fetchConfig();
 
     let chatInput = document.getElementById('chat-input').value;
+
     const chatDisplay = document.getElementById('chat-display');
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
     const dateTimestamp = new Date().toLocaleString();
@@ -1314,6 +1449,8 @@ async function postQuestion() {
     // Scroll to the position right above the newest questionBubble
     const questionBubbleTop = questionBubble.offsetTop;
     chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+    await addMessageToThread(threadId, chatInput, "user");
 
     getChatResponse(questionBubble);
 }
@@ -1484,6 +1621,7 @@ async function renderDocuments(blobs) {
     }
 }
 
+// Function to render documents in HTML table format
 async function renderDocumentsHtmlTable(blobs) {
 
     const config = await fetchConfig();
@@ -1892,6 +2030,7 @@ function updateFileCount() {
     document.getElementById('file-count').textContent = `Files selected: ${fileCount}`;
 }
 
+// Function to update a message in a thread
 async function updateMessage(threadId, messageId, metadata) {
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
@@ -1950,6 +2089,7 @@ function updatePlaceholder() {
     }
 }
 
+// Function to update a thread
 async function updateThread(threadId, metadata, toolResources) {
 
     const config = await fetchConfig();

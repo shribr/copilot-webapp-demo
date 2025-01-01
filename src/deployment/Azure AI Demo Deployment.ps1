@@ -1293,6 +1293,7 @@ function New-ApiManagementService {
     }
 }
 
+# Function to create a new Application Insights component
 function New-ApplicationInsights {
     param (
         [string]$appInsightsName,
