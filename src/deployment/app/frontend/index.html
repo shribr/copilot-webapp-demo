@@ -11,56 +11,10 @@
     <link rel="stylesheet" href="css/styles.css" type="text/css" />
     <!-- <link rel="stylesheet" href="css/MudBlazor.min.css" type="text/css" /> -->
 
-    <script type="text/javascript">var appInsights = window.appInsights || function (config) { function r(config) { t[config] = function () { var i = arguments; t.queue.push(function () { t[config].apply(t, i) }) } } var t = { config: config }, u = document, e = window, o = "script", s = u.createElement(o), i, f; s.src = config.url || "//az416426.vo.msecnd.net/scripts/a/ai.0.js"; u.getElementsByTagName(o)[0].parentNode.appendChild(s); try { t.cookie = u.cookie } catch (h) { } for (t.queue = [], i = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; i.length;)r("track" + i.pop()); return r("setAuthenticatedUserContext"), r("clearAuthenticatedUserContext"), config.disableExceptionTracking || (i = "onerror", r("_" + i), f = e[i], e[i] = function (config, r, u, e, o) { var s = f && f(config, r, u, e, o); return s !== !0 && t["_" + i](config, r, u, e, o), s }), t }
-            ({
-                instrumentationKey: "c37e54cb-cca9-4921-bc69-fadde7913bd7"
-            });
-        window.appInsights = appInsights;
-    </script>
+
 </head>
 
 <body class="flex-container">
-    <!-- <header class="mud-appbar mud-appbar-fixed-top mud-elevation-20">
-        <div class="mud-toolbar mud-toolbar-gutters mud-toolbar-appbar">
-            <button id="nav-toggle" type="button" title="Toggle navigation sidebar"
-                class="mud-button-root mud-icon-button mud-inherit-text hover:mud-inherit-hover mud-ripple mud-ripple-icon mud-icon-button-size-large mud-icon-button-edge-start"
-                _bl_4="" style="--mud-ripple-offset-x: -3px; --mud-ripple-offset-y: 3px;"><span
-                    class="mud-icon-button-label"><svg class="mud-icon-root mud-svg-icon mud-icon-size-large"
-                        focusable="false" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
-                    </svg></span></button>
-            <div class="mud-tooltip-root mud-tooltip-inline"><button aria-pressed="false"
-                    type="button"
-                    class="mud-button-root mud-icon-button mud-inherit-text hover:mud-inherit-hover mud-ripple mud-ripple-icon mud-icon-button-size-large"
-                    _bl_34="" style="--mud-ripple-offset-x: 0px; --mud-ripple-offset-y: -8px;"><span
-                        class="mud-icon-button-label"><svg
-                            class="mud-icon-root mud-svg-icon mud-icon-size-large" focusable="false" viewBox="0 0 24 24"
-                            aria-hidden="true">
-                            <g>
-                                <rect fill="none" height="24" width="24"></rect>
-                                <path
-                                    d="M12,4c4.41,0,8,3.59,8,8s-3.59,8-8,8s-8-3.59-8-8S7.59,4,12,4 M12,2C6.48,2,2,6.48,2,12c0,5.52,4.48,10,10,10 c5.52,0,10-4.48,10-10C22,6.48,17.52,2,12,2L12,2z M13,12l0-4h-2l0,4H8l4,4l4-4H13z">
-                                </path>
-                            </g>
-                        </svg></span></button>
-                <div id="popover-1ad3ec3e-073c-4b85-9dd3-a1df3bae88e0" class="mud-popover-cascading-value"></div>
-            </div>
-            <div class="flex-grow-1"></div><button type="button"
-                title="Open the developer settings side panel"
-                class="mud-button-root mud-icon-button mud-inherit-text hover:mud-inherit-hover mud-ripple mud-ripple-icon mud-icon-button-size-large"
-                _bl_33="" style="--mud-ripple-offset-x: 4px; --mud-ripple-offset-y: 5px;"><span
-                    class="mud-icon-button-label"><svg class="mud-icon-root mud-svg-icon mud-icon-size-large"
-                        focusable="false" viewBox="0 0 24 24" aria-hidden="true">
-                        <g>
-                            <path d="M0,0h24v24H0V0z" fill="none"></path>
-                            <path
-                                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z">
-                            </path>
-                        </g>
-                    </svg></span></button>
-        </div>
-    </header> -->
     <div id="top-navigation-toolbar">
         <div><img src="images/site-logo-default.png" id="site-logo" class="site-logo-default" alt="Site Logo"></div>
         <div id="main-header-title">Chat with Azure Copilot</div>
@@ -88,7 +42,7 @@
                             <h2>Chat with your data</h2>
                             <div id="chat-examples-container">
                                 <p>Examples of questions you can ask:</p>
-                                <ul id="chat_examples">
+                                <ul id="chat-examples">
                                     <li>What is the summary of the document?</li>
                                     <li>Can you extract key points from the document?</li>
                                     <li>What are the main topics covered?</li>
@@ -135,7 +89,7 @@
                         <div id="file-type-support-header">Azure Copilot Chat currently supports the following file
                             types:</div>
                         <div id="file-type-support-list">
-                            <ul id="file_types">
+                            <ul id="file-types">
                                 <li>.pdf</li>
                                 <li>.md</li>
                                 <li>.html</li>
@@ -171,10 +125,10 @@
                             <button id="clear-filter-button" title="Clear Filter">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
+                                    <g id="SVGRepo-bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo-tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
                                     </g>
-                                    <g id="SVGRepo_iconCarrier">
+                                    <g id="SVGRepo-iconCarrier">
                                         <path
                                             d="M15 15L21 21M21 15L15 21M10 21V14.6627C10 14.4182 10 14.2959 9.97237 14.1808C9.94787 14.0787 9.90747 13.9812 9.85264 13.8917C9.7908 13.7908 9.70432 13.7043 9.53137 13.5314L3.46863 7.46863C3.29568 7.29568 3.2092 7.2092 3.14736 7.10828C3.09253 7.01881 3.05213 6.92127 3.02763 6.81923C3 6.70414 3 6.58185 3 6.33726V4.6C3 4.03995 3 3.75992 3.10899 3.54601C3.20487 3.35785 3.35785 3.20487 3.54601 3.10899C3.75992 3 4.03995 3 4.6 3H19.4C19.9601 3 20.2401 3 20.454 3.10899C20.6422 3.20487 20.7951 3.35785 20.891 3.54601C21 3.75992 21 4.03995 21 4.6V6.33726C21 6.58185 21 6.70414 20.9724 6.81923C20.9479 6.92127 20.9075 7.01881 20.8526 7.10828C20.7908 7.2092 20.7043 7.29568 20.5314 7.46863L17 11"
                                             stroke="#000000" stroke="currentColor" stroke-width="2"
@@ -185,10 +139,10 @@
                             <button id="filter-button" title="Filter">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
+                                    <g id="SVGRepo-bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo-tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
                                     </g>
-                                    <g id="SVGRepo_iconCarrier">
+                                    <g id="SVGRepo-iconCarrier">
                                         <path
                                             d="M3 4.6C3 4.03995 3 3.75992 3.10899 3.54601C3.20487 3.35785 3.35785 3.20487 3.54601 3.10899C3.75992 3 4.03995 3 4.6 3H19.4C19.9601 3 20.2401 3 20.454 3.10899C20.6422 3.20487 20.7951 3.35785 20.891 3.54601C21 3.75992 21 4.03995 21 4.6V6.33726C21 6.58185 21 6.70414 20.9724 6.81923C20.9479 6.92127 20.9075 7.01881 20.8526 7.10828C20.7908 7.2092 20.7043 7.29568 20.5314 7.46863L14.4686 13.5314C14.2957 13.7043 14.2092 13.7908 14.1474 13.8917C14.0925 13.9812 14.0521 14.0787 14.0276 14.1808C14 14.2959 14 14.4182 14 14.6627V17L10 21V14.6627C10 14.4182 10 14.2959 9.97237 14.1808C9.94787 14.0787 9.90747 13.9812 9.85264 13.8917C9.7908 13.7908 9.70432 13.7043 9.53137 13.5314L3.46863 7.46863C3.29568 7.29568 3.2092 7.2092 3.14736 7.10828C3.09253 7.01881 3.05213 6.92127 3.02763 6.81923C3 6.70414 3 6.58185 3 6.33726V4.6Z"
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -204,22 +158,24 @@
                 <div id="document-list-outer-container">
                     <div id="document-list-container">
                         <table id="document-table">
-                            <tbody id="document-table-body">
+                            <thead id="document-table-header">
                                 <tr class="document-row header">
-                                    <td id="header-preview" class="document-cell preview">Preview</td>
-                                    <td id="header-status" class="document-cell preview">Status <span class="sort-arrow"
-                                            id="status-arrow">&#9650;</span></td>
-                                    <td id="header-name" class="document-cell">Name<span class="sort-arrow"
-                                            id="name-arrow">&#9650;</span></td>
-                                    <td id="header-content-type" class="document-cell">Content Type<span
-                                            class="sort-arrow" id="content-type-arrow">&#9650;</span></td>
-                                    <td id="header-size" class="document-cell">Size<span class="sort-arrow"
-                                            id="size-arrow">&#9650;</span></td>
-                                    <td id="header-date" class="document-cell">Last Modified<span class="sort-arrow"
-                                            id="date-arrow">&#9650;</span>
-                                    </td>
-                                    <td class="document-cell"></td>
+                                    <th id="header-preview" class="document-cell document-cell-preview">Preview</th>
+                                    <th id="header-status" class="document-cell document-cell-status">Status <span
+                                            class="sort-arrow" id="status-arrow">&#9650;</span></th>
+                                    <th id="header-name" class="document-cell document-cell-name">Name<span
+                                            class="sort-arrow" id="name-arrow">&#9650;</span></th>
+                                    <th id="header-content-type" class="document-cell document-cell-content-type">
+                                        Content Type<span class="sort-arrow" id="content-type-arrow">&#9650;</span></th>
+                                    <th id="header-size" class="document-cell document-cell-file-size">Size<span
+                                            class="sort-arrow" id="size-arrow">&#9650;</span></th>
+                                    <th id="header-date" class="document-cell document-cell-last-modified">Last
+                                        Modified<span class="sort-arrow" id="date-arrow">&#9650;</span>
+                                    </th>
+                                    <th class="document-cell"></th>
                                 </tr>
+                            <tbody id="document-table-body">
+
                             </tbody>
                         </table>
                     </div>
@@ -267,7 +223,7 @@
                     needs.</p>
 
                 <h4>Why Choose Azure AI Copilot Chat?</h4>
-                <ul id="why_copilot">
+                <ul id="why-copilot">
                     <li><strong>Intelligent Assistance:</strong> Leverage the power of AI to get accurate and
                         insightful responses.</li>
                     <li><strong>Personalized Experience:</strong> Enjoy conversations tailored to your preferences
@@ -281,7 +237,7 @@
                 </ul>
                 <br />
                 <div class="cta">
-                    <h4 id="get_started">Get Started Today</h3>
+                    <h4 id="get-started">Get Started Today</h3>
                         <p>Join the growing community of users who are transforming their communication with Azure
                             AI
                             Copilot Chat. Whether
@@ -297,9 +253,14 @@
     </div>
     </div>
     <div id="settings-overlay"
-        class="mud-overlay mud-drawer-overlay mud-overlay-drawer mud-drawer-pos-right mud-drawer-overlay--open mud-drawer-overlay-temporary mud-drawer-overlay-md">
-        <div id="settings-overlay-dark" class="mud-overlay-scrim mud-overlay-dark settings-overlay"></div>
+        class="settings-overlay settings-drawer-overlay settings-overlay-drawer settings-drawer-pos-right settings-drawer-overlay-md">
+        <div id="settings-overlay-dark" class="settings-overlay-scrim settings-overlay-dark settings-overlay-hidden">
+        </div>
     </div>
+    <div id="delete-all-threads-overlay" class="settings-overlay settings-drawer-overlay settings-overlay-drawer">
+    </div>
+    <div id="delete-all-threads-overlay-dark"
+        class="settings-overlay-scrim settings-overlay-dark settings-overlay-hidden"></div>
     <!-- Settings Dialog HTML -->
     <div id="settings-dialog">
         <!-- Close Button SVG -->
@@ -444,9 +405,15 @@
         </div>
         <div class="form-group form-group-flex form-group-delete-all-threads">
             <div id="delete-all-threads-button" style="display:none">Delete all Threads</div>
+            <div id="delete-all-threads-confirmation-dialog" style="display:none">
+                <div>Are you sure you want to delete all threads?</div>
+                <div>
+                    <button id="delete-all-threads-confirm" value="yes">Yes</button>
+                    <button id="delete-all-threads-cancel" value="no">No</button>
+                </div>
+            </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"

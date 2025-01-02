@@ -232,3 +232,183 @@
 *** SCRIPT START TIME: 01/01/2025 05:54:39 ***
 2025-01-01 05:54:43 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
 2025-01-01 05:54:59 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 52 ***
+*** SCRIPT START TIME: 01/01/2025 05:58:09 ***
+2025-01-01 05:58:11 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 05:58:26 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 53 ***
+*** SCRIPT START TIME: 01/01/2025 15:26:26 ***
+2025-01-01 15:26:29 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 15:26:54 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 54 ***
+*** SCRIPT START TIME: 01/01/2025 15:30:36 ***
+2025-01-01 15:30:39 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 15:30:56 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 55 ***
+*** SCRIPT START TIME: 01/01/2025 15:38:39 ***
+2025-01-01 15:38:41 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 15:38:57 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 56 ***
+*** SCRIPT START TIME: 01/01/2025 15:43:51 ***
+2025-01-01 15:43:53 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 15:44:11 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 57 ***
+*** SCRIPT START TIME: 01/01/2025 15:57:52 ***
+2025-01-01 15:57:54 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 15:58:11 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 58 ***
+*** SCRIPT START TIME: 01/01/2025 20:31:39 ***
+2025-01-01 20:31:42 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 20:32:11 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 59 ***
+*** SCRIPT START TIME: 01/01/2025 20:42:39 ***
+2025-01-01 20:42:42 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 20:43:00 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 60 ***
+*** SCRIPT START TIME: 01/01/2025 20:49:30 ***
+2025-01-01 20:49:33 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 20:49:51 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 61 ***
+*** SCRIPT START TIME: 01/01/2025 21:21:23 ***
+2025-01-01 21:21:26 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 21:21:49 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 62 ***
+*** SCRIPT START TIME: 01/01/2025 22:39:56 ***
+2025-01-01 22:40:01 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 22:40:36 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 63 ***
+*** SCRIPT START TIME: 01/01/2025 22:43:17 ***
+2025-01-01 22:43:19 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 22:43:44 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 64 ***
+*** SCRIPT START TIME: 01/01/2025 22:55:08 ***
+2025-01-01 22:55:12 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 22:55:36 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 65 ***
+*** SCRIPT START TIME: 01/01/2025 22:59:13 ***
+2025-01-01 22:59:15 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 22:59:35 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 66 ***
+*** SCRIPT START TIME: 01/01/2025 23:00:43 ***
+2025-01-01 23:00:46 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 23:01:02 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 67 ***
+*** SCRIPT START TIME: 01/01/2025 23:05:14 ***
+2025-01-01 23:05:16 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 23:05:34 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 68 ***
+*** SCRIPT START TIME: 01/01/2025 23:10:17 ***
+2025-01-01 23:10:21 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-01 23:10:38 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 69 ***
+*** SCRIPT START TIME: 01/02/2025 00:22:23 ***
+2025-01-02 00:22:26 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 00:22:55 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 70 ***
+*** SCRIPT START TIME: 01/02/2025 00:32:36 ***
+2025-01-02 00:32:39 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 00:32:57 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 71 ***
+*** SCRIPT START TIME: 01/02/2025 00:41:23 ***
+2025-01-02 00:41:26 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 00:41:46 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 72 ***
+*** SCRIPT START TIME: 01/02/2025 00:43:02 ***
+2025-01-02 00:43:04 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 00:43:21 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 73 ***
+*** SCRIPT START TIME: 01/02/2025 00:54:08 ***
+2025-01-02 00:54:12 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 00:54:31 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 74 ***
+*** SCRIPT START TIME: 01/02/2025 00:55:01 ***
+2025-01-02 00:55:04 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 00:55:27 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 75 ***
+*** SCRIPT START TIME: 01/02/2025 01:05:03 ***
+2025-01-02 01:05:07 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:05:26 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 76 ***
+*** SCRIPT START TIME: 01/02/2025 01:05:58 ***
+2025-01-02 01:06:00 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:06:20 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 77 ***
+*** SCRIPT START TIME: 01/02/2025 01:08:09 ***
+2025-01-02 01:08:12 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:08:32 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 78 ***
+*** SCRIPT START TIME: 01/02/2025 01:09:43 ***
+2025-01-02 01:09:45 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:10:16 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 79 ***
+*** SCRIPT START TIME: 01/02/2025 01:14:42 ***
+2025-01-02 01:14:45 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:15:05 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 80 ***
+*** SCRIPT START TIME: 01/02/2025 01:16:51 ***
+2025-01-02 01:16:54 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:17:11 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 81 ***
+*** SCRIPT START TIME: 01/02/2025 01:20:25 ***
+2025-01-02 01:20:28 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:20:46 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 82 ***
+*** SCRIPT START TIME: 01/02/2025 01:23:07 ***
+2025-01-02 01:23:09 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:23:25 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 83 ***
+*** SCRIPT START TIME: 01/02/2025 01:30:25 ***
+2025-01-02 01:30:28 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:30:45 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 84 ***
+*** SCRIPT START TIME: 01/02/2025 01:32:29 ***
+2025-01-02 01:32:33 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:32:48 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 85 ***
+*** SCRIPT START TIME: 01/02/2025 01:43:15 ***
+2025-01-02 01:43:19 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:43:38 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 86 ***
+*** SCRIPT START TIME: 01/02/2025 01:52:38 ***
+2025-01-02 01:52:42 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:53:00 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 87 ***
+*** SCRIPT START TIME: 01/02/2025 01:56:55 ***
+2025-01-02 01:56:57 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 01:57:13 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 88 ***
+*** SCRIPT START TIME: 01/02/2025 02:01:23 ***
+2025-01-02 02:01:26 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 02:01:43 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 89 ***
+*** SCRIPT START TIME: 01/02/2025 02:04:55 ***
+2025-01-02 02:04:58 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 02:05:22 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 90 ***
+*** SCRIPT START TIME: 01/02/2025 02:08:48 ***
+2025-01-02 02:08:50 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 02:09:10 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 91 ***
+*** SCRIPT START TIME: 01/02/2025 02:22:11 ***
+2025-01-02 02:22:14 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 02:22:33 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 92 ***
+*** SCRIPT START TIME: 01/02/2025 02:25:43 ***
+2025-01-02 02:25:46 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 02:26:01 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 93 ***
+*** SCRIPT START TIME: 01/02/2025 02:29:16 ***
+2025-01-02 02:29:18 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 02:29:36 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 94 ***
+*** SCRIPT START TIME: 01/02/2025 02:52:26 ***
+2025-01-02 02:52:29 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 02:52:56 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 95 ***
+*** SCRIPT START TIME: 01/02/2025 03:08:22 ***
+2025-01-02 03:08:25 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 03:08:42 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 96 ***
+*** SCRIPT START TIME: 01/02/2025 03:10:03 ***
+2025-01-02 03:10:06 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-02 03:10:28 - Web app 'app-copilot-demo-003' deployed successfully.

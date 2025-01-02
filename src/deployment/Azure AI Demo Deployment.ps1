@@ -3164,10 +3164,14 @@ function Reset-DeploymentPath {
         Set-Location ../
         $currentLocation = Get-Location
         $currentDirectory = Split-Path $currentLocation.Path -Leaf
+
+        Write-Host "Current location is: $currentLocation.Path"
     } while (
         $currentDirectory -ne "deployment"
     )
     
+    Write-Host "Deployment path reset to: $currentLocation.Path"
+
     return $currentLocation.Path
 
 }
