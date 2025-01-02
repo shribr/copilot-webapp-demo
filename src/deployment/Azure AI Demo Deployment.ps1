@@ -3165,12 +3165,12 @@ function Reset-DeploymentPath {
         $currentLocation = Get-Location
         $currentDirectory = Split-Path $currentLocation.Path -Leaf
 
-        Write-Host "Current location is: $currentLocation.Path"
+        Write-Host "Current location is: $currentLocation"
     } while (
         $currentDirectory -ne "deployment"
     )
     
-    Write-Host "Deployment path reset to: $currentLocation.Path"
+    Write-Host "Deployment path reset to: $currentLocation"
 
     return $currentLocation.Path
 
@@ -3570,8 +3570,6 @@ function Start-Deployment {
 
     $resourceGroupName = $global:resourceGroupName
 
-    $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
-
     if ($appendUniqueSuffix -eq $true) {
         $resourceGroupName = "$resourceGroupName$resourceSuffix"
     }
@@ -3595,6 +3593,8 @@ function Start-Deployment {
 
     #return 
     
+    $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
+
     if ($global:appDeploymentOnly -eq $true) {
         # Deploy web app and function app services
         foreach ($appService in $appServices) {

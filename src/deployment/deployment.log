@@ -444,3 +444,9 @@
 *** SCRIPT START TIME: 01/02/2025 17:20:55 ***
 2025-01-02 17:20:59 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
 2025-01-02 17:21:32 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 105 ***
+*** SCRIPT START TIME: 01/02/2025 17:38:15 ***
+2025-01-02 17:38:23 - Resource group 'RG-COPILOT-DEMO-005' created successfully. [1]
+2025-01-02 17:38:26 - App 'app-copilot-demo-005' does not exist. Please create the app before deploying.
+*** LOG SEQUENCE: 106 ***
+*** SCRIPT START TIME: 01/02/2025 17:39:49 ***
