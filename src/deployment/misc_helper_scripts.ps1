@@ -39,29 +39,6 @@ $unusedCssDefinitions = @(
     ".mud-disabled .mud-svg-icon",
     ".mud-disabled .mud-icon-default"
 )
-
-function Remove-Unused-Css-Definitions() {
-    param (
-        [string]$cssFilePath,
-        [string[]]$unusedCssDefinitions
-    )
-
-    # Read the content of the CSS file
-    $cssContent = Get-Content -Path $cssFilePath -Raw
-
-    # Loop through each unused CSS definition and remove it from the content
-    foreach ($definition in $unusedCssDefinitions) {
-        # Create a regex pattern to match the CSS definition and its content
-        $pattern = [regex]::Escape($definition) + "\s*\{[^}]*\}"
-        $cssContent = [regex]::Replace($cssContent, $pattern, "", [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-    }
-
-    # Write the updated content back to the CSS file
-    Set-Content -Path $cssFilePath -Value $cssContent
-
-    Write-Output "Unused CSS definitions have been removed."
-}
-
 #####################################################################################################################
 
 function Find-Mud-Css-Definitions-In-File() {
@@ -233,7 +210,7 @@ function Find-Css-Definitions-With-Underscore {
 
 function Replace-Underscores-In-File() {
     param (
-        [string]$filePathToProcess
+        [string]$filePathToProcess = $global:cssFilePath1
     )
 
     if (-Not (Test-Path $filePathToProcess)) {
@@ -241,7 +218,7 @@ function Replace-Underscores-In-File() {
         return
     }
 
-    $results = Find-Css-Definitions-With-Underscore -filePath $global:cssFilePath2
+    $results = Find-Css-Definitions-With-Underscore -filePath $filePathToProcess
 
     if ($results.Count -eq 0) {
         Write-Output "No definitions containing an underscore were found."
@@ -332,3 +309,212 @@ function Remove-Duplicate-Css-Definitions() {
 
     Write-Output "Duplicate CSS definitions removed."
 }
+
+function Add-Missing-Fields {
+    param (
+        [PSCustomObject]$source,
+        [ref]$target
+    )
+
+    foreach ($property in $source.PSObject.Properties) {
+        Write-Output "Processing property: $($property.Name)"
+        if (-not $target.Value.PSObject.Properties.Match($property.Name)) {
+            if ($property.Value -is [PSCustomObject]) {
+                $target.Value | Add-Member -MemberType NoteProperty -Name $property.Name -Value ([PSCustomObject]@{})
+            }
+            elseif ($property.Value -is [System.Collections.IEnumerable] -and -not ($property.Value -is [string])) {
+                $target.Value | Add-Member -MemberType NoteProperty -Name $property.Name -Value @()
+            }
+            else {
+                $target.Value | Add-Member -MemberType NoteProperty -Name $property.Name -Value $null
+            }
+        }
+
+        if ($property.Value -is [PSCustomObject]) {
+            if (-not $target.Value.$($property.Name)) {
+                $target.Value.$($property.Name) = [PSCustomObject]@{}
+            }
+            Add-Missing-Fields $property.Value ([ref]$target.Value.$($property.Name))
+        }
+        elseif ($property.Value -is [System.Collections.IEnumerable] -and -not ($property.Value -is [string])) {
+            if (-not $target.Value.$($property.Name)) {
+                $target.Value.$($property.Name) = @()
+            }
+            for ($i = 0; $i -lt $property.Value.Count; $i++) {
+                if ($property.Value[$i] -is [PSCustomObject]) {
+                    if ($i -ge $target.Value.$($property.Name).Count) {
+                        $target.Value.$($property.Name) += [PSCustomObject]@{}
+                    }
+                    Add-Missing-Fields $property.Value[$i] ([ref]$target.Value.$($property.Name)[$i])
+                }
+                else {
+                    if ($i -ge $target.Value.$($property.Name).Count) {
+                        $target.Value.$($property.Name) += $property.Value[$i]
+                    }
+                }
+            }
+        }
+        else {
+            $target.Value.$($property.Name) = $property.Value
+        }
+    }
+}
+
+function Update-Json-Fields {
+    param (
+        [string]$sourceJsonFilePath,
+        [string]$targetJsonFilePath
+    )
+
+    if (-Not (Test-Path $sourceJsonFilePath)) {
+        Write-Error "Source file not found: $sourceJsonFilePath"
+        return
+    }
+
+    if (-Not (Test-Path $targetJsonFilePath)) {
+        Write-Error "Target file not found: $targetJsonFilePath"
+        return
+    }
+
+    # Read the content of the JSON files
+    $sourceJsonContent = Get-Content -Path $sourceJsonFilePath -Raw | ConvertFrom-Json
+    $targetJsonContent = Get-Content -Path $targetJsonFilePath -Raw | ConvertFrom-Json
+
+    Add-Missing-Fields $sourceJsonContent ([ref]$targetJsonContent)
+
+    # Convert the updated target JSON content back to JSON format
+    $updatedTargetJsonContent = $targetJsonContent | ConvertTo-Json -Depth 10
+
+    # Write the updated JSON content back to the target file
+    Set-Content -Path $targetJsonFilePath -Value $updatedTargetJsonContent
+
+    Write-Output "Target JSON file updated with missing fields from source JSON file."
+}
+function Get-SelectorsFromCss {
+    param (
+        [string]$cssFilePath
+    )
+
+    if (-Not (Test-Path $cssFilePath)) {
+        Write-Error "CSS file not found: $cssFilePath"
+        return @()
+    }
+
+    $cssContent = Get-Content -Path $cssFilePath -Raw
+    $regex = [regex]::Matches($cssContent, '(?<!#)\.([a-zA-Z_-][a-zA-Z0-9_-]*)\s*\{|(?<!#)\#([a-zA-Z_-][a-zA-Z0-9_-]*)\s*\{')
+    $selectors = $regex | ForEach-Object {
+        if ($_.Groups[1].Value) {
+            $_.Groups[1].Value
+        }
+        elseif ($_.Groups[2].Value) {
+            $_.Groups[2].Value
+        }
+    }
+
+    return $selectors
+}
+
+function Get-SelectorsFromHtmlJs {
+    param (
+        [string[]]$filePaths
+    )
+
+    $selectors = @()
+
+    foreach ($filePath in $filePaths) {
+        if (-Not (Test-Path $filePath)) {
+            Write-Error "File not found: $filePath"
+            continue
+        }
+
+        $content = Get-Content -Path $filePath -Raw
+        $regex = [regex]::Matches($content, '\b([a-zA-Z_-][a-zA-Z0-9_-]*)\b')
+        $selectors += $regex | ForEach-Object {
+            $_.Groups[1].Value
+        }
+    }
+
+    return $selectors
+}
+
+function Verify-Selectors {
+    param (
+        [string[]]$selectors,
+        [string[]]$htmlJsFilePaths
+    )
+
+    $usedSelectors = Get-SelectorsFromHtmlJs -filePaths $htmlJsFilePaths
+    $verifiedUnusedSelectors = $selectors | Where-Object { $_ -notin $usedSelectors }
+
+    return $verifiedUnusedSelectors
+}
+
+function Find-UnusedCssDefinitions {
+    param (
+        [string]$cssFilePath,
+        [string[]]$htmlJsFilePaths
+    )
+
+    $cssSelectors = Get-SelectorsFromCss -cssFilePath $cssFilePath
+    $usedSelectors = Get-SelectorsFromHtmlJs -filePaths $htmlJsFilePaths
+
+    $unusedSelectors = $cssSelectors | Where-Object { $_ -notin $usedSelectors }
+
+    if ($unusedSelectors.Count -eq 0) {
+        Write-Output "No unused CSS definitions found."
+    }
+    else {
+        Write-Output "Initial unused CSS definitions found:"
+        $unusedSelectors | ForEach-Object { Write-Output $_ }
+
+        # Verify the unused selectors
+        $verifiedUnusedSelectors = Verify-Selectors -selectors $unusedSelectors -htmlJsFilePaths $htmlJsFilePaths
+
+        if ($verifiedUnusedSelectors.Count -eq 0) {
+            Write-Output "No unused CSS definitions found after verification."
+        }
+        else {
+            $classSelectors = $verifiedUnusedSelectors | Where-Object { $_ -notmatch '^#' } | Sort-Object
+            $idSelectors = $verifiedUnusedSelectors | Where-Object { $_ -match '^#' } | Sort-Object
+
+            Write-Output "Verified unused CSS definitions found:"
+            Write-Output "Class Selectors (Total: $($classSelectors.Count)):"
+            $classSelectors | ForEach-Object { Write-Output $_ }
+
+            Write-Output "ID Selectors (Total: $($idSelectors.Count)):"
+            $idSelectors | ForEach-Object { Write-Output $_ }
+
+            # Call the Remove-Unused-Css-Definitions function
+            Remove-Unused-Css-Definitions -cssFilePath $cssFilePath -unusedCssDefinitions $verifiedUnusedSelectors
+        }
+    }
+}
+
+function Remove-Unused-Css-Definitions {
+    param (
+        [string]$cssFilePath,
+        [string[]]$unusedCssDefinitions
+    )
+
+    # Read the content of the CSS file
+    $cssContent = Get-Content -Path $cssFilePath -Raw
+
+    # Loop through each unused CSS definition and remove it from the content
+    foreach ($definition in $unusedCssDefinitions) {
+        # Create a regex pattern to match the CSS definition and its content
+        $pattern = "(\.|#)" + [regex]::Escape($definition) + "\s*\{[^}]*\}"
+        $cssContent = [regex]::Replace($cssContent, $pattern, "", [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+    }
+
+    # Write the updated content back to the CSS file
+    Set-Content -Path $cssFilePath -Value $cssContent
+
+    Write-Output "Unused CSS definitions have been removed."
+}
+
+# Example usage
+$cssFilePath = $global:cssFilePath1
+$htmlJsFilePaths = @($global:jsFilePath, $global:htmlFilePath)
+Find-UnusedCssDefinitions -cssFilePath $cssFilePath -htmlJsFilePaths $htmlJsFilePaths
+
+#Update-Json-Fields -sourceJsonFilePath "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/parameters.json" -targetJsonFilePath "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/parameters.backup.json"
