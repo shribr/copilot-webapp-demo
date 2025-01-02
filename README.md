@@ -4,7 +4,7 @@
 
 This project is a web application that allows users to chat with Azure Copilot. It includes a simple HTML interface and a PowerShell script for deployment.
 
-<img width="1423" alt="azure-ai-demo-home" src="src/deployment/app/frontend/images/azure-ai-demo-home.png">
+<img width="1423" alt="azure-ai-demo-home" src="images/azure-ai-demo-home.png">
 
 ## Prerequisites
 
@@ -138,7 +138,7 @@ Once the deployment script completes the following resources should have been cr
 
 The image below shows a diagram of the deployed resources:
 
-<img width="1423" alt="azure-ai-demo-resource-visualizer" src="src/deployment/app/frontend/images/azure-ai-demo-resource-visualizer.png">
+<img width="1423" alt="azure-ai-demo-resource-visualizer" src="images/azure-ai-demo-resource-visualizer.png">
 
 ### Workflow of the Script
 
@@ -157,6 +157,7 @@ The image below shows a diagram of the deployed resources:
 3. **Resource Creation Functions:**
 
    - The script defines multiple functions to create various Azure resources, such as:
+
      - `New-AIHub`: Creates AI Hub and AI Model.
      - `New-AIService`: Creates AI service.
      - `New-ApiManagementService`: - Creates new Api Management service.
@@ -374,19 +375,19 @@ This architecture ensures a robust, scalable, and maintainable web application l
 
 The index.html file includes the following screens:
 
-<img width="1423" alt="azure-ai-demo-home" src="src/deployment/app/frontend/images/azure-ai-demo-home.png">
+<img width="1423" alt="azure-ai-demo-home" src="images/azure-ai-demo-home.png">
 
-<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/app/frontend/images/azure-ai-demo-upload-docs.png">
+<img width="1423" alt="azure-ai-demo-upload-docs" src="images/azure-ai-demo-upload-docs.png">
 
-<img width="1410" alt="azure-ai-demo-chat" src="src/deployment/app/frontend/images/azure-ai-demo-chat.png">
+<img width="1410" alt="azure-ai-demo-chat" src="images/azure-ai-demo-chat.png">
 
-<img width="1409" alt="azure-ai-demo-response" src="src/deployment/app/frontend/images/azure-ai-demo-response.png">
+<img width="1409" alt="azure-ai-demo-response" src="images/azure-ai-demo-response.png">
 
-<img width="1879" alt="azure-ai-demo-settings" src="src/deployment/app/frontend/images/azure-ai-demo-settings.png">
+<img width="1879" alt="azure-ai-demo-settings" src="images/azure-ai-demo-settings.png">
 
-<img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/app/frontend/images/azure-ai-demo-selected-docs.png">
+<img width="1153" alt="azure-ai-demo-selected-docs" src="images/azure-ai-demo-selected-docs.png">
 
-<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/app/frontend/images/azure-ai-demo-existing-docs.png">
+<img width="1164" alt="azure-ai-demo-existing-docs" src="images/azure-ai-demo-existing-docs.png">
 
 ### Chat Workflow
 
@@ -405,7 +406,7 @@ There are several manual steps which need to be performed for a variety of reaso
    - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. <sup>[5](#search_service_index_vectorizer_multi_service_account)</sup>
 3. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
 4. **Azure AI Project / Machine Learning Workspace:**
-   <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/app/frontend/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+   <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
 
@@ -438,22 +439,28 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 ### Image Reference
 
 #### Storage Service CORS
-<img id="storage_service_cors" width="600" alt="Setting CORS" src="src/deployment/app/frontend/images/azure-ai-demo-storage-cors-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="storage_service_cors" width="600" alt="Setting CORS" src="images/azure-ai-demo-storage-cors-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 #### Search Service Index CORS
-<img id="search_service_index_cors" width="600" alt="Search Index CORS Config" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="search_service_index_cors" width="600" alt="Search Index CORS Config" src="images/azure-ai-demo-search-index-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 #### Search Service Index Vectorizer Api-Key Redacted
-<img id="search_service_index_redacted_api_key" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-apikey-redacted.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="search_service_index_redacted_api_key" width="600" alt="Multi-Service Account" src="images/azure-ai-demo-search-index-apikey-redacted.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 #### Search Service Datasource Managed Identity
-<img id="search_service_datasource_managed_identity" width="600" alt="Managed Identity" src="src/deployment/app/frontend/images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="search_service_datasource_managed_identity" width="600" alt="Managed Identity" src="images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 #### Search Service Skillset Connect to AI Service
-<img id="search_service_skillset_connect_ai_service" width="600" alt="Managed Identity" src="src/deployment/app/frontend/images/azure-ai-demo-search-skillset-connect-ai-service.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="search_service_skillset_connect_ai_service" width="600" alt="Managed Identity" src="images/azure-ai-demo-search-skillset-connect-ai-service.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 #### Search Service Index Vectorizer Multi-Service Account
-<img id="search_service_index_vectorizer_multi_service_account" width="600" alt="Multi-Service Account" src="src/deployment/app/frontend/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="search_service_index_vectorizer_multi_service_account" width="600" alt="Multi-Service Account" src="images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 ### Contributing
 

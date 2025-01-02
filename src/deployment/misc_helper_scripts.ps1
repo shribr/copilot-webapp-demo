@@ -3,7 +3,7 @@ $global:cssFilePath1 = "/Users/amischreiber/source/repos/copilot-webapp-demo/src
 $global:cssFilePath2 = "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/app/frontend/css/styles_alphabetized.css"
 $global:jsFilePath = "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/app/frontend/scripts/script.js"
 $global:htmlFilePath = "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/app/frontend/index.html"
-
+$global:ConfigFilePath = "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/app/frontendconfig.json"
 # List of unused CSS definitions
 $unusedCssDefinitions = @(
     ".site-logo-custom",
@@ -390,6 +390,7 @@ function Update-Json-Fields {
 
     Write-Output "Target JSON file updated with missing fields from source JSON file."
 }
+
 function Get-SelectorsFromCss {
     param (
         [string]$cssFilePath
@@ -414,9 +415,10 @@ function Get-SelectorsFromCss {
     return $selectors
 }
 
-function Get-SelectorsFromHtmlJs {
+function Get-SelectorsFromHtmlJsJson {
     param (
-        [string[]]$filePaths
+        [string[]]$filePaths,
+        [string]$jsonFilePath
     )
 
     $selectors = @()
@@ -434,16 +436,25 @@ function Get-SelectorsFromHtmlJs {
         }
     }
 
+    if (Test-Path $jsonFilePath) {
+        $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+        $jsonSelectors = $jsonContent | ConvertTo-Json -Depth 10 | Select-String -Pattern '\b([a-zA-Z_-][a-zA-Z0-9_-]*)\b'
+        $jsonSelectors.Matches | ForEach-Object {
+            $selectors += $_.Groups[1].Value
+        }
+    }
+
     return $selectors
 }
 
 function Verify-Selectors {
     param (
         [string[]]$selectors,
-        [string[]]$htmlJsFilePaths
+        [string[]]$htmlJsFilePaths,
+        [string]$jsonFilePath
     )
 
-    $usedSelectors = Get-SelectorsFromHtmlJs -filePaths $htmlJsFilePaths
+    $usedSelectors = Get-SelectorsFromHtmlJsJson -filePaths $htmlJsFilePaths -jsonFilePath $jsonFilePath
     $verifiedUnusedSelectors = $selectors | Where-Object { $_ -notin $usedSelectors }
 
     return $verifiedUnusedSelectors
@@ -452,11 +463,12 @@ function Verify-Selectors {
 function Find-UnusedCssDefinitions {
     param (
         [string]$cssFilePath,
-        [string[]]$htmlJsFilePaths
+        [string[]]$htmlJsFilePaths,
+        [string]$jsonFilePath
     )
 
     $cssSelectors = Get-SelectorsFromCss -cssFilePath $cssFilePath
-    $usedSelectors = Get-SelectorsFromHtmlJs -filePaths $htmlJsFilePaths
+    $usedSelectors = Get-SelectorsFromHtmlJsJson -filePaths $htmlJsFilePaths -jsonFilePath $jsonFilePath
 
     $unusedSelectors = $cssSelectors | Where-Object { $_ -notin $usedSelectors }
 
@@ -468,7 +480,7 @@ function Find-UnusedCssDefinitions {
         $unusedSelectors | ForEach-Object { Write-Output $_ }
 
         # Verify the unused selectors
-        $verifiedUnusedSelectors = Verify-Selectors -selectors $unusedSelectors -htmlJsFilePaths $htmlJsFilePaths
+        $verifiedUnusedSelectors = Verify-Selectors -selectors $unusedSelectors -htmlJsFilePaths $htmlJsFilePaths -jsonFilePath $jsonFilePath
 
         if ($verifiedUnusedSelectors.Count -eq 0) {
             Write-Output "No unused CSS definitions found after verification."
@@ -515,6 +527,7 @@ function Remove-Unused-Css-Definitions {
 # Example usage
 $cssFilePath = $global:cssFilePath1
 $htmlJsFilePaths = @($global:jsFilePath, $global:htmlFilePath)
-Find-UnusedCssDefinitions -cssFilePath $cssFilePath -htmlJsFilePaths $htmlJsFilePaths
+$jsonFilePath = $global:jsonFilePath
+Find-UnusedCssDefinitions -cssFilePath $cssFilePath -htmlJsFilePaths $htmlJsFilePaths -jsonFilePath $jsonFilePath
 
 #Update-Json-Fields -sourceJsonFilePath "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/parameters.json" -targetJsonFilePath "/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/parameters.backup.json"

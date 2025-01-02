@@ -482,7 +482,7 @@ async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, ch
     openAIModelResultsId = `openai-model-results-${answerResponseNumber}`;
 
     if (aiEnhancedAnswers.length > 0) {
-        answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><ol class="ai_enhanced_answer_results">${aiEnhancedAnswers}</ol><br/></div>`;
+        answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><ol class="ai-enhanced-answer-results">${aiEnhancedAnswers}</ol><br/></div>`;
         answerContent.innerHTML += `<div class="answer-source-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div></div>`;
     }
     else {

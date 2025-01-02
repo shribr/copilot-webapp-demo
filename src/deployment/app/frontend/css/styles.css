@@ -57,15 +57,29 @@ code {
   padding: 1px;
 }
 
+.answer-citations {
+  color: rgba(33, 150, 243, 1);
+  background-color: rgba(33, 150, 243, 0.058823529411764705);
+  border-radius: 4px;
+  height: 32px;
+  font-size: 14px;
+  padding: 4px;
+  margin-left: 8px;
+  margin-bottom: 2px;
+  top: 0px;
+}
 
-
-
+.answer-results {
+  padding-bottom: 8px;
+}
 
 .answer-sources {
   font-size: inherit;
 }
 
-
+.answer-sources-container {
+  font-size: inherit;
+}
 
 .bullet-title {
   color: #555;
@@ -99,8 +113,6 @@ code {
   white-space: pre;
   overflow-x: auto;
 }
-
-
 
 .document-cell {
   display: table-cell;
@@ -140,8 +152,6 @@ code {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-
 
 .document-cell-last-modified {
   text-align: left;
@@ -202,8 +212,6 @@ code {
   cursor: pointer;
 }
 
-
-
 .file-size-content {
   align-items: center;
   display: inline-flex;
@@ -249,8 +257,6 @@ code {
   margin-bottom: 5px;
 }
 
-
-
 .form-group-delete-all-threads {
   padding-top: 16px;
   display: flex;
@@ -278,23 +284,24 @@ code {
 .icon-default,
 .icon-svg,
 .icon-svg-nav,
+.icon-svg-mag {
+  overflow: visible;
+  width: 28px;
+  height: 28px;
+}
 
+.icon-svg-mag {
+  fill: white !important;
+}
 
-
+.icon-svg-nav {
+  fill: rgba(13, 12, 52, 1) !important;
+  color: white !important;
+}
 
 .icon-root:focus {
   outline: 0;
 }
-
-
-
-
-
-
-
-
-
-
 
 .links {
   width: 100%;
@@ -319,8 +326,6 @@ code {
   background-color: rgba(13, 12, 52, 1) !important;
   color: white !important;
 }
-
-
 
 .openai-model-results {
   font-size: 16px;
@@ -357,13 +362,9 @@ code {
   transition: transform 0.3s ease-in-out;
 }
 
-
-
 .settings-drawer-overlay-md {
   width: 400px;
 }
-
-
 
 .settings-drawer-pos-right {
   right: 0;
@@ -401,9 +402,7 @@ code {
   z-index: 1060;
 }
 
-.settings-overlay
-
-.settings-overlay .settings-overlay-scrim {
+.settings-overlay .settings-overlay .settings-overlay-scrim {
   top: 0;
   left: 0;
   right: 0;
@@ -471,8 +470,6 @@ code {
   margin-right: 10px;
 }
 
-
-
 .tab {
   cursor: pointer;
   padding: 10px 20px 10px 10px;
@@ -500,6 +497,10 @@ code {
   border-bottom: 1px solid #0d0c34;
   color: white;
   background-color: #0d0c34;
+}
+
+.tab.active svg {
+  fill: white;
 }
 
 .tab-content {
@@ -852,8 +853,6 @@ code {
   cursor: pointer;
 }
 
-
-
 #delete-all-threads-button {
   background-color: firebrick;
   color: white;
@@ -1076,8 +1075,6 @@ code {
   /* Add padding to the placeholder text */
 }
 
-
-
 #home-container {
   background-color: #ffffff;
   border: 1px solid #ddd;
@@ -1227,6 +1224,7 @@ code {
 #settings-overlay {
   display: none;
   z-index: 1000;
+  flex-direction: row;
 }
 
 #settings-overlay-dark {
@@ -1236,11 +1234,13 @@ code {
 
 #supporting-content-results,
 #azure-openai-content-results,
-.ai_enhanced
-
-#content-container,
-#settings-overlay {
-  flex-direction: row;
+.ai-enhanced-answer-results {
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  background-color: white;
+  padding-inline-start: 40px;
+  list-style: disc !important;
+  white-space: break-spaces;
 }
 
 /* Navigation styles */
@@ -1248,8 +1248,6 @@ code {
 #svg-expander {
   cursor: pointer;
 }
-
-
 
 #toolbar .links a {
   color: white;
@@ -1371,10 +1369,6 @@ nav ul li a:hover {
   position: fixed;
 }
 
-#svg-expander {
-  cursor: pointer;
-}
-
 #chat-info {
   margin-bottom: 20px;
   padding: 10px;
@@ -1471,4 +1465,3 @@ nav ul li a:hover {
     opacity: 1;
   }
 }
-
