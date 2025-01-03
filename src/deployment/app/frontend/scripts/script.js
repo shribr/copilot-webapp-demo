@@ -1257,6 +1257,9 @@ async function getChatResponse(questionBubble) {
         try {
             // Process the search results to extract relevant chunks and map them to their respective documents
 
+            // Need to check for errors from Azure OpenAI model
+            if (openAIModelResults.error) { }
+
             //This call to mapAnswersToDocSources is for the raw answers from Azure Search and used to populate the supporting content tab. 
             //It needs to be the same data returned from the Azure Search call above completely untouched.
             //const searchAnswers = docStorageResponse["@search.answers"];
