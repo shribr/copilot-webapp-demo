@@ -137,3 +137,43 @@
 2025-01-03 00:19:40 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
 2025-01-03 00:19:45 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
 2025-01-03 00:19:59 - Config file updated successfully.
+*** LOG SEQUENCE: 10 ***
+*** SCRIPT START TIME: 01/03/2025 00:21:02 ***
+2025-01-03 00:21:03 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-03 00:21:05 - Identity 'id-copilot-demo-003' already exists.
+2025-01-03 00:21:05 - Storage account 'stcopilotdemo003' already exists.
+2025-01-03 00:21:07 - Subnet 'subnet-copilot-demo-003' already exists.
+2025-01-03 00:21:07 - App Service Plan 'asp-copilot-demo-003' already exists.
+2025-01-03 00:21:07 - Cognitive Service 'cog-copilot-demo-003' already exists.
+2025-01-03 00:21:08 - Search Service 'srch-copilot-demo-003' already exists.
+2025-01-03 00:21:11 - Search Index 'srch-index-copilot-demo-003' already exists.
+2025-01-03 00:21:12 - Search Index 'vector-srch-index-copilot-demo-003' already exists.
+2025-01-03 00:21:13 - Search Index 'embeddings-srch-index-copilot-demo-003' already exists.
+2025-01-03 00:21:15 - Search Skill Set 'srch-skillset-copilot-demo-003' already exists.
+2025-01-03 00:21:16 - Search Skill Set 'vector-srch-skillset-copilot-demo-003' already exists.
+2025-01-03 00:21:17 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-003' already exists.
+2025-01-03 00:21:19 - Search Indexer '@{IndexName=srch-index-copilot-demo-003; Name=srch-indexer-copilot-demo-003; Schema=search-indexer-schema.json; SkillSetName=srch-skillset-copilot-demo-003}' already exists.
+2025-01-03 00:21:20 - Search Indexer 'srch-indexer-copilot-demo-003' ran successfully.
+2025-01-03 00:21:21 - Search Indexer '@{IndexName=vector-srch-index-copilot-demo-003; Name=vector-srch-indexer-copilot-demo-003; Schema=vector-search-indexer-schema.json; SkillSetName=vector-srch-skillset-copilot-demo-003}' already exists.
+2025-01-03 00:21:22 - Search Indexer 'vector-srch-indexer-copilot-demo-003' ran successfully.
+2025-01-03 00:21:24 - Search Indexer '@{IndexName=embeddings-srch-index-copilot-demo-003; Name=embeddings-srch-indexer-copilot-demo-003; Schema=embeddings-search-indexer-schema.json; SkillSetName=embeddings-srch-skillset-copilot-demo-003}' already exists.
+2025-01-03 00:21:25 - Search Indexer 'embeddings-srch-indexer-copilot-demo-003' ran successfully.
+2025-01-03 00:21:35 - Log Analytics workspace 'log-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - Application Insights 'appi-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - Azure OpenAI service 'openai-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - Container Registry 'crcopilotdemo003' already exists.
+2025-01-03 00:21:35 - Document Intelligence Service 'docintel-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - Computer Vision Service 'cv-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - Key Vault 'kv-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - AI Hub 'hub-ai-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - AI Service 'ai-service-copilot-demo-003' already exists.
+2025-01-03 00:21:35 - Machine Learning Workspace 'project-ai-copilot-demo-003' already exists.
+2025-01-03 00:21:46 - Model deployment 'gpt-4o' for 'ai-service-copilot-demo-003' already exists.
+2025-01-03 00:21:47 - Model deployment 'text-embedding' for 'ai-service-copilot-demo-003' already exists.
+2025-01-03 00:21:53 - Azure AIService 'ai-service-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2025-01-03 00:21:58 - Azure OpenAIService 'openai-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2025-01-03 00:22:03 - Azure StorageAccount 'stcopilotdemo003' connection for 'hub-ai-copilot-demo-003' already exists.
+2025-01-03 00:22:08 - Azure SearchService 'srch-copilot-demo-003' connection for 'hub-ai-copilot-demo-003' already exists.
+2025-01-03 00:22:19 - Config file updated successfully.
+2025-01-03 00:22:39 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 01 MIN : 36 SEC : 663 MS ***
+
