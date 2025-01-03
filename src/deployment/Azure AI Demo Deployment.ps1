@@ -4328,8 +4328,8 @@ function Update-ConfigFile {
         $searchApiKey = az search admin-key show --resource-group $global:resourceGroupName --service-name $global:searchServiceName --query "primaryKey" --output tsv
         $openAIApiKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $global:openAIAccountName --query "key1" --output tsv
         $aiServiceKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $aiServiceName --query "key1" --output tsv
-        $functionAppKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
-        $functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        #$functionAppKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
+        #$functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
         # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
         $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services btfq --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
@@ -4396,9 +4396,9 @@ function Update-ConfigFile {
         # Update the config with the new key-value pair
         # Update the config with the new key-value pair
         $config.AZURE_AI_SERVICE_API_KEY = $aiServiceKey
-        $config.AZURE_FUNCTION_API_KEY = $functionAppKey
-        $config.AZURE_FUNCTION_APP_NAME = $functionAppName
-        $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
+        #$config.AZURE_FUNCTION_API_KEY = $functionAppKey
+        #$config.AZURE_FUNCTION_APP_NAME = $functionAppName
+        #$config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
         $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
         $config.AZURE_SEARCH_API_KEY = $searchApiKey
