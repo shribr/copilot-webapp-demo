@@ -88,7 +88,7 @@
       "ResourceGroup": "RG-COPILOT-DEMO-003"
     }
   ],
-  "appDeploymentOnly": false,
+  "appDeploymentOnly": true,
   "appInsightsName": "appi-copilot-demo-003",
   "appServiceEnvironmentName": "ase-copilot-demo-003",
   "appServicePlanName": "asp-copilot-demo-003",

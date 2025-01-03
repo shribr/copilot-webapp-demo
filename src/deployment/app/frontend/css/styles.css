@@ -470,6 +470,10 @@ code {
   margin-right: 10px;
 }
 
+.supporting-content-link {
+  color: rgba(33, 150, 243, 1) !important;
+}
+
 .tab {
   cursor: pointer;
   padding: 10px 20px 10px 10px;

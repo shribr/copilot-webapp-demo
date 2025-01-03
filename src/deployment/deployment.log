@@ -177,3 +177,7 @@
 2025-01-03 00:22:19 - Config file updated successfully.
 2025-01-03 00:22:39 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 01 MIN : 36 SEC : 663 MS ***
 
+*** LOG SEQUENCE: 11 ***
+*** SCRIPT START TIME: 01/03/2025 00:35:57 ***
+2025-01-03 00:35:58 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-03 00:36:16 - Web app 'app-copilot-demo-003' deployed successfully.
