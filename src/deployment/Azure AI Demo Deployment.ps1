@@ -2965,7 +2965,11 @@ function New-SearchSkillSet {
 
         $skillSetUrl = "https://$searchServiceName.search.windows.net/skillsets?api-version=$global:searchServiceAPiVersion"
 
+        # Update the skillset file with the correct resource base name
+        Update-SearchSkillSetFiles
+
         $fileContent = Get-Content -Path $searchSkillSet.File -Raw
+
         $updatedContent = $fileContent -replace $previousResourceBaseName, $resourceBaseName
         Set-Content -Path $searchSkillSet.File -Value $updatedContent
 
@@ -3843,6 +3847,7 @@ function Test-DirectoryExists {
     param (
         [string]$directoryPath
     )
+
     if (-not (Test-Path -Path $directoryPath -PathType Container)) {
         New-Item -ItemType Directory -Path $directoryPath
     }
@@ -4276,6 +4281,22 @@ function Update-SearchIndexFiles {
         $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
+    }
+}
+
+# Function to update search skill set files
+function Update-SearchSkillSetFiles {
+    $resourceBaseName = $global:resourceBaseName
+
+    $searchSkillSetFiles = $global:searchSkillSets
+
+    foreach ($searchSkillSetFile in $searchSkillSetFiles) {
+
+        $content = Get-Content -Path $searchSkillSetFile
+
+        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
+
+        Set-Content -Path $searchSkillSetFile -Value $updatedContent
     }
 }
 

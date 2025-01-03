@@ -88,7 +88,7 @@
       "ResourceGroup": "RG-COPILOT-DEMO-005"
     }
   ],
-  "appDeploymentOnly": true,
+  "appDeploymentOnly": false,
   "appInsightsName": "appi-copilot-demo-005",
   "appServiceEnvironmentName": "ase-copilot-demo-005",
   "appServicePlanName": "asp-copilot-demo-005",
@@ -301,7 +301,7 @@
     "Website": "https://www.contoso.com"
   },
   "portalDashboardName": "portaldash-copilot-demo-005",
-  "previousResourceBaseName": "copilot-demo-003",
+  "previousResourceBaseName": "copilot-demo-004",
   "privateEndpoints": [
     {
       "Location": "east us",

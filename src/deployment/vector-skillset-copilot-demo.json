@@ -1,133 +1,16 @@
 {
-  "name": "vector-srch-skillset-copilot-demo-004",
-  "description": "Skillset to chunk documents for vectorization.",
-  "skills": [
-    {
-      "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
-      "name": "#1",
-      "context": "/document/normalized_images/*",
-      "inputs": [
-        {
-          "name": "image",
-          "source": "/document/normalized_images/*",
-          "inputs": []
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text",
-          "targetName": "text"
-        }
-      ],
-      "defaultLanguageCode": "en",
-      "detectOrientation": true,
-      "lineEnding": "Space"
-    },
-    {
-      "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
-      "name": "#2",
-      "context": "/document",
-      "inputs": [
-        {
-          "name": "text",
-          "source": "/document/content",
-          "inputs": []
-        },
-        {
-          "name": "itemsToInsert",
-          "source": "/document/normalized_images/*/text",
-          "inputs": []
-        },
-        {
-          "name": "offsets",
-          "source": "/document/normalized_images/*/contentOffset",
-          "inputs": []
-        }
-      ],
-      "outputs": [
-        {
-          "name": "mergedText",
-          "targetName": "mergedText"
-        }
-      ],
-      "insertPreTag": " ",
-      "insertPostTag": " "
-    },
-    {
-      "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
-      "name": "#3",
-      "description": "Split skill to chunk documents",
-      "context": "/document",
-      "inputs": [
-        {
-          "name": "text",
-          "source": "/document/mergedText",
-          "inputs": []
-        }
-      ],
-      "outputs": [
-        {
-          "name": "textItems",
-          "targetName": "pages"
-        }
-      ],
-      "defaultLanguageCode": "en",
-      "textSplitMode": "pages",
-      "maximumPageLength": 2000,
-      "pageOverlapLength": 500
-    },
-    {
-      "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
-      "name": "#4",
-      "description": "An AI Services Vision vectorization skill for text",
-      "context": "/document/pages/*",
-      "inputs": [
-        {
-          "name": "text",
-          "source": "/document/pages/*",
-          "inputs": []
-        }
-      ],
-      "outputs": [
-        {
-          "name": "vector",
-          "targetName": "text_vector"
-        }
-      ],
-      "modelVersion": "2023-04-15"
-    },
-    {
-      "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
-      "name": "#5",
-      "description": "An AI Services Vision vectorization skill for images",
-      "context": "/document/normalized_images/*",
-      "inputs": [
-        {
-          "name": "image",
-          "source": "/document/normalized_images/*",
-          "inputs": []
-        }
-      ],
-      "outputs": [
-        {
-          "name": "vector",
-          "targetName": "image_vector"
-        }
-      ],
-      "modelVersion": "2023-04-15"
-    }
-  ],
-  "cognitiveServices": {
-    "key": "3992cc75d2ae4325bacf1d07301e897f",
-    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
-  },
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
+  "cognitiveServices": {
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
+    "key": "cb757e129a6046e482b7b18eb5a5c4d9"
+  },
+  "description": "Skillset to chunk documents for vectorization.",
   "indexProjections": {
+    "parameters": {
+      "projectionMode": "skipIndexingParentDocuments"
+    },
     "selectors": [
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-004",
-        "parentKeyFieldName": "text_parent_id",
-        "sourceContext": "/document/pages/*",
         "mappings": [
           {
             "name": "text_vector",
@@ -145,12 +28,12 @@
             "name": "title",
             "source": "/document/title"
           }
-        ]
+        ],
+        "parentKeyFieldName": "text_parent_id",
+        "sourceContext": "/document/pages/*",
+        "targetIndexName": "vector-srch-index-copilot-demo-005"
       },
       {
-        "targetIndexName": "vector-srch-index-copilot-demo-004",
-        "parentKeyFieldName": "image_parent_id",
-        "sourceContext": "/document/normalized_images/*",
         "mappings": [
           {
             "name": "image_vector",
@@ -164,11 +47,128 @@
             "name": "title",
             "source": "/document/title"
           }
-        ]
+        ],
+        "parentKeyFieldName": "image_parent_id",
+        "sourceContext": "/document/normalized_images/*",
+        "targetIndexName": "vector-srch-index-copilot-demo-005"
       }
-    ],
-    "parameters": {
-      "projectionMode": "skipIndexingParentDocuments"
+    ]
+  },
+  "name": "vector-srch-skillset-copilot-demo-005",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
+      "context": "/document/normalized_images/*",
+      "defaultLanguageCode": "en",
+      "detectOrientation": true,
+      "inputs": [
+        {
+          "inputs": [],
+          "name": "image",
+          "source": "/document/normalized_images/*"
+        }
+      ],
+      "lineEnding": "Space",
+      "name": "#1",
+      "outputs": [
+        {
+          "name": "text",
+          "targetName": "text"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
+      "context": "/document",
+      "inputs": [
+        {
+          "inputs": [],
+          "name": "text",
+          "source": "/document/content"
+        },
+        {
+          "inputs": [],
+          "name": "itemsToInsert",
+          "source": "/document/normalized_images/*/text"
+        },
+        {
+          "inputs": [],
+          "name": "offsets",
+          "source": "/document/normalized_images/*/contentOffset"
+        }
+      ],
+      "insertPostTag": " ",
+      "insertPreTag": " ",
+      "name": "#2",
+      "outputs": [
+        {
+          "name": "mergedText",
+          "targetName": "mergedText"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+      "context": "/document",
+      "defaultLanguageCode": "en",
+      "description": "Split skill to chunk documents",
+      "inputs": [
+        {
+          "inputs": [],
+          "name": "text",
+          "source": "/document/mergedText"
+        }
+      ],
+      "maximumPageLength": 2000,
+      "name": "#3",
+      "outputs": [
+        {
+          "name": "textItems",
+          "targetName": "pages"
+        }
+      ],
+      "pageOverlapLength": 500,
+      "textSplitMode": "pages"
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
+      "context": "/document/pages/*",
+      "description": "An AI Services Vision vectorization skill for text",
+      "inputs": [
+        {
+          "inputs": [],
+          "name": "text",
+          "source": "/document/pages/*"
+        }
+      ],
+      "modelVersion": "2023-04-15",
+      "name": "#4",
+      "outputs": [
+        {
+          "name": "vector",
+          "targetName": "text_vector"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Vision.VectorizeSkill",
+      "context": "/document/normalized_images/*",
+      "description": "An AI Services Vision vectorization skill for images",
+      "inputs": [
+        {
+          "inputs": [],
+          "name": "image",
+          "source": "/document/normalized_images/*"
+        }
+      ],
+      "modelVersion": "2023-04-15",
+      "name": "#5",
+      "outputs": [
+        {
+          "name": "vector",
+          "targetName": "image_vector"
+        }
+      ]
     }
-  }
+  ]
 }

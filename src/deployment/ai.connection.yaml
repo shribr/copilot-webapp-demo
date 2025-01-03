@@ -1,5 +1,5 @@
-name: ai-service-copilot-demo-004
+name: ai-service-copilot-demo-005
 type: "azure_ai_services"
-endpoint: https://ai-service-copilot-demo-004.cognitiveservices.azure.com
-api_key: 039793b5277e40e787c7431baffb93de
-ai_services_resource_id: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-004/providers/Microsoft.CognitiveServices/accounts/ai-service-copilot-demo-004
+endpoint: https://ai-service-copilot-demo-005.cognitiveservices.azure.com
+api_key: 3a6e4b9431d94f4eabe2c2b9dd0341eb
+ai_services_resource_id: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-005/providers/Microsoft.CognitiveServices/accounts/ai-service-copilot-demo-005
