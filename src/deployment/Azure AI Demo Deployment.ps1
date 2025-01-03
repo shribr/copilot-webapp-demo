@@ -1386,7 +1386,7 @@ function New-AppService {
                 Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath $global:LogFilePath
             }
 
-            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -deployZipResources $deployZipResources -appService $appService -deployZipPackage $deployZipPackage
+            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -deployZipResources $deployZipResources -deployZipPackage $deployZipPackage
         }
         catch {
             Write-Error "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -4293,15 +4293,13 @@ function Update-SearchIndexFiles {
 function Update-SearchSkillSetFiles {
     $resourceBaseName = $global:resourceBaseName
 
-    $searchSkillSetFiles = $global:searchSkillSets
+    foreach ($searchSkillSet in $searchSkillSets) {
 
-    foreach ($searchSkillSetFile in $searchSkillSetFiles) {
-
-        $content = Get-Content -Path $searchSkillSetFile
+        $content = Get-Content -Path $searchSkillSet.File
 
         $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
 
-        Set-Content -Path $searchSkillSetFile -Value $updatedContent
+        Set-Content -Path $searchSkillSet.File -Value $updatedContent
     }
 }
 

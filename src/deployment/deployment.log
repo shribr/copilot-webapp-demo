@@ -49,3 +49,56 @@
 2025-01-03 01:06:18 - Subnet 'subnet-copilot-demo-001' already exists.
 2025-01-03 01:06:18 - App Service Plan 'asp-copilot-demo-001' already exists.
 2025-01-03 01:06:18 - Cognitive Service 'cog-copilot-demo-001' already exists.
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 01/03/2025 01:10:01 ***
+2025-01-03 01:10:09 - Resource group 'RG-COPILOT-DEMO-002' created successfully. [1]
+2025-01-03 01:10:14 - User Assigned Identity 'id-copilot-demo-002' created successfully. [2]
+2025-01-03 01:10:31 - Service principal created for identity 'id-copilot-demo-002'.
+2025-01-03 01:10:49 - User 'id-copilot-demo-002' assigned to role: 'Contributor'.
+2025-01-03 01:10:51 - User 'id-copilot-demo-002' assigned to role: 'Cognitive Services OpenAI User'.
+2025-01-03 01:10:54 - User 'id-copilot-demo-002' assigned to role: 'Search Index Data Reader'.
+2025-01-03 01:10:57 - User 'id-copilot-demo-002' assigned to role: 'Storage Blob Data Reader'.
+2025-01-03 01:11:21 - Storage account 'stcopilotdemo002' created successfully. [3]
+2025-01-03 01:11:45 - Virtual Network 'vnet-copilot-demo-002' created successfully. [4]
+2025-01-03 01:11:50 - Subnet 'subnet-copilot-demo-002' created successfully.
+2025-01-03 01:12:03 - App Service Plan 'asp-copilot-demo-002' created successfully. [5]
+2025-01-03 01:12:08 - Cognitive Service 'cog-copilot-demo-002' restored successfully. [6]
+2025-01-03 01:13:05 - Search Service 'srch-copilot-demo-002' created successfully. [7]
+2025-01-03 01:13:11 - Datasource 'srch-datasource-copilot-demo-002' created successfully.
+2025-01-03 01:13:16 - Index 'srch-index-copilot-demo-002' created successfully.
+2025-01-03 01:13:19 - Index 'vector-srch-index-copilot-demo-002' created successfully.
+2025-01-03 01:13:23 - Index 'embeddings-srch-index-copilot-demo-002' created successfully.
+2025-01-03 01:13:57 - Failed to create Search Service 'srch-copilot-demo-002': (Line 2769) : Failed to create skillset 'srch-skillset-copilot-demo-002': (Line 4300) : Cannot find path '/Users/amischreiber/source/repos/copilot-webapp-demo/src/deployment/@{File=srch-skillset-copilot-demo.json; Schema=}' because it does not exist.
+2025-01-03 01:14:00 - Search Index 'srch-index-copilot-demo-002' already exists.
+2025-01-03 01:14:01 - Search Index 'vector-srch-index-copilot-demo-002' already exists.
+2025-01-03 01:14:02 - Search Index 'embeddings-srch-index-copilot-demo-002' already exists.
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 01/03/2025 01:17:08 ***
+2025-01-03 01:17:09 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-03 01:17:10 - Identity 'id-copilot-demo-002' already exists.
+2025-01-03 01:17:10 - Storage account 'stcopilotdemo002' already exists.
+2025-01-03 01:17:13 - Subnet 'subnet-copilot-demo-002' already exists.
+2025-01-03 01:17:13 - App Service Plan 'asp-copilot-demo-002' already exists.
+2025-01-03 01:17:13 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2025-01-03 01:17:14 - Search Service 'srch-copilot-demo-002' already exists.
+2025-01-03 01:17:17 - Search Index 'srch-index-copilot-demo-002' already exists.
+2025-01-03 01:17:18 - Search Index 'vector-srch-index-copilot-demo-002' already exists.
+2025-01-03 01:17:20 - Search Index 'embeddings-srch-index-copilot-demo-002' already exists.
+2025-01-03 01:18:35 - Skillset 'srch-skillset-copilot-demo-002' created successfully.
+2025-01-03 01:19:12 - Skillset 'vector-srch-skillset-copilot-demo-002' created successfully.
+2025-01-03 01:19:51 - Skillset 'embeddings-srch-skillset-copilot-demo-002' created successfully.
+2025-01-03 01:19:55 - Search Indexer 'srch-indexer-copilot-demo-002' created successfully.
+2025-01-03 01:19:56 - Search Indexer 'srch-indexer-copilot-demo-002' ran successfully.
+2025-01-03 01:19:59 - Search Indexer 'vector-srch-indexer-copilot-demo-002' created successfully.
+2025-01-03 01:20:00 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2025-01-03 01:20:03 - Search Indexer 'embeddings-srch-indexer-copilot-demo-002' created successfully.
+2025-01-03 01:20:05 - Search Indexer 'embeddings-srch-indexer-copilot-demo-002' ran successfully.
+2025-01-03 01:20:27 - Log Analytics Workspace 'log-copilot-demo-002' created successfully. [1]
+2025-01-03 01:20:32 - Application Insights component 'appi-copilot-demo-002' created successfully. [2]
+2025-01-03 01:20:37 - Azure OpenAI service 'openai-copilot-demo-002' restored successfully. [3]
+2025-01-03 01:20:37 - Azure OpenAI service 'openai-copilot-demo-002' created successfully. [3]
+2025-01-03 01:20:37 - File 'container.registry.yaml' created and populated.
+2025-01-03 01:22:45 - Container Registry 'crcopilotdemo002' created successfully. [4]
+2025-01-03 01:22:52 - Document Intelligence account 'kv-copilot-demo-002' restored successfully. [5]
+2025-01-03 01:22:56 - Computer Vision 'cv-copilot-demo-002' restored successfully. [6]
+2025-01-03 01:24:10 - Web app 'app-copilot-demo-002' created successfully. Moving on to deployment. [7]
