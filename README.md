@@ -430,6 +430,27 @@ Anyhow, once the project is created you need to make sure to set the quota to dy
 
 NOTE: Another issue with the whole Azure AI project is that because the script cannot create the correct instance of it due to the issues mentioned above, you will still to create one manually. Now, there is a pretty good chance that the script created one for you but...it was created in Azure ML Studio. So you will need to delete that project from your resource group and then be sure to also delete it from the "Recently Deleted" area too. In it's current state it has not been purged and if you try to create the correct project in Azure AI Studio (which you're about to do) it will fail saying the resource already exists. Anyhow...once you've purged the resource, you then create the "correct" project in Azure AI Studio. Make sure to select the correct Hub that the script created to house your previous Azure ML project that you just purged. If you don't then it won't be associated with your resource group or any of the other AI related resources and the solution will not work. Once you've created the project, create two AI models: gpt-4o and text-embedding-3-large. The names for both of these will be "gpt-4o" and "text-embedding".
 
+The next few screenshots outline the manual steps you need to take in order to configure the AI Project.
+
+1. Create new AI project and specify existing hub from your resource group.
+2. Select Models and Assets from the left navigation menu (towards the bottom).
+3. Select asset
+4. Select Model Deployment Type
+5. Select existing AI service from your resource group.
+6. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding).
+
+<img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_models_assets_menu" width="600" alt="AI Studio Model Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-asset-menu.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_select_assets" width="600" alt="AI Studio Select Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-select.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_select_deployment_type" width="600" alt="AI Studio Select Deployment Type" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-deployment-type.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_select_ai_resource" width="600" alt="AI Studio Select AI Resource" src="src/deployment/images/azure-ai-demo-ai-studio-project-ai-resource.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_add_models" width="600" alt="AI Studio Add AI Models" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-management.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
 ### Additional Notes
 
 **REST APIs**
