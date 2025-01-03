@@ -1,0 +1,39 @@
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 01/03/2025 12:34:20 ***
+2025-01-03 12:34:21 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-03 12:34:22 - Identity 'id-copilot-demo-002' already exists.
+2025-01-03 12:34:22 - Storage account 'stcopilotdemo002' already exists.
+2025-01-03 12:34:24 - Subnet 'subnet-copilot-demo-002' already exists.
+2025-01-03 12:34:24 - App Service Plan 'asp-copilot-demo-002' already exists.
+2025-01-03 12:34:24 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2025-01-03 12:34:25 - Search Service 'srch-copilot-demo-002' already exists.
+2025-01-03 12:34:28 - Search Index 'srch-index-copilot-demo-002' already exists.
+2025-01-03 12:34:29 - Search Index 'vector-srch-index-copilot-demo-002' already exists.
+2025-01-03 12:34:30 - Search Index 'embeddings-srch-index-copilot-demo-002' already exists.
+2025-01-03 12:34:32 - Search Skill Set 'srch-skillset-copilot-demo-002' already exists.
+2025-01-03 12:34:33 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2025-01-03 12:34:34 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-002' already exists.
+2025-01-03 12:34:35 - Search Indexer '@{IndexName=srch-index-copilot-demo-002; Name=srch-indexer-copilot-demo-002; Schema=search-indexer-schema.json; SkillSetName=srch-skillset-copilot-demo-002}' already exists.
+2025-01-03 12:34:36 - Search Indexer 'srch-indexer-copilot-demo-002' ran successfully.
+2025-01-03 12:34:38 - Search Indexer '@{IndexName=vector-srch-index-copilot-demo-002; Name=vector-srch-indexer-copilot-demo-002; Schema=vector-search-indexer-schema.json; SkillSetName=vector-srch-skillset-copilot-demo-002}' already exists.
+2025-01-03 12:34:39 - Search Indexer 'vector-srch-indexer-copilot-demo-002' ran successfully.
+2025-01-03 12:34:41 - Search Indexer '@{IndexName=embeddings-srch-index-copilot-demo-002; Name=embeddings-srch-indexer-copilot-demo-002; Schema=embeddings-search-indexer-schema.json; SkillSetName=embeddings-srch-skillset-copilot-demo-002}' already exists.
+2025-01-03 12:34:42 - Search Indexer 'embeddings-srch-indexer-copilot-demo-002' ran successfully.
+2025-01-03 12:34:52 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2025-01-03 12:34:52 - Application Insights 'appi-copilot-demo-002' already exists.
+2025-01-03 12:34:52 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2025-01-03 12:34:52 - Container Registry 'crcopilotdemo002' already exists.
+2025-01-03 12:34:52 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2025-01-03 12:34:52 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2025-01-03 12:34:52 - Key Vault 'kv-copilot-demo-002' already exists.
+2025-01-03 12:34:52 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2025-01-03 12:34:52 - AI Service 'ai-service-copilot-demo-002' already exists.
+2025-01-03 12:35:26 - Machine Learning Workspace 'project-ai-copilot-demo-002' created successfullt. [1]
+2025-01-03 12:35:37 - Model deployment 'gpt-4o' for 'ai-service-copilot-demo-002' already exists.
+2025-01-03 12:35:38 - Model deployment 'text-embedding' for 'ai-service-copilot-demo-002' already exists.
+2025-01-03 12:35:44 - File 'ai.connection.yaml' created and populated.
+2025-01-03 12:35:52 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created successfully.
+2025-01-03 12:35:58 - File 'openai.connection.yaml' created and populated.
+2025-01-03 12:36:03 - Azure OpenAIService 'openai-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' created successfully.
+2025-01-03 12:36:08 - File 'storage.connection.yaml' created and populated.
+2025-01-03 12:36:13 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' created successfully.

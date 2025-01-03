@@ -2928,8 +2928,8 @@ function New-SearchService {
                         New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
                     }
                     else {
-                        Write-Host "Search Indexer '$indexer' already exists."
-                        Write-Log -message "Search Indexer '$indexer' already exists."
+                        Write-Host "Search Indexer '$indexerName' already exists."
+                        Write-Log -message "Search Indexer '$indexerName' already exists."
                     }
 
                     Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
