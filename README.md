@@ -404,7 +404,7 @@ There are several manual steps which need to be performed for a variety of reaso
    - **Search Service Index Redacted API Key:** Remove the apiKey `<redacted>` entry from the vector search index json if it exists. Don't just remove the value `<redacted>`. Remove the entire property. <sup>[3](#search_service_index_redacted_api_key)</sup>
    - **Search Service Datasource Managed Identity:** Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed. You may need to remove and re-add the managed identity user to the Search service in order to run the indexer too.
    - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[4](#search_service_skillset_connect_ai_service)</sup>
-   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. <sup>[5](#search_service_index_vectorizer_multi_service_account)</sup>
+   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. You also need to set the Authentication Type to "API Key". <sup>[5](#search_service_index_vectorizer_multi_service_account)</sup>
 4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
 5. **Azure AI Project / Machine Learning Workspace:**
    <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
@@ -432,12 +432,11 @@ NOTE: Another issue with the whole Azure AI project is that because the script c
 
 The next few screenshots outline the manual steps you need to take in order to configure the AI Project.
 
-1. Create new AI project and specify existing hub from your resource group.
-2. Select Models and Assets from the left navigation menu (towards the bottom).
-3. Select asset
-4. Select Model Deployment Type
-5. Select existing AI service from your resource group.
-6. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding).
+1. Create new AI project and specify existing hub from your resource group. <sup>[6](#ai_studio_project_create)</sup>
+2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[7](#ai_studio_project_models_assets_menu)</sup>
+3. Select asset. <sup>[8](#ai_studio_project_select_assets)</sup>
+5. Select existing AI service from your resource group. <sup>[9](#ai_studio_project_select_ai_resource)</sup>
+6. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[10](#ai_studio_project_add_models)</sup>
 
 <img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project-create.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
