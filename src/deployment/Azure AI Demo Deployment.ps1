@@ -3792,7 +3792,7 @@ function Start-Deployment {
     
     # Deploy web app and function app services
     foreach ($appService in $appServices) {
-        if ($existingResources -notcontains $appService) {
+        if ($existingResources -notcontains $appService.Name) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
         }
     }

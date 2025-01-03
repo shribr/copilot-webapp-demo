@@ -430,11 +430,11 @@ async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, ch
 
                     sourceNumber++;
 
-                    const supportingContentLink = `<a class="answer_citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${doc.title}</a>`;
+                    const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${doc.title}</a>`;
 
                     citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
-                    footNoteLinks += `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                    footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
                 }
                 else {
                     console.log(`Document already listed: ${docPath}`);
@@ -463,9 +463,7 @@ async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, ch
                 documents: answer.documents
             });
 
-        //const footNoteLink = `<sup class="answer_citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-
-        const aiEnhancedAnswerHtml = '<li class="answer_results">' + aiEnhancedAnswer + footNoteLinks + '</li>';
+        const aiEnhancedAnswerHtml = '<li class="answer-results">' + aiEnhancedAnswer + footNoteLinks + '</li>';
         aiEnhancedAnswers += aiEnhancedAnswerHtml;
     }
 
@@ -604,17 +602,13 @@ function createTabContentSupportingContent(mappedAzureSearchAnswers, docStorageR
                     const docPath = `${doc.metadata_storage_path}?${sasToken}`;
                     const docTitle = doc.title;
 
-                    const footNoteLink = `<sup class="answer_citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                    const docLink = ` <a href="${docPath}" class="supporting_content_link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
-                    //supportingContentResults += '<li class="answer_results">' + answer.text.replace(" **", "").replace(/\s+/g, " ") + footNoteLink + '</li>';
-                    supportingContentResults += '<li class="answer_results">' + answerText + docLink + '</li>';
+                    const footNoteLink = `<sup class="answer-citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                    const docLink = ` <a href="${docPath}" class="supporting-content-link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
+
+                    supportingContentResults += '<li class="answer-results">' + answerText + docLink + '</li>';
 
                     if (!listedPaths.has(docPath)) {
                         listedPaths.add(docPath);
-
-                        //const supportingContentLink = `<a class="answer_citations" title="${docPath}" href="${docPath}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${docTitle}</a>`;
-
-                        //citationContentResults += `<div id="citation-link-${answerResultsNumber}-${sourceNumber}">${supportingContentLink}</div>`;
 
                         sourceNumber++;
                     } else {
@@ -626,7 +620,7 @@ function createTabContentSupportingContent(mappedAzureSearchAnswers, docStorageR
         });
 
         if (supportingContentResults != "") {
-            supportingContent.innerHTML += '<div id="azure-storage-results-container"><div id="azure-storage-results-header">Supporting Content from Azure Storage</div>' + '<ol id="supporting_content_results">' + supportingContentResults + '</ol><br/></div>';
+            supportingContent.innerHTML += '<div id="azure-storage-results-container"><div id="azure-storage-results-header">Supporting Content from Azure Storage</div>' + '<ol id="supporting-content-results">' + supportingContentResults + '</ol><br/></div>';
         }
 
         console.log('Cross-referenced answers:', mappedAzureSearchAnswers);
