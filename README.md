@@ -377,7 +377,7 @@ The index.html file includes the following screens:
 
 <img width="1423" alt="azure-ai-demo-home" src="src/deployment/images/azure-ai-demo-home.png">
 
-<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/images/azure-ai-demo-upload-docs.png">
+<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/images/azure-ai-demo-documents-upload-documents.png">
 
 <img width="1410" alt="azure-ai-demo-chat" src="src/deployment/images/azure-ai-demo-chat.png">
 
@@ -387,7 +387,7 @@ The index.html file includes the following screens:
 
 <img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/images/azure-ai-demo-selected-docs.png">
 
-<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-existing-docs.png">
+<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing-documents.png">
 
 ### Chat Workflow
 
