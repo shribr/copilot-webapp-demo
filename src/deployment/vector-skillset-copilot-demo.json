@@ -31,7 +31,7 @@
         ],
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-005"
+        "targetIndexName": "vector-srch-index-copilot-demo-001"
       },
       {
         "mappings": [
@@ -50,11 +50,11 @@
         ],
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-005"
+        "targetIndexName": "vector-srch-index-copilot-demo-001"
       }
     ]
   },
-  "name": "vector-srch-skillset-copilot-demo-005",
+  "name": "vector-srch-skillset-copilot-demo-001",
   "skills": [
     {
       "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",

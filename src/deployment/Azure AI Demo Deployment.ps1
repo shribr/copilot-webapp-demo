@@ -2658,10 +2658,14 @@ function New-SearchService {
         #$searchServiceSku = "basic"
 
         try {
-            $ErrorActionPreference = 'Continue'
+            $ErrorActionPreference = 'Stop'
 
             az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
             
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to create search service: $createServiceOutput"
+            }
+
             $global:resourceCounter += 1
 
             Write-Host "Search Service '$searchServiceName' created successfully. [$global:resourceCounter]"
