@@ -15,6 +15,13 @@
 </head>
 
 <body class="flex-container">
+    <!-- <div id="hamburger-menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 6H21V8H3V6Z" fill="currentColor"/>
+            <path d="M3 11H21V13H3V11Z" fill="currentColor"/>
+            <path d="M3 16H21V18H3V16Z" fill="currentColor"/>
+        </svg>
+    </div> -->
     <div id="top-navigation-toolbar">
         <div><img src="images/site-logo-default.png" id="site-logo" class="site-logo-default" alt="Site Logo"></div>
         <div id="main-header-title">Chat with Azure Copilot</div>
@@ -31,7 +38,9 @@
         <div id="left-nav-container">
             <nav id="left-nav-menu">
                 <ul>
-                </ul>
+                    <li><a href="?screen=home" aria-label="Home" title="Home" data-tooltip="Home" id="sidenav-item-ITEM1"><svg fill="currentColor" class="icon-svg-nav sidenav link" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"></path><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg> Home</a></li>
+                    <li><a href="?screen=documents" aria-label="Documents" title="Documents" data-tooltip="Documents" id="sidenav-item-ITEM2"><svg fill="currentColor" class="icon-svg-nav sidenav link" focusable="false" viewBox="0 0 24 24" aria-hidden="true"> <path d="M0 0h24v24H0V0z" fill="none"></path> <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2.06 11L15 15.28 12.06 17l.78-3.33-2.59-2.24 3.41-.29L15 8l1.34 3.14 3.41.29-2.59 2.24.78 3.33z"> </path> </svg> Documents</a></li>
+                    <li><a href="?screen=chat" aria-label="Chat" title="Chat" data-tooltip="Chat" id="sidenav-item-ITEM3"><svg fill="currentColor" class="icon-svg-nav sidenav link" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"></path><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path></svg> Chat</a></li></ul>
             </nav>
         </div>
         <div id="main-content">
@@ -179,39 +188,6 @@
                             </tbody>
                         </table>
                     </div>
-                        <div class="document-row header">
-                            <div id="header-preview" class="document-cell preview">Preview</div>
-                            <div id="header-status" class="document-cell preview">Status <span class="sort-arrow"
-                                    id="status-arrow">&#9650;</span></div>
-                            <div id="header-name" class="document-cell">Name<span class="sort-arrow"
-                                    id="name-arrow">&#9650;</span></div>
-                            <div id="header-content-type" class="document-cell">Content Type<span class="sort-arrow"
-                                    id="content-type-arrow">&#9650;</span></div>
-                            <div id="header-size" class="document-cell">Size<span class="sort-arrow"
-                                    id="size-arrow">&#9650;</span></div>
-                            <div id="header-date" class="document-cell">Last Modified<span class="sort-arrow"
-                                    id="date-arrow">&#9650;</span></div>
-                            <div class="document-cell"></div>
-                        </div>
-                        <div class="document-row sample">
-                            <div class="document-cell preview"><button>Preview</button></div>
-                            <div class="document-cell preview">Active</div>
-                            <div class="document-cell">Document 1</div>
-                            <div class="document-cell">PDF</div>
-                            <div class="document-cell">1.2 MB</div>
-                            <div class="document-cell">2023-10-01</div>
-                            <div class="document-cell"></div>
-                        </div>
-                        <div class="document-row sample">
-                            <div class="document-cell cell preview"><button>Preview</button></div>
-                            <div class="document-cell cell preview">Inactive</div>
-                            <div class="document-cell">Document 2</div>
-                            <div class="document-cell">Word</div>
-                            <div class="document-cell">1.2 MB</div>
-                            <div class="document-cell">2023-10-02</div>
-                            <div class="document-cell"></div>
-                        </div>
-                    </div> -->
                 </div>
             </div>
             <div id="home-container">

@@ -31,7 +31,16 @@ $(document).ready(function () {
 
     getDocuments();
 
-    createSidenavLinks();
+    //createSidenavLinks();
+
+    // document.getElementById('hamburger-menu').addEventListener('click', function() {
+    //     var nav = document.getElementById('left-nav-container');
+    //     if (nav.classList.contains('active')) {
+    //         nav.classList.remove('active');
+    //     } else {
+    //         nav.classList.add('active');
+    //     }
+    // });
 
     const threads = getAllThreads();
 
