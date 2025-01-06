@@ -20,7 +20,7 @@ let tool_resources = {
     }
 };
 
-$(document).ready(function () {
+$(document).ready(async function () {
 
     setChatDisplayHeight();
 
@@ -42,9 +42,9 @@ $(document).ready(function () {
     //     }
     // });
 
-    const threads = getAllThreads();
+    const threads = await getAllThreads();
 
-    if (threads.length > 0) {
+    if (threads.length > 0 && threads) {
         document.getElementById('delete-all-threads-button').style.display = 'block';
 
         const threadCount = threads.length;
@@ -308,7 +308,7 @@ async function addMessageToThread(threadId, message, role) {
     const dateTimestamp = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
     try {
         // First see if there is an existing thread
-        if (threadId == null || threadId == undefined || threadId == "") {
+        if (threadId == null || threadId == undefined || threadId == "" || thread.error) {
 
             const metadata = { "Created Date/Time": new Date().toLocaleString() };
 
@@ -1196,7 +1196,7 @@ async function getChatResponse(questionBubble) {
 
     try {
         // First see if there is an existing thread
-        if (threadId == null || threadId == undefined || threadId == "") {
+        if (threadId == null || threadId == undefined || threadId == "" || thread.error) {
             const metadata = { "thread_name": "User Chat" };
 
             thread = await createThread(metadata);
@@ -1470,6 +1470,11 @@ async function getThread(threadId) {
         });
 
         const thread = await response.json();
+
+        if (thread.error != null) {
+            console.log('Error getting thread:', thread.error);
+            return null;
+        }
 
         return thread;
     }
