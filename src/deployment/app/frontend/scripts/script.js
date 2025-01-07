@@ -322,6 +322,7 @@ async function addMessageToThread(threadId, message, role, persona) {
         }
         else {
             thread = await getThread(threadId);
+            threadId = thread.id;
         }
 
     } catch (error) {
@@ -1482,7 +1483,9 @@ async function getThread(threadId) {
 
         if (thread.error != null) {
             console.log('Error getting thread:', thread.error);
-            return null;
+
+            return await createThread({ "thread_name": "User Chat" });
+            //return null;
         }
 
         return thread;
