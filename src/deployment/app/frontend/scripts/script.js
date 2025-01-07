@@ -302,7 +302,7 @@ $(document).ready(async function () {
 });
 
 // Function to add a message to a thread
-async function addMessageToThread(threadId, message, role, persona) {
+async function addMessageToThread(threadId, message, role, persona, attachment) {
 
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
@@ -332,7 +332,7 @@ async function addMessageToThread(threadId, message, role, persona) {
 
     const jsonMessage = JSON.stringify(message);
 
-    const jsonString = `{ "role": "${role}", "content": ${jsonMessage}, "metadata": { "dateTimestamp": "${dateTimestamp}", "Persona": "${persona.title}" } }`;
+    const jsonString = `{ "role": "${role}", "content": ${jsonMessage}, "metadata": { "dateTimestamp": "${dateTimestamp}", "Persona": "${persona.title}", "attachment" : "${attachment}" } }`;
 
     try {
         const response = await fetch(endpoint, {
@@ -466,7 +466,7 @@ async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, ch
         const aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona, threadId);
         //aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
 
-        await addMessageToThread(threadId, aiEnhancedAnswer, "assistant", persona);
+        await addMessageToThread(threadId, aiEnhancedAnswer, "assistant", persona, docPath);
 
         //aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
         aiEnhancedAnswersArray.push(
@@ -1191,6 +1191,7 @@ async function getChatResponse(questionBubble) {
 
     // Get the selected chat persona
     const persona = getSelectedChatPersona();
+    const docPath = "";
 
     const toolResources = {
         "azure_ai_search": {
@@ -1223,10 +1224,13 @@ async function getChatResponse(questionBubble) {
     const loadingAnimation = document.querySelector('.loading-animation');
     loadingAnimation.style.display = 'flex';
 
+    // Temporarary attachment for testing
+    const attachment = "";
+
     if (chatInput) {
 
         // Add the user's message to the thread
-        threadId = await addMessageToThread(threadId, chatInput, "user", persona);
+        threadId = await addMessageToThread(threadId, chatInput, "user", persona, attachment);
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
