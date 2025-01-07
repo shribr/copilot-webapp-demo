@@ -20,6 +20,12 @@ let tool_resources = {
     }
 };
 
+document.addEventListener('DOMContentLoaded', async function () {
+
+    await refreshThreads();
+
+});
+
 $(document).ready(async function () {
 
     setChatDisplayHeight();
@@ -41,18 +47,6 @@ $(document).ready(async function () {
     //         nav.classList.add('active');
     //     }
     // });
-
-    const threads = await getAllThreads();
-
-    if (threads.length > 0 && threads) {
-        document.getElementById('delete-all-threads-button').style.display = 'block';
-
-        const threadCount = threads.length;
-        document.getElementById('delete-all-threads-button').innerHTML = `Delete All Threads (${threadCount})`;
-    }
-    else {
-        document.getElementById('delete-all-threads-button').style.display = 'none';
-    }
 
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatDisplay = document.getElementById('chat-display');
@@ -117,8 +111,9 @@ $(document).ready(async function () {
 
     document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
 
-    $('#delete-all-threads-button').on('click', async function () {
-        await deleteAllThreads();
+    $('#delete-all-threads-button').on('click', async function (event) {
+        //await deleteAllThreads(event);
+        showDeleteAllThreadsConfirmationDialog();
     });
 
     // Add event listeners to column headers for sorting
@@ -236,16 +231,7 @@ $(document).ready(async function () {
     document.getElementById('link-settings').addEventListener('click', function (event) {
         event.preventDefault();
 
-        const settingsDialog = document.getElementById('settings-dialog');
-        const settingsOverlay = document.getElementById('settings-overlay');
-
-        if (settingsDialog.style.display === 'none' || settingsDialog.style.display === '') {
-            settingsDialog.style.display = 'block';
-            //settingsOverlay.style.display = 'block';
-        } else {
-            settingsDialog.style.display = 'none';
-            //settingsOverlay.style.display = 'none';
-        }
+        showSettingsDialog();
 
         // Handle settings click
         console.log('Settings clicked');
@@ -296,11 +282,27 @@ $(document).ready(async function () {
         }
     });
 
+    document.getElementById('admin-header').addEventListener('click', function () {
+        const content = document.getElementById('admin-container');
+        const arrow = document.querySelector('#datasources-header .accordion-arrow');
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            arrow.innerHTML = '&#9650;'; // Up arrow
+        } else {
+            content.style.display = 'none';
+            arrow.innerHTML = '&#9660;'; // Down arrow
+        }
+    });
+
+    document.getElementById('refresh-threads-button').addEventListener('click', async function () {
+        await refreshThreads();
+    });
+
     renderChatPersonas();
 });
 
 // Function to add a message to a thread
-async function addMessageToThread(threadId, message, role) {
+async function addMessageToThread(threadId, message, role, persona) {
 
     const config = await fetchConfig();
     const apiVersion = config.OPENAI_API_VERSION;
@@ -310,7 +312,10 @@ async function addMessageToThread(threadId, message, role) {
         // First see if there is an existing thread
         if (threadId == null || threadId == undefined || threadId == "" || thread.error) {
 
-            const metadata = { "Created Date/Time": new Date().toLocaleString() };
+            const metadata = {
+                "Created Date/Time": new Date().toLocaleString(),
+                "Persona": persona,
+            };
 
             thread = await createThread(metadata);
             threadId = thread.id;
@@ -461,7 +466,7 @@ async function createChatResponseContent(chatInput, mappedAzureSearchAnswers, ch
         const aiEnhancedAnswer = await getAnswersFromAzureOpenAIModel(answer.text, "gpt-4o", persona, threadId);
         //aiEnhancedAnswer = aiEnhancedAnswer.replace(/\*\*(.*?)\*\*:?/g, '<b class="bullet-title">$1:</b>:');
 
-        await addMessageToThread(threadId, aiEnhancedAnswer, "assistant");
+        await addMessageToThread(threadId, aiEnhancedAnswer, "assistant", persona);
 
         //aiEnhancedAnswersArray[0].text = aiEnhancedAnswer;
         aiEnhancedAnswersArray.push(
@@ -668,6 +673,8 @@ async function createThread(metadata) {
 
         document.getElementById('delete-all-threads-button').style.display = 'block';
 
+        await refreshThreads();
+
         return thread;
     }
     catch (error) {
@@ -678,19 +685,16 @@ async function createThread(metadata) {
 }
 
 // Function to delete all threads
-async function deleteAllThreads() {
-
+async function deleteAllThreads(event) {
     const deleteAllThreadsConfirmationDialog = document.getElementById('delete-all-threads-confirmation-dialog');
-
-    deleteAllThreadsConfirmationDialog.style.display = 'block';
-
     const deleteAllThreadsConfirmationDialogOverlay = document.getElementById("delete-all-threads-overlay");
-    deleteAllThreadsConfirmationDialogOverlay.style.display = 'block';
+    const deleteAllThreadsContainer = document.getElementById('delete-all-threads-container');
+    const noThreadsFoundContainer = document.getElementById('no-threads-found-container');
 
-    if (deleteAllThreadsConfirmationDialog.style.display === 'block') {
-        deleteAllThreadsConfirmationDialog.style.display = 'none';
-        deleteAllThreadsConfirmationDialogOverlay.style.display = 'none';
-    }
+    deleteAllThreadsConfirmationDialog.style.display = 'none';
+    deleteAllThreadsConfirmationDialogOverlay.style.display = 'none';
+    deleteAllThreadsContainer.style.display = 'none';
+    noThreadsFoundContainer.style.display = 'flex';
 
     const threads = await getAllThreads();
     if (Array.isArray(threads)) {
@@ -698,25 +702,26 @@ async function deleteAllThreads() {
             await deleteThread(thread.id);
         }
         console.log('All threads deleted successfully.');
-    }
-    else {
+    } else {
         console.log('No threads found.');
     }
 }
 
+// Function to delete all threads confirmation
 function deleteAllThreadsConfirmation(event) {
 
     var confirmDeleteAllThreads = event.target.value;
 
-    if (confirmDeleteAllThreads == "Yes") {
-        deleteAllThreads();
+    if (confirmDeleteAllThreads === "yes") {
+        deleteAllThreads(event);
+    } else {
+        // Hide the confirmation dialog if "No" is selected
+        const deleteAllThreadsConfirmationDialog = document.getElementById('delete-all-threads-confirmation-dialog');
+        const deleteAllThreadsConfirmationDialogOverlay = document.getElementById("delete-all-threads-overlay");
+        deleteAllThreadsConfirmationDialog.style.display = 'none';
+        deleteAllThreadsConfirmationDialogOverlay.style.display = 'none';
+        console.log('Thread deletion cancelled.');
     }
-
-    const deleteAllThreadsConfirmationDialog = document.getElementById('delete-all-threads-confirmation-dialog');
-    deleteAllThreadsConfirmationDialog.style.display = 'none';
-
-    const deleteAllThreadsConfirmationDialogOverlay = document.getElementById('delete-all-threads-confirmation-dialog-overlay');
-    deleteAllThreadsConfirmationDialogOverlay.style.display = 'none';
 }
 
 // function to delete documents
@@ -847,6 +852,10 @@ async function getAllMessages(threadId) {
                 'http2': 'true'
             }
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const messages = await response.json();
 
@@ -1217,7 +1226,7 @@ async function getChatResponse(questionBubble) {
     if (chatInput) {
 
         // Add the user's message to the thread
-        threadId = await addMessageToThread(threadId, chatInput, "user");
+        threadId = await addMessageToThread(threadId, chatInput, "user", persona);
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
@@ -1619,6 +1628,29 @@ async function postQuestion() {
     getChatResponse(questionBubble);
 }
 
+// Function to refresh threads
+async function refreshThreads() {
+    document.getElementById('delete-all-threads-container').style.display = 'none';
+    document.getElementById('loading-threads-container').style.display = 'flex';
+    document.getElementById('no-threads-found-container').style.display = 'none';
+
+    const threads = await getAllThreads();
+
+    if (threads.length > 0 && threads) {
+        document.getElementById('delete-all-threads-container').style.display = 'block';
+        document.getElementById('loading-threads-container').style.display = 'none';
+        document.getElementById('no-threads-found-container').style.display = 'none';
+
+        const threadCount = threads.length;
+        document.getElementById('delete-all-threads-button').innerHTML = `Delete All Threads (${threadCount})`;
+    }
+    else {
+        document.getElementById('delete-all-threads-container').style.display = 'none';
+        document.getElementById('loading-threads-container').style.display = 'none';
+        document.getElementById('no-threads-found-container').style.display = 'flex';
+    }
+}
+
 // Function to render chat personas
 async function renderChatPersonas() {
     const config = await fetchConfig();
@@ -1637,11 +1669,11 @@ async function renderChatPersonas() {
         const chatRadioButtonChecked = persona.Type === 'Default' ? 'checked' : '';
 
         chatPersona.innerHTML = `<div class="form-group form-group-flex">
-                    <div>
-                        <input type="radio" ${chatRadioButtonChecked} class="chat-persona-radio" name="chat-persona" title="${persona.Prompt}" id="chat-persona-${persona.Type}" />
+                    <div id="chat-persona-container-${persona.Type.replace(" ", "-")}">
+                        <input type="radio" ${chatRadioButtonChecked} class="chat-persona-radio" name="chat-persona" title="${persona.Prompt}" id="chat-persona-${persona.Type.replace(" ", "-")}" />
                     </div>
                     <div>
-                        <label for="chat-persona-icons">${persona.Type}</label>
+                        <label for="chat-persona-${persona.Type.replace(" ", "-")}" class="chat-persona-label">${persona.Type}</label>
                     </div>
                 </div>`;
 
@@ -1722,7 +1754,7 @@ async function renderDocumentsHtmlTable(blobs) {
             statusCell.innerHTML = '<span class="status-content">Active</span>';
 
             const nameCell = document.createElement('td');
-            nameCell.className = 'document-cell';
+            nameCell.className = 'document-cell document-cell-name';
             const nameLink = document.createElement('a');
             nameLink.href = blobUrl;
             //nameLink.textContent = truncateText(blobName, 20);
@@ -1920,6 +1952,46 @@ async function setSiteLogo() {
         siteLogo.classList.remove('site-logo-default');
         siteLogo.classList.add('site-logo-custom');
     }
+}
+
+// Function to show the delete all threads confirmation dialog
+function showDeleteAllThreadsConfirmationDialog() {
+    const deleteAllThreadsConfirmationDialog = document.getElementById('delete-all-threads-confirmation-dialog');
+    //const deleteAllThreadsConfirmationDialogOverlay = document.getElementById("delete-all-threads-overlay");
+
+    deleteAllThreadsConfirmationDialog.style.display = 'block';
+    //deleteAllThreadsConfirmationDialogOverlay.style.display = 'block';
+
+    // Add event listeners for the Yes and No buttons
+    const yesButton = document.getElementById('delete-all-threads-button-yes');
+    const noButton = document.getElementById('delete-all-threads-button-no');
+
+    yesButton.addEventListener('click', deleteAllThreadsConfirmation);
+    noButton.addEventListener('click', deleteAllThreadsConfirmation);
+}
+
+// Function to show the settings dialog
+function showSettingsDialog() {
+
+    const settingsDialog = document.getElementById('settings-dialog');
+    const settingsOverlay = document.getElementById('settings-overlay');
+
+    if (settingsDialog.style.display === 'none' || settingsDialog.style.display === '') {
+        settingsDialog.style.display = 'block';
+        //settingsOverlay.style.display = 'block';
+    } else {
+        settingsDialog.style.display = 'none';
+        //settingsOverlay.style.display = 'none';
+    }
+
+    // const formGroupDeleteAllThreads = document.getElementById('form-group-delete-all-threads');
+    // const deleteAllThreadsButton = document.getElementById('delete-all-threads-button');
+
+    // const loadingDeleteAllThreadsAnimation = document.createElement('div');
+
+    // loadingDeleteAllThreadsAnimation.setAttribute('class', 'loading-animation');
+    // loadingDeleteAllThreadsAnimation.innerHTML = '<div class="spinner" id="loading-delete-all-threads-animation"></div> Loading threads...'; // Hide it initially
+    // formGroupDeleteAllThreads.insertBefore(loadingDeleteAllThreadsAnimation, deleteAllThreadsButton);
 }
 
 // Function to show a toast notification
