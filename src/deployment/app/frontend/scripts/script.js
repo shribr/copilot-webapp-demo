@@ -332,7 +332,7 @@ async function addMessageToThread(threadId, message, role, persona) {
 
     const jsonMessage = JSON.stringify(message);
 
-    const jsonString = `{ "role": "${role}", "content": ${jsonMessage}, "metadata": { "dateTimestamp": "${dateTimestamp}", "Persona": "${persona}" } }`;
+    const jsonString = `{ "role": "${role}", "content": ${jsonMessage}, "metadata": { "dateTimestamp": "${dateTimestamp}", "Persona": "${persona.title}" } }`;
 
     try {
         const response = await fetch(endpoint, {
@@ -365,7 +365,7 @@ function buildChatHistory(answerResponseNumber, question, rawAnswers, opentAiRef
             question: question,
             rawAnswers: rawAnswers,
             opentAiRefinedAnswers: opentAiRefinedAnswers,
-            persona: persona,
+            persona: persona.title,
             dateTimestamp: dateTimestamp
         }
     };
@@ -1039,7 +1039,7 @@ async function getAnswersFromAzureOpenAIModel(userInput, aiModelName, persona, t
     userMessageContent.text = userInput;
 
     const systemMessageContent = openAIRequestBody.messages.find(message => message.role === 'system').content[0];
-    systemMessageContent.text = persona;
+    systemMessageContent.text = persona.description;
 
     //I am commenting this out for now because I want to see if I can get the chat history to work without it.
     // const messageList = await getAllMessages(threadId);
@@ -1505,10 +1505,18 @@ function getQueryParam(param) {
 // Function to get the selected chat persona
 function getSelectedChatPersona() {
     const selectedRadio = document.querySelector('input[name="chat-persona"]:checked');
+
+    var persona = {};
+
     if (selectedRadio) {
-        return selectedRadio.title;
+        const label = document.querySelector(`label[for="${selectedRadio.id}"]`);
+
+        persona = { "description": selectedRadio.title, "title": label.innerText };
+        return persona;
     }
-    return "";
+    else {
+        return persona;
+    }
 }
 
 // Function to check if a text is a question
