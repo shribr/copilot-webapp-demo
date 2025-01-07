@@ -313,8 +313,7 @@ async function addMessageToThread(threadId, message, role, persona) {
         if (threadId == null || threadId == undefined || threadId == "" || thread.error) {
 
             const metadata = {
-                "Created Date/Time": new Date().toLocaleString(),
-                "Persona": persona,
+                "Created Date/Time": new Date().toLocaleString()
             };
 
             thread = await createThread(metadata);
@@ -333,7 +332,7 @@ async function addMessageToThread(threadId, message, role, persona) {
 
     const jsonMessage = JSON.stringify(message);
 
-    const jsonString = `{ "role": "${role}", "content": ${jsonMessage}, "metadata": { "dateTimestamp": "${dateTimestamp}" } }`;
+    const jsonString = `{ "role": "${role}", "content": ${jsonMessage}, "metadata": { "dateTimestamp": "${dateTimestamp}", "Persona": "${persona}" } }`;
 
     try {
         const response = await fetch(endpoint, {
