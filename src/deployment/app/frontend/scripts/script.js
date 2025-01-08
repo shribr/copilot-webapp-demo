@@ -4,6 +4,7 @@ let currentSortColumn = '';
 let currentSortDirection = 'asc';
 let answerResponseNumber = 1;
 let aiEnhancedAnswersArray = [];
+
 let thread = { "messages": [] };
 
 let tool_resources = {
@@ -256,7 +257,6 @@ $(document).ready(async function () {
 
     renderChatPersonas();
 });
-
 
 // Function to build chat history
 function addMessageToChatHistory(thread, message) {
@@ -593,8 +593,8 @@ function formatBytes(bytes) {
     else return (bytes / 1048576).toFixed(2) + ' MB';
 }
 
-//code to send chat message to Azure OpenAI model
-async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona) {
+//Function to send chat message to Azure OpenAI model to either search the model directly or internal data sources
+async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSources) {
 
     if (!userInput) return;
 
@@ -604,51 +604,32 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona) {
     const apiVersion = config.OPENAI_API_VERSION;
     const deploymentName = aiModelName;
     const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
-    const datasources = config.DATA_SOURCES;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
-    //const getThoughtProcess = "In addition to your normal response also include an explanation of your thought process and store that info in a property called 'thought_process'.";
-    const getThoughtProcess = "Include an explanation of your thought process to arrivate at this answer";
 
-    const userMessageContent = userInput + " " + getThoughtProcess;
+    var results = [];
 
     openAIRequestBody.messages = [];
     openAIRequestBody.messages = thread.messages;
 
-    datasources.forEach(source => {
-        source.parameters.role_information = persona.Prompt;
-        openAIRequestBody.data_sources.push(source);
-    });
+    if (dataSources.length > 0) {
+        dataSources.forEach(async source => {
+            source.parameters.role_information = persona.Prompt;
+            openAIRequestBody.data_sources.push(source);
 
-    const jsonString = JSON.stringify(openAIRequestBody);
+            const jsonString = JSON.stringify(openAIRequestBody);
 
-    try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': `${apiKey}`,
-                'http2': 'true'
-            },
-            body: jsonString
+            const result = await invokeRESTAPI(jsonString, endpoint, apiKey);
+
+            results.push(result);
         });
-
-        // 2025/01/07: ADS - Add in text to inform users of token usage
-        const data = await response.json();
-
-        return data;
     }
-    catch (error) {
-        if (error.code == 429) {
-
-            const data = { error: 'Token rate limit exceeded. Please try again later.' };
-            return data;
-        }
-        else {
-            const data = { error: 'An error occurred. Please try again later.' };
-            return data;
-        }
+    else {
+        delete openAIRequestBody.data_sources;
     }
+
+    return results;
+
 }
 
 //code to send chat message to Bing Search API (still under development)
@@ -727,6 +708,7 @@ async function getChatResponse(questionBubble) {
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const datasources = config.DATA_SOURCES;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
@@ -766,6 +748,9 @@ async function getChatResponse(questionBubble) {
 
         // Get answers from Azure OpenAI model
         const azureOpenAIResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona);
+
+        // Get answers from Azure OpenAI model
+        const azureOpenAIYourDataResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona, dataSources);
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -952,6 +937,40 @@ async function getSelectedChatPersona() {
     else {
         return persona;
     }
+}
+
+// Function to call the rest API
+async function invokeRESTAPI(jsonString, endpoint, apiKey) {
+
+    let data = {};
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': `${apiKey}`,
+                'http2': 'true'
+            },
+            body: jsonString
+        });
+
+        data = await response.json();
+
+        return data;
+    }
+    catch (error) {
+        if (error.code == 429) {
+
+            const data = { error: 'Token rate limit exceeded. Please try again later.' };
+            return data;
+        }
+        else {
+            const data = { error: 'An error occurred. Please try again later.' };
+            return data;
+        }
+    }
+
 }
 
 // Function to check if a text is a question
