@@ -35,7 +35,7 @@ $(document).ready(async function () {
     chatDisplayContainer.insertBefore(loadingAnimation, chatDisplay);
 
     $('#send-button').on('click', postQuestion);
-    $('#clear-button').on('click', async function () { await clearChatDisplay(); });
+    $('#clear-button').on('click', clearChatDisplay);
 
     if (document.getElementById('chat-input').value.trim() === '') {
         $('#send-button').prop('disabled', true);
@@ -267,7 +267,7 @@ function addMessageToChatHistory(thread, message) {
 }
 
 // Function to clear the chat display
-async function clearChatDisplay() {
+function clearChatDisplay() {
     const chatDisplayContainer = document.getElementById('chat-display-container');
 
     const chatDisplay = document.getElementById('chat-display');
@@ -296,7 +296,7 @@ function clearFileInput() {
 }
 
 // Function to create chat response content
-async function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, sasToken) {
+async function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, sasToken) {
 
     const config = await fetchConfig();
 
@@ -323,7 +323,13 @@ async function createChatResponseContent(azureOpenAIResults, chatResponse, answe
 
         const answer = choice.message;
         const role = answer.role;
-        const answerText = answer.content.replace(" **", "").replace(/\s+/g, " ");
+        var answerText = answer.content.replace(" **", "").replace(/\s+/g, " ");
+
+        answerText = answerText.split("$$$$")[0];
+
+        if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
+            answerText = persona.NoResults;
+        }
 
         const message = { "role": role, "content": answerText };
 
@@ -360,7 +366,7 @@ async function createChatResponseContent(azureOpenAIResults, chatResponse, answe
             });
         }
 
-        const answerListHTML = '<li class="answer-results">' + answerText + footNoteLinks + '</li>';
+        const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
 
         answers += answerListHTML;
 
@@ -372,7 +378,7 @@ async function createChatResponseContent(azureOpenAIResults, chatResponse, answe
     openAIModelResultsId = `openai-model-results-${answerResponseNumber}`;
 
     if (answers.length > 0) {
-        answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><ol class="ai-enhanced-answer-results">${answers}</ol><br/></div>`;
+        answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><div class="ai-enhanced-answer-results">${answers}</div><br/></div>`;
         answerContent.innerHTML += `<div class="answer-source-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div></div>`;
     }
     else {
@@ -493,13 +499,14 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 
                 citations.forEach(citation => {
 
-                    const docPath = `${storageUrl}/${citation.title}?${sasToken}`;
                     const docTitle = citation.title;
+                    const docPath = `${storageUrl}/${docTitle}`;
 
-                    const answerText = citation.content.replace(" **", "").replace(/\s+/g, " ");
+                    var answerText = citation.content.replace(" **", "").replace(/\s+/g, " ");
+                    answerText = answerText.split(docPath)[0];
 
                     const footNoteLink = `<sup class="answer-citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                    const docLink = ` <a href="${docPath}" class="supporting-content-link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
+                    const docLink = ` <a href="${docPath}?${sasToken}" class="supporting-content-link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
 
                     supportingContentResults += '<li class="answer-results">' + answerText + docLink + '</li>';
 
@@ -521,6 +528,33 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
     }
 
     return supportingContent;
+}
+
+// Function to create tab contents for thought process content
+function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
+
+    if (azureOpenAIResults && !azureOpenAIResults.error) {
+
+        var thoughtProcessResults = "";
+
+        azureOpenAIResults.choices.forEach(choice => {
+
+            const answerText = choice.message.content.replace("**", "");
+            //const thoughtProcess = answerText.split("$$$$")[1].replace(/^\s+|\n+/g, "").trim();
+            const thoughtProcess = answerText.split("$$$$")[1].trim();
+
+            if (thoughtProcess) {
+                thoughtProcessResults += thoughtProcess;
+            }
+        });
+
+        if (thoughtProcessResults != "") {
+            thoughtProcessContent.innerHTML += '<div id="thought-process-results-container">' + thoughtProcessResults + '</div>';
+        }
+    }
+
+    return thoughtProcessContent;
+
 }
 
 // function to delete documents
@@ -574,7 +608,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona) {
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
     //const getThoughtProcess = "In addition to your normal response also include an explanation of your thought process and store that info in a property called 'thought_process'.";
-    const getThoughtProcess = "";
+    const getThoughtProcess = "Include an explanation of your thought process to arrivate at this answer";
 
     const userMessageContent = userInput + " " + getThoughtProcess;
 
@@ -582,7 +616,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona) {
     openAIRequestBody.messages = thread.messages;
 
     datasources.forEach(source => {
-        source.parameters.role_information = persona.description;
+        source.parameters.role_information = persona.Prompt;
         openAIRequestBody.data_sources.push(source);
     });
 
@@ -710,7 +744,7 @@ async function getChatResponse(questionBubble) {
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     // Get the selected chat persona
-    const persona = getSelectedChatPersona();
+    const persona = await getSelectedChatPersona();
 
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
@@ -721,7 +755,9 @@ async function getChatResponse(questionBubble) {
 
     if (chatInput) {
 
-        const message = { "role": "user", "content": chatInput };
+        const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins.";
+
+        const message = { "role": "user", "content": prompt };
 
         addMessageToChatHistory(thread, message);
 
@@ -749,10 +785,9 @@ async function getChatResponse(questionBubble) {
         answerContent.className = 'tab-content active';
         answerContent.style.fontStyle = 'italic';
 
-        const codeContent = document.createElement('div');
-        codeContent.className = 'code-content';
-        codeContent.innerHTML = 'Thought process content goes here.';
-        thoughtProcessContent.appendChild(codeContent);
+        //const codeContent = document.createElement('div');
+        //codeContent.className = 'code-content';
+        //thoughtProcessContent.appendChild(codeContent);
 
         try {
             // Create tab contents for supporting content
@@ -764,10 +799,13 @@ async function getChatResponse(questionBubble) {
             // Append the chat bubble to the chat-display div
             chatDisplay.appendChild(chatResponse);
 
-            await createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, sasToken);
+            await createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, sasToken);
+
+            createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent);
 
             chatResponse.appendChild(thoughtProcessContent);
             chatResponse.appendChild(supportingContent);
+
 
             setEqualHeightForTabContents();
 
@@ -894,15 +932,21 @@ function getQueryParam(param) {
 }
 
 // Function to get the selected chat persona
-function getSelectedChatPersona() {
+async function getSelectedChatPersona() {
+
+    const config = await fetchConfig();
+
     const selectedRadio = document.querySelector('input[name="chat-persona"]:checked');
 
     var persona = {};
 
     if (selectedRadio) {
         const label = document.querySelector(`label[for="${selectedRadio.id}"]`);
+        const personaType = label.innerText;
 
-        persona = { "description": selectedRadio.title, "title": label.innerText };
+        const chatPersonas = config.CHAT_PERSONAS;
+
+        persona = chatPersonas.find(p => p.Type === personaType) || {};
         return persona;
     }
     else {
