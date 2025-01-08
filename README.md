@@ -259,12 +259,9 @@ The image below shows a diagram of the deployed resources:
       - **Azure-AI-Demo-Azure-Resource-Visualizer.png**: Screenshot image.
       - **favicon.png**: Favicon image.
       - **azure-ai-demo-chat.png**: Chat screenshot.
-      - **azure-ai-demo-existing-docs.png**: Existing documents screenshot.
+      - **azure-ai-demo-dcouments-existing.png**: Existing documents screenshot.
       - **azure-ai-demo-selected-docs.png**: Documents selected for upload.
-      - **azure-ai-demo-upload-docs.png**: Upload documents interface.
-      - **tech_ai_background.jpg**: Background image.
-      - **site-logo-custom.png**: Custom site logo used for branding.
-      - **site-logo-default.png**: Default site logo (generic office building).
+      - **azure-ai-demo-documents-upload.png**: Upload documents interface.
     - **index.html**: Main HTML file for the frontend.
     - **scripts/**: Directory for JavaScript files.
       - **script.js**: Main JavaScript file.
@@ -312,14 +309,11 @@ The image below shows a diagram of the deployed resources:
 │   │   ├── favicon.ico
 │   │   ├── images
 │   │   │   ├── azure-ai-demo-chat.png
-│   │   │   ├── azure-ai-demo-existing-docs.png
+│   │   │   ├── azure-ai-demo-documents-existing.png
 │   │   │   ├── azure-ai-demo-selected-docs.png
 │   │   │   ├── azure-ai-demo-upload-docs.png
 │   │   │   ├── building.png
 │   │   │   ├── favicon.png
-│   │   │   ├── site-logo-custom.png
-│   │   │   ├── site-logo-default.png
-│   │   │   └── tech_ai_background.jpg
 │   │   ├── index.html
 │   │   ├── scripts
 │   │   │   └── script.js
@@ -377,7 +371,7 @@ The index.html file includes the following screens:
 
 <img width="1423" alt="azure-ai-demo-home" src="src/deployment/images/azure-ai-demo-home.png">
 
-<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/images/azure-ai-demo-documents-upload-documents.png">
+<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/images/azure-ai-demo-documents-upload.png">
 
 <img width="1410" alt="azure-ai-demo-chat" src="src/deployment/images/azure-ai-demo-chat.png">
 
@@ -387,7 +381,7 @@ The index.html file includes the following screens:
 
 <img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/images/azure-ai-demo-selected-docs.png">
 
-<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing-documents.png">
+<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing.png">
 
 ### Chat Workflow
 
@@ -436,8 +430,8 @@ The next few screenshots outline the manual steps you need to take in order to c
 1. Create new AI project and specify existing hub from your resource group. <sup>[6](#ai_studio_project_create)</sup>
 2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[7](#ai_studio_project_models_assets_menu)</sup>
 3. Select asset. <sup>[8](#ai_studio_project_select_assets)</sup>
-5. Select existing AI service from your resource group. <sup>[9](#ai_studio_project_select_ai_resource)</sup>
-6. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[10](#ai_studio_project_add_models)</sup>
+4. Select existing AI service from your resource group. <sup>[9](#ai_studio_project_select_ai_resource)</sup>
+5. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[10](#ai_studio_project_add_models)</sup>
 
 <img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project-create.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
@@ -456,7 +450,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 ### Additional Notes
 
 **REST APIs**
-It is important to note that the technologies used by this solution are changing by the second. New versions of libraries and APIs are being released constantly and documentation is being updated on a near weekly basis. Since this solution leverages REST APIs, ensuring that you are using the most up-to-date API version for each service's API is absolutely critical. With each new API release, new capabilities are added (and sometimes existing ones removed).
+It is important to note that the technologies used by this solution are changing by the second. New versions of libraries and APIs are being released constantly and documentation is being updated on a near weekly basis. Since this solution leverages REST APIs, ensuring that you are using the most up-to-date API version for each service's API is absolutely critical. With each new API release, new capabilities are added (and sometimes existing ones removed). All the magic happens in the [Azure Open AI On Your Own Data API](https://learn.microsoft.com/en-us/azure/ai-services/openai/references/azure-search?tabs=rest).
 
 A perfect example is the Azure [Search Service API](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). There is actually documentation for how to migrate to the newest version of the API located [here](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). In the documentation, it actually says "2023-07-01-preview was the first REST API for vector support. Do not use this API version. It's now deprecated and you should migrate to either stable or newer preview REST APIs immediately."
 

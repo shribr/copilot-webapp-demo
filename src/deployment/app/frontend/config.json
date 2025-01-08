@@ -1,30 +1,30 @@
 {
-  "AZURE_AI_SERVICE_API_KEY": "fe3aa68e90b64213b39a40f25755ff0c",
-  "AZURE_SEARCH_API_KEY": "YudZLO6FbkaVQtg309gQVOveZ6NcwFI740qaB38Y4lAzSeB9OnNI",
+  "AZURE_AI_SERVICE_API_KEY": "5366aeb70ed448ad86196c68ae41e44a",
+  "AZURE_SEARCH_API_KEY": "Rb6nJSI6d6McgF4WxSZjze7pYyvToML98TdIbnsMhYAzSeCyRboE",
   "AZURE_SEARCH_API_VERSION": "2024-11-01-Preview",
   "AZURE_FUNCTION_API_KEY": null,
   "AZURE_FUNCTION_APP_NAME": "",
   "AZURE_FUNCTION_APP_URL": "https://",
   "AZURE_FUNCTION_NAME": "Chat",
-  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-002",
-  "AZURE_RESOURCE_BASE_NAME": "copilot-demo-002",
+  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-005",
+  "AZURE_RESOURCE_BASE_NAME": "copilot-demo-005",
   "AZURE_SEARCH_INDEX_NAME": "configFilePath",
   "AZURE_SEARCH_INDEXER_NAME": "app/frontend/config.json",
-  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-002-semantic-configuration",
-  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-002",
+  "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-005-semantic-configuration",
+  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-005",
   "AZURE_SEARCH_VECTOR_INDEX_NAME": "",
   "AZURE_SEARCH_VECTOR_INDEXER_NAME": "",
-  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo002",
+  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo005",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-01T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=qbft&srt=co&sig=cpGu1e9tMVENy5a5OpUX80251RjDKR1bRFW3JUAKAvU%3D",
-  "AZURE_STORAGE_KEY": "Ugq/KxZmm9leSPR2JehpE6+zzQVPVA++BvdBMXVUnch/NfMKfw8WnEA96advEf9d1t0XBjHW3s2L+AStTJ/3hQ==",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo005.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-05T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bfqt&srt=co&sig=7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D",
+  "AZURE_STORAGE_KEY": "0U1U/G53fa5B3CiAd+NR43iRsES1VRAkPlvkz7PquPsp4PRBr2eBXn/UmHsuwvCZZITqdXUquSQV+AStzlXScA==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
   "DEPLOYMENT_ID": "ai",
   "ICON_COLOR": "false",
-  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-002",
-  "OPENAI_API_KEY": "7f35735496054438aaeb72d0f1ee29a1",
+  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-005",
+  "OPENAI_API_KEY": "a862f9d45a3a4c9aacea5a8500fb6391",
   "OPENAI_API_VERSION": "2024-08-01-preview",
   "REGION": "eastus",
   "SEARCH_AZURE_OPENAI_MODEL": true,
@@ -34,7 +34,7 @@
     {
       "Name": "gpt-4o",
       "Format": "OpenAI",
-      "ApiKey": "fe3aa68e90b64213b39a40f25755ff0c",
+      "ApiKey": "5366aeb70ed448ad86196c68ae41e44a",
       "Type": "gpt-4o",
       "Sku": {
         "Capacity": 100,
@@ -46,7 +46,7 @@
     {
       "Name": "text-embedding",
       "Format": "OpenAI",
-      "ApiKey": "fe3aa68e90b64213b39a40f25755ff0c",
+      "ApiKey": "5366aeb70ed448ad86196c68ae41e44a",
       "Type": "text-embedding-3-large",
       "Sku": {
         "Capacity": 100,
@@ -74,16 +74,36 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "qbft",
+    "SS": "bfqt",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-01-01T23:59:59Z",
-    "ST": "2025-01-01T23:59:59Z",
+    "SE": "2026-01-05T23:59:59Z",
+    "ST": "2025-01-05T23:59:59Z",
     "SPR": "https",
-    "SIG": "cpGu1e9tMVENy5a5OpUX80251RjDKR1bRFW3JUAKAvU%3D",
+    "SIG": "7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
+  },
+  "AZURE_OPENAI_REQUEST_BODY": {
+    "data_sources": [],
+    "messages": [
+      {
+        "role": "system",
+        "content": ""
+      },
+      {
+        "role": "user",
+        "content": ""
+      }
+    ],
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "max_tokens": 800,
+    "stop": null,
+    "stream": false
   },
   "CHAT_PERSONAS": [
     {
@@ -130,6 +150,20 @@
       "Type": "Default",
       "Description": "You are a helpful assistant who loves to help people with their questions and problems. You are very knowledgeable and love to share your knowledge with others.",
       "Prompt": "You are a helpful assistant."
+    }
+  ],
+  "DATA_SOURCES": [
+    {
+      "type": "azure_search",
+      "parameters": {
+        "endpoint": "https://srch-copilot-demo-005.search.windows.net",
+        "index_name": "vector-srch-index-copilot-demo-005",
+        "role_information": "",
+        "authentication": {
+          "type": "api_key",
+          "key": "Rb6nJSI6d6McgF4WxSZjze7pYyvToML98TdIbnsMhYAzSeCyRboE"
+        }
+      }
     }
   ],
   "FILE_TYPES": {
@@ -309,38 +343,38 @@
   },
   "SEARCH_INDEXERS": [
     {
-      "IndexName": "srch-index-copilot-demo-002",
-      "Name": "srch-indexer-copilot-demo-002",
+      "IndexName": "srch-index-copilot-demo-005",
+      "Name": "srch-indexer-copilot-demo-005",
       "Schema": "search-indexer-schema.json",
-      "SkillSetName": "srch-skillset-copilot-demo-002"
+      "SkillSetName": "srch-skillset-copilot-demo-005"
     },
     {
-      "IndexName": "vector-srch-index-copilot-demo-002",
-      "Name": "vector-srch-indexer-copilot-demo-002",
+      "IndexName": "vector-srch-index-copilot-demo-005",
+      "Name": "vector-srch-indexer-copilot-demo-005",
       "Schema": "vector-search-indexer-schema.json",
-      "SkillSetName": "vector-srch-skillset-copilot-demo-002"
+      "SkillSetName": "vector-srch-skillset-copilot-demo-005"
     },
     {
-      "IndexName": "embeddings-srch-index-copilot-demo-002",
-      "Name": "embeddings-srch-indexer-copilot-demo-002",
+      "IndexName": "embeddings-srch-index-copilot-demo-005",
+      "Name": "embeddings-srch-indexer-copilot-demo-005",
       "Schema": "embeddings-search-indexer-schema.json",
-      "SkillSetName": "embeddings-srch-skillset-copilot-demo-002"
+      "SkillSetName": "embeddings-srch-skillset-copilot-demo-005"
     }
   ],
   "SEARCH_INDEXES": [
     {
       "Model": "gpt-4o",
-      "Name": "srch-index-copilot-demo-002",
+      "Name": "srch-index-copilot-demo-005",
       "Schema": "search-index-schema.json"
     },
     {
       "Model": "gpt-4o",
-      "Name": "vector-srch-index-copilot-demo-002",
+      "Name": "vector-srch-index-copilot-demo-005",
       "Schema": "vector-search-index-schema.json"
     },
     {
       "Model": "text-embedding-3-large",
-      "Name": "embeddings-srch-index-copilot-demo-002",
+      "Name": "embeddings-srch-index-copilot-demo-005",
       "Schema": "embeddings-search-index-schema.json"
     }
   ],

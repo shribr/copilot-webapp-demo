@@ -4430,9 +4430,15 @@ function Update-ConfigFile {
         # Clear existing values in SEARCH_INDEXES
         $config.SEARCH_INDEXES = @()
 
+        $vectorSearchIndex = $null
+
         # Loop through the search indexes collection from global:searchIndexes
         foreach ($searchIndex in $global:searchIndexes) {
             $config.SEARCH_INDEXES += $searchIndex
+
+            if ($searchIndex.Name -match "vector") {
+                $vectorSearchIndex = $searchIndex
+            }
         }
 
         # Clear existing values in SEARCH_INDEXERS
@@ -4441,6 +4447,41 @@ function Update-ConfigFile {
         # Loop through the search indexes collection from global:searchIndexes
         foreach ($searchIndexer in $global:searchIndexers) {
             $config.SEARCH_INDEXERS += $searchIndexer
+        }
+
+        # Define the AZURE_OPENAI_REQUEST_BODY
+        $config.AZURE_OPENAI_REQUEST_BODY = @{
+            "data_sources"      = @(
+                @{
+                    "type"       = "azure_search"
+                    "parameters" = @{
+                        "endpoint"       = "https://$global:searchServiceName.search.windows.net"
+                        "index_name"     = "$vectorSearchIndex"
+                        "authentication" = @{
+                            "type" = "api_key"
+                            "key"  = "$searchApiKey"
+                        }
+                    }
+                }
+            )
+            "messages"          = @(
+                @{
+                    "role"             = "system"
+                    "role_information" = "You are a helpful assistant"
+                    "content"          = ""
+                }
+                @{
+                    "role"    = "user"
+                    "content" = ""
+                }
+            )
+            "temperature"       = 0.7
+            "top_p"             = 0.95
+            "frequency_penalty" = 0
+            "presence_penalty"  = 0
+            "max_tokens"        = 800
+            "stop"              = $null
+            "stream"            = $false
         }
 
         # Clear existing values in AI_MODELS
