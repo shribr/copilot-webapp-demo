@@ -298,14 +298,14 @@ function clearFileInput() {
 // Function to create chat response content
 async function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, sasToken) {
 
-    const config = await fetchConfig();
-
-    const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
-
     var sourceNumber = 0;
     var citationContentResults = "";
     var openAIModelResultsId = "";
     var answers = "";
+
+    const config = await fetchConfig();
+
+    const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
@@ -316,61 +316,70 @@ async function createChatResponseContent(azureOpenAIResults, chatResponse, answe
 
     var footNoteLinks = "";
 
-    // Loop through the answers and create the response content      
-    azureOpenAIResults.choices.forEach(choice => {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
-        console.log(`Choice: ${choice}`);
+        // Loop through the answers and create the response content      
+        azureOpenAIResults.choices.forEach(choice => {
 
-        const answer = choice.message;
-        const role = answer.role;
-        var answerText = answer.content.replace(" **", "").replace(/\s+/g, " ");
+            console.log(`Choice: ${choice}`);
 
-        answerText = answerText.split("$$$$")[0];
+            const answer = choice.message;
+            const role = answer.role;
+            var answerText = answer.content.replace(" **", "").replace(/\s+/g, " ");
 
-        if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
-            answerText = persona.NoResults;
-        }
+            answerText = answerText.split("$$$$")[0];
 
-        const message = { "role": role, "content": answerText };
+            if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
+                answerText = persona.NoResults;
+            }
 
-        addMessageToChatHistory(thread, message);
+            const message = { "role": role, "content": answerText };
 
-        const context = answer.context;
+            addMessageToChatHistory(thread, message);
 
-        const citations = context.citations;
+            const context = answer.context;
 
-        if (citations) {
+            const citations = context.citations;
 
-            console.log(`Citations: ${citations}`);
+            if (citations) {
 
-            citations.forEach(citation => {
-                const docTitle = citation.title;
+                console.log(`Citations: ${citations}`);
 
-                const docUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${docTitle}?${sasToken}`;
+                citations.forEach(citation => {
+                    const docTitle = citation.title;
 
-                if (!listedPaths.has(docTitle)) {
-                    listedPaths.add(docTitle);
+                    const docUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${docTitle}?${sasToken}`;
 
-                    sourceNumber++;
+                    if (!listedPaths.has(docTitle)) {
+                        listedPaths.add(docTitle);
 
-                    const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${docTitle}</a>`;
+                        sourceNumber++;
 
-                    citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+                        const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${docTitle}</a>`;
 
-                    footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                }
-                else {
-                    console.log(`Document already listed: ${docTitle}`);
-                }
+                        citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
-            });
-        }
+                        footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                    }
+                    else {
+                        console.log(`Document already listed: ${docTitle}`);
+                    }
 
-        const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+                });
+            }
+
+            const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+
+            answers += answerListHTML;
+
+        });
+
+    }
+    else {
+        const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
 
         answers += answerListHTML;
-
-    });
+    }
 
     answerContent.innerHTML += '<div id="openai-model-results-header">Search Results</div>';
 
@@ -475,7 +484,7 @@ async function createTabs() {
 // Function to create tab contents for supporting content results returned from Azure Search
 function createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken) {
 
-    if (azureOpenAIResults && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         //var answerResults = "";
         var citationContentResults = "";
@@ -533,7 +542,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 // Function to create tab contents for thought process content
 function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
 
-    if (azureOpenAIResults && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         var thoughtProcessResults = "";
 
@@ -708,7 +717,7 @@ async function getChatResponse(questionBubble) {
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const datasources = config.DATA_SOURCES;
+    const dataSources = config.DATA_SOURCES;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
@@ -746,11 +755,8 @@ async function getChatResponse(questionBubble) {
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
 
-        // Get answers from Azure OpenAI model
-        const azureOpenAIResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona);
-
-        // Get answers from Azure OpenAI model
-        const azureOpenAIYourDataResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona, dataSources);
+        // Get answers from Azure OpenAI model and datasources
+        const azureOpenAIResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona, dataSources);
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
