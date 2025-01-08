@@ -281,6 +281,8 @@ async function clearChatDisplay() {
 
     document.getElementById('expand-chat-svg-container').style.display = 'none';
     document.getElementById('jump-to-top-arrow').style.display = 'none';
+
+    thread.messages = []; // Clear the chat history
 }
 
 //code to clear file input
