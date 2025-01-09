@@ -323,13 +323,13 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
             answerText = answerText.split("$$$$")[0];
 
-            if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
-                answerText = persona.NoResults;
-            }
-
             const message = { "role": role, "content": answerText };
 
             addMessageToChatHistory(thread, message);
+
+            if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
+                answerText = persona.NoResults;
+            }
 
             const context = answer.context;
 
@@ -342,6 +342,11 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
                 for (const citation of citations) {
                     const docTitle = citation.title;
                     const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
+
+                    // Detect and replace [doc*] with [page *] and create hyperlink
+                    answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
+                        return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
+                    });
 
                     if (!listedPaths.has(docTitle)) {
                         listedPaths.add(docTitle);

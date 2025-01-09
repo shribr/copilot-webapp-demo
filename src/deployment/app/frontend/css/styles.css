@@ -125,6 +125,10 @@ code {
   top: 0px;
 }
 
+.page-number {
+  margin-left: -4px !important;
+}
+
 .answer-results {
   padding-bottom: 8px;
 }
@@ -392,6 +396,7 @@ code {
   color: #555;
   text-align: center;
   margin-top: 20px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
