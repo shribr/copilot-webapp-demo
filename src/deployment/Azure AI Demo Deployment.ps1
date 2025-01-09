@@ -545,6 +545,34 @@ function Get-Parameters-Sorted {
     return $sortedParametersObject
 }
 
+# Function to check the status of a resource
+function Get-ResourceStatus {
+    param (
+        [string]$resourceName,
+        [string]$resourceGroupName,
+        [string]$resourceType
+    )
+
+    try {
+        $resource = az resource show --name $resourceName --resource-group $resourceGroupName --resource-type $resourceType --output json | ConvertFrom-Json
+        if ($resource.properties.provisioningState -eq "Succeeded") {
+            Write-Host "Resource '$resourceName' is provisioned successfully."
+            Write-Log -message "Resource '$resourceName' is provisioned successfully."
+        }
+        else {
+            Write-Host "Resource '$resourceName' is in state: $($resource.properties.provisioningState)"
+            Write-Log -message "Resource '$resourceName' is in state: $($resource.properties.provisioningState)"
+        }
+    }
+    catch {
+        Write-Error "Failed to get status for resource '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to get status for resource '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Example usage of Get-ResourceStatus function for Azure Cognitive Search
+Get-ResourceStatus -resourceName "your-search-service-name" -resourceGroupName "your-resource-group-name" -resourceType "Microsoft.Search/searchServices"
+
 # Function to check if a search index exists
 function Get-SearchIndexes {
     param (

@@ -45,6 +45,11 @@ $(document).ready(async function () {
         $('#send-button').prop('disabled', false);
     }
 
+    document.getElementById('hamburger-menu').addEventListener('click', function () {
+        const leftNav = document.getElementById('left-nav-container');
+        leftNav.style.display = (leftNav.style.display === 'block' || leftNav.style.display === "") ? 'none' : 'block';
+    });
+
     const chatInput = document.getElementById('chat-input');
 
     chatInput.addEventListener('keyup', function () {
@@ -916,7 +921,8 @@ async function getDocuments() {
             headers: {
                 'Content-Type': 'text/xml',
                 'Cache-Control': 'no-cache'
-            }
+            },
+            mode: 'no-cors'
         });
 
         if (response.ok) {

@@ -1,12 +1,39 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 01/09/2025 01:12:13 ***
-2025-01-09 01:12:15 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
-2025-01-09 01:12:34 - Web app 'app-copilot-demo-005' deployed successfully.
+*** SCRIPT START TIME: 01/09/2025 13:13:08 ***
+2025-01-09 13:13:10 - Resource Group 'RG-COPILOT-DEMO-001' already exists.
+2025-01-09 13:13:15 - User Assigned Identity 'id-copilot-demo-001' created successfully. [1]
+2025-01-09 13:13:32 - Service principal created for identity 'id-copilot-demo-001'.
+2025-01-09 13:13:53 - User 'id-copilot-demo-001' assigned to role: 'Contributor'.
+2025-01-09 13:13:56 - User 'id-copilot-demo-001' assigned to role: 'Cognitive Services OpenAI User'.
+2025-01-09 13:13:59 - User 'id-copilot-demo-001' assigned to role: 'Search Index Data Reader'.
+2025-01-09 13:14:04 - User 'id-copilot-demo-001' assigned to role: 'Storage Blob Data Reader'.
+2025-01-09 13:14:26 - Storage account 'stcopilotdemo001' created successfully. [2]
+2025-01-09 13:14:49 - Virtual Network 'vnet-copilot-demo-001' created successfully. [3]
+2025-01-09 13:15:03 - Subnet 'subnet-copilot-demo-001' created successfully.
+2025-01-09 13:15:18 - App Service Plan 'asp-copilot-demo-001' created successfully. [4]
+2025-01-09 13:15:21 - Cognitive Services account 'cog-copilot-demo-001' created successfully. [5]
 *** LOG SEQUENCE: 2 ***
-*** SCRIPT START TIME: 01/09/2025 01:14:50 ***
-2025-01-09 01:14:52 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
-2025-01-09 01:15:19 - Web app 'app-copilot-demo-005' deployed successfully.
+*** SCRIPT START TIME: 01/09/2025 13:17:59 ***
+2025-01-09 13:18:00 - Resource Group 'RG-COPILOT-DEMO-001' already exists.
+2025-01-09 13:18:01 - Identity 'id-copilot-demo-001' already exists.
+2025-01-09 13:18:01 - Storage account 'stcopilotdemo001' already exists.
+2025-01-09 13:18:03 - Subnet 'subnet-copilot-demo-001' already exists.
+2025-01-09 13:18:03 - App Service Plan 'asp-copilot-demo-001' already exists.
+2025-01-09 13:18:03 - Cognitive Service 'cog-copilot-demo-001' already exists.
 *** LOG SEQUENCE: 3 ***
-*** SCRIPT START TIME: 01/09/2025 01:19:56 ***
-2025-01-09 01:19:58 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
-2025-01-09 01:20:28 - Web app 'app-copilot-demo-005' deployed successfully.
+*** SCRIPT START TIME: 01/09/2025 14:09:49 ***
+2025-01-09 14:09:50 - Resource Group 'RG-COPILOT-DEMO-001' already exists.
+2025-01-09 14:09:52 - Identity 'id-copilot-demo-001' already exists.
+2025-01-09 14:09:52 - Storage account 'stcopilotdemo001' already exists.
+2025-01-09 14:09:54 - Subnet 'subnet-copilot-demo-001' already exists.
+2025-01-09 14:09:54 - App Service Plan 'asp-copilot-demo-001' already exists.
+2025-01-09 14:09:54 - Cognitive Service 'cog-copilot-demo-001' already exists.
+2025-01-09 16:08:09 - Resource 'your-search-service-name' is in state: 
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 01/09/2025 16:08:14 ***
+2025-01-09 16:08:15 - Resource Group 'RG-COPILOT-DEMO-001' already exists.
+2025-01-09 16:08:17 - Identity 'id-copilot-demo-001' already exists.
+2025-01-09 16:08:17 - Storage account 'stcopilotdemo001' already exists.
+2025-01-09 16:08:19 - Subnet 'subnet-copilot-demo-001' already exists.
+2025-01-09 16:08:19 - App Service Plan 'asp-copilot-demo-001' already exists.
+2025-01-09 16:08:19 - Cognitive Service 'cog-copilot-demo-001' already exists.
