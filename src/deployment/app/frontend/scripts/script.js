@@ -20,7 +20,7 @@ let tool_resources = {
 
 $(document).ready(async function () {
 
-    setChatDisplayHeight();
+    //setChatDisplayHeight();
 
     setSiteLogo();
 
@@ -47,12 +47,14 @@ $(document).ready(async function () {
 
     const chatInput = document.getElementById('chat-input');
 
-    chatInput.addEventListener('keydown', function () {
+    chatInput.addEventListener('keyup', function () {
         if (chatInput.value.trim() === '') {
             $('#send-button').prop('disabled', true);
+            //$('#send-button').addClass('button-disabled');
         }
         else {
             $('#send-button').prop('disabled', false);
+            //$('#send-button').removeClass('button-disabled');
         }
     });
 
@@ -296,20 +298,12 @@ function clearFileInput() {
 }
 
 // Function to create chat response content
-async function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, sasToken) {
+function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, storageUrl, sasToken, downloadChatResultsSVG) {
 
     var sourceNumber = 0;
     var citationContentResults = "";
     var openAIModelResultsId = "";
     var answers = "";
-
-    const config = await fetchConfig();
-
-    const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
-
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
-    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
 
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
@@ -318,8 +312,8 @@ async function createChatResponseContent(azureOpenAIResults, chatResponse, answe
 
     if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
-        // Loop through the answers and create the response content      
-        azureOpenAIResults.choices.forEach(choice => {
+        // Loop through the answers and create the response content   
+        for (const choice of azureOpenAIResults[0].choices) {
 
             console.log(`Choice: ${choice}`);
 
@@ -345,10 +339,9 @@ async function createChatResponseContent(azureOpenAIResults, chatResponse, answe
 
                 console.log(`Citations: ${citations}`);
 
-                citations.forEach(citation => {
+                for (const citation of citations) {
                     const docTitle = citation.title;
-
-                    const docUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${docTitle}?${sasToken}`;
+                    const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
 
                     if (!listedPaths.has(docTitle)) {
                         listedPaths.add(docTitle);
@@ -365,14 +358,14 @@ async function createChatResponseContent(azureOpenAIResults, chatResponse, answe
                         console.log(`Document already listed: ${docTitle}`);
                     }
 
-                });
+                }
             }
 
             const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
 
             answers += answerListHTML;
 
-        });
+        }
 
     }
     else {
@@ -463,20 +456,21 @@ async function createSidenavLinks() {
 }
 
 // Function to create tabs
-async function createTabs() {
-
-    const config = await fetchConfig();
+function createTabs(responseTabs) {
 
     const tabs = document.createElement('div');
     tabs.className = 'tabs';
 
     // Loop through CHAT_TABS to create tabs dynamically
-    Object.entries(config.RESPONSE_TABS).forEach(([key, value], index) => {
+
+    for (let index = 0; index < responseTabs.length; index++) {
+        const [key, value] = responseTabs[index];
         const tab = document.createElement('div');
         tab.className = `tab ${index === 0 ? 'active' : ''}`;
+        tab.id = value.ID;
         tab.innerHTML = `${value.SVG} ${value.TEXT}`;
         tabs.appendChild(tab);
-    });
+    }
 
     return tabs;
 }
@@ -497,7 +491,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 
         console.log(`Azure OpenAI Results: ${azureOpenAIResults}`);
 
-        azureOpenAIResults.choices.forEach(choice => {
+        for (const choice of azureOpenAIResults[0].choices) {
 
             const answer = choice.message;
             const context = answer.context;
@@ -506,7 +500,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 
             if (citations) {
 
-                citations.forEach(citation => {
+                for (const citation of citations) {
 
                     const docTitle = citation.title;
                     const docPath = `${storageUrl}/${docTitle}`;
@@ -526,10 +520,10 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
                     } else {
                         console.log(`Document already listed: ${docPath}`);
                     }
-                });
+                }
                 answerNumber++;
             }
-        });
+        }
 
         if (supportingContentResults != "") {
             supportingContent.innerHTML += '<div id="azure-storage-results-container"><div id="azure-storage-results-header">Supporting Content from Azure Storage</div>' + '<ol id="supporting-content-results">' + supportingContentResults + '</ol><br/></div>';
@@ -540,22 +534,21 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 }
 
 // Function to create tab contents for thought process content
-function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
+async function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
 
     if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         var thoughtProcessResults = "";
 
-        azureOpenAIResults.choices.forEach(choice => {
+        for (const choice of azureOpenAIResults[0].choices) {
 
             const answerText = choice.message.content.replace("**", "");
-            //const thoughtProcess = answerText.split("$$$$")[1].replace(/^\s+|\n+/g, "").trim();
             const thoughtProcess = answerText.split("$$$$")[1].trim();
 
             if (thoughtProcess) {
                 thoughtProcessResults += thoughtProcess;
             }
-        });
+        }
 
         if (thoughtProcessResults != "") {
             thoughtProcessContent.innerHTML += '<div id="thought-process-results-container">' + thoughtProcessResults + '</div>';
@@ -622,7 +615,8 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     openAIRequestBody.messages = thread.messages;
 
     if (dataSources.length > 0) {
-        dataSources.forEach(async source => {
+
+        for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
             openAIRequestBody.data_sources.push(source);
 
@@ -631,7 +625,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
             const result = await invokeRESTAPI(jsonString, endpoint, apiKey);
 
             results.push(result);
-        });
+        }
     }
     else {
         delete openAIRequestBody.data_sources;
@@ -718,6 +712,8 @@ async function getChatResponse(questionBubble) {
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const dataSources = config.DATA_SOURCES;
+    const responseTabList = Object.entries(config.RESPONSE_TABS);
+    const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
@@ -763,40 +759,40 @@ async function getChatResponse(questionBubble) {
         chatResponse.setAttribute('class', 'chat-response user slide-up'); // Add slide-up class
         chatResponse.setAttribute('id', `chat-response-${answerResponseNumber}`);
 
-        const tabs = await createTabs();
+        const tabs = createTabs(responseTabList);
 
-        const thoughtProcessContent = document.createElement('div');
-        thoughtProcessContent.className = 'tab-content';
-
-        const supportingContent = document.createElement('div');
-        supportingContent.className = 'tab-content';
-        supportingContent.style.fontStyle = 'italic';
+        // Append tabs and contents to chat bubble
+        chatResponse.appendChild(tabs);
 
         const answerContent = document.createElement('div');
         answerContent.className = 'tab-content active';
+        answerContent.id = 'tab-content-answer';
         answerContent.style.fontStyle = 'italic';
 
-        //const codeContent = document.createElement('div');
-        //codeContent.className = 'code-content';
-        //thoughtProcessContent.appendChild(codeContent);
+        const thoughtProcessContent = document.createElement('div');
+        thoughtProcessContent.className = 'tab-content';
+        thoughtProcessContent.id = 'tab-content-thought-process';
+
+        const supportingContent = document.createElement('div');
+        supportingContent.className = 'tab-content';
+        supportingContent.id = 'tab-content-supporting-content';
+        supportingContent.style.fontStyle = 'italic';
 
         try {
-            // Create tab contents for supporting content
-            createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken);
-
-            // Append tabs and contents to chat bubble
-            chatResponse.appendChild(tabs);
-
             // Append the chat bubble to the chat-display div
             chatDisplay.appendChild(chatResponse);
 
-            await createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, sasToken);
+            // Create tab contents for chat response content
+            createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, storageUrl, sasToken, downloadChatResultsSVG);
 
+            // Create tab contents for thought process content
             createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent);
+
+            // Create tab contents for supporting content
+            createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken);
 
             chatResponse.appendChild(thoughtProcessContent);
             chatResponse.appendChild(supportingContent);
-
 
             setEqualHeightForTabContents();
 
@@ -1041,8 +1037,6 @@ async function postQuestion() {
     // Scroll to the position right above the newest questionBubble
     const questionBubbleTop = questionBubble.offsetTop;
     chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
-
-    //await addMessageToThread(threadId, chatInput, "user");
 
     getChatResponse(questionBubble);
 }

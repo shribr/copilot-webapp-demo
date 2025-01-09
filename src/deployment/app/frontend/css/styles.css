@@ -141,6 +141,11 @@ code {
   color: #555;
 }
 
+.button-disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .chat-response {
   background-color: #87ceeb;
   /* background-color: white; */
@@ -583,6 +588,12 @@ code {
 .tab-content {
   flex: 1;
   display: none;
+}
+
+#tab-content-answer,
+#tab-content-thought-process,
+#tab-content-supporting-content {
+  flex: 1;
 }
 
 .tab-content.active {
@@ -1396,6 +1407,11 @@ code {
 
 #send-button:hover {
   background-color: #0046b3;
+}
+
+#send-button:disabled {
+  background-color: lightgray;
+  cursor: not-allowed;
 }
 
 #settings-overlay {
