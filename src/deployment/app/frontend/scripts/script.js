@@ -394,7 +394,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         answerContent.innerHTML += `<div id="answer-sources-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div ></div> `;
     }
     else {
-        answerContent.innerHTML += `< div id = "${openAIModelResultsId}" > No results found.</div > `;
+        answerContent.innerHTML += `<div id = "${openAIModelResultsId}"> No results found.</div>`;
     }
 
     chatResponse.appendChild(answerContent);
@@ -410,11 +410,13 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
         const downloadChatResultsButtonId = `download - chat - results - button - ${answerResponseNumber} `;
 
-        const downloadChatResultsButton = `<div id = "${downloadChatResultsButtonId}" onclick = "downloadChatResults('${openAIModelResultsId}')" class="download-chat-results-button">${downloadChatResultsSVG}</div> `;
+        const downloadChatResultsButton = `<div id = "${downloadChatResultsButtonId}" onclick = "downloadChatResults()" class="download-chat-results-button">${downloadChatResultsSVG}</div> `;
 
         downloadChatResultsContainer.innerHTML = downloadChatResultsButton;
 
         openAIResultsContainer.appendChild(downloadChatResultsContainer);
+
+        document.getElementById(downloadChatResultsButtonId).addEventListener('click', downloadChatResults);
     }
 
 }
@@ -602,9 +604,9 @@ function deleteDocuments() {
 }
 
 // Function to download chat results to a file
-function downloadChatResults(chatResultsId) {
+function downloadChatResults(event) {
 
-    const chatResults = collectChatResults(chatResultsId);
+    const chatResults = `<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Chat Results</title></head><body style="font-family: Arial; padding: 14px;"><div>${event.target.parentElement.parentElement.parentElement.previousElementSibling.previousSibling.firstChild.innerHTML}</div></body></html>`;
     const blob = new Blob([chatResults], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
