@@ -113,7 +113,8 @@ code {
   padding: 1px;
 }
 
-.answer-citations {
+.answer-citations,
+.followup-questions {
   color: rgba(33, 150, 243, 1);
   background-color: rgba(33, 150, 243, 0.058823529411764705);
   border-radius: 4px;
@@ -122,11 +123,17 @@ code {
   padding: 4px;
   margin-left: 8px;
   margin-bottom: 2px;
+  text-decoration: underline;
+  cursor: pointer;
   top: 0px;
 }
 
-.page-number {
-  margin-left: -4px !important;
+.followup-questions {
+  padding: 0px;
+  background-color: transparent;
+  height: 24px;
+  font-size: 14px;
+  margin-bottom: -12px;
 }
 
 .answer-results {
@@ -134,10 +141,6 @@ code {
 }
 
 .answer-sources {
-  font-size: inherit;
-}
-
-.answer-sources-container {
   font-size: inherit;
 }
 
@@ -417,6 +420,10 @@ code {
   white-space: nowrap;
 }
 
+.page-number {
+  margin-left: -4px !important;
+}
+
 .question-bubble-date {
   font-size: 12px;
   font-style: italic;
@@ -677,6 +684,16 @@ code {
   background-color: #0046b3;
 }
 
+#answer-sources-container,
+#followup-questions-container {
+  font-size: inherit;
+  margin-bottom: 20px;
+}
+
+#followup-questions-container h6 {
+  margin-bottom: 0.1rem;
+}
+
 #azure-storage-results-header {
   text-decoration: underline;
   font-weight: bold;
@@ -747,6 +764,14 @@ code {
   margin: 0;
   /* Remove default margin */
   background-color: #f4f4f9;
+}
+
+#followup-questions-container {
+  margin-top: 40px;
+}
+
+#followup-questions-container ol {
+  line-height: 0.8;
 }
 
 /* File upload styles */

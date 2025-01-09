@@ -319,7 +319,10 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
             const answer = choice.message;
             const role = answer.role;
-            var answerText = answer.content.replace(" **", "").replace(/\s+/g, " ");
+            var answerText = answer.content.replace("**", "").replace(/\s+/g, " ");
+            var followUpQuestions = answerText.split("$$$$")[2].trim();
+
+            //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
             answerText = answerText.split("$$$$")[0];
 
@@ -387,10 +390,11 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
     if (answers.length > 0) {
         answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><div class="ai-enhanced-answer-results">${answers}</div><br/></div>`;
-        answerContent.innerHTML += `<div class="answer-source-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div></div>`;
+        answerContent.innerHTML += `<div id="followup-questions-container"><h6 class="followup-question">Suggested Follow Up Questions:</h6>${followUpQuestions}</div>`;
+        answerContent.innerHTML += `<div id="answer-sources-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div ></div> `;
     }
     else {
-        answerContent.innerHTML += `<div id="${openAIModelResultsId}">No results found.</div>`;
+        answerContent.innerHTML += `< div id = "${openAIModelResultsId}" > No results found.</div > `;
     }
 
     chatResponse.appendChild(answerContent);
@@ -401,12 +405,12 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         const openAIResultsContainer = document.getElementById(openAIModelResultsId);
 
         const downloadChatResultsContainer = document.createElement('div');
-        downloadChatResultsContainer.id = `download-chat-results-container-${answerResponseNumber}`;
+        downloadChatResultsContainer.id = `download - chat - results - container - ${answerResponseNumber} `;
         downloadChatResultsContainer.className = 'download-chat-results-container';
 
-        const downloadChatResultsButtonId = `download-chat-results-button-${answerResponseNumber}`;
+        const downloadChatResultsButtonId = `download - chat - results - button - ${answerResponseNumber} `;
 
-        const downloadChatResultsButton = `<div id="${downloadChatResultsButtonId}" onclick="downloadChatResults('${openAIModelResultsId}')" class="download-chat-results-button">${downloadChatResultsSVG}</div>`;
+        const downloadChatResultsButton = `<div id = "${downloadChatResultsButtonId}" onclick = "downloadChatResults('${openAIModelResultsId}')" class="download-chat-results-button">${downloadChatResultsSVG}</div> `;
 
         downloadChatResultsContainer.innerHTML = downloadChatResultsButton;
 
@@ -417,7 +421,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
 // Function to collect chat results
 function collectChatResults(chatResultsId) {
-    const chatDisplay = document.getElementById(`${chatResultsId}`);
+    const chatDisplay = document.getElementById(`${chatResultsId} `);
     return chatDisplay.innerHTML;
 }
 
@@ -445,13 +449,13 @@ async function createSidenavLinks() {
                 sidenavLink.setAttribute('aria-label', value.TEXT);
                 sidenavLink.setAttribute('title', value.TEXT);
                 sidenavLink.setAttribute('data-tooltip', value.TEXT);
-                sidenavLink.setAttribute('id', `sidenav-item-${key}`);
-                sidenavLink.innerHTML = `${value.SVG} ${value.TEXT}`;
+                sidenavLink.setAttribute('id', `sidenav - item - ${key} `);
+                sidenavLink.innerHTML = `${value.SVG} ${value.TEXT} `;
 
                 sidenavItem.appendChild(sidenavLink);
                 sidenav.appendChild(sidenavItem);
 
-                console.log(`Key: ${key}, Text: ${value.TEXT}`);
+                console.log(`Key: ${key}, Text: ${value.TEXT} `);
             }
         } else {
             console.error('sidenavLinks is not an array:', sidenavLinks);
@@ -472,13 +476,39 @@ function createTabs(responseTabs) {
     for (let index = 0; index < responseTabs.length; index++) {
         const [key, value] = responseTabs[index];
         const tab = document.createElement('div');
-        tab.className = `tab ${index === 0 ? 'active' : ''}`;
+        tab.className = `tab ${index === 0 ? 'active' : ''} `;
         tab.id = value.ID;
-        tab.innerHTML = `${value.SVG} ${value.TEXT}`;
+        tab.innerHTML = `${value.SVG} ${value.TEXT} `;
         tabs.appendChild(tab);
     }
 
     return tabs;
+}
+
+// Function to create tab contents for follow-up questions
+function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsContent) {
+
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+
+        var followUpQuestionsResults = "";
+
+        for (const choice of azureOpenAIResults[0].choices) {
+
+            const answerText = choice.message.content.replace("**", "");
+            const followUpQuestions = answerText.split("$$$$")[2].trim();
+
+            if (followUpQuestions) {
+                followUpQuestionsResults += followUpQuestions;
+            }
+        }
+
+        if (followUpQuestionsResults != "") {
+            followUpQuestionsContent.innerHTML += '<div id="follow-up-questions-results-container">' + followUpQuestionsResults + '</div>';
+        }
+    }
+
+    return followUpQuestionsContent;
+
 }
 
 // Function to create tab contents for supporting content results returned from Azure Search
@@ -495,7 +525,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
         // Initialize a Set to store unique document paths
         const listedPaths = new Set();
 
-        console.log(`Azure OpenAI Results: ${azureOpenAIResults}`);
+        console.log(`Azure OpenAI Results: ${azureOpenAIResults} `);
 
         for (const choice of azureOpenAIResults[0].choices) {
 
@@ -540,7 +570,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 }
 
 // Function to create tab contents for thought process content
-async function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
+function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
 
     if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
@@ -748,7 +778,7 @@ async function getChatResponse(questionBubble) {
 
     if (chatInput) {
 
-        const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins.";
+        const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set followup questions surrounded by <ol> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.";
 
         const message = { "role": "user", "content": prompt };
 
@@ -830,6 +860,14 @@ async function getChatResponse(questionBubble) {
 
         // Clear the input field
         chatInput.value = '';
+
+        var followUpQuestionLinks = document.getElementsByClassName('followup-questions');
+
+        for (const link of followUpQuestionLinks) {
+            link.addEventListener('click', function () {
+                document.getElementById('chat-input').value = link.textContent;
+            });
+        }
 
         // Scroll to the position right above the newest questionBubble
         const questionBubbleTop = chatResponse.offsetTop;
