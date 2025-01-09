@@ -256,12 +256,9 @@ The image below shows a diagram of the deployed resources:
       - **styles.css**: Main stylesheet.
     - **favicon.ico**: Favicon for the frontend.
     - **images/**: Directory for image files.
-      - **Azure-AI-Demo-Azure-Resource-Visualizer.png**: Screenshot image.
-      - **favicon.png**: Favicon image.
       - **azure-ai-demo-chat.png**: Chat screenshot.
-      - **azure-ai-demo-dcouments-existing.png**: Existing documents screenshot.
+      - **azure-ai-demo-documents-existing.png**: Existing documents screenshot.
       - **azure-ai-demo-selected-docs.png**: Documents selected for upload.
-      - **azure-ai-demo-documents-upload.png**: Upload documents interface.
     - **index.html**: Main HTML file for the frontend.
     - **scripts/**: Directory for JavaScript files.
       - **script.js**: Main JavaScript file.
@@ -282,6 +279,21 @@ The image below shows a diagram of the deployed resources:
   - **package-lock.json**: NPM package lock file.
   - **package.json**: NPM package file.
   - **temp/**: Temporary files directory.
+- **deployment/**: Directory for deployment-specific files.
+  - **images/**: Directory for deployment images.
+    - **azure-ai-demo-ai-studio-project-create.png**: AI Studio Project creation screenshot.
+    - **azure-ai-demo-ai-studio-project-model-asset-menu.png**: AI Studio Model Assets menu screenshot.
+    - **azure-ai-demo-ai-studio-project-model-select.png**: AI Studio Select Assets screenshot.
+    - **azure-ai-demo-ai-studio-project-ai-resource.png**: AI Studio Select AI Resource screenshot.
+    - **azure-ai-demo-ai-studio-project-model-management.png**: AI Studio Add AI Models screenshot.
+    - **azure-ai-demo-documents-upload.png**: Upload documents screenshot.
+    - **azure-ai-demo-selected-docs.png**: Selected documents screenshot.
+    - **azure-ai-demo-documents-existing.png**: Existing documents screenshot.
+    - **azure-ai-demo-search-datasource-managed-identity-config.png**: Search Service Datasource Managed Identity screenshot.
+    - **azure-ai-demo-search-skillset-connect-ai-service.png**: Search Service Skillset Connect to AI Service screenshot.
+    - **azure-ai-demo-search-index-vectorizer-multi-service-account-config.png**: Search Service Index Vectorizer Multi-Service Account screenshot.
+    - **azure-ai-demo-search-managed-identity-remove.png**: Removed and Re-Add Search Service Managed Identity screenshot.
+    - **azure-ai-demo-resource-visualizer.png**: Azure AI Demo Resource Visualizer screenshot.
 - **deployment.log**: Log file for the deployment process.
 - **directory_structure.txt**: File containing the directory structure.
 - **launch.json**: Launch configuration file.
@@ -311,9 +323,6 @@ The image below shows a diagram of the deployed resources:
 │   │   │   ├── azure-ai-demo-chat.png
 │   │   │   ├── azure-ai-demo-documents-existing.png
 │   │   │   ├── azure-ai-demo-selected-docs.png
-│   │   │   ├── azure-ai-demo-upload-docs.png
-│   │   │   ├── building.png
-│   │   │   ├── favicon.png
 │   │   ├── index.html
 │   │   ├── scripts
 │   │   │   └── script.js
@@ -328,18 +337,36 @@ The image below shows a diagram of the deployed resources:
 │   │       ├── ChatHistory.cs
 │   │       ├── ChatOrchestrator.cs
 │   │       ├── IChatCompletion.cs
-│   │       ├── host.json
+│   │       ├── Properties
+│   │       │   └── launchSettings.json
 │   ├── ml.workspace.yaml
 │   ├── package-lock.json
 │   ├── package.json
 │   └── temp
+├── deployment
+│   ├── images
+│   │   ├── azure-ai-demo-ai-studio-project-create.png
+│   │   ├── azure-ai-demo-ai-studio-project-model-asset-menu.png
+│   │   ├── azure-ai-demo-ai-studio-project-model-select.png
+│   │   ├── azure-ai-demo-ai-studio-project-ai-resource.png
+│   │   ├── azure-ai-demo-ai-studio-project-model-management.png
+│   │   ├── azure-ai-demo-documents-upload.png
+│   │   ├── azure-ai-demo-selected-docs.png
+│   │   ├── azure-ai-demo-documents-existing.png
+│   │   ├── azure-ai-demo-search-datasource-managed-identity-config.png
+│   │   ├── azure-ai-demo-search-skillset-connect-ai-service.png
+│   │   ├── azure-ai-demo-search-index-vectorizer-multi-service-account-config.png
+│   │   ├── azure-ai-demo-search-managed-identity-remove.png
+│   │   ├── azure-ai-demo-resource-visualizer.png
 ├── deployment.log
+├── directory_structure.txt
 ├── launch.json
+├── parameters backup.json
 ├── parameters.json
 ├── search-index-schema.json
 ├── search-indexer-schema.json
 ├── server.js
-└── settings.json
+├── settings.json
 
 ```
 
