@@ -319,7 +319,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
             const answer = choice.message;
             const role = answer.role;
-            var answerText = answer.content.replace("**", "").replace(/\s+/g, " ");
+            var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
             var followUpQuestions = answerText.split("$$$$")[2].trim();
 
             //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
@@ -580,7 +580,7 @@ function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) 
 
         for (const choice of azureOpenAIResults[0].choices) {
 
-            const answerText = choice.message.content.replace("**", "");
+            const answerText = choice.message.content.replace(/\*\*/g, "");
             const thoughtProcess = answerText.split("$$$$")[1].trim();
 
             if (thoughtProcess) {
