@@ -325,10 +325,11 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
             const message = { "role": role, "content": answerText };
 
-            addMessageToChatHistory(thread, message);
-
             if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
                 answerText = persona.NoResults;
+            }
+            else {
+                addMessageToChatHistory(thread, message);
             }
 
             const context = answer.context;
