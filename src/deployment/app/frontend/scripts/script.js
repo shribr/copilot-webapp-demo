@@ -234,6 +234,15 @@ $(document).ready(async function () {
         console.log('Settings clicked');
     });
 
+    document.getElementById('settings-container').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        showSettingsDialog();
+
+        // Handle settings click
+        console.log('Settings clicked');
+    });
+
     document.getElementById('link-profile').addEventListener('click', function (event) {
         event.preventDefault();
         // Handle profile click
@@ -1562,7 +1571,7 @@ async function uploadFilesToAzure(files) {
 
     for (const file of files) {
         const fileName = file.name.replace("#", "");
-        const uploadUrl = fullStorageUrl;
+        const uploadUrl = `${storageUrl}/${fileName}?&${sasToken}`;
         const date = new Date().toUTCString();
 
         try {

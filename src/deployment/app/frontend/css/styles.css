@@ -55,6 +55,9 @@ body {
   #top-navigation-toolbar-link-container {
     display: none;
   }
+  #settings-container {
+    display: inline-block !important;
+  }
 }
 
 @media (min-width: 601px) {
@@ -86,9 +89,9 @@ body {
     max-width: 95%;
   }
 
-  #left-nav-container {
-    display: none;
-  }
+  /* #left-nav-container {
+    display: none !important;
+  } */
 
   #site-logo-container {
     display: none !important;
@@ -101,6 +104,10 @@ body {
 
   #top-navigation-toolbar-link-container {
     display: none;
+  }
+
+  #settings-container {
+    display: inline-block;
   }
 }
 
@@ -1567,6 +1574,12 @@ code {
 #send-button:disabled {
   background-color: lightgray;
   cursor: not-allowed;
+}
+
+#settings-container {
+  display: none;
+  fill: currentColor;
+  cursor: pointer;
 }
 
 #settings-overlay {
