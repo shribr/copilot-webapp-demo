@@ -22,6 +22,8 @@ $(document).ready(async function () {
 
     //setChatDisplayHeight();
 
+    hideLeftNav();
+
     const config = await fetchConfig();
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
@@ -1017,6 +1019,16 @@ async function getSelectedChatPersona() {
     }
     else {
         return persona;
+    }
+}
+
+function hideLeftNav() {
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    if (width < 601) {
+        document.getElementById('left-nav-container').style.display = 'none';
     }
 }
 
