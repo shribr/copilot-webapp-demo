@@ -37,6 +37,15 @@ body {
   #chat-info-text-copy {
     display: none !important;
   }
+
+  .followup-questions {
+    line-height: 2;
+    margin-bottom: 2px !important;
+  }
+
+  #followup-questions-container ol {
+    line-height: 2 !important;
+  }
 }
 
 @media (min-width: 768px) {
@@ -49,6 +58,11 @@ body {
     margin-left: auto !important;
     flex: 1 !important;
   }
+
+  .followup-questions {
+    margin-bottom: 2px !important;
+    line-height: 2px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -57,6 +71,17 @@ body {
   }
   #settings-container {
     display: inline-block !important;
+  }
+
+  .followup-questions {
+    margin-bottom: 2px !important;
+  }
+}
+
+@media (max-width: 601px) {
+  .followup-questions {
+    margin-bottom: 2px !important;
+    line-height: 2px;
   }
 }
 
@@ -89,6 +114,9 @@ body {
     max-width: 95%;
   }
 
+  .followup-questions {
+    margin-bottom: 2px !important;
+  }
   /* #left-nav-container {
     display: none !important;
   } */
@@ -276,6 +304,7 @@ code {
 
 .answer-sources {
   font-size: inherit;
+  padding-top: 20px;
 }
 
 .bullet-title {
