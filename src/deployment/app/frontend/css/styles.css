@@ -29,16 +29,25 @@ body {
   height: 42px;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   #hamburger-menu {
     display: none;
   }
 
-  #left-nav-container {
-    display: flex !important;
-  }
-
   #site-logo-container {
+    display: flex !important;
+    margin-left: auto !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #top-navigation-toolbar-link-container {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  #left-nav-container {
     display: flex !important;
   }
 }
@@ -807,22 +816,6 @@ code {
 }
 
 /* CSS FROM BLAZOR FRAMEWORK */
-
-/* Document container styles */
-#document-container {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 20px;
-  margin-left: 200px;
-  margin-right: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 85%;
-  max-width: 85%;
-}
 
 /* Ensure the body takes the full viewport height and uses Flexbox */
 .flex-container {
