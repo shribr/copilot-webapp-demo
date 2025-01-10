@@ -29,6 +29,16 @@ body {
   height: 42px;
 }
 
+@media (max-width: 980px) {
+  .tabs {
+    display: revert !important;
+  }
+
+  #chat-info-text-copy {
+    display: none !important;
+  }
+}
+
 @media (min-width: 768px) {
   #hamburger-menu {
     display: none;
