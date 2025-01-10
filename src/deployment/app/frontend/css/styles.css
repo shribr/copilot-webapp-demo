@@ -50,6 +50,11 @@ body {
   #left-nav-container {
     display: flex !important;
   }
+  #home-container,
+  #document-container,
+  #chat-container {
+    margin-left: 200px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -60,7 +65,8 @@ body {
   #home-container,
   #document-container,
   #chat-container {
-    margin-left: auto !important;
+    /* margin-left: auto !important; */
+    max-width: 95%;
   }
 
   #left-nav-container {
@@ -78,6 +84,38 @@ body {
 
   #top-navigation-toolbar-link-container {
     display: none;
+  }
+}
+
+@media (max-width: 980px) {
+  #document-table-header {
+    display: none;
+  }
+
+  .document-row {
+    display: flex;
+  }
+
+  .document-cell {
+    display: flex !important;
+    justify-content: space-between !important;
+    border: 0px !important;
+  }
+
+  .document-cell:before {
+    content: attr(data-label);
+    font-weight: 500;
+    padding-right: 16px;
+    padding-inline-end: 16px;
+    padding-inline-start: unset;
+  }
+
+  .document-cell:last-child {
+    border-bottom: 1px solid #ddd !important;
+  }
+
+  #document-table {
+    margin-top: 20px !important;
   }
 }
 
@@ -130,9 +168,7 @@ body {
   flex-direction: column;
 }
 
-#main-content,
-#document-container,
-#home-container {
+#main-content {
   width: 100%;
 }
 
@@ -803,7 +839,6 @@ code {
   display: flex;
   flex-direction: column;
   height: 95%;
-  margin-left: 200px;
 }
 
 /* Content container styles */
@@ -1039,6 +1074,12 @@ code {
   cursor: pointer;
 }
 
+#document-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
 #form-group-delete-all-threads {
   font-family: inherit;
 }
@@ -1121,14 +1162,12 @@ code {
   display: flex;
   flex-wrap: wrap;
   padding: 20px;
-  margin-left: 200px;
-  margin-right: 20px;
+  /* margin-left: 200px;
+  margin-right: 20px; */
   background-color: #ffffff;
   border-radius: 8px;
   border: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 85%;
-  max-width: 85%;
 }
 
 #document-container .document {
@@ -1300,7 +1339,6 @@ code {
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  margin-left: 200px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   display: flex;
