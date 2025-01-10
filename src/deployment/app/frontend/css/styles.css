@@ -37,6 +37,7 @@ body {
   #site-logo-container {
     display: flex !important;
     margin-left: auto !important;
+    flex: 1 !important;
   }
 }
 
@@ -54,6 +55,12 @@ body {
   #document-container,
   #chat-container {
     margin-left: 200px;
+  }
+
+  #site-logo-container {
+    display: flex !important;
+    margin-left: auto !important;
+    flex: 1 !important;
   }
 }
 
@@ -572,7 +579,7 @@ code {
   transform: translateX(100%);
 }
 
-.settings-overlay {
+#settings-overlay {
   top: 0;
   left: 0;
   right: 0;
@@ -581,14 +588,19 @@ code {
   align-items: center;
   justify-content: center;
   border-radius: inherit;
-  display: flex;
+  /* display: flex; */
   position: fixed;
   transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), z-index 1ms;
   z-index: 5;
 }
 
-.settings-overlay-dark {
+#settings-overlay-dark {
   background-color: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .settings-overlay-drawer {
@@ -1448,7 +1460,7 @@ code {
   font-weight: bold;
   text-align: left;
   margin-left: 20px;
-  /* width: 100%; */
+  width: 100%;
   white-space: nowrap;
 }
 
@@ -1590,6 +1602,10 @@ code {
   width: 100%;
   text-align: right;
   white-space: nowrap;
+}
+
+#top-navigation-toolbar-link-container a:hover {
+  color: #e6e6e6 !important;
 }
 
 #upload-button-container {
