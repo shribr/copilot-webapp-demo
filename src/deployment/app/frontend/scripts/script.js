@@ -18,6 +18,21 @@ let tool_resources = {
     }
 };
 
+// document.addEventListener('DOMContentLoaded', function () {
+//     const hamburgerMenu = document.getElementById('hamburger-menu');
+//     const leftNavContainer = document.getElementById('left-nav-container');
+
+//     hamburgerMenu.addEventListener('click', function () {
+//         if (window.innerWidth <= 600) {
+//             if (leftNavContainer.style.display === 'block') {
+//                 leftNavContainer.style.display = 'none';
+//             } else {
+//                 leftNavContainer.style.display = 'block !important';
+//             }
+//         }
+//     });
+// });
+
 $(document).ready(async function () {
 
     //setChatDisplayHeight();

@@ -88,6 +88,7 @@ body {
   #left-nav-container {
     display: flex !important;
   }
+
   #home-container,
   #document-container,
   #chat-container {
@@ -109,6 +110,7 @@ body {
 @media (max-width: 600px) {
   #hamburger-menu {
     display: block;
+    margin-left: 0px;
   }
 
   #main-header-title {
@@ -127,9 +129,9 @@ body {
     margin-bottom: 2px !important;
   }
 
-  /* #left-nav-container {
+  #left-nav-container {
     display: none;
-  } */
+  }
 
   #site-logo-container {
     display: none !important;
@@ -138,6 +140,7 @@ body {
   #top-naviation-toolbar {
     display: flex;
     justify-content: flex-end !important;
+    padding: 15px 20px;
   }
 
   #top-navigation-toolbar-link-container {
@@ -704,7 +707,7 @@ code {
 .site-logo,
 .site-logo-default {
   height: 42px;
-  margin-left: -5px;
+  margin-left: 5px;
   margin-right: 100px;
   padding-right: 20px;
   fill: white;
@@ -973,7 +976,7 @@ code {
   background-color: rgba(13, 12, 52, 1);
   /* Blue color */
   color: white;
-  padding: 15px 30px;
+  padding: 15px 10px;
   /* Add padding to the toolbar */
   display: flex;
   justify-content: space-between;
@@ -1021,7 +1024,7 @@ code {
 
 #chat-info-text-copy {
   padding: 10px;
-  width: 500px;
+  /* width: 500px; */
 }
 
 #chat-info-text-copy h2 {
@@ -1303,11 +1306,12 @@ code {
 #file-types,
 #chat-examples {
   border: 1px solid #e6e6e6;
-  padding-top: 15px !important;
-  padding-bottom: 15px !important;
+  /* padding-top: 15px !important;
+  padding-bottom: 15px !important; */
   background-color: white;
   padding-inline-start: 40px;
   list-style: disc !important;
+  padding: 25px;
 }
 
 #file-list {
