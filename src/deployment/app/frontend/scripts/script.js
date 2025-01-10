@@ -1182,7 +1182,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, sasToken) {
             const previewCell = document.createElement('td');
             previewCell.className = 'document-cell document-cell-preview';
             previewCell.setAttribute = 'data-label', 'Preview';
-            previewCell.innerHTML = `<button class="button-magnifying-glass"><a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a></button>`;
+            previewCell.innerHTML = `<button class="button-magnifying-glass" title="Preview"><a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a></button>`;
 
             const statusCell = document.createElement('td');
             statusCell.className = 'document-cell document-cell-status';
