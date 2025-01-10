@@ -27,6 +27,9 @@ $(document).ready(async function () {
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
+    const editIcon = config.ICONS.EDIT.MONOTONE;
+    const deleteIcon = config.ICONS.DELETE.MONOTONE;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
@@ -38,7 +41,7 @@ $(document).ready(async function () {
 
     setSiteLogo();
 
-    getDocuments(storageUrl, sasToken, fullStorageUrl);
+    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
 
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatDisplay = document.getElementById('chat-display');
@@ -913,7 +916,7 @@ async function getChatResponse(questionBubble) {
 }
 
 //code to get documents from Azure Storage
-async function getDocuments(storageUrl, sasToken, fullStorageUrl) {
+async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
     //const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
     //const storageUrl = config.AZURE_STORAGE_FULL_URL;
@@ -924,8 +927,7 @@ async function getDocuments(storageUrl, sasToken, fullStorageUrl) {
             headers: {
                 'Content-Type': 'text/xml',
                 'Cache-Control': 'no-cache'
-            },
-            mode: 'no-cors'
+            }
         });
 
         if (response.ok) {
@@ -937,7 +939,7 @@ async function getDocuments(storageUrl, sasToken, fullStorageUrl) {
 
             // Render documents
             //renderDocuments(blobs);
-            renderDocumentsHtmlTable(blobs, storageUrl, sasToken);
+            renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
         } else {
             console.error('Failed to fetch documents:', response.statusText);
         }
@@ -1130,7 +1132,7 @@ async function renderChatPersonas() {
 }
 
 // Function to render documents in HTML table format
-function renderDocumentsHtmlTable(blobs, storageUrl, sasToken) {
+function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
     const docList = document.getElementById('document-table-body');
     const sampleRows = document.querySelectorAll('.document-row.sample');
@@ -1159,7 +1161,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, sasToken) {
                 hour12: true
             });
             const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `https://${storageUrl}/${containerName}/${blobName}?${sasToken}`;
+            let blobUrl = `${storageUrl}/${containerName}/${blobName}?${sasToken}`;
             blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
             const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
             return { blobName, lastModified, contentType, blobUrl, blobSize };
@@ -1174,50 +1176,50 @@ function renderDocumentsHtmlTable(blobs, storageUrl, sasToken) {
             const blobName = blob.blobName;
             const lastModified = blob.lastModified;
             const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+            let blobUrl = `${storageUrl}/${containerName}/${blobName}?${sasToken}`;
             //blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
             const blobSize = blob.blobSize;
 
             // Create the document cells
             const previewCell = document.createElement('td');
             previewCell.className = 'document-cell document-cell-preview';
-            previewCell.setAttribute = 'data-label', 'Preview';
-            previewCell.innerHTML = `<button class="button-magnifying-glass" title="Preview"><a href="${blobUrl}" target="_blank">${config.ICONS.MAGNIFYING_GLASS.MONOTONE}</a></button>`;
+            previewCell.setAttribute('data-label', 'Preview');
+            previewCell.innerHTML = `<button class="button-magnifying-glass" title="Preview"><a href="${blobUrl}" target="_blank">${magnifyingGlassIcon}</a></button>`;
 
             const statusCell = document.createElement('td');
             statusCell.className = 'document-cell document-cell-status';
-            statusCell.setAttribute = 'data-label', 'Status';
+            statusCell.setAttribute('data-label', 'Status');
             statusCell.innerHTML = '<span class="status-content">Active</span>';
 
             const nameCell = document.createElement('td');
             nameCell.className = 'document-cell document-cell-name';
-            nameCell.setAttribute = 'data-label', 'Name';
+            nameCell.setAttribute('data-label', 'Name');
             const nameLink = document.createElement('a');
             nameLink.href = blobUrl;
             //nameLink.textContent = truncateText(blobName, 20);
-            nameLink.textContent = blobName;
+            nameLink.textContent = truncateString(blobName, 60);
             nameLink.target = '_blank'; // Open link in a new tab
             nameCell.appendChild(nameLink);
 
             const contentTypeCell = document.createElement('td');
             contentTypeCell.className = 'document-cell document-cell-content-type';
-            contentTypeCell.setAttribute = 'data-label', 'Content Type';
+            contentTypeCell.setAttribute('data-label', 'Content Type');
 
             contentTypeCell.innerHTML = `<code>${contentType}</code>`;
 
             const fileSizeCell = document.createElement('td');
             fileSizeCell.className = 'document-cell document-cell-file-size';
-            fileSizeCell.setAttribute = 'data-label', 'File Size';
+            fileSizeCell.setAttribute('data-label', 'File Size');
             fileSizeCell.innerHTML = `<span class="file-size-content">${blobSize}</span>`;
 
             const lastModifiedCell = document.createElement('td');
             lastModifiedCell.className = 'document-cell';
-            lastModifiedCell.setAttribute = 'data-label', 'Last Modified';
+            lastModifiedCell.setAttribute('data-label', 'Last Modified');
             lastModifiedCell.textContent = lastModified;
 
             const actionDiv = document.createElement('div');
             actionDiv.className = 'action-content';
-            actionDiv.innerHTML = `<a href="#" title="delete file" class="edit-button">${config.ICONS.EDIT.MONOTONE}</a><a href="#" title="edit file" class="delete-button">${config.ICONS.DELETE.MONOTONE}</a>`;
+            actionDiv.innerHTML = `<a href="#" title="delete file" class="edit-button">${editIcon}</a><a href="#" title="edit file" class="delete-button">${deleteIcon}</a>`;
 
             const actionCell = document.createElement('td');
             actionCell.className = 'document-cell action-container';
@@ -1490,6 +1492,13 @@ function toggleDisplay(screen) {
     }
 }
 
+function truncateString(str, num) {
+    if (str.length <= num) {
+        return str;
+    }
+    return str.slice(0, num) + '...';
+}
+
 // Function to truncate text
 function truncateText(text, maxLength) {
     if (text.length > maxLength) {
@@ -1541,17 +1550,19 @@ async function uploadFilesToAzure(files) {
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
-    const searchIndexers = config.SEARCH_INDEXERS;
-    const fileTypes = config.FILE_TYPES;
+    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.SVG;
+    const editIcon = config.ICONS.EDIT.MONOTONE;
+    const deleteIcon = config.ICONS.DELETE.MONOTONE;
 
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
+    const fullStorageUrl = `${storageUrl}?${sasToken}`;
 
     for (const file of files) {
         const fileName = file.name.replace("#", "");
-        const uploadUrl = `${storageUrl}/${fileName}?&${sasToken}`;
+        const uploadUrl = fullStorageUrl;
         const date = new Date().toUTCString();
 
         try {
@@ -1572,7 +1583,7 @@ async function uploadFilesToAzure(files) {
             if (response.ok) {
                 showToastNotification(`Upload successful for ${file.name}.`, true);
                 console.log(`Upload successful for ${file.name}.`);
-                getDocuments(storageUrl, sasToken); // Refresh the document list after successful upload
+                getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
             } else {
                 const errorText = await response.text();
                 showToastNotification(`Error uploading file ${file.name} to Azure Storage: ${errorText}`, false);

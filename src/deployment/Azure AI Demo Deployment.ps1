@@ -550,7 +550,7 @@ function Get-ResourceStatus {
     param (
         [string]$resourceName,
         [string]$resourceGroupName,
-        [string]$resourceType
+        [string]$resourceType = "Microsoft.Search/searchServices"
     )
 
     try {
@@ -569,9 +569,6 @@ function Get-ResourceStatus {
         Write-Log -message "Failed to get status for resource '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
-
-# Example usage of Get-ResourceStatus function for Azure Cognitive Search
-Get-ResourceStatus -resourceName "your-search-service-name" -resourceGroupName "your-resource-group-name" -resourceType "Microsoft.Search/searchServices"
 
 # Function to check if a search index exists
 function Get-SearchIndexes {
@@ -3631,6 +3628,8 @@ function Start-Deployment {
     #return 
     
     $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
+
+    Get-ResourceStatus -resourceGroupName $resourceGroupName -resourceName $searchServiceName -resourceType "Microsoft.Search/searchServices"
 
     if ($global:appDeploymentOnly -eq $true) {
         # Deploy web app and function app services
