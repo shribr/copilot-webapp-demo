@@ -34,9 +34,9 @@ body {
     display: revert !important;
   }
 
-  #chat-info-text-copy {
+  /* #chat-info-text-copy {
     display: none !important;
-  }
+  } */
 
   .followup-questions {
     line-height: 2;
@@ -61,7 +61,6 @@ body {
 
   .followup-questions {
     margin-bottom: 2px !important;
-    line-height: 2px;
   }
 }
 
@@ -117,8 +116,9 @@ body {
   .followup-questions {
     margin-bottom: 2px !important;
   }
+
   /* #left-nav-container {
-    display: none !important;
+    display: none;
   } */
 
   #site-logo-container {
@@ -1747,7 +1747,7 @@ nav ul li a:hover {
 }
 
 /* Navigation styles */
-#left-nav-container {
+/* #left-nav-container {
   display: none;
   background-color: #ffffff;
   color: #333;
@@ -1762,7 +1762,7 @@ nav ul li a:hover {
   align-items: top;
   z-index: 50;
   position: fixed;
-}
+} */
 
 #chat-info {
   margin-bottom: 20px;

@@ -64,7 +64,7 @@ $(document).ready(async function () {
 
     document.getElementById('hamburger-menu').addEventListener('click', function () {
         const leftNav = document.getElementById('left-nav-container');
-        leftNav.style.display = (leftNav.style.display === 'block' || leftNav.style.display === "") ? 'none' : 'block';
+        leftNav.style.display = (leftNav.style.display === 'block' || leftNav.style.display === 'block !important' || leftNav.style.display === "") ? 'none' : 'block';
     });
 
     const chatInput = document.getElementById('chat-input');
@@ -302,9 +302,12 @@ function addMessageToChatHistory(thread, message) {
 // Function to clear the chat display
 function clearChatDisplay() {
     const chatDisplayContainer = document.getElementById('chat-display-container');
+    const chatInfoCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
 
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.innerHTML = ''; // Clear all content
+
+    chatInfoCurrentQuestionContainer.innerHTML = ''; // Clear the current question
 
     const loadingAnimation = document.createElement('div');
     loadingAnimation.setAttribute('class', 'loading-animation');
@@ -1106,6 +1109,8 @@ async function postQuestion() {
     chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
     getChatResponse(questionBubble);
+
+    document.getElementById("chat-info-text-copy").style.display = 'none';
 }
 
 // Function to render chat personas
