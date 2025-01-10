@@ -23,7 +23,27 @@ body {
   color: white;
 }
 
-@media (max-width: 768px) {
+#hamburger-menu svg {
+  fill: white;
+  width: 42px;
+  height: 42px;
+}
+
+@media (min-width: 769px) {
+  #hamburger-menu {
+    display: none;
+  }
+
+  #left-nav-container {
+    display: flex !important;
+  }
+
+  #site-logo-container {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 600px) {
   #hamburger-menu {
     display: block;
   }
@@ -31,7 +51,7 @@ body {
   #home-container,
   #document-container,
   #chat-container {
-    margin-left: 0px !important;
+    margin-left: auto !important;
   }
 
   #left-nav-container {
@@ -115,11 +135,6 @@ body {
 #chat-input-container {
   flex-direction: column;
 }
-
-#chat-input-prompt-textbox {
-  width: 100%;
-}
-/*}*/
 
 code {
   color: #444;
@@ -573,11 +588,13 @@ code {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.site-logo,
 .site-logo-default {
-  width: 80px;
+  height: 42px;
   margin-left: -5px;
   margin-right: 100px;
   padding-right: 20px;
+  fill: white;
 }
 
 .site-logo-custom {
@@ -942,7 +959,7 @@ code {
 
 #chat-input-prompt-textbox {
   display: flex;
-  padding-right: 19px;
+  width: 100%;
 }
 
 #chat-input::placeholder {
