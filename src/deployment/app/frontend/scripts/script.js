@@ -18,21 +18,6 @@ let tool_resources = {
     }
 };
 
-// document.addEventListener('DOMContentLoaded', function () {
-//     const hamburgerMenu = document.getElementById('hamburger-menu');
-//     const leftNavContainer = document.getElementById('left-nav-container');
-
-//     hamburgerMenu.addEventListener('click', function () {
-//         if (window.innerWidth <= 600) {
-//             if (leftNavContainer.style.display === 'block') {
-//                 leftNavContainer.style.display = 'none';
-//             } else {
-//                 leftNavContainer.style.display = 'block !important';
-//             }
-//         }
-//     });
-// });
-
 $(document).ready(async function () {
 
     //setChatDisplayHeight();
@@ -105,9 +90,18 @@ $(document).ready(async function () {
         const settingsDialog = document.getElementById('settings-dialog');
         const settingsOverlay = document.getElementById('settings-overlay');
 
+        const leftNavContainer = document.getElementById('left-nav-container');
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
         if (settingsDialog.style.display === 'block' && !settingsDialog.contains(event.target) && !document.getElementById('link-settings').contains(event.target)) {
             settingsDialog.style.display = 'none';
             settingsOverlay.style.display = 'none';
+        }
+
+        if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
+            leftNavContainer.style.display = 'none';
         }
     });
 
