@@ -99,11 +99,21 @@ body {
     margin-left: auto !important;
     flex: 1 !important;
   }
+
+  /* #main-header-title {
+    font-size: 1.4em;
+    margin-left: 0px;
+  } */
 }
 
 @media (max-width: 600px) {
   #hamburger-menu {
     display: block;
+  }
+
+  #main-header-title {
+    font-size: 1.4em !important;
+    margin-left: 0px !important;
   }
 
   #home-container,
