@@ -239,7 +239,7 @@ body {
 }
 
 #login-container {
-  display: none;
+  display: none !important;
 }
 
 /* #login-container {
