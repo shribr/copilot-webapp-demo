@@ -150,7 +150,7 @@ body {
   #chat-container,
   #login-container {
     /* margin-left: auto !important; */
-    max-width: 95%;
+    max-width: 99%;
   }
 
   .followup-questions {
