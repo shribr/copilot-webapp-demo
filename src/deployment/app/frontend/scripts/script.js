@@ -1270,7 +1270,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             const blobName = blob.blobName;
             const lastModified = blob.lastModified;
             const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `${storageUrl}/${containerName}/${blobName}?${sasToken}`;
+            let blobUrl = `${storageUrl}//${blobName}?${sasToken}`;
             //blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
             const blobSize = blob.blobSize;
 
