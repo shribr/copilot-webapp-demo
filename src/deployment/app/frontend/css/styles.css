@@ -121,6 +121,14 @@ body {
     margin-left: 0px !important;
   }
 
+  #existing-documents-container {
+    flex-direction: column;
+  }
+
+  #filter-container {
+    flex: 1 1 100%;
+  }
+
   #home-container,
   #document-container,
   #chat-container {
@@ -1129,6 +1137,7 @@ code {
 
 #clear-filter-button,
 #filter-button {
+  flex: 0 0 auto;
   border: 1px solid #d3d3d3;
   /* Light gray border */
   background: none;
@@ -1279,6 +1288,13 @@ code {
   max-width: 100%;
 }
 
+#existing-documents-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
 #existing-documents {
   margin-top: 20px;
   width: 100%;
@@ -1293,11 +1309,14 @@ code {
 #existing-documents-header {
   font-size: 1.5rem;
   display: flex;
+  flex: 1 1 100%;
   /* align-items: center; */
   justify-content: space-between;
   max-width: 100%;
   width: 100%;
   padding-left: 6px;
+  margin-right: 10px;
+  margin-top: 30px;
   /* Ensure space between title and filter elements */
 }
 
@@ -1388,7 +1407,7 @@ code {
 
 #filter-container {
   display: flex;
-  flex-direction: row;
+  flex: 1 1 auto;
   align-items: center;
   margin-left: auto;
   padding-bottom: 6px;
@@ -1398,10 +1417,12 @@ code {
 
 #filter-input {
   /* flex: 1; */
+  flex: 1 1 auto;
   padding: 5px;
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-right: 10px;
+  min-width: 120px;
   /* Add 4px of padding between the input and the button */
 }
 
