@@ -21,18 +21,23 @@ let tool_resources = {
 document.addEventListener("DOMContentLoaded", function () {
 
     var status = getQueryParam('status');
+    var screen = getQueryParam('screen');
 
     var loginContainer = document.getElementById("login-container");
     var leftNavContainer = document.getElementById("left-nav-container");
+    var settingsIcon = document.getElementById("settings-icon");
     var topNavToolbarLinkContainer = document.getElementById("top-navigation-toolbar-link-container");
     // var documentContainer = document.getElementById("document-container");
     // var chatContainer = document.getElementById("chat-container");
     // var homeContainer = document.getElementById("home-container");
 
     if (window.getComputedStyle(loginContainer).display === "flex" || status === "login" || screen === "login") {
-        loginContainer.style.display = "flex";
+        loginContainer.style.display = "flex !important";
         leftNavContainer.style.display = "none";
         topNavToolbarLinkContainer.style.display = "none";
+        settingsIcon.style.display = "none";
+
+        document.getElementById('hamburger-menu').style.display = 'none';
         // documentContainer.style.display = "none";
         // chatContainer.style.display = "none";
         // homeContainer.style.display = "none";
