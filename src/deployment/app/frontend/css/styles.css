@@ -78,6 +78,10 @@ body {
   .followup-questions {
     margin-bottom: 2px !important;
   }
+
+  #existing-documents-container {
+    flex-direction: row !important;
+  }
 }
 
 /* THIS MEANS GREATER THAN OR EQUAL TO 601PX */
@@ -119,10 +123,6 @@ body {
   #main-header-title {
     font-size: 1.4em !important;
     margin-left: 0px !important;
-  }
-
-  #existing-documents-container {
-    flex-direction: column;
   }
 
   #filter-container {
