@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // var chatContainer = document.getElementById("chat-container");
     // var homeContainer = document.getElementById("home-container");
 
-    if (window.getComputedStyle(loginContainer).display === "flex" || status === "login") {
+    if (window.getComputedStyle(loginContainer).display === "flex" || status === "login" || screen === "login") {
         loginContainer.style.display = "flex";
         leftNavContainer.style.display = "none";
         topNavToolbarLinkContainer.style.display = "none";
@@ -1255,7 +1255,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
                 hour12: true
             });
             const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `${storageUrl}/${containerName}/${blobName}?${sasToken}`;
+            let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
             blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
             const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
             return { blobName, lastModified, contentType, blobUrl, blobSize };

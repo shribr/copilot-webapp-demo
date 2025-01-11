@@ -237,16 +237,16 @@ body {
   padding: 10px;
 }
 
-#login-container {
+/* #login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* height: 100vh; */
+  height: 100vh;
   display: none;
-}
+} */
 
-#login-content-container {
+/* #login-content-container {
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -255,7 +255,7 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 400px;
   text-align: left;
-}
+} */
 
 #login-form .form-group {
   margin-bottom: 15px;
@@ -945,7 +945,8 @@ code {
 }
 
 /* Chat container styles */
-#chat-container {
+#chat-container,
+#login-container {
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -1067,7 +1068,8 @@ code {
   overflow-y: scroll;
 }
 
-#chat-info-text-copy {
+#chat-info-text-copy,
+#login-info {
   padding: 10px;
   /* width: 500px; */
 }
@@ -1841,7 +1843,8 @@ nav ul li a:hover {
   position: fixed;
 } */
 
-#chat-info {
+#chat-info,
+#login-content-container {
   margin-bottom: 20px;
   padding: 10px;
   border: 1px solid #ddd;
