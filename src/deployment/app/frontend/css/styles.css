@@ -297,7 +297,7 @@ code {
   color: rgba(33, 150, 243, 1);
   background-color: rgba(33, 150, 243, 0.058823529411764705);
   border-radius: 4px;
-  height: 32px;
+  /* height: 32px; */
   font-size: 14px;
   padding: 4px;
   margin-left: 8px;
@@ -1037,7 +1037,8 @@ code {
 
 #chat-info-text-copy,
 #chat-info-current-question-container {
-  margin: 25px;
+  /* margin: 25px; */
+  font-size: inherit;
 }
 
 #chat-input {
@@ -1420,6 +1421,10 @@ code {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+#home-container h2 {
+  font-size: 1.5rem !important;
 }
 
 #jump-to-top-arrow {

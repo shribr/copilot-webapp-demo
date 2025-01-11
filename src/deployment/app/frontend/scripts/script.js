@@ -107,6 +107,26 @@ $(document).ready(async function () {
         }
     });
 
+    // ...existing code...
+
+    window.addEventListener('resize', function () {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Add your resize logic here
+        console.log(`Window resized to width: ${width}, height: ${height}`);
+
+        // Example: Adjust the display of leftNavContainer based on the new width
+        const leftNavContainer = document.getElementById('left-nav-container');
+        if (width > 600) {
+            leftNavContainer.style.display = 'block';
+        } else {
+            leftNavContainer.style.display = 'none';
+        }
+    });
+
+    // ...existing code...
+
     const screen = getQueryParam('screen');
 
     toggleDisplay(screen);
@@ -390,7 +410,12 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                 for (const citation of citations) {
                     const docTitle = citation.title;
+                    //const docTitle = toProperCase(citation.title);;
                     const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
+
+                    //https://stcopilotdemo005.blob.core.windows.net/content/Fy22_all_staff-626645-v1-ecm_implementation__posted__pws__attachment_f_ecm_reference_and_target_architecture_final.docx?sv=2022-11-02&ss=bfqt&srt=co&sp=rwdxylacupfti&se=2026-01-05T23:59:59Z&spr=https&sig=7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D
+                    //https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fstcopilotdemo005.blob.core.windows.net%2Fcontent%2FFY22_ALL_STAFF-626662-v4-ECM_IMPLEMENTATION__POSTED__PWS.docx%3Fsv%3D2022-11-02%26ss%3Dbfqt%26srt%3Dco%26sp%3Drwdxylacupfti%26se%3D2026-01-05T23%3A59%3A59Z%26spr%3Dhttps%26sig%3D7Fbqeh9M%252B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%253D&wdOrigin=BROWSELINK
+                    //https://stcopilotdemo005.blob.core.windows.net/content/power-pages-guidance.pdf?sv=2022-11-02&ss=bfqt&srt=co&sp=rwdxylacupfti&se=2026-01-05T23:59:59Z&spr=https&sig=7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D
 
                     // Detect and replace [doc*] with [page *] and create hyperlink
                     answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
@@ -402,7 +427,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                         sourceNumber++;
 
-                        const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${docTitle}</a>`;
+                        const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
 
                         citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
@@ -1525,6 +1550,13 @@ function toggleDisplay(screen) {
         $documentContainer.hide();
         $homeContainer.show();
     }
+}
+
+// Function to format string in proper case
+function toProperCase(str) {
+    return str.replace(/\w\S*/g, function (txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
 }
 
 function truncateString(str, num) {
