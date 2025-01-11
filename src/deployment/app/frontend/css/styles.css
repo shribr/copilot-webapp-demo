@@ -171,6 +171,14 @@ body {
 
 /* THIS MEANS LESS THAN OR EQUAL TO 980PX */
 @media (max-width: 980px) {
+  .question-bubble {
+    right: 0px !important;
+    width: auto !important;
+  }
+}
+
+/* THIS MEANS LESS THAN OR EQUAL TO 1236PX */
+@media (max-width: 1236px) {
   #document-table-header {
     display: none;
   }
@@ -199,11 +207,6 @@ body {
 
   #document-table {
     margin-top: 20px !important;
-  }
-
-  .question-bubble {
-    right: 0px !important;
-    width: auto !important;
   }
 }
 
