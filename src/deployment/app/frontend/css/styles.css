@@ -212,6 +212,10 @@ body {
     padding-inline-start: unset;
   }
 
+  .document-cell .document-cell-name .blob-name:before {
+    content: "";
+  }
+
   .document-cell:last-child {
     border-bottom: 1px solid #ddd !important;
   }
@@ -368,6 +372,22 @@ code {
 .answer-sources {
   font-size: inherit;
   padding-top: 20px;
+}
+
+.no-before::before {
+  content: none !important;
+}
+
+.blob-name::before {
+  content: "Name";
+  display: block;
+  white-space: pre-wrap;
+  line-height: 2;
+}
+
+.blob-name {
+  white-space: pre-wrap;
+  line-height: 2;
 }
 
 .bullet-title {

@@ -50,6 +50,13 @@ $(document).ready(async function () {
 
     hideLeftNav();
 
+    const width = window.innerWidth;
+
+    //toggleBeforeAfter(width);
+
+    const elements = document.getElementsByClassName('document-cell-name');
+    Array.from(elements).forEach(element => element.classList.add('no-before'));
+
     const config = await fetchConfig();
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
@@ -153,13 +160,22 @@ $(document).ready(async function () {
         } else {
             leftNavContainer.style.display = 'none';
         }
+
+        if (width < 1235) {
+            const elements = document.getElementsByClassName('blob-name');
+            Array.from(elements).forEach(element => element.classList.remove('no-before'));
+        }
+        else {
+            const elements = document.getElementsByClassName('blob-name');
+            Array.from(elements).forEach(element => element.classList.add('no-before'));
+        }
     });
 
     // ...existing code...
 
     const screen = getQueryParam('screen');
 
-    toggleDisplay(screen);
+    //toggleDisplay(screen);
 
     // Add event listeners to navigation links
     $('#left-nav-container nav ul li').on('click', function (event) {
@@ -1272,7 +1288,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             const documentRow = document.createElement('tr');
             documentRow.className = 'document-row';
 
-            const blobName = blob.blobName;
+            var blobName = blob.blobName;
             const lastModified = blob.lastModified;
             const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
             let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
@@ -1291,14 +1307,21 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             statusCell.innerHTML = '<span class="status-content">Active</span>';
 
             const nameCell = document.createElement('td');
-            nameCell.className = 'document-cell document-cell-name';
+            nameCell.className = 'document-cell document-cell-name no-before';
             nameCell.setAttribute('data-label', 'Name');
             const nameLink = document.createElement('a');
             nameLink.href = blobUrl;
-            //nameLink.textContent = truncateText(blobName, 20);
-            nameLink.textContent = truncateString(blobName, 60);
-            nameLink.target = '_blank'; // Open link in a new tab
-            nameCell.appendChild(nameLink);
+
+            blobName = truncateString(blobName, 60);
+
+            nameLink.textContent = blobName;
+            nameLink.target = '_blank';
+
+            const nameContainer = document.createElement('div');
+            nameContainer.className = 'blob-name';
+            nameContainer.appendChild(nameLink);
+
+            nameCell.appendChild(nameContainer);
 
             const contentTypeCell = document.createElement('td');
             contentTypeCell.className = 'document-cell document-cell-content-type';
@@ -1564,6 +1587,20 @@ function toggleAllCheckboxes() {
     datasourceCheckboxes.forEach(checkbox => {
         checkbox.checked = allCheckbox.checked;
     });
+}
+
+function toggleBeforeAfter(width) {
+    if (width < 1236) {
+        const elements = document.getElementsByClassName('document-cell-name');
+        Array.from(elements).forEach(element => element.classList.add('no-before'));
+
+        const nameElements = document.getElementsByClassName('blob-name');
+        Array.from(nameElements).forEach(element => element.classList.remove('no-before'));
+    }
+    else {
+        const elements = document.getElementsByClassName('blob-name');
+        Array.from(elements).forEach(element => element.classList.add('no-before'));
+    }
 }
 
 //code to toggle between chat and document screens
