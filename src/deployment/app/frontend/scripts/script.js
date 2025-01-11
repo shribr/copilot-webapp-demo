@@ -18,6 +18,27 @@ let tool_resources = {
     }
 };
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    var status = getQueryParam('status');
+
+    var loginContainer = document.getElementById("login-container");
+    var leftNavContainer = document.getElementById("left-nav-container");
+    var topNavToolbarLinkContainer = document.getElementById("top-navigation-toolbar-link-container");
+    // var documentContainer = document.getElementById("document-container");
+    // var chatContainer = document.getElementById("chat-container");
+    // var homeContainer = document.getElementById("home-container");
+
+    if (window.getComputedStyle(loginContainer).display === "flex" || status === "login") {
+        loginContainer.style.display = "flex";
+        leftNavContainer.style.display = "none";
+        topNavToolbarLinkContainer.style.display = "none";
+        // documentContainer.style.display = "none";
+        // chatContainer.style.display = "none";
+        // homeContainer.style.display = "none";
+    }
+});
+
 $(document).ready(async function () {
 
     //setChatDisplayHeight();
@@ -1532,23 +1553,43 @@ function toggleDisplay(screen) {
     const $chatContainer = $('#chat-container');
     const $documentContainer = $('#document-container');
     const $homeContainer = $('#home-container');
+    const $loginContainer = $('#login-container');
+    const $leftNavContainer = $('#left-nav-container');
+    const $topNavToolbarLinkContainer = document.getElementById("top-navigation-toolbar-link-container");
 
-    if (screen === 'chat') {
-        $chatContainer.show();
+    const status = getQueryParam('status');
+
+    if (status === 'success' || true) {
+        if (screen === 'chat') {
+            $chatContainer.show();
+            $documentContainer.hide();
+            $homeContainer.hide();
+        } else if (screen === 'documents') {
+            $chatContainer.hide();
+            $homeContainer.hide();
+            $documentContainer.show();
+        } else if (screen === 'home') {
+            $chatContainer.hide();
+            $documentContainer.hide();
+            $homeContainer.show();
+        } else if (screen === 'login') {
+            $chatContainer.hide();
+            $documentContainer.hide();
+            $homeContainer.hide();
+            $loginContainer.show();
+        } else {
+            $chatContainer.hide();
+            $documentContainer.hide();
+            $homeContainer.show();
+        }
+    }
+    else {
+        $chatContainer.hide();
         $documentContainer.hide();
         $homeContainer.hide();
-    } else if (screen === 'documents') {
-        $chatContainer.hide();
-        $homeContainer.hide();
-        $documentContainer.show();
-    } else if (screen === 'home') {
-        $chatContainer.hide();
-        $documentContainer.hide();
-        $homeContainer.show();
-    } else {
-        $chatContainer.hide();
-        $documentContainer.hide();
-        $homeContainer.show();
+        $topNavToolbarLinkContainer.hide();
+        $leftNavContainer.hide();
+        $loginContainer.show();
     }
 }
 

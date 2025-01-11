@@ -92,7 +92,8 @@ body {
 
   #home-container,
   #document-container,
-  #chat-container {
+  #chat-container,
+  #login-container {
     margin-left: 200px;
   }
 
@@ -213,16 +214,16 @@ body {
   padding: 10px;
 }
 
-#login-content-container {
+#login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  /* margin-top: 80px; */
+  /* height: 100vh; */
+  display: none;
 }
 
-#login-container {
+#login-content-container {
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -241,8 +242,17 @@ body {
   width: 100%;
 }
 
+#login-container:not(:empty) ~ #left-nav-container,
+#login-container:not(:empty) ~ #top-navigation-toolbar-link-container {
+  display: none;
+}
+
 #content-container {
   flex-direction: column;
+}
+
+#login-content-container h2 {
+  margin-bottom: 40px;
 }
 
 #main-content {
