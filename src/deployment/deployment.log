@@ -174,3 +174,8 @@
 2025-01-10 22:30:16 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
 2025-01-10 22:30:19 - Resource 'srch-copilot-demo-005' is provisioned successfully.
 2025-01-10 22:30:35 - Web app 'app-copilot-demo-005' deployed successfully.
+*** LOG SEQUENCE: 32 ***
+*** SCRIPT START TIME: 01/10/2025 23:25:01 ***
+2025-01-10 23:25:03 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-10 23:25:05 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-10 23:25:36 - Web app 'app-copilot-demo-005' deployed successfully.

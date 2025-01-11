@@ -377,6 +377,9 @@ function clearChatDisplay() {
     document.getElementById('clear-button').style.display = 'none';
 
     thread.messages = []; // Clear the chat history
+
+    document.getElementById('chat-info-text-copy').style.display = 'block';
+    document.getElementById('chat-examples-container').style.display = 'block';
 }
 
 //code to clear file input
