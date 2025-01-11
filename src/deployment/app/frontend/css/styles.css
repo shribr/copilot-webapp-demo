@@ -147,7 +147,8 @@ body {
 
   #home-container,
   #document-container,
-  #chat-container {
+  #chat-container,
+  #login-container {
     /* margin-left: auto !important; */
     max-width: 95%;
   }
@@ -235,6 +236,10 @@ body {
   display: flex;
   justify-content: flex-end;
   padding: 10px;
+}
+
+#login-container {
+  display: none;
 }
 
 /* #login-container {
