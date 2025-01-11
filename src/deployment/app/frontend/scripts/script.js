@@ -75,6 +75,10 @@ $(document).ready(async function () {
     loadingAnimation.style.display = 'none'; // Hide it initially
     chatDisplayContainer.insertBefore(loadingAnimation, chatDisplay);
 
+    if (chatDisplay.innerHTML.trim() === '') {
+        document.getElementById('clear-button').style.display = 'none';
+    }
+
     $('#send-button').on('click', postQuestion);
     $('#clear-button').on('click', clearChatDisplay);
 
@@ -370,6 +374,8 @@ function clearChatDisplay() {
     document.getElementById('expand-chat-svg-container').style.display = 'none';
     document.getElementById('jump-to-top-arrow').style.display = 'none';
 
+    document.getElementById('clear-button').style.display = 'none';
+
     thread.messages = []; // Clear the chat history
 }
 
@@ -496,18 +502,20 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         const openAIResultsContainer = document.getElementById(openAIModelResultsId);
 
         const downloadChatResultsContainer = document.createElement('div');
-        downloadChatResultsContainer.id = `download - chat - results - container - ${answerResponseNumber} `;
+        downloadChatResultsContainer.id = `download-chat-results-container-${answerResponseNumber} `;
         downloadChatResultsContainer.className = 'download-chat-results-container';
 
-        const downloadChatResultsButtonId = `download - chat - results - button - ${answerResponseNumber} `;
+        const downloadChatResultsButtonId = `download-chat-results-button-${answerResponseNumber} `;
 
-        const downloadChatResultsButton = `<div id = "${downloadChatResultsButtonId}" onclick = "downloadChatResults()" class="download-chat-results-button">${downloadChatResultsSVG}</div> `;
+        const downloadChatResultsButton = `<div id ="${downloadChatResultsButtonId}" onclick = "downloadChatResults()" class="download-chat-results-button">${downloadChatResultsSVG}</div> `;
 
         downloadChatResultsContainer.innerHTML = downloadChatResultsButton;
 
         openAIResultsContainer.appendChild(downloadChatResultsContainer);
 
         document.getElementById(downloadChatResultsButtonId).addEventListener('click', downloadChatResults);
+
+        //answerResponseNumber++;
     }
 
 }
@@ -952,7 +960,7 @@ async function getChatResponse(questionBubble) {
         loadingAnimation.style.display = 'none';
 
         // Clear the input field
-        chatInput.value = '';
+        document.getElementById('chat-input').value = '';
 
         var followUpQuestionLinks = document.getElementsByClassName('followup-questions');
 
@@ -980,6 +988,8 @@ async function getChatResponse(questionBubble) {
 
     document.getElementById('expand-chat-svg-container').style.display = 'block';
     document.getElementById('jump-to-top-arrow').style.display = 'block';
+
+    document.getElementById('clear-button').style.display = '';
 
     answerResponseNumber++;
 }
