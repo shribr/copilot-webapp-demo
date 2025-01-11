@@ -3,6 +3,12 @@ a {
   color: rgba(13, 12, 52, 1);
 }
 
+#followup-questions-container,
+::after,
+::before {
+  box-sizing: content-box;
+}
+
 body {
   font-family: "Roboto", "Helvetica", "Arial", "sans-serif";
   margin: 0;
@@ -94,7 +100,7 @@ body {
   #document-container,
   #chat-container,
   #login-container {
-    margin-left: 200px;
+    margin-left: 210px;
   }
 
   #site-logo-container {
@@ -111,6 +117,10 @@ body {
 
 /* THIS MEANS LESS THAN OR EQUAL TO 600PX */
 @media (max-width: 600px) {
+  .chat-response {
+    word-break: break-all;
+  }
+
   #hamburger-menu {
     display: block;
     margin-left: 0px;
@@ -749,7 +759,7 @@ code {
 }
 
 .site-logo-custom {
-  width: 200px;
+  width: 210px;
   margin-left: -25px;
   padding-right: 20px;
 }
@@ -925,7 +935,7 @@ code {
   position: fixed;
   right: 0;
   top: 0;
-  width: 400px; /* Increased width */
+  width: auto;
   height: 100%;
   background-color: white;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
@@ -1270,7 +1280,7 @@ code {
   display: flex;
   flex-wrap: wrap;
   padding: 20px;
-  /* margin-left: 200px;
+  /* margin-left: 210px;
   margin-right: 20px; */
   background-color: #ffffff;
   border-radius: 8px;
@@ -1485,7 +1495,7 @@ code {
   background-color: #ffffff;
   color: #333;
   padding: 20px;
-  width: 200px;
+  width: 210px;
   height: 100% !important;
   flex-shrink: 0;
   display: flex;
@@ -1819,7 +1829,7 @@ nav ul li a:hover {
   background-color: #ffffff;
   color: #333;
   padding: 20px;
-  width: 200px;
+  width: 210px;
   height: 100%;
   flex-shrink: 0;
   display: flex;

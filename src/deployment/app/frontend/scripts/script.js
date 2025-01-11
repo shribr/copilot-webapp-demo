@@ -122,7 +122,7 @@ $(document).ready(async function () {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        if (settingsDialog.style.display === 'block' && !settingsDialog.contains(event.target) && !document.getElementById('link-settings').contains(event.target)) {
+        if (settingsDialog.style.display === 'block' && !settingsDialog.contains(event.target) && !document.getElementById('link-settings').contains(event.target) && !document.getElementById('settings-icon').contains(event.target)) {
             settingsDialog.style.display = 'none';
             settingsOverlay.style.display = 'none';
         }
@@ -290,7 +290,7 @@ $(document).ready(async function () {
         console.log('Settings clicked');
     });
 
-    document.getElementById('settings-container').addEventListener('click', function (event) {
+    document.getElementById('settings-icon').addEventListener('click', function (event) {
         event.preventDefault();
 
         showSettingsDialog();
@@ -879,8 +879,8 @@ async function getChatResponse(questionBubble) {
 
     if (chatInput) {
 
-        const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set followup questions surrounded by <ol> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.";
-
+        //const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <div class='followup-question'> elements and the entire set of followup questions surrounded by a parent <div id='followup-questions-list'> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.";
+        const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set of followup questions surrounded by <ol id='followup-questions-list'> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.";
         const message = { "role": "user", "content": prompt };
 
         addMessageToChatHistory(thread, message);
