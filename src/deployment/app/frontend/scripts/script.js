@@ -175,7 +175,7 @@ $(document).ready(async function () {
 
     const screen = getQueryParam('screen');
 
-    //toggleDisplay(screen);
+    toggleDisplay(screen);
 
     // Add event listeners to navigation links
     $('#left-nav-container nav ul li').on('click', function (event) {
