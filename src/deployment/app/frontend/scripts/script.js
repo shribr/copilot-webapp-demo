@@ -4,6 +4,9 @@ let currentSortColumn = '';
 let currentSortDirection = 'asc';
 let answerResponseNumber = 1;
 let aiEnhancedAnswersArray = [];
+let originalDocumentCount = 0;
+let existingDocumentCount = 0;
+let filteredDocumentCount = 0;
 
 let thread = { "messages": [] };
 
@@ -266,6 +269,8 @@ $(document).ready(async function () {
             });
         }
 
+        filteredDocumentCount = 0;
+
         documentRows.forEach(row => {
             if (row.style.display === 'none') {
                 return; // Skip hidden rows
@@ -273,22 +278,28 @@ $(document).ready(async function () {
             const nameCell = row.querySelector('.document-cell:nth-child(3)');
             if (nameCell.textContent.toLowerCase().includes(filterValue)) {
                 row.style.display = '';
+                filteredDocumentCount++;
+                console.log(`Filtered document count: ${filteredDocumentCount}`);
             } else {
                 row.style.display = 'none';
             }
+
+            document.getElementById('existing-documents-count').innerText = `(${filteredDocumentCount})`;
         });
     });
 
     document.getElementById('clear-filter-button').addEventListener('click', function () {
         document.getElementById('filter-input').value = ''; // Clear the filter input
-        const documentRows = document.querySelectorAll('#document-list .document-row:not(.header)');
+        const documentRows = document.querySelectorAll('#document-table .document-row:not(.header)');
         documentRows.forEach(row => {
             if (!row.classList.contains('sample')) {
-                row.style.display = ''; // Reset the visibility of all rows except sample ones
+                row.style.display = 'block'; // Reset the visibility of all rows except sample ones
             }
         });
         this.style.display = 'none'; // Hide the clear filter button
         document.getElementById('filter-button').style.display = 'block'; // Show the filter button
+
+        document.getElementById('existing-documents-count').innerText = `(${originalDocumentCount})`;
     });
 
     // Event listener for upload button
@@ -1281,6 +1292,12 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
             return { blobName, lastModified, contentType, blobUrl, blobSize };
         });
+
+        originalDocumentCount = blobData.length;
+        existingDocumentCount = blobData.length;
+        filteredDocumentCount = originalDocumentCount;
+
+        document.getElementById('existing-documents-count').innerText = `(${filteredDocumentCount})`;
 
         // Iterate over the sorted blob data and create document rows
         blobData.forEach(blob => {
