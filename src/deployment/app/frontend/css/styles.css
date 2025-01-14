@@ -245,9 +245,9 @@ body {
   padding: 10px;
 }
 
-#login-container {
+/* #login-container {
   display: none !important;
-}
+} */
 
 /* #login-container {
   display: flex;
@@ -277,6 +277,7 @@ body {
   width: 100%;
 }
 
+/* THIS CODE HIDES THE TOP NAVIGATION AND LEFT NAVIGATION IF THE LOGIN SCREEN IS VISIBLE */
 #login-container:not(:empty) ~ #left-nav-container,
 #login-container:not(:empty) ~ #top-navigation-toolbar-link-container {
   display: none;
@@ -981,7 +982,7 @@ code {
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
+  display: none;
   flex-direction: column;
   height: 95%;
 }
@@ -1505,7 +1506,6 @@ code {
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
   display: flex;
   flex-direction: column;
   height: 100%;

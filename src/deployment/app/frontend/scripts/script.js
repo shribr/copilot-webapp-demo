@@ -8,6 +8,17 @@ let originalDocumentCount = 0;
 let existingDocumentCount = 0;
 let filteredDocumentCount = 0;
 
+let msalInstance = {};
+let accessToken = {};
+
+let activeAccount = {};
+
+let loggedIn = false;
+
+const loginRequest = {
+    scopes: ["user.read"]
+};
+
 let thread = { "messages": [] };
 
 let tool_resources = {
@@ -20,6 +31,8 @@ let tool_resources = {
         ]
     }
 };
+
+checkIfLoggedIn();
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -50,6 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
 $(document).ready(async function () {
 
     //setChatDisplayHeight();
+    //logout();
+
+    const config = await fetchConfig();
 
     hideLeftNav();
 
@@ -59,8 +75,6 @@ $(document).ready(async function () {
 
     const elements = document.getElementsByClassName('document-cell-name');
     Array.from(elements).forEach(element => element.classList.add('no-before'));
-
-    const config = await fetchConfig();
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
@@ -96,6 +110,8 @@ $(document).ready(async function () {
 
     $('#send-button').on('click', postQuestion);
     $('#clear-button').on('click', clearChatDisplay);
+
+    $('#login-button').on('click', login);
 
     if (document.getElementById('chat-input').value.trim() === '') {
         $('#send-button').prop('disabled', true);
@@ -385,6 +401,57 @@ function addMessageToChatHistory(thread, message) {
     thread.messages.push(message);
 
     console.log(thread);
+}
+
+// API Test Call
+async function callApi() {
+
+    const config = await fetchConfig();
+
+    tokenRequest = await getAccessToken(config.AZURE_CLIENT_APP_ID);
+
+    msalInstance.acquireTokenSilent(tokenRequest)
+        .then(response => {
+            fetch("https://your-api-endpoint.com/data", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${response.accessToken}`
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("API data:", data);
+                })
+                .catch(error => {
+                    console.error("API call error:", error);
+                });
+        })
+        .catch(error => {
+            console.error("Token acquisition error:", error);
+        });
+}
+
+// Function to check if user is logged in
+async function checkIfLoggedIn() {
+
+    const config = await fetchConfig();
+    await initMSALInstance(config);
+
+    const accounts = msalInstance.getAllAccounts();
+    if (accounts.length > 0) {
+        msalInstance.setActiveAccount(accounts[0]);
+        console.log("User is logged in:", accounts[0]);
+        //msalInstance.loginRedirect(loginRequest);
+        loggedIn = true;
+    } else {
+        console.log("No user is logged in.");
+        await login();
+        loggedIn = false;
+    }
+
+    // if (!loggedIn) {
+    //     window.location.href = '/login'; // Redirect to login page if not logged in
+    // }
 }
 
 // Function to clear the chat display
@@ -875,6 +942,28 @@ async function getAnswersFromPublicInternet(userInput) {
     }
 }
 
+// Function to get the AUTH token
+async function getAccessToken(clientId, activeAccount) {
+
+    const tokenRequest = {
+        scopes: [`api://${clientId}/access_as_user`],
+        account: activeAccount
+    };
+
+    msalInstance.acquireTokenSilent(tokenRequest)
+        .then(response => {
+            console.log("Token acquired:", response.accessToken);
+
+            return response.accessToken;
+        })
+        .catch(error => {
+            console.error("Token acquisition error:", error);
+            return null;
+        });
+
+    return null;
+}
+
 // Function to show responses to questions
 async function getChatResponse(questionBubble) {
 
@@ -1032,8 +1121,7 @@ async function getChatResponse(questionBubble) {
 //code to get documents from Azure Storage
 async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
-    //const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}?${sasToken}`;
-    //const storageUrl = config.AZURE_STORAGE_FULL_URL;
+
 
     try {
         const response = await fetch(`${fullStorageUrl}`, {
@@ -1113,6 +1201,7 @@ async function getSelectedChatPersona() {
     }
 }
 
+// Function to hide the left navigation on small screens
 function hideLeftNav() {
 
     const width = window.innerWidth;
@@ -1123,10 +1212,73 @@ function hideLeftNav() {
     }
 }
 
+// Function to initialize new instance of MSAL
+async function initMSALInstance(config) {
+
+    const tenantId = config.AZURE_TENANT_ID;
+    const clientId = config.AZURE_CLIENT_APP_ID;
+    const appServiceName = config.AZURE_APP_SERVICE_NAME;
+
+    const msalConfig = {
+        auth: {
+            clientId: `${clientId}`,
+            authority: `https://login.microsoftonline.com/${tenantId}`,
+            redirectUri: `https://${appServiceName}.azurewebsites.net`
+        },
+        cache: {
+            cacheLocation: "localStorage", // This configures where your cache will be stored
+            storeAuthStateInCookie: true // Set this to true if you are having issues on IE11 or Edge
+        }
+    };
+
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+
+    msalInstance.handleRedirectPromise()
+        .then(response => {
+            if (response) {
+                msalInstance.setActiveAccount(response.account);
+                console.log("Login successful:", response);
+            } else {
+                console.log("No redirect response found.");
+            }
+        })
+        .catch(error => {
+            console.error("Error handling redirect:", error);
+        });
+}
+
 // Function to call the rest API
-async function invokeRESTAPI(jsonString, endpoint, apiKey) {
+async function invokeRESTAPI(jsonString, endpoint, apiKey, clientId) {
 
     let data = {};
+
+    const tokenRequest = {
+        scopes: [`api://${clientId}/access_as_user`],
+        account: activeAccount
+    };
+
+    // msalInstance.acquireTokenSilent(tokenRequest)
+    //     .then(response => {
+    //         fetch(endpoint, {
+    //             method: "GET",
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 "Authorization": `Bearer ${response.accessToken}`,
+    //                 'http2': 'true'
+    //             },
+    //             body: jsonString
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 console.log("API data:", data);
+    //             })
+    //             .catch(error => {
+    //                 console.error("API call error:", error);
+    //             });
+    //     })
+    //     .catch(error => {
+    //         console.error("Token acquisition error:", error);
+    //     });
 
     try {
         const response = await fetch(endpoint, {
@@ -1162,6 +1314,16 @@ function isQuestion(text) {
     const questionWords = ['who', 'what', 'where', 'when', 'why', 'how'];
     const words = text.trim().toLowerCase().split(/\s+/);
     return questionWords.includes(words[0]);
+}
+
+// Function to authenticate the user
+async function login() {
+    msalInstance.loginRedirect(loginRequest);
+}
+
+// Function to log out the user
+function logout() {
+    msalInstance.logout();
 }
 
 // Function to post a question to the chat display
@@ -1622,46 +1784,44 @@ function toggleBeforeAfter(width) {
 
 //code to toggle between chat and document screens
 function toggleDisplay(screen) {
-    const $chatContainer = $('#chat-container');
-    const $documentContainer = $('#document-container');
-    const $homeContainer = $('#home-container');
-    const $loginContainer = $('#login-container');
-    const $leftNavContainer = $('#left-nav-container');
-    const $topNavToolbarLinkContainer = document.getElementById("top-navigation-toolbar-link-container");
+    const chatContainer = $('#chat-container');
+    const documentContainer = $('#document-container');
+    const homeContainer = $('#home-container');
+    const loginContainer = $('#login-container');
+    const leftNavContainer = $('#left-nav-container');
+    const topNavToolbarLinkContainer = $('#top-navigation-toolbar-link-container');
+    const settingsIcon = $('#settings-icon');
 
     const status = getQueryParam('status');
 
-    if (status === 'success' || true) {
+    if (loggedIn) {
         if (screen === 'chat') {
-            $chatContainer.show();
-            $documentContainer.hide();
-            $homeContainer.hide();
+            chatContainer.show();
+            documentContainer.hide();
+            homeContainer.hide();
         } else if (screen === 'documents') {
-            $chatContainer.hide();
-            $homeContainer.hide();
-            $documentContainer.show();
+            chatContainer.hide();
+            homeContainer.hide();
+            documentContainer.show();
         } else if (screen === 'home') {
-            $chatContainer.hide();
-            $documentContainer.hide();
-            $homeContainer.show();
-        } else if (screen === 'login') {
-            $chatContainer.hide();
-            $documentContainer.hide();
-            $homeContainer.hide();
-            $loginContainer.show();
+            chatContainer.hide();
+            documentContainer.hide();
+            homeContainer.show();
         } else {
-            $chatContainer.hide();
-            $documentContainer.hide();
-            $homeContainer.show();
+            chatContainer.hide();
+            documentContainer.hide();
+            homeContainer.hide();
+            //loginContainer.show();
         }
     }
     else {
-        $chatContainer.hide();
-        $documentContainer.hide();
-        $homeContainer.hide();
-        $topNavToolbarLinkContainer.hide();
-        $leftNavContainer.hide();
-        $loginContainer.show();
+        chatContainer.hide();
+        documentContainer.hide();
+        homeContainer.hide();
+        topNavToolbarLinkContainer.hide();
+        leftNavContainer.hide();
+        loginContainer.hide();
+        settingsIcon.hide();
     }
 }
 
@@ -1734,6 +1894,8 @@ async function uploadFilesToAzure(files) {
     const editIcon = config.ICONS.EDIT.MONOTONE;
     const deleteIcon = config.ICONS.DELETE.MONOTONE;
 
+    const searchIndexers = config.SEARCH_INDEXERS;
+
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
@@ -1777,5 +1939,5 @@ async function uploadFilesToAzure(files) {
     clearFileInput();
 
     //The isn't working yet because of permissions issues
-    //await runSearchIndexer(searchIndexers);
+    await runSearchIndexer(searchIndexers);
 }
