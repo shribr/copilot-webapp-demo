@@ -2,7 +2,30 @@
 
 ## Overview
 
-This project is a web application that allows users to chat with Azure Copilot. It includes a simple HTML interface and a PowerShell script for deployment.
+This project is a web application that allows users to chat with Azure Copilot to query their own data. In addition to responses returned by Copilot, the application also provides the user with source references, suggested follow up questions AND a "Thought Process" tab which allows the user to understand how the AI arrived at it's answers. As an added bonus, a varity of AI personas are included which provide varying prompts based on their assigned descriptions. This allows the AI to focus on role specific aspects of the data being searched that would appear to be most important to a variety of different users. While searching the exact same dataset, the information which would be of interest to an IT professional would not be the same as what an attorney might be interested in.
+
+### Here are a list of included personas: ###
+
+- Attorney
+- Business Professional
+- CEO
+- Data Scientist
+- Doctor
+- Engineer
+- Financial Advisor
+- Fitness Enthusiast
+- Foodie
+- HR Manager
+- Journalist
+- Marketing Professional
+- Network Security Specialist
+- New Yorker
+- Teacher
+- Tech Enthusiast
+- Teenage Girl
+- Traveler
+
+The solution is fully configurable via a parameters.json file. It includes a simple HTML interface and a PowerShell script for deployment.
 
 <img width="1423" alt="azure-ai-demo-home" src="src/deployment/images/azure-ai-demo-home.png">
 
@@ -16,14 +39,6 @@ This project is a web application that allows users to chat with Azure Copilot. 
 - [ms-vscode.azurecli](https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli) - Azure CLI tools
 - [ms-vscode.powershell](https://marketplace.visualstudio.com/items?itemName=ms-vscode.powershell) - PowerShell language support
 - [PowerShell Core](https://github.com/PowerShell/PowerShell) (for running the deployment script)
-
-### .NET Development (Required)
-
-- [ms-dotnettools.csharp](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) - C# language support
-- [ms-dotnettools.dotnet-interactive-vscode](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode) - .NET Interactive Notebooks
-- [ms-dotnettools.vscode-dotnet-pack](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscode-dotnet-pack) - .NET Pack support
-- [ms-dotnettools.vscode-dotnet-runtime](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscode-dotnet-runtime) - .NET Runtime support
-- [ms-dotnettools.vscode-dotnet-sdk](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscode-dotnet-sdk) - .NET SDK support
 
 ### GitHub Integration (Required)
 
@@ -386,7 +401,7 @@ The web application is structured to leverage various Azure services for a seaml
 
 - **Frontend**: The frontend is built using HTML, CSS, and JavaScript, located in the frontend directory. It includes configuration files, stylesheets, images, and scripts necessary for the user interface.
 
-- **Backend**: The backend consists of Azure Functions, specifically designed for chat-related functionalities. These functions are located in the chat directory and include classes like `ChatCompletion`, `ChatContext`, `ChatHistory`, and `ChatOrchestrator`.
+- **Backend**: None. This solution only leverages the built-in REST APIs for all of the required Azure resources.
 
 This architecture ensures a robust, scalable, and maintainable web application leveraging Azure's cloud capabilities.
 
