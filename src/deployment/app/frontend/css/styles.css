@@ -13,7 +13,7 @@ body {
   font-family: "Roboto", "Helvetica", "Arial", "sans-serif";
   margin: 0;
   padding: 0;
-  display: flex;
+  display: none;
   flex-direction: column;
   height: 100vh;
   background-color: #f4f4f9;
@@ -77,7 +77,8 @@ body {
   #top-navigation-toolbar-link-container {
     display: none;
   }
-  #settings-container {
+  #settings-container,
+  #user-profile-container {
     display: inline-block !important;
   }
 
@@ -178,7 +179,8 @@ body {
     display: none;
   }
 
-  #settings-container {
+  #settings-container,
+  #user-profile-container {
     display: inline-block;
   }
 }
@@ -712,7 +714,7 @@ code {
   transform: translateX(100%);
 }
 
-#settings-overlay {
+#panel-overlay {
   top: 0;
   left: 0;
   right: 0;
@@ -727,7 +729,7 @@ code {
   z-index: 5;
 }
 
-#settings-overlay-dark {
+#panel-overlay-dark {
   background-color: rgba(0, 0, 0, 0.7);
   position: fixed;
   top: 0;
@@ -736,7 +738,7 @@ code {
   bottom: 0;
 }
 
-.settings-overlay-drawer {
+.panel-overlay-drawer {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -748,7 +750,7 @@ code {
   z-index: 1060;
 }
 
-.settings-overlay .settings-overlay .settings-overlay-scrim {
+.panel-overlay .panel-overlay .panel-overlay-scrim {
   top: 0;
   left: 0;
   right: 0;
@@ -765,11 +767,11 @@ code {
   -o-animation: animation-fadein ease 0.15s;
 }
 
-.settings-overlay-hidden {
+.panel-overlay-hidden {
   display: none;
 }
 
-.settings-overlay-scrim {
+.panel-overlay-scrim {
   position: absolute;
   top: 0;
   left: 0;
@@ -959,18 +961,56 @@ code {
 }
 
 /* Add this to your CSS file or within a <style> tag in your HTML */
-#settings-dialog {
+#settings-panel,
+#user-profile-panel {
   display: none;
   position: fixed;
-  right: 0;
-  top: 0;
   width: auto;
-  height: 100%;
   background-color: white;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-  padding: 20px;
+
   overflow-y: auto;
   z-index: 1000;
+}
+
+#settings-panel {
+  height: 100%;
+  right: 0;
+  top: 0;
+  padding: 20px;
+}
+
+#user-profile-panel {
+  right: 10px;
+  top: 80px;
+  border-radius: 5px;
+}
+
+#user-profile-panel-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(13, 12, 52, 1);
+  color: white;
+  padding: 20px;
+}
+
+#user-profile-panel-header-text {
+  flex: 1;
+  font-size: 1.8rem;
+  font-weight: bold !important;
+}
+
+#user-profile-panel-header-text h2 {
+  font-weight: 800;
+}
+
+#user-profile-panel-icon-container {
+  margin-top: 6px;
+  margin-right: 8px;
+}
+
+#user-profile-panel-icon {
+  fill: white;
 }
 
 /* Chat container styles */
@@ -1216,7 +1256,7 @@ code {
   /* Rounded corners */
 }
 
-#close-settings-dialog {
+.close-panel {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -1716,19 +1756,31 @@ code {
   cursor: not-allowed;
 }
 
-#settings-container {
+#settings-container,
+#user-profile-container {
   display: none;
   fill: currentColor;
   cursor: pointer;
+  margin-left: 4px;
 }
 
-#settings-overlay {
+#user-profile-container {
+  margin-top: 4px;
+}
+
+#user-profile-content {
+  padding: 20px;
+}
+
+#panel-overlay {
   display: none;
   z-index: 1000;
   flex-direction: row;
+  opacity: 60%;
+  background-color: gray;
 }
 
-#settings-overlay-dark {
+#panel-overlay-dark {
   background-color: rgba(33, 33, 33, 0.4980392156862745);
   z-index: 1;
 }

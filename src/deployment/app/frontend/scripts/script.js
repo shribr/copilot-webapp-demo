@@ -32,7 +32,7 @@ let tool_resources = {
     }
 };
 
-checkIfLoggedIn();
+await checkIfLoggedIn();
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -67,7 +67,13 @@ $(document).ready(async function () {
 
     const config = await fetchConfig();
 
+    await checkIfLoggedIn();
+
     hideLeftNav();
+
+    setSiteLogo();
+
+    //renderPanelIcons();
 
     const width = window.innerWidth;
 
@@ -90,8 +96,6 @@ $(document).ready(async function () {
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
-
-    setSiteLogo();
 
     getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
 
@@ -145,17 +149,27 @@ $(document).ready(async function () {
     });
 
     document.addEventListener('click', function (event) {
-        const settingsDialog = document.getElementById('settings-dialog');
-        const settingsOverlay = document.getElementById('settings-overlay');
 
+        const settingsPanel = document.getElementById('settings-panel');
+        const userProfilePanel = document.getElementById('user-profile-panel');
+        const panelOverlay = document.getElementById('panel-overlay');
         const leftNavContainer = document.getElementById('left-nav-container');
+
+        if (settingsPanel.style.display === 'block' && !settingsPanel.contains(event.target) && !document.getElementById('link-settings').contains(event.target) && !document.getElementById('settings-icon').contains(event.target)) {
+            settingsPanel.style.display = 'none';
+            panelOverlay.style.display = 'none';
+        }
+
+        if (userProfilePanel.style.display === 'block' && !userProfilePanel.contains(event.target) && !document.getElementById('link-user-profile').contains(event.target) && !document.getElementById('user-profile-icon').contains(event.target)) {
+            userProfilePanel.style.display = 'none';
+            panelOverlay.style.display = 'none';
+        }
 
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        if (settingsDialog.style.display === 'block' && !settingsDialog.contains(event.target) && !document.getElementById('link-settings').contains(event.target) && !document.getElementById('settings-icon').contains(event.target)) {
-            settingsDialog.style.display = 'none';
-            settingsOverlay.style.display = 'none';
+        if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
+            leftNavContainer.style.display = 'none';
         }
 
         if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
@@ -332,7 +346,7 @@ $(document).ready(async function () {
     document.getElementById('link-settings').addEventListener('click', function (event) {
         event.preventDefault();
 
-        showSettingsDialog();
+        togglePanel('settings-panel');
 
         // Handle settings click
         console.log('Settings clicked');
@@ -341,16 +355,28 @@ $(document).ready(async function () {
     document.getElementById('settings-icon').addEventListener('click', function (event) {
         event.preventDefault();
 
-        showSettingsDialog();
+        togglePanel('settings-panel');
 
         // Handle settings click
         console.log('Settings clicked');
     });
 
-    document.getElementById('link-profile').addEventListener('click', function (event) {
+    document.getElementById('link-user-profile').addEventListener('click', function (event) {
         event.preventDefault();
+
+        togglePanel('user-profile-panel');
+
         // Handle profile click
-        console.log('Profile clicked');
+        console.log('User Profile clicked');
+    });
+
+    document.getElementById('user-profile-icon').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        togglePanel('user-profile-panel');
+
+        // Handle settings click
+        console.log('User Profile clicked');
     });
 
     document.getElementById('link-help').addEventListener('click', function (event) {
@@ -359,9 +385,14 @@ $(document).ready(async function () {
         console.log('Help clicked');
     });
 
-    document.getElementById('close-settings-dialog').addEventListener('click', function () {
-        document.getElementById('settings-dialog').style.display = 'none';
-        document.getElementById('settings-overlay').style.display = 'none';
+    document.getElementById('close-settings-panel').addEventListener('click', function () {
+        document.getElementById('settings-panel').style.display = 'none';
+        document.getElementById('panel-overlay').style.display = 'none';
+    });
+
+    document.getElementById('close-user-profile-panel').addEventListener('click', function () {
+        document.getElementById('user-profile-panel').style.display = 'none';
+        document.getElementById('panel-overlay').style.display = 'none';
     });
 
     document.getElementById('jump-to-top-arrow').addEventListener('click', function () {
@@ -435,23 +466,34 @@ async function callApi() {
 async function checkIfLoggedIn() {
 
     const config = await fetchConfig();
+    const userProfilePanel = document.getElementById('user-profile-panel');
+
+    const userProfileName = document.getElementById('user-profile-info-name-value');
+    const userProfileEmail = document.getElementById('user-profile-info-email-value');
+
     await initMSALInstance(config);
 
+    const body = document.querySelector('body');
+
     const accounts = msalInstance.getAllAccounts();
+
     if (accounts.length > 0) {
         msalInstance.setActiveAccount(accounts[0]);
         console.log("User is logged in:", accounts[0]);
+        userProfileName.innerText = accounts[0].name;
+        userProfileEmail.innerText = accounts[0].username;
+
+        activeAccount = accounts[0];
+
+        body.style.display = 'flex';
         //msalInstance.loginRedirect(loginRequest);
         loggedIn = true;
     } else {
         console.log("No user is logged in.");
+
         await login();
         loggedIn = false;
     }
-
-    // if (!loggedIn) {
-    //     window.location.href = '/login'; // Redirect to login page if not logged in
-    // }
 }
 
 // Function to clear the chat display
@@ -835,16 +877,19 @@ function formatBytes(bytes) {
 }
 
 //Function to send chat message to Azure OpenAI model to either search the model directly or internal data sources
-async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSources) {
+async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSources, keyVaultName) {
 
     if (!userInput) return;
 
     const config = await fetchConfig();
 
-    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    //const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    const apiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
     const apiVersion = config.OPENAI_API_VERSION;
     const deploymentName = aiModelName;
     const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
+    const clientId = config.AZURE_CLIENT_APP_ID;
+
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
@@ -853,15 +898,23 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     openAIRequestBody.messages = [];
     openAIRequestBody.messages = thread.messages;
 
+    const tokenRequest = {
+        scopes: [`api://${clientId}/key_vault_read`],
+        account: activeAccount
+    };
+
+    const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+
     if (dataSources.length > 0) {
 
         for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
+            source.parameters.authentication.key = await getSecretFromKeyVault(keyVaultName, config.AZURE_SEARCH_SERVICE_SECRET_NAME, tokenResponse.accessToken);
             openAIRequestBody.data_sources.push(source);
 
             const jsonString = JSON.stringify(openAIRequestBody);
 
-            const result = await invokeRESTAPI(jsonString, endpoint, apiKey);
+            const result = await invokeRESTAPI(jsonString, endpoint, apiTokenSecretName);
 
             results.push(result);
         }
@@ -943,7 +996,7 @@ async function getAnswersFromPublicInternet(userInput) {
 }
 
 // Function to get the AUTH token
-async function getAccessToken(clientId, activeAccount) {
+async function getAccessToken(clientId) {
 
     const tokenRequest = {
         scopes: [`api://${clientId}/access_as_user`],
@@ -973,6 +1026,8 @@ async function getChatResponse(questionBubble) {
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const dataSources = config.DATA_SOURCES;
+    const keyVaultName = config.AZURE_KEY_VAULT_NAME;
+
     const responseTabList = Object.entries(config.RESPONSE_TABS);
     const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
 
@@ -1013,7 +1068,7 @@ async function getChatResponse(questionBubble) {
         chatExamplesContainer.style.display = 'none';
 
         // Get answers from Azure OpenAI model and datasources
-        const azureOpenAIResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona, dataSources);
+        const azureOpenAIResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona, dataSources, keyVaultName);
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -1121,8 +1176,6 @@ async function getChatResponse(questionBubble) {
 //code to get documents from Azure Storage
 async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
-
-
     try {
         const response = await fetch(`${fullStorageUrl}`, {
             method: 'GET',
@@ -1176,6 +1229,33 @@ async function getSasToken() {
 function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
+}
+
+// Function to retrieve secret from Azure Key Vault
+async function getSecretFromKeyVault(keyVaultName, secretName, accessToken) {
+
+    const keyVaultUrl = `https://${keyVaultName}.vault.azure.net/secrets/${secretName}?api-version=7.0`;
+
+    try {
+        const response = await fetch(keyVaultUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.value;
+        } else {
+            console.error('Failed to fetch secret:', response.statusText);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching secret:', error);
+        return null;
+    }
 }
 
 // Function to get the selected chat persona
@@ -1248,44 +1328,31 @@ async function initMSALInstance(config) {
 }
 
 // Function to call the rest API
-async function invokeRESTAPI(jsonString, endpoint, apiKey, clientId) {
+async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
     let data = {};
 
+    const config = await fetchConfig();
+    const keyVaultName = config.AZURE_KEY_VAULT_NAME;
+
+    const clientId = config.AZURE_CLIENT_APP_ID;
+
     const tokenRequest = {
-        scopes: [`api://${clientId}/access_as_user`],
+        scopes: [`api://${clientId}/key_vault_read`],
         account: activeAccount
     };
 
-    // msalInstance.acquireTokenSilent(tokenRequest)
-    //     .then(response => {
-    //         fetch(endpoint, {
-    //             method: "GET",
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 "Authorization": `Bearer ${response.accessToken}`,
-    //                 'http2': 'true'
-    //             },
-    //             body: jsonString
-    //         })
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 console.log("API data:", data);
-    //             })
-    //             .catch(error => {
-    //                 console.error("API call error:", error);
-    //             });
-    //     })
-    //     .catch(error => {
-    //         console.error("Token acquisition error:", error);
-    //     });
-
     try {
+        const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+
+        const apiKey = await getSecretFromKeyVault(keyVaultName, apiTokenSecretName, tokenResponse.accessToken);
+
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'api-key': `${apiKey}`,
+                'Authorization': `Bearer ${tokenResponse.accessToken}`,
                 'http2': 'true'
             },
             body: jsonString
@@ -1540,6 +1607,21 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
     }
 }
 
+// Function to render panel icons
+async function renderPanelIcons() {
+    const config = await fetchConfig();
+
+    const settingsIcon = config.ICONS.SETTINGS.MONOTONE;
+    const userProfileIcon = config.ICONS.USER_PROFILE.MONOTONE;
+
+    const settingsIconContainer = document.getElementById('settings-container');
+    const profileIconContainer = document.getElementById('user-profile-container');
+
+    settingsIconContainer.innerHTML = settingsIcon;
+    profileIconContainer.innerHTML = userProfileIcon;
+
+}
+
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
@@ -1642,10 +1724,10 @@ async function setSiteLogo() {
 }
 
 // Function to show the settings dialog
-function showSettingsDialog() {
+function showSettingsPanel() {
 
-    const settingsDialog = document.getElementById('settings-dialog');
-    const settingsOverlay = document.getElementById('settings-overlay');
+    const settingsDialog = document.getElementById('settings-panel');
+    const settingsOverlay = document.getElementById('panel-overlay');
 
     if (settingsDialog.style.display === 'none' || settingsDialog.style.display === '') {
         settingsDialog.style.display = 'block';
@@ -1654,15 +1736,6 @@ function showSettingsDialog() {
         settingsDialog.style.display = 'none';
         //settingsOverlay.style.display = 'none';
     }
-
-    // const formGroupDeleteAllThreads = document.getElementById('form-group-delete-all-threads');
-    // const deleteAllThreadsButton = document.getElementById('delete-all-threads-button');
-
-    // const loadingDeleteAllThreadsAnimation = document.createElement('div');
-
-    // loadingDeleteAllThreadsAnimation.setAttribute('class', 'loading-animation');
-    // loadingDeleteAllThreadsAnimation.innerHTML = '<div class="spinner" id="loading-delete-all-threads-animation"></div> Loading threads...'; // Hide it initially
-    // formGroupDeleteAllThreads.insertBefore(loadingDeleteAllThreadsAnimation, deleteAllThreadsButton);
 }
 
 // Function to show a toast notification
@@ -1768,6 +1841,7 @@ function toggleAllCheckboxes() {
     });
 }
 
+// Function to insert field title into search results
 function toggleBeforeAfter(width) {
     if (width < 1236) {
         const elements = document.getElementsByClassName('document-cell-name');
@@ -1791,9 +1865,11 @@ function toggleDisplay(screen) {
     const leftNavContainer = $('#left-nav-container');
     const topNavToolbarLinkContainer = $('#top-navigation-toolbar-link-container');
     const settingsIcon = $('#settings-icon');
+    const userProfileIcon = $('#user-profile-icon');
 
     const status = getQueryParam('status');
 
+    //Remove "true" for production
     if (loggedIn) {
         if (screen === 'chat') {
             chatContainer.show();
@@ -1803,15 +1879,10 @@ function toggleDisplay(screen) {
             chatContainer.hide();
             homeContainer.hide();
             documentContainer.show();
-        } else if (screen === 'home') {
-            chatContainer.hide();
-            documentContainer.hide();
-            homeContainer.show();
         } else {
             chatContainer.hide();
             documentContainer.hide();
-            homeContainer.hide();
-            //loginContainer.show();
+            homeContainer.show();
         }
     }
     else {
@@ -1822,7 +1893,19 @@ function toggleDisplay(screen) {
         leftNavContainer.hide();
         loginContainer.hide();
         settingsIcon.hide();
+        userProfileIcon.hide();
     }
+}
+
+// Function to show the selected panel
+function togglePanel(panel) {
+    const panelOverlay = document.getElementById('panel-overlay');
+
+    const panelElement = document.getElementById(panel);
+
+    panelElement.style.display = panelElement.style.display === 'block' ? 'none' : 'block';
+
+    panelOverlay.style.display = panelOverlay.style.display === 'block' ? 'none' : 'block';
 }
 
 // Function to format string in proper case
@@ -1832,6 +1915,7 @@ function toProperCase(str) {
     });
 }
 
+// Function to truncate a string
 function truncateString(str, num) {
     if (str.length <= num) {
         return str;

@@ -1,5 +1,7 @@
 {
-  "AZURE_AI_SERVICE_API_KEY": "5366aeb70ed448ad86196c68ae41e44a",
+  "AUTHENTICATION_MODE": "MSAL",
+  "AZURE_OPENAI_SERVICE_API_KEY": "5366aeb70ed448ad86196c68ae41e44a",
+  "AZURE_OPENAI_SERVICE_SECRET_NAME": "OpenAIServiceApiKey",
   "AZURE_CLIENT_APP_ID": "a157200d-0915-44a6-89bc-f60540cbad09",
   "AZURE_APP_SERVICE_NAME": "app-copilot-demo-005",
   "AZURE_SEARCH_API_KEY": "Rb6nJSI6d6McgF4WxSZjze7pYyvToML98TdIbnsMhYAzSeCyRboE",
@@ -14,12 +16,14 @@
   "AZURE_SEARCH_INDEXER_NAME": "app/frontend/config.json",
   "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index-copilot-demo-005-semantic-configuration",
   "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-005",
+  "AZURE_SEARCH_SERVICE_SECRET_NAME": "SearchServiceApiKey",
   "AZURE_SEARCH_VECTOR_INDEX_NAME": "",
   "AZURE_SEARCH_VECTOR_INDEXER_NAME": "",
   "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo005",
+  "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo005.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-05T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bfqt&srt=co&sig=7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo005.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-12T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bftq&srt=co&sig=dyRKp9Kaqqke9ZDNfprcafiAhnqs9PgTf/ZKvUYLIXo%3D",
   "AZURE_STORAGE_KEY": "0U1U/G53fa5B3CiAd+NR43iRsES1VRAkPlvkz7PquPsp4PRBr2eBXn/UmHsuwvCZZITqdXUquSQV+AStzlXScA==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -35,28 +39,28 @@
   "SITE_LOGO": "default",
   "AI_MODELS": [
     {
-      "Name": "gpt-4o",
       "Format": "OpenAI",
-      "ApiKey": "5366aeb70ed448ad86196c68ae41e44a",
-      "Type": "gpt-4o",
+      "ApiVersion": "2024-08-01-preview",
+      "Type": "gpt-4",
       "Sku": {
-        "Capacity": 100,
-        "Name": "Standard"
+        "Name": "Standard",
+        "Capacity": 100
       },
-      "ModelVersion": null,
-      "ApiVersion": "2024-08-01-preview"
+      "Name": "gpt-4",
+      "ApiKey": "5366aeb70ed448ad86196c68ae41e44a",
+      "ModelVersion": null
     },
     {
-      "Name": "text-embedding",
       "Format": "OpenAI",
-      "ApiKey": "5366aeb70ed448ad86196c68ae41e44a",
+      "ApiVersion": "2023-05-15",
       "Type": "text-embedding-3-large",
       "Sku": {
-        "Capacity": 100,
-        "Name": "Standard"
+        "Name": "Standard",
+        "Capacity": 100
       },
-      "ModelVersion": null,
-      "ApiVersion": "2023-05-15"
+      "Name": "text-embedding",
+      "ApiKey": "5366aeb70ed448ad86196c68ae41e44a",
+      "ModelVersion": null
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -77,21 +81,22 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "bfqt",
+    "SS": "bftq",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-01-05T23:59:59Z",
-    "ST": "2025-01-05T23:59:59Z",
+    "SE": "2026-01-12T23:59:59Z",
+    "ST": "2025-01-12T23:59:59Z",
     "SPR": "https",
-    "SIG": "7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D",
+    "SIG": "dyRKp9Kaqqke9ZDNfprcafiAhnqs9PgTf/ZKvUYLIXo%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
-    "data_sources": [],
+    "temperature": 0.7,
     "messages": [
       {
+        "role_information": "You are a helpful assistant",
         "role": "system",
         "content": ""
       },
@@ -100,26 +105,98 @@
         "content": ""
       }
     ],
-    "temperature": 0.7,
-    "top_p": 0.95,
-    "frequency_penalty": 0,
     "presence_penalty": 0,
-    "max_tokens": 800,
+    "data_sources": [
+      {
+        "parameters": {
+          "authentication": {
+            "key": "Rb6nJSI6d6McgF4WxSZjze7pYyvToML98TdIbnsMhYAzSeCyRboE",
+            "type": "api_key"
+          },
+          "index_name": "@{Model=gpt-4o; Name=vector-srch-index-copilot-demo-005; Schema=vector-search-index-schema.json}",
+          "endpoint": "https://srch-copilot-demo-005.search.windows.net"
+        },
+        "type": "azure_search"
+      }
+    ],
+    "stream": false,
+    "top_p": 0.95,
     "stop": null,
-    "stream": false
+    "frequency_penalty": 0,
+    "max_tokens": 800
   },
   "CHAT_PERSONAS": [
     {
-      "Type": "Teenage Girl",
-      "Description": "You are a teenage girl who is very passionate about fashion and beauty. You love to share your thoughts and opinions on the latest trends and products. You are also very creative and love to express yourself through art and music.",
-      "Prompt": "You are a teenage girl. You are very perky and enthusiastic.",
-      "NoResults": "Oops! I couldn't find any information on that. Would you like me to look up something else?"
+      "Type": "Business Professional",
+      "Description": "You are a business professional who loves to talk about the latest business trends and strategies. You are very knowledgeable about the latest business tips and tricks. You are primarily focused on how you company utilizes data from a finance perspective.",
+      "Prompt": "You are a business professional and are always talking about how you're doing in the stock market.",
+      "NoResults": "Sorry, usually I'm pretty good at crunching numbers, but I couldn't find anything on that."
     },
     {
-      "Type": "New Yorker",
-      "Description": "You are a New Yorker who loves to talk about the latest news and events in the city. You are very knowledgeable about the local culture and history. You are also very friendly and love to meet new people.",
-      "Prompt": "You are a stereotypical guy from Long Island, New York. You talk with a thick New York accent and use all the slang words.",
-      "NoResults": " Sorry buddy, I got nuttin'."
+      "Type": "Data Scientist",
+      "Description": "You are a data scientist who loves to talk about the latest data trends and algorithms. You are primarily focused on analytics and data.",
+      "Prompt": " YOu are a data scientist.",
+      "NoResults": "Sorry, I'm normally pretty good with data but the numbers just didn't add up on that one."
+    },
+    {
+      "Type": "HR Manager",
+      "Description": "You are an HR Manager who is passionate about employee well-being and organizational development. You focus on recruitment, employee relations, and compliance with labor laws.",
+      "Prompt": "You are an HR Manager discussing strategies for improving employee engagement and retention.",
+      "NoResults": "Sorry, I usually have great insights on HR matters, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Network Security Specialist",
+      "Description": "You are a Network Security Specialist who is dedicated to protecting organizational data and infrastructure. You focus on identifying vulnerabilities, implementing security measures, and responding to security incidents.",
+      "Prompt": "You are a Network Security Specialist discussing the latest cybersecurity threats and best practices for protecting networks.",
+      "NoResults": "Sorry, I'm usually on top of security trends, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Attorney",
+      "Description": "You are an Attorney who specializes in providing legal advice and representation. You focus on understanding laws, preparing legal documents, and representing clients in legal proceedings.",
+      "Prompt": "You are an Attorney discussing recent changes in legislation and their impact on your clients.",
+      "NoResults": "Sorry, I usually have a good grasp of legal matters, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Marketing Professional",
+      "Description": "You are a Marketing Professional who loves to talk about the latest marketing trends and strategies. You are very knowledgeable about the latest marketing tips and tricks. You are primarily focused on digital marketing and social media.",
+      "Prompt": "You are a Marketing Professional discussing the latest digital marketing strategies and social media trends.",
+      "NoResults": "Sorry, I'm usually pretty good at marketing, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Teacher",
+      "Description": "You are a Teacher who is passionate about education and helping students learn. You focus on creating engaging lesson plans, assessing student progress, and providing support to students.",
+      "Prompt": "You are a Teacher discussing innovative teaching methods and strategies for student success.",
+      "NoResults": "Sorry, I'm usually pretty good at teaching, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Doctor",
+      "Description": "You are a Doctor who is dedicated to providing quality healthcare to patients. You focus on diagnosing and treating medical conditions, as well as promoting health and wellness.",
+      "Prompt": "You are a Doctor discussing the latest medical research and treatments for common health conditions.",
+      "NoResults": "Sorry, I'm usually pretty good at diagnosing problems, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Engineer",
+      "Description": "You are an Engineer who loves to talk about the latest technology and innovations. You are very knowledgeable about the latest engineering trends and techniques. You are primarily focused on software engineering and coding.",
+      "Prompt": "You are an Engineer discussing the latest software development tools and techniques.",
+      "NoResults": "Sorry, I'm usually pretty good at building things, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Financial Advisor",
+      "Description": "You are a Financial Advisor who is dedicated to helping clients achieve their financial goals. You focus on financial planning, investment management, and retirement planning.",
+      "Prompt": "You are a Financial Advisor discussing investment strategies and retirement planning.",
+      "NoResults": "Sorry, I'm usually pretty good at managing money, but I couldn't find anything on that."
+    },
+    {
+      "Type": "Journalist",
+      "Description": "You are a Journalist who is passionate about reporting the news and telling stories. You focus on researching and writing articles, conducting interviews, and staying up-to-date on current events.",
+      "Prompt": "You are a Journalist discussing the latest news stories and trends in journalism.",
+      "NoResults": "Sorry, I'm usually pretty good at reporting the news, but I couldn't find anything on that."
+    },
+    {
+      "Type": "CEO",
+      "Description": "You are a CEO who needs things short and percise with not much detail.",
+      "Prompt": "You are a CEO who needs things short and percise with not much detail.",
+      "NoResults": "Sorry, I'm usually pretty good at making decisions but I couldn't find anything on that."
     },
     {
       "Type": "Tech Enthusiast",
@@ -146,22 +223,16 @@
       "NoResults": "Sorry, I was all pumped and ready to answer your question but I ran out of steam."
     },
     {
-      "Type": "Business Professional",
-      "Description": "You are a business professional who loves to talk about the latest business trends and strategies. You are very knowledgeable about the latest business tips and tricks. You are primarily focused on how you company utilizes data from a finance perspective.",
-      "Prompt": "You are a business professional and are always talking about how you're doing in the stock market.",
-      "NoResults": "Sorry, usually I'm pretty good at crunching numbers, but I couldn't find anything on that."
+      "Type": "Teenage Girl",
+      "Description": "You are a teenage girl who is very passionate about fashion and beauty. You love to share your thoughts and opinions on the latest trends and products. You are also very creative and love to express yourself through art and music.",
+      "Prompt": "You are a teenage girl. You are very perky and enthusiastic.",
+      "NoResults": "Oops! I couldn't find any information on that. Would you like me to look up something else?"
     },
     {
-      "Type": "Data Scientist",
-      "Description": "You are a data scientist who loves to talk about the latest data trends and algorithms. You are primarily focused on analytics and data.",
-      "Prompt": " YOu are a data scientist.",
-      "NoResults": "Sorry, I'm normally pretty good with data but the numbers just didn't add up on that one."
-    },
-    {
-      "Type": "CEO",
-      "Description": "You are a CEO who needs things short and percise with not much detail.",
-      "Prompt": "You are a CEO who needs things short and percise with not much detail.",
-      "NoResults": "Sorry, I'm usually pretty good at making decisions but I couldn't find anything on that."
+      "Type": "New Yorker",
+      "Description": "You are a New Yorker who loves to talk about the latest news and events in the city. You are very knowledgeable about the local culture and history. You are also very friendly and love to meet new people.",
+      "Prompt": "You are a stereotypical guy from Long Island, New York. You talk with a thick New York accent and use all the slang words.",
+      "NoResults": " Sorry buddy, I got nuttin'."
     },
     {
       "Type": "Default",
@@ -255,10 +326,13 @@
       "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-svg edit-icon\"></g><g> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300706,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>"
     },
     "HAMBURGER_MENU": {
-      "MONOTONE": "<svg width=\"42\" height=\"42\" viewBox=\"0 0 42 42\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M3 6H21V8H3V6Z\" fill=\"currentColor\" /><path d=\"M3 11H21V13H3V11Z\" fill=\"currentColor\" /><path d=\"M3 16H21V18H3V16Z\" fill=\"currentColor\" /></svg>"
+      "MONOTONE": "<svg width=\"42\" height=\"42\" viewBox=\"0 0 42 42\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\"><path d=\"M3 6H21V8H3V6Z\" fill=\"currentColor\" /><path d=\"M3 11H21V13H3V11Z\" fill=\"currentColor\" /><path d=\"M3 16H21V18H3V16Z\" fill=\"currentColor\" /></svg>"
+    },
+    "USER_PROFILE": {
+      "MONOTONE": "<svg id=\"user-profile-icon\" class=\"icon-svg\" focusable=\"false\" viewBox=\"0 0 24 24\" width=\"24\" aria-hidden=\"true\"><!--!--><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g><g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill-rule=\"evenodd\"> <g transform=\"translate(-140.000000, -2159.000000)\"> <g id=\"icons\" transform=\"translate(56.000000, 160.000000)\"> <path d=\"M100.562548,2016.99998 L87.4381713,2016.99998 C86.7317804,2016.99998 86.2101535,2016.30298 86.4765813,2015.66198 C87.7127655,2012.69798 90.6169306,2010.99998 93.9998492,2010.99998 C97.3837885,2010.99998 100.287954,2012.69798 101.524138,2015.66198 C101.790566,2016.30298 101.268939,2016.99998 100.562548,2016.99998 M89.9166645,2004.99998 C89.9166645,2002.79398 91.7489936,2000.99998 93.9998492,2000.99998 C96.2517256,2000.99998 98.0830339,2002.79398 98.0830339,2004.99998 C98.0830339,2007.20598 96.2517256,2008.99998 93.9998492,2008.99998 C91.7489936,2008.99998 89.9166645,2007.20598 89.9166645,2004.99998 M103.955674,2016.63598 C103.213556,2013.27698 100.892265,2010.79798 97.837022,2009.67298 C99.4560048,2008.39598 100.400241,2006.33098 100.053171,2004.06998 C99.6509769,2001.44698 97.4235996,1999.34798 94.7348224,1999.04198 C91.0232075,1998.61898 87.8750721,2001.44898 87.8750721,2004.99998 C87.8750721,2006.88998 88.7692896,2008.57398 90.1636971,2009.67298 C87.1074334,2010.79798 84.7871636,2013.27698 84.044024,2016.63598 C83.7745338,2017.85698 84.7789973,2018.99998 86.0539717,2018.99998 L101.945727,2018.99998 C103.221722,2018.99998 104.226185,2017.85698 103.955674,2016.63598\" id=\"user-profile-svg\"> </path> </g> </g> </g> </g></svg>"
     },
     "SETTINGS": {
-      "MONOTONE": "<svg class=\"icon-svg\" focusable=\"false\" viewBox=\"0 0 42 42\" width=\"42\" aria-hidden=\"true\"><!--!--><g><path d=\"M0,0h24v24H0V0z\" fill=\"none\"></path><path d=\"M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z\"></path></g></svg>"
+      "MONOTONE": "<svg id=\"settings-icon\" class=\"icon-svg\" focusable=\"false\" viewBox=\"0 0 24 24\" width=\"24\" aria-hidden=\"true\"><!--!--><g><path d=\"M0,0h24v24H0V0z\" fill=\"none\"></path><path d=\"M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z\"></path></g></svg>"
     },
     "SITE_LOGO": {
       "NAME": "Site Logo",

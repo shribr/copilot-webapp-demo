@@ -120,17 +120,11 @@ $global:ResourceTypes = @(
 $global:AIHubConnectedResources = @()
 
 # List of all KeyVault secret keys
-$global:KeyVaultSecrets = @(
-    “AzureOpenAiChatGptDeployment”, 
-    “AzureOpenAiEmbeddingDeployment”, 
-    “AzureOpenAiServiceEndpoint”, 
-    “AzureSearchIndex”, 
-    “AzureSearchServiceEndpoint”, 
-    “AzureStorageAccountEndpoint”, 
-    “AzureStorageContainer”, 
-    “UseAOAI”, 
-    “UseVision”
-)
+$global:KeyVaultSecrets = [PSCustomObject]@{
+    StorageServiceApiKey = ""
+    SearchServiceApiKey  = ""
+    OpenAIServiceApiKey  = ""
+}
 
 # Function to convert string to proper case
 function ConvertTo-ProperCase {
@@ -462,6 +456,26 @@ function Get-DataSources {
     
 }
 
+# Function to check if a Key Vault secret exists
+function Get-KeyVaultSecret {
+    param(
+        [string]$keyVaultName,
+        [string]$secretName
+    )
+
+    try {
+        $secret = az keyvault secret show --vault-name $keyVaultName --name $secretName --query "value" --output tsv
+        Write-Host "Secret: '$secretName' already exista."
+        Write-Log -message "Secret: '$SecretName' already exists." -logFilePath $global:LogFilePath
+        return $secret
+    }
+    catch {
+        Write-Host "Secret: '$secretName' does not exist."
+        Write-Log -message "Secret: '$SecretName' does not exist." -logFilePath $global:LogFilePath
+        return $null
+    }
+}
+
 # Function to get the latest API version for a resource type
 function Get-LatestApiVersion {
     param (
@@ -512,20 +526,6 @@ function Get-LatestDotNetRuntime {
     return $latestRuntime
 }
 
-# Helper function to get a random integer
-function Get-RandomInt {
-    param (
-        [int]$max
-    )
-
-    $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-    $bytes = New-Object byte[] 4
-    $random.GetBytes($bytes)
-    [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
-
-    return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
-}
-
 # Function to alphabetize the parameters object
 function Get-Parameters-Sorted {
     param (
@@ -543,6 +543,20 @@ function Get-Parameters-Sorted {
     }
 
     return $sortedParametersObject
+}
+
+# Helper function to get a random integer
+function Get-RandomInt {
+    param (
+        [int]$max
+    )
+
+    $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    $bytes = New-Object byte[] 4
+    $random.GetBytes($bytes)
+    [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
+
+    return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 }
 
 # Function to check the status of a resource
@@ -613,8 +627,8 @@ function Get-SearchIndexers {
     
     try {
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers @{ "api-key" = "$accessToken" }
-        $indexes = $response.value | Select-Object -ExpandProperty name
-        return $indexes
+        $indexers = $response.value | Select-Object -ExpandProperty name
+        return $indexers
     }
     catch {
         Write-Error "Failed to query search indexes: $_"
@@ -820,6 +834,7 @@ function Initialize-Parameters {
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiServiceProperties = $parametersObject.aiServiceProperties
     $global:apiManagementService = $parametersObject.apiManagementService
+    $global:apiPermissions = $parametersObject.apiPermissions
     $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appInsightsName = $parametersObject.appInsightsName
@@ -842,6 +857,7 @@ function Initialize-Parameters {
     $global:deployZipResources = $parametersObject.deployZipResources
     $global:documentIntelligenceName = $parametersObject.documentIntelligenceName
     $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
+    $global:exposeApiScopes = $parametersObject.exposeApiScopes
     $global:keyVaultName = $parametersObject.keyVaultName
     $global:location = $parametersObject.location
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
@@ -959,6 +975,7 @@ function Initialize-Parameters {
         aiServiceName                = $aiServiceName
         aiServiceProperties          = $aiServiceProperties
         apiManagementService         = $apiManagementService
+        apiPermissions               = $apiPermissions
         appDeploymentOnly            = $appDeploymentOnly
         appendUniqueSuffix           = $appendUniqueSuffix
         appInsightsName              = $appInsightsName
@@ -981,6 +998,7 @@ function Initialize-Parameters {
         deployZipResources           = $deployZipResources
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
+        exposeApiScopes              = $exposeApiScopes
         keyVaultName                 = $keyVaultName
         location                     = $location
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
@@ -1216,6 +1234,8 @@ function New-AIService {
 
             $global:aiServiceProperties.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
 
+            $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:aiServiceProperties.ApiKey
+
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
             if ($jsonOutput -match "error") {
@@ -1277,6 +1297,11 @@ function New-AIService {
         }
     }
     else {
+
+        $global:aiServiceProperties.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
+
+        $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:aiServiceProperties.ApiKey
+
         Write-Host "AI Service '$aiServiceName' already exists."
         Write-Log -message "AI Service '$aiServiceName' already exists." -logFilePath $global:LogFilePath
     }
@@ -1908,8 +1933,7 @@ function New-KeyVault {
             -userPrincipalName $userPrincipalName `
             -useRBAC $useRBAC
 
-        Set-KeyVaultSecrets -keyVaultName $keyVaultName `
-            -resourceGroupName $resourceGroupName
+        #Set-KeyVaultSecrets -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName
     }
     else {
         Write-Host "Key Vault '$keyVaultName' already exists."
@@ -2700,6 +2724,8 @@ function New-SearchService {
 
             $global:searchServiceProperties.ApiKey = $global:searchServiceApiKey
 
+            $global:KeyVaultSecrets.SearchServiceApiKey = $global:searchServiceApiKey
+
             $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
             $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
 
@@ -2816,7 +2842,7 @@ function New-SearchService {
                         }
                         else {
                             Write-Host "Search Indexer '$indexer' already exists."
-                            Write-Log -message "Search Indexer '$indexer' already exists."
+                            Write-Log -message "Search Indexer '$indexer' already exists." -logFilePath $global:LogFilePath
                         }
                     }
 
@@ -2844,8 +2870,12 @@ function New-SearchService {
         #az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
         #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
 
-        #$global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
-        
+        $global:searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+
+        $global:searchServiceProperties.ApiKey = $global:searchServiceApiKey
+
+        $global:KeyVaultSecrets.SearchServiceApiKey = $global:searchServiceApiKey
+
         $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
         $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
 
@@ -3066,6 +3096,8 @@ function New-StorageAccount {
         
             $global:storageServiceProperties.Credentials.AccountKey = $global:storageServiceAccountKey
             
+            $global:KeyVaultSecrets.StorageServiceApiKey = $global:storageServiceAccountKey
+
             # Enable CORS
             az storage cors clear --account-name $storageAccountName --services bfqt
             az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageAccountName --account-key $storageAccessKey
@@ -3079,6 +3111,14 @@ function New-StorageAccount {
         }
     }
     else {
+
+        # Retrieve the storage account key
+        $global:storageServiceAccountKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
+        
+        $global:storageServiceProperties.Credentials.AccountKey = $global:storageServiceAccountKey
+            
+        $global:KeyVaultSecrets.StorageServiceApiKey = $global:storageServiceAccountKey
+            
         Write-Host "Storage account '$storageAccountName' already exists."
         Write-Log -message "Storage account '$storageAccountName' already exists."
     }
@@ -3140,6 +3180,81 @@ function New-VirtualNetwork {
     }
 }
 
+# Function to register an app, set API permissions, expose the API, and set Key Vault access policies
+function Register-App {
+    param (
+        [string]$appName,
+        [string]$resourceGroupName,
+        [string]$keyVaultName,
+        [array]$apiPermissions,
+        [array]$exposeApiScopes
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        # Register the app
+        $appRegistration = az ad app create --display-name $appName --available-to-other-tenants false --query "{appId: appId, objectId: objectId}" --output json | ConvertFrom-Json
+        $appId = $appRegistration.appId
+        $objectId = $appRegistration.objectId
+
+        Write-Host "App '$appName' registered successfully with App ID: $appId and Object ID: $objectId."
+        Write-Log -message "App '$appName' registered successfully with App ID: $appId and Object ID: $objectId."
+
+        # Get the new Application ID URI
+        $appUri = "api://$appId"
+
+        # Update apiPermissions with the new Application ID URI if it matches a specific condition
+        foreach ($permission in $apiPermissions) {
+            if ($permission.api -like "api://*") {
+                $permission.api = $appUri
+            }
+        }
+       
+        # Example usage
+        $parametersFilePath = "parameters.json"
+        Update-ParametersFileAppRegistration -parametersFilePath $parametersFilePath -appId $appId -appUri $appUri
+
+        # Set API permissions
+        foreach ($permission in $apiPermissions) {
+            az ad app permission add --id $appId --api $permission.api --api-permissions $permission.permission
+        }
+        az ad app permission grant --id $appId --api $apiPermissions.api --scope $apiPermissions.permission
+        Write-Host "API permissions set for app '$appName'."
+        Write-Log -message "API permissions set for app '$appName'."
+
+        # Expose the API
+        $apiScopes = @()
+        foreach ($scope in $exposeApiScopes) {
+            $apiScopes += @{
+                "adminConsentDescription" = $scope.adminConsentDescription
+                "adminConsentDisplayName" = $scope.adminConsentDisplayName
+                "id"                      = [guid]::NewGuid().ToString()
+                "isEnabled"               = $true
+                "type"                    = "User"
+                "userConsentDescription"  = $scope.userConsentDescription
+                "userConsentDisplayName"  = $scope.userConsentDisplayName
+                "value"                   = $scope.value
+            }
+        }
+        $apiManifest = @{
+            "identifierUris"    = @("api://$appId")
+            "oauth2Permissions" = $apiScopes
+        }
+        az ad app update --id $appId --set $apiManifest
+        Write-Host "API exposed for app '$appName'."
+        Write-Log -message "API exposed for app '$appName'."
+
+        # Set Key Vault access policies
+        az keyvault set-policy --name $keyVaultName --object-id $objectId --secret-permissions get list set delete --key-permissions get list create delete --certificate-permissions get list create delete
+        Write-Host "Key Vault access policies set for app '$appName'."
+        Write-Log -message "Key Vault access policies set for app '$appName'."
+    }
+    catch {
+        Write-Error "Failed to register app '$appName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to register app '$appName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
 # Function to delete Azure resource groups
 function Remove-AzureResourceGroup {
     
@@ -3503,11 +3618,13 @@ function Set-KeyVaultSecrets {
         [string]$resourceGroupName
     )
     # Loop through the array of secrets and store each one in the Key Vault
-    foreach ($secretName in $global:KeyVaultSecrets) {
+    foreach ($property in $global:KeyVaultSecrets.PSObject.Properties) {
         # Generate a random value for the secret
         #$secretValue = New-RandomPassword
-        $secretValue = "TESTSECRET"
-
+        #$secretValue = "TESTSECRET"
+        $secretName = $property.Name
+        $secretValue = $property.Value
+        
         try {
             $ErrorActionPreference = 'Stop'
             az keyvault secret set --vault-name $keyVaultName --name $secretName --value $secretValue --output none
@@ -3756,6 +3873,8 @@ function Start-Deployment {
     # Create a new AI Service
     New-AIService -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
+    Set-KeyVaultSecrets -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName
+
     # The CLI needs to be updated to allow Azure AI Studio projects to be created correctly. 
     # This code will create a new workspace in ML Studio but not in AI Studio. 
     # I am still having this code execute so that the rest of the script doesn't error out. 
@@ -3866,7 +3985,7 @@ function Start-SearchIndexer {
         Invoke-RestMethod -Uri $searchIndexerUrl -Method Post -Headers @{ "api-key" = $searchServiceApiKey }
 
         Write-Host "Search Indexer '$searchIndexerName' ran successfully."
-        Write-Log -message "Search Indexer '$searchIndexerName' ran successfully."
+        Write-Log -message "Search Indexer '$searchIndexerName' ran successfully." -logFilePath $global:LogFilePath
     }
     catch {
         Write-Error "Failed to run Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -4270,6 +4389,43 @@ identity:
         Write-Log -message "Failed to create or write to 'ml.workspace.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
     return $filePath
+}
+
+# Function to update parameters.json with new values from app registration
+function Update-ParametersFileAppRegistration {
+    param (
+        [string]$parametersFilePath,
+        [string]$appId,
+        [string]$appUri
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        # Read the existing parameters.json file
+        $parameters = Get-Content -Path $parametersFilePath -Raw | ConvertFrom-Json
+
+        # Update the parameters with new values
+        $parameters.apiPermissions = $parameters.apiPermissions | ForEach-Object {
+            if ($_.api -like "api://*") {
+                $_.api = $appUri
+            }
+            $_
+        }
+
+        # Convert the updated parameters back to JSON
+        $updatedParametersJson = $parameters | ConvertTo-Json -Depth 10
+
+        # Write the updated JSON back to the parameters.json file
+        Set-Content -Path $parametersFilePath -Value $updatedParametersJson
+
+        Write-Host "parameters.json updated successfully."
+        Write-Log -message "parameters.json updated successfully."
+    }
+    catch {
+        Write-Error "Failed to update parameters.json: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to update parameters.json: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
 }
 
 # Function to update the parameters.json file with the latest API versions. NOTE: This function is not currently used.
