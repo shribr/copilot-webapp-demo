@@ -862,6 +862,7 @@ function Initialize-Parameters {
     $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
     $global:exposeApiScopes = $parametersObject.exposeApiScopes
     $global:keyVaultName = $parametersObject.keyVaultName
+    $global:keyVaultApiVersion = $parametersObject.keyVaultApiVersion
     $global:location = $parametersObject.location
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
     $global:machineLearningProperties = $parametersObject.machineLearningProperties
@@ -1004,6 +1005,7 @@ function Initialize-Parameters {
         eventHubNamespaceName        = $eventHubNamespaceName
         exposeApiScopes              = $exposeApiScopes
         keyVaultName                 = $keyVaultName
+        keyVaultApiVersion           = $keyVaultApiVersion
         location                     = $location
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
         machineLearningProperties    = $machineLearningProperties
@@ -1315,7 +1317,7 @@ function New-AIService {
 function New-ApiManagementService {
     param (
         [string]$resourceGroupName,
-        [array]$apiManagementService,
+        [psobject]$apiManagementService,
         [array]$existingResources
     )
 
@@ -2457,7 +2459,7 @@ function New-ResourceGroup {
 # Function to create resources
 function New-Resources {
     param (
-        [array]$apiManagementService,
+        [Microsoft.PackageManagement.Internal.Implementation.PackageDetailsRequestObject]$apiManagementService,
         [string]$aiProjectName,
         [string]$appInsightsName,
         [string]$appServiceEnvironmentName,
@@ -4532,6 +4534,7 @@ function Update-ConfigFile {
         [string]$searchVectorIndexerName,
         [string]$openAIAccountName,
         [string]$aiServiceName,
+        [psobject]$apiManagementService,
         [string]$functionAppName,
         [string]$siteLogo
     )
@@ -4614,7 +4617,10 @@ function Update-ConfigFile {
         #$config.AZURE_FUNCTION_API_KEY = $functionAppKey
         #$config.AZURE_FUNCTION_APP_NAME = $functionAppName
         #$config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
+        $congif.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
+        $config.AZURE_APIM_SUBSCRIPTION_KEY = $global:apiManagementService.SubscriptionKey
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
+        $config.AZURE_KEY_VAULT_API_VERSION = $global:keyVaultApiVersion
         $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
         $config.AZURE_SEARCH_API_KEY = $searchApiKey
         $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
