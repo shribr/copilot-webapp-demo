@@ -1323,7 +1323,7 @@ function New-ApiManagementService {
 
     #https://eastus.api.cognitive.microsoft.com/documentintelligence/documentModels/prebuilt-read:analyze?api-version=2024-07-31-preview&api-key=94a688bb516141839048e01dc680192d
     #https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/read.png
-    
+
     $apiManagementServiceName = $apiManagementService.Name
 
     if ($existingResources -notcontains $apiManagementServiceName) {
@@ -1336,6 +1336,28 @@ function New-ApiManagementService {
             $global:resourceCounter += 1
             Write-Host "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]"
             Write-Log -message "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+
+            # Check if the API already exists
+            $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+            if (-not $apiExists) {
+                # Create the API
+                az apim api create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --display-name "KeyVault Proxy" --path keyvault --service-url "https://$global:KeyVaultName.vault.azure.net/" --protocols https
+
+                # Add operations
+                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
+                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
+
+                # Add CORS policy to operations
+                az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+                az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+
+                Write-Host "API 'KeyVaultProxy' and its operations created successfully."
+                Write-Log -message "API 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
+            }
+            else {
+                Write-Host "API 'KeyVaultProxy' already exists."
+                Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
+            }
     
         }
         catch {
@@ -1346,6 +1368,28 @@ function New-ApiManagementService {
     else {
         Write-Host "API Management service '$apiManagementServiceName' already exists."
         Write-Log -message "API Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
+
+        # Check if the API already exists
+        $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy"
+        if (-not $apiExists) {
+            # Create the API
+            az apim api create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --display-name "KeyVault Proxy" --path keyvault --service-url "https://$global:KeyVaultName.vault.azure.net/" --protocols https
+
+            # Add operations
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
+
+            # Add CORS policy to operations
+            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+
+            Write-Host "API 'KeyVaultProxy' and its operations created successfully."
+            Write-Log -message "API 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
+        }
+        else {
+            Write-Host "API 'KeyVaultProxy' already exists."
+            Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
+        }
     }
 }
 
@@ -1426,6 +1470,8 @@ function New-App-Registration {
 
         # Retrieve the current application manifest
         $app = az ad app show --id $appId | ConvertFrom-Json
+
+        # NEED TO UPDATE CODE BELOW TO UPDATE THE MANIFEST ***
 
         # Update the identifierUris and oauth2PermissionScopes properties
         $app.identifierUris = $identifierUrisArray
@@ -2459,7 +2505,7 @@ function New-ResourceGroup {
 # Function to create resources
 function New-Resources {
     param (
-        [Microsoft.PackageManagement.Internal.Implementation.PackageDetailsRequestObject]$apiManagementService,
+        [psobject]$apiManagementService,
         [string]$aiProjectName,
         [string]$appInsightsName,
         [string]$appServiceEnvironmentName,
@@ -3788,7 +3834,7 @@ function Start-Deployment {
         foreach ($appService in $appServices) {
             Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $global:storageAccountName -deployZipResources $true
             
-            #New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
+            New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
         }
 
         return
@@ -4617,7 +4663,7 @@ function Update-ConfigFile {
         #$config.AZURE_FUNCTION_API_KEY = $functionAppKey
         #$config.AZURE_FUNCTION_APP_NAME = $functionAppName
         #$config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
-        $congif.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
+        $config.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
         $config.AZURE_APIM_SUBSCRIPTION_KEY = $global:apiManagementService.SubscriptionKey
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
         $config.AZURE_KEY_VAULT_API_VERSION = $global:keyVaultApiVersion
@@ -4671,6 +4717,7 @@ function Update-ConfigFile {
         }
 
         # Define the AZURE_OPENAI_REQUEST_BODY
+        #region AZURE_OPENAI_REQUEST_BODY
         $config.AZURE_OPENAI_REQUEST_BODY = @{
             "data_sources"      = @(
                 @{
@@ -4704,6 +4751,7 @@ function Update-ConfigFile {
             "stop"              = $null
             "stream"            = $false
         }
+        #endregion
 
         # Clear existing values in AI_MODELS
         $config.AI_MODELS = @()

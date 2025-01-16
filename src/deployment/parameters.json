@@ -71,7 +71,11 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": ["text", "hybrid", "vector"],
+    "RetrievalModel": [
+      "text",
+      "hybrid",
+      "vector"
+    ],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -87,7 +91,7 @@
     "ResourceGroup": "RG-COPILOT-DEMO-005",
     "SubscriptionKey": "cdbe83897e9c485baa86fa1f310b4166"
   },
-  "appRegistrationClientId": "0631d9ec-59c5-42a0-852f-14c77381bb34",
+  "appRegistrationClientId": "6cda07cb-d3c6-486d-ac9b-60b5161d24f8",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
@@ -108,7 +112,7 @@
       ]
     }
   ],
-  "appDeploymentOnly": true,
+  "appDeploymentOnly": false,
   "appInsightsName": "appi-copilot-demo-005",
   "appServiceEnvironmentName": "ase-copilot-demo-005",
   "appServicePlanName": "asp-copilot-demo-005",
@@ -125,6 +129,18 @@
       "Runtime": "NODE:20LTS",
       "Type": "Web",
       "Url": "https://app-copilot-demo-005.azurewebsites.net"
+    },
+    {
+      "AppServicePlan": "asp-copilot-demo-005",
+      "DeletePackageAfterDeploy": true,
+      "DeployZipPackage": true,
+      "Location": "east us",
+      "Name": "func-copilot-demo-005",
+      "Path": "app/functions/apikeys",
+      "ResourceGroup": "RG-COPILOT-DEMO-005",
+      "Runtime": "dotnet-isolated",
+      "Type": "Function",
+      "Url": "https://func-copilot-demo-005.azurewebsites.net"
     }
   ],
   "appendUniqueSuffix": false,
