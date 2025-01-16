@@ -884,15 +884,19 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     const config = await fetchConfig();
 
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
-    const apiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
+    const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
+    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const apiVersion = config.OPENAI_API_VERSION;
     const deploymentName = aiModelName;
     const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
     const clientId = config.AZURE_CLIENT_APP_ID;
-    const apimEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets/${apiTokenSecretName}`
     const keyVaultEndPoint = "https://vault.azure.net/.default"
     const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
+    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+
+    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
+
 
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
@@ -909,17 +913,21 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
 
+    const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+
     if (dataSources.length > 0) {
 
         for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
-            source.parameters.authentication.key = await getSecretFromKeyVault(apimEndPoint, apimSubscriptionKey, tokenResponse.accessToken);
+            //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
+            source.parameters.authentication.key = searchApiKey;
             //source.parameters.authentication.key = apiKey
-            openAIRequestBody.data_sources.push(source);
+            //openAIRequestBody.data_sources.push(source);
 
             const jsonString = JSON.stringify(openAIRequestBody);
 
-            const result = await invokeRESTAPI(jsonString, endpoint, apiTokenSecretName);
+            //We need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API
+            const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
 
             results.push(result);
         }
@@ -1237,13 +1245,12 @@ function getQueryParam(param) {
 }
 
 // Function to retrieve secret from Azure Key Vault
-async function getSecretFromKeyVault(endpoint, apimSubscriptionKey, accessToken) {
+async function getSecretFromKeyVault(keyVaultEndPoint, apiSecretName, apiVersion, apimSubscriptionKey, accessToken) {
 
-    //THIS IS BREAKING BECAUSE OF CORS WHICH CANNOT BE CONFIGURED FOR AZURE KEY VAULT.
-    //const keyVaultUrl = `https://${keyVaultName}.vault.azure.net/secrets/${secretName}?api-version=7.5`;
+    const keyVaultUrl = `${keyVaultEndPoint}/${apiSecretName}?api-version=${apiVersion}`;
 
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetch(keyVaultUrl, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -1343,27 +1350,36 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
     const keyVaultName = config.AZURE_KEY_VAULT_NAME;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
     const clientId = config.AZURE_CLIENT_APP_ID;
-    const keyVaultEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets/${apiTokenSecretName}`
+    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+    const keyVaultEndPoint = "https://vault.azure.net/.default"
+    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
     const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
 
     const tokenRequest = {
-        scopes: [`${keyVaultEndPoint}`],
+        scopes: [`https://vault.azure.net/.default`],
         account: activeAccount
     };
 
     try {
-        const tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        let tokenResponse;
 
-        const apiKey = await getSecretFromKeyVault(keyVaultEndPoint, apimSubscriptionKey, tokenResponse.accessToken);
+        try {
+            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+            console.log("Token acquired silently");
+        } catch (silentError) {
+            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+            console.log("Token acquired via popup");
+        }
+
+        const apiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
         //const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                //'api-key': `${apiKey}`,
-                'api-version': '7.5',
-                'Authorization': `Bearer ${apiKey}`,
+                'api-key': `${apiKey}`,
                 'http2': 'true'
             },
             body: jsonString
