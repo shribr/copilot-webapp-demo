@@ -20,7 +20,7 @@
   "aiModelName": "ai-model-copilot-demo-005",
   "aiModelSkuCapacity": 100,
   "aiModelSkuName": "Standard",
-  "aiModelType": "gpt-4",
+  "aiModelType": "gpt-4o",
   "aiModelVersion": "2024-08-06",
   "aiModels": [
     {
@@ -71,11 +71,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -113,7 +109,7 @@
       ]
     }
   ],
-  "appDeploymentOnly": false,
+  "appDeploymentOnly": true,
   "appInsightsName": "appi-copilot-demo-005",
   "appServiceEnvironmentName": "ase-copilot-demo-005",
   "appServicePlanName": "asp-copilot-demo-005",

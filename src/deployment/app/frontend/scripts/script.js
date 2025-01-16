@@ -883,7 +883,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     const config = await fetchConfig();
 
-    //const apiKey = config.AZURE_AI_SERVICE_API_KEY;
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
     const apiVersion = config.OPENAI_API_VERSION;
     const deploymentName = aiModelName;
@@ -909,8 +909,9 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
         for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
-            source.parameters.authentication.key = await getSecretFromKeyVault(keyVaultName, config.AZURE_SEARCH_SERVICE_SECRET_NAME, tokenResponse.accessToken);
-            openAIRequestBody.data_sources.push(source);
+            //source.parameters.authentication.key = await getSecretFromKeyVault(keyVaultName, config.AZURE_SEARCH_SERVICE_SECRET_NAME, tokenResponse.accessToken);
+            source.parameters.authentication.key = apiKey
+            //openAIRequestBody.data_sources.push(source);
 
             const jsonString = JSON.stringify(openAIRequestBody);
 
@@ -1345,16 +1346,17 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
     };
 
     try {
-        const tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        //const tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
 
-        const apiKey = await getSecretFromKeyVault(keyVaultName, apiTokenSecretName, tokenResponse.accessToken);
+        //const apiKey = await getSecretFromKeyVault(keyVaultName, apiTokenSecretName, tokenResponse.accessToken);
+        const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'api-key': `${apiKey}`,
-                'Authorization': `Bearer ${tokenResponse.accessToken}`,
+                //'Authorization': `Bearer ${tokenResponse.accessToken}`,
                 'http2': 'true'
             },
             body: jsonString

@@ -41,7 +41,7 @@
     {
       "Format": "OpenAI",
       "ApiVersion": "2024-08-01-preview",
-      "Type": "gpt-4",
+      "Type": "gpt-4o",
       "Sku": {
         "Name": "Standard",
         "Capacity": 100
@@ -113,7 +113,7 @@
             "key": "Rb6nJSI6d6McgF4WxSZjze7pYyvToML98TdIbnsMhYAzSeCyRboE",
             "type": "api_key"
           },
-          "index_name": "@{Model=gpt-4o; Name=vector-srch-index-copilot-demo-005; Schema=vector-search-index-schema.json}",
+          "index_name": "vector-srch-index-copilot-demo-005",
           "endpoint": "https://srch-copilot-demo-005.search.windows.net"
         },
         "type": "azure_search"
