@@ -95,6 +95,8 @@ param (
     [string]$parametersFile = "parameters.json"
 )
 
+$global:parametersFile = "parameters.json"
+
 # Mapping of global resource types
 $global:ResourceTypes = @(
     "Microsoft.ApiManagement",
@@ -834,10 +836,11 @@ function Initialize-Parameters {
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiServiceProperties = $parametersObject.aiServiceProperties
     $global:apiManagementService = $parametersObject.apiManagementService
-    $global:apiPermissions = $parametersObject.apiPermissions
     $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appInsightsName = $parametersObject.appInsightsName
+    $global:appRegistrationClientId = $parametersObject.appRegistrationClientId
+    $global:appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
     $global:appServiceEnvironmentName = $parametersObject.appServiceEnvironmentName
     $global:appServicePlanName = $parametersObject.appServicePlanName
     $global:appServicePlanSku = $parametersObject.appServicePlanSku
@@ -975,10 +978,11 @@ function Initialize-Parameters {
         aiServiceName                = $aiServiceName
         aiServiceProperties          = $aiServiceProperties
         apiManagementService         = $apiManagementService
-        apiPermissions               = $apiPermissions
+        appRegRequiredResourceAccess = $appRegRequiredResourceAccess
         appDeploymentOnly            = $appDeploymentOnly
         appendUniqueSuffix           = $appendUniqueSuffix
         appInsightsName              = $appInsightsName
+        appRegistrationClientId      = $appRegistrationClientId
         appServiceEnvironmentName    = $appServiceEnvironmentName
         appServicePlanName           = $appServicePlanName
         appServicePlanSku            = $appServicePlanSku
@@ -1340,6 +1344,110 @@ function New-ApiManagementService {
     else {
         Write-Host "API Management service '$apiManagementServiceName' already exists."
         Write-Log -message "API Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
+    }
+}
+
+# Function to register an app, set API permissions, expose the API, and set Key Vault access policies
+function New-App-Registration {
+    param (
+        [string]$appServiceName,
+        [string]$appServiceUrl,
+        [string]$resourceGroupName,
+        [string]$keyVaultName,
+        [array]$appRegRequiredResourceAccess,
+        [array]$exposeApiScopes,
+        [string]$parametersFile
+    )
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        $appRegRequiredResourceAccessJson = $appRegRequiredResourceAccess | ConvertTo-Json -depth 4
+
+        # Check if the app is already registered
+        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
+
+        if ($existingApp) {
+            Write-Host "App '$appServiceName' is already registered with App ID: $existingApp."
+            Write-Log -message "App '$appServiceName' is already registered with App ID: $existingApp."
+
+            $appId = $existingApp
+            $objectId = az ad app show --id $appId --query "objectId" --output tsv
+        }
+        else {
+            # Register the app
+            $appRegistration = az ad app create --display-name $appServiceName --sign-in-audience "AzureADandPersonalMicrosoftAccount" --required-resource-access $appRegRequiredResourceAccessJson
+            
+            $appId = $appRegistration.appId
+            $objectId = $appRegistration.objectId
+
+            Write-Host "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
+            Write-Log -message "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
+        }
+
+        # Update the parameters file with the new app registration details
+        Update-ParametersFile-AppRegistration -parametersFile $parametersFile -appId $appId -appUri $appUri
+
+        $permissions = "User.Read.All"
+        
+        # Check and set API permissions
+        foreach ($permission in $appRegRequiredResourceAccess) {
+            $existingPermission = az ad app permission list --id $appId --query "[?resourceAppId=='$($permission.resourceAppId)'].{id:id, value:value}" --output tsv
+            if (-not $existingPermission) {
+                az ad app permission add --id $appId --api $permission.resourceAppId --api-permissions $permissions
+                az ad app permission grant --id $appId --api $permission.resourceAppId --scope $permissions
+            }
+        }
+        
+        #az ad app permission grant --id $appId --api $permission.resourceAppId --scope $permissions
+        
+        Write-Host "API permissions set for app '$appServiceName'."
+        Write-Log -message "API permissions set for app '$appServiceName'."
+
+        # Check and expose the API
+        $existingScopes = az ad app show --id $appId --query "oauth2Permissions[].value" --output tsv
+        $apiScopes = @()
+        foreach ($scope in $exposeApiScopes) {
+            if (-not ($existingScopes -contains $scope.value)) {
+                $apiScopes += @{
+                    "adminConsentDescription" = $scope.adminConsentDescription
+                    "adminConsentDisplayName" = $scope.adminConsentDisplayName
+                    "id"                      = [guid]::NewGuid().ToString()
+                    "isEnabled"               = $true
+                    "type"                    = "User"
+                    "userConsentDescription"  = $scope.userConsentDescription
+                    "userConsentDisplayName"  = $scope.userConsentDisplayName
+                    "value"                   = $scope.value
+                }
+            }
+        }
+
+        # Retrieve the current application manifest
+        $app = az ad app show --id $appId | ConvertFrom-Json
+
+        # Update the identifierUris and oauth2PermissionScopes properties
+        $app.identifierUris = $identifierUrisArray
+        $app.api.oauth2PermissionScopes = $oauth2PermissionScopesArray
+
+        # Convert the updated manifest back to JSON
+        $appJson = $app | ConvertTo-Json -Depth 10
+
+        # Update the application with the modified manifest
+        $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
+        #az ad app update --id $appId --set @appManifest.json
+        az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
+        Write-Host "API exposed for app '$appServiceName'."
+        Write-Log -message "API exposed for app '$appServiceName'."
+
+        # Set Key Vault access policies
+        az keyvault set-policy --name $keyVaultName --object-id $objectId --secret-permissions get list set delete --key-permissions get list create delete --certificate-permissions get list create delete
+        
+        Write-Host "Key Vault access policies set for app '$appServiceName'."
+        Write-Log -message "Key Vault access policies set for app '$appServiceName'."
+    }
+    catch {
+        Write-Error "Failed to register app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to register app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
@@ -2463,7 +2571,7 @@ function New-Resources {
     # Create API Management Service
     
     # Commenting out for now because this resource is not being used in the deployment and it takes way too long to provision
-    #New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources
+    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
 }
 
@@ -3180,81 +3288,6 @@ function New-VirtualNetwork {
     }
 }
 
-# Function to register an app, set API permissions, expose the API, and set Key Vault access policies
-function Register-App {
-    param (
-        [string]$appName,
-        [string]$resourceGroupName,
-        [string]$keyVaultName,
-        [array]$apiPermissions,
-        [array]$exposeApiScopes
-    )
-
-    try {
-        $ErrorActionPreference = 'Stop'
-
-        # Register the app
-        $appRegistration = az ad app create --display-name $appName --available-to-other-tenants false --query "{appId: appId, objectId: objectId}" --output json | ConvertFrom-Json
-        $appId = $appRegistration.appId
-        $objectId = $appRegistration.objectId
-
-        Write-Host "App '$appName' registered successfully with App ID: $appId and Object ID: $objectId."
-        Write-Log -message "App '$appName' registered successfully with App ID: $appId and Object ID: $objectId."
-
-        # Get the new Application ID URI
-        $appUri = "api://$appId"
-
-        # Update apiPermissions with the new Application ID URI if it matches a specific condition
-        foreach ($permission in $apiPermissions) {
-            if ($permission.api -like "api://*") {
-                $permission.api = $appUri
-            }
-        }
-       
-        # Example usage
-        $parametersFilePath = "parameters.json"
-        Update-ParametersFileAppRegistration -parametersFilePath $parametersFilePath -appId $appId -appUri $appUri
-
-        # Set API permissions
-        foreach ($permission in $apiPermissions) {
-            az ad app permission add --id $appId --api $permission.api --api-permissions $permission.permission
-        }
-        az ad app permission grant --id $appId --api $apiPermissions.api --scope $apiPermissions.permission
-        Write-Host "API permissions set for app '$appName'."
-        Write-Log -message "API permissions set for app '$appName'."
-
-        # Expose the API
-        $apiScopes = @()
-        foreach ($scope in $exposeApiScopes) {
-            $apiScopes += @{
-                "adminConsentDescription" = $scope.adminConsentDescription
-                "adminConsentDisplayName" = $scope.adminConsentDisplayName
-                "id"                      = [guid]::NewGuid().ToString()
-                "isEnabled"               = $true
-                "type"                    = "User"
-                "userConsentDescription"  = $scope.userConsentDescription
-                "userConsentDisplayName"  = $scope.userConsentDisplayName
-                "value"                   = $scope.value
-            }
-        }
-        $apiManifest = @{
-            "identifierUris"    = @("api://$appId")
-            "oauth2Permissions" = $apiScopes
-        }
-        az ad app update --id $appId --set $apiManifest
-        Write-Host "API exposed for app '$appName'."
-        Write-Log -message "API exposed for app '$appName'."
-
-        # Set Key Vault access policies
-        az keyvault set-policy --name $keyVaultName --object-id $objectId --secret-permissions get list set delete --key-permissions get list create delete --certificate-permissions get list create delete
-        Write-Host "Key Vault access policies set for app '$appName'."
-        Write-Log -message "Key Vault access policies set for app '$appName'."
-    }
-    catch {
-        Write-Error "Failed to register app '$appName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to register app '$appName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-}
 # Function to delete Azure resource groups
 function Remove-AzureResourceGroup {
     
@@ -3752,6 +3785,8 @@ function Start-Deployment {
         # Deploy web app and function app services
         foreach ($appService in $appServices) {
             Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $global:storageAccountName -deployZipResources $true
+            
+            #New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
         }
 
         return
@@ -3945,6 +3980,8 @@ function Start-Deployment {
         if ($existingResources -notcontains $appService.Name) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
         }
+
+        New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
     }
 
     # End the timer
@@ -4392,9 +4429,9 @@ identity:
 }
 
 # Function to update parameters.json with new values from app registration
-function Update-ParametersFileAppRegistration {
+function Update-ParametersFile-AppRegistration {
     param (
-        [string]$parametersFilePath,
+        [string]$parametersFile,
         [string]$appId,
         [string]$appUri
     )
@@ -4403,21 +4440,16 @@ function Update-ParametersFileAppRegistration {
         $ErrorActionPreference = 'Stop'
 
         # Read the existing parameters.json file
-        $parameters = Get-Content -Path $parametersFilePath -Raw | ConvertFrom-Json
+        $parameters = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
 
         # Update the parameters with new values
-        $parameters.apiPermissions = $parameters.apiPermissions | ForEach-Object {
-            if ($_.api -like "api://*") {
-                $_.api = $appUri
-            }
-            $_
-        }
+        $parameters.appRegistrationClientId = $appId
 
         # Convert the updated parameters back to JSON
         $updatedParametersJson = $parameters | ConvertTo-Json -Depth 10
 
         # Write the updated JSON back to the parameters.json file
-        Set-Content -Path $parametersFilePath -Value $updatedParametersJson
+        Set-Content -Path $parametersFile -Value $updatedParametersJson
 
         Write-Host "parameters.json updated successfully."
         Write-Log -message "parameters.json updated successfully."
@@ -4578,7 +4610,7 @@ function Update-ConfigFile {
     
         # Update the config with the new key-value pair
         # Update the config with the new key-value pair
-        $config.AZURE_AI_SERVICE_API_KEY = $aiServiceKey
+        $config.AZURE_OPENAI_SERVICE_API_KEY = $aiServiceKey
         #$config.AZURE_FUNCTION_API_KEY = $functionAppKey
         #$config.AZURE_FUNCTION_APP_NAME = $functionAppName
         #$config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"

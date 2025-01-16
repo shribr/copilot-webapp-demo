@@ -1,0 +1,92 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
+  "addIns": [],
+  "api": {
+    "acceptMappedClaims": null,
+    "knownClientApplications": [],
+    "oauth2PermissionScopes": null,
+    "preAuthorizedApplications": [],
+    "requestedAccessTokenVersion": 2
+  },
+  "appId": "0631d9ec-59c5-42a0-852f-14c77381bb34",
+  "appRoles": [],
+  "applicationTemplateId": null,
+  "certification": null,
+  "createdDateTime": "2025-01-16T02:32:17Z",
+  "defaultRedirectUri": null,
+  "deletedDateTime": null,
+  "description": null,
+  "disabledByMicrosoftStatus": null,
+  "displayName": "app-copilot-demo-005",
+  "groupMembershipClaims": null,
+  "id": "66f3b80c-26d4-4e74-b665-9636477a1a13",
+  "identifierUris": null,
+  "info": {
+    "logoUrl": null,
+    "marketingUrl": null,
+    "privacyStatementUrl": null,
+    "supportUrl": null,
+    "termsOfServiceUrl": null
+  },
+  "isDeviceOnlyAuthSupported": null,
+  "isFallbackPublicClient": null,
+  "keyCredentials": [],
+  "nativeAuthenticationApisEnabled": null,
+  "notes": null,
+  "optionalClaims": null,
+  "parentalControlSettings": {
+    "countriesBlockedForMinors": [],
+    "legalAgeGroupRule": "Allow"
+  },
+  "passwordCredentials": [],
+  "publicClient": {
+    "redirectUris": []
+  },
+  "publisherDomain": "FedAIRS.onmicrosoft.com",
+  "requestSignatureVerification": null,
+  "requiredResourceAccess": [
+    {
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        }
+      ],
+      "resourceAppId": "00000003-0000-0000-c000-000000000000"
+    },
+    {
+      "resourceAccess": [
+        {
+          "id": "f53da476-18e3-4152-8e01-aec403e6edc0",
+          "type": "Scope"
+        }
+      ],
+      "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093"
+    }
+  ],
+  "samlMetadataUrl": null,
+  "serviceManagementReference": null,
+  "servicePrincipalLockConfiguration": null,
+  "signInAudience": "AzureADandPersonalMicrosoftAccount",
+  "spa": {
+    "redirectUris": []
+  },
+  "tags": [],
+  "tokenEncryptionKeyId": null,
+  "uniqueName": null,
+  "verifiedPublisher": {
+    "addedDateTime": null,
+    "displayName": null,
+    "verifiedPublisherId": null
+  },
+  "web": {
+    "homePageUrl": null,
+    "implicitGrantSettings": {
+      "enableAccessTokenIssuance": false,
+      "enableIdTokenIssuance": false
+    },
+    "logoutUrl": null,
+    "redirectUriSettings": [],
+    "redirectUris": []
+  }
+}

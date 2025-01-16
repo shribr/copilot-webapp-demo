@@ -899,7 +899,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     openAIRequestBody.messages = thread.messages;
 
     const tokenRequest = {
-        scopes: [`api://${clientId}/key_vault_read`],
+        scopes: ["https://vault.azure.net/.default"],
         account: activeAccount
     };
 
@@ -1234,14 +1234,16 @@ function getQueryParam(param) {
 // Function to retrieve secret from Azure Key Vault
 async function getSecretFromKeyVault(keyVaultName, secretName, accessToken) {
 
-    const keyVaultUrl = `https://${keyVaultName}.vault.azure.net/secrets/${secretName}?api-version=7.0`;
+    //THIS IS BREAKING BECAUSE OF CORS WHICH CANNOT BE CONFIGURED FOR AZURE KEY VAULT.
+    const keyVaultUrl = `https://${keyVaultName}.vault.azure.net/secrets/${secretName}?api-version=7.5`;
 
     try {
         const response = await fetch(keyVaultUrl, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'mode': 'no-cors'
             }
         });
 
@@ -1338,12 +1340,12 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
     const clientId = config.AZURE_CLIENT_APP_ID;
 
     const tokenRequest = {
-        scopes: [`api://${clientId}/key_vault_read`],
+        scopes: [`https://vault.azure.net/.default`],
         account: activeAccount
     };
 
     try {
-        const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        const tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
 
         const apiKey = await getSecretFromKeyVault(keyVaultName, apiTokenSecretName, tokenResponse.accessToken);
 
@@ -1366,10 +1368,12 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
         if (error.code == 429) {
 
             const data = { error: 'Token rate limit exceeded. Please try again later.' };
+            console.error('Token rate limit exceeded. Please try again later.', error);
             return data;
         }
         else {
             const data = { error: 'An error occurred. Please try again later.' };
+            console.error('Error retrieving apikey from Azure Key Vault:', error);
             return data;
         }
     }
@@ -1643,7 +1647,7 @@ async function runSearchIndexer(searchIndexers) {
         var headers = {
             'api-key': apiKey,
             'Content-Type': 'application/json',
-            'mode': 'no-cors',
+            'mode': 'cors',
         };
 
         // Invoke the REST method to run the search indexer

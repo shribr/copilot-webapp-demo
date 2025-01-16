@@ -1,0 +1,12 @@
+[
+  {
+    "adminConsentDescription": "Allow the application to access YourAppName on behalf of the signed-in user.",
+    "adminConsentDisplayName": "Access YourAppName",
+    "id": "unique-scope-id",
+    "isEnabled": true,
+    "type": "User",
+    "userConsentDescription": "Allow the application to access YourAppName on your behalf.",
+    "userConsentDisplayName": "Access YourAppName",
+    "value": "access_as_user"
+  }
+]
