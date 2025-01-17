@@ -54,3 +54,27 @@
 2025-01-16 16:48:51 - Key Vault access policies set for app 'func-copilot-demo-005'.
 2025-01-16 16:48:51 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 16 MIN : 40 SEC : 603 MS ***
 
+*** LOG SEQUENCE: 2 ***
+*** SCRIPT START TIME: 01/16/2025 19:57:54 ***
+2025-01-16 19:57:57 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-16 19:58:00 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-16 19:58:27 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-16 19:58:28 - App 'app-copilot-demo-005' is already registered with App ID: 0631d9ec-59c5-42a0-852f-14c77381bb34.
+*** LOG SEQUENCE: 3 ***
+*** SCRIPT START TIME: 01/16/2025 19:59:58 ***
+2025-01-16 19:59:59 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-16 20:00:02 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-16 20:00:23 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-16 20:00:52 - Function app 'func-copilot-demo-005' deployed successfully.
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 01/16/2025 20:02:32 ***
+2025-01-16 20:02:33 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-16 20:02:36 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-16 20:02:51 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-16 20:03:20 - Function app 'func-copilot-demo-005' deployed successfully.
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 01/16/2025 20:16:35 ***
+2025-01-16 20:16:37 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-16 20:16:41 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-16 20:16:58 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-16 20:17:34 - Function app 'func-copilot-demo-005' deployed successfully.

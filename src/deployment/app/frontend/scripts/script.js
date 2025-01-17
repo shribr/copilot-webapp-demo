@@ -8,6 +8,9 @@ let originalDocumentCount = 0;
 let existingDocumentCount = 0;
 let filteredDocumentCount = 0;
 
+let timerInterval;
+let startTime;
+
 let msalInstance = {};
 let accessToken = {};
 
@@ -922,7 +925,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
             //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
             source.parameters.authentication.key = searchApiKey;
             //source.parameters.authentication.key = apiKey
-            //openAIRequestBody.data_sources.push(source);
+            openAIRequestBody.data_sources.push(source);
 
             const jsonString = JSON.stringify(openAIRequestBody);
 
@@ -1478,7 +1481,11 @@ async function postQuestion() {
     const questionBubbleTop = questionBubble.offsetTop;
     chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
+    startTimer(); // Start the timer
+
     getChatResponse(questionBubble);
+
+    stopTimer(); // Stop the timer
 
     document.getElementById("chat-info-text-copy").style.display = 'none';
 }
@@ -1857,6 +1864,19 @@ function sortDocuments(criteria) {
     }
 
     renderDocuments(sortedBlobs);
+}
+
+function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('chat-response-timer').innerText = `Elapsed Time: ${elapsedTime}s`;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    //document.getElementById('chat-response-timer').innerText = `Time: 0s`;
 }
 
 // Function to toggle all checkboxes

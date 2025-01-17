@@ -71,11 +71,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -112,7 +108,7 @@
       ]
     }
   ],
-  "appDeploymentOnly": false,
+  "appDeploymentOnly": true,
   "appInsightsName": "appi-copilot-demo-005",
   "appServiceEnvironmentName": "ase-copilot-demo-005",
   "appServicePlanName": "asp-copilot-demo-005",
