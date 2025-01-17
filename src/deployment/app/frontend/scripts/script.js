@@ -18,6 +18,8 @@ let activeAccount = {};
 
 let loggedIn = false;
 
+let config = {};
+
 const loginRequest = {
     scopes: ["user.read"]
 };
@@ -68,7 +70,7 @@ $(document).ready(async function () {
     //setChatDisplayHeight();
     //logout();
 
-    const config = await fetchConfig();
+    config = await fetchConfig();
 
     await checkIfLoggedIn();
 
@@ -440,7 +442,7 @@ function addMessageToChatHistory(thread, message) {
 // API Test Call
 async function callApi() {
 
-    const config = await fetchConfig();
+
 
     tokenRequest = await getAccessToken(config.AZURE_CLIENT_APP_ID);
 
@@ -468,7 +470,7 @@ async function callApi() {
 // Function to check if user is logged in
 async function checkIfLoggedIn() {
 
-    const config = await fetchConfig();
+
     const userProfilePanel = document.getElementById('user-profile-panel');
 
     const userProfileName = document.getElementById('user-profile-info-name-value');
@@ -554,16 +556,17 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         // Loop through the answers and create the response content   
         for (const choice of azureOpenAIResults[0].choices) {
 
-            console.log(`Choice: ${choice}`);
+            console.log(choice);
 
             const answer = choice.message;
             const role = answer.role;
             var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
-            var followUpQuestions = answerText.split("$$$$")[2].trim();
+
+            var followUpQuestions = answerText.indexOf("$$$$") > 1 ? answerText.split("$$$$")[2].trim() : "";
 
             //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
-            answerText = answerText.split("$$$$")[0];
+            answerText = answerText.indexOf("$$$$") > 0 ? answerText.split("$$$$")[0] : answerText;
 
             const message = { "role": role, "content": answerText };
 
@@ -580,7 +583,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
             if (citations) {
 
-                console.log(`Citations: ${citations}`);
+                console.log(citations);
 
                 for (const citation of citations) {
                     const docTitle = citation.title;
@@ -596,7 +599,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
                         return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
                     });
 
-                    if (!listedPaths.has(docTitle)) {
+                    if (!listedPaths.has(docTitle) && docTitle != "") {
                         listedPaths.add(docTitle);
 
                         sourceNumber++;
@@ -676,7 +679,7 @@ function collectChatResults(chatResultsId) {
 //function to create side navigation links
 async function createSidenavLinks() {
 
-    const config = await fetchConfig();
+
 
     try {
 
@@ -743,7 +746,7 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
         for (const choice of azureOpenAIResults[0].choices) {
 
             const answerText = choice.message.content.replace("**", "");
-            const followUpQuestions = answerText.split("$$$$")[2].trim();
+            const followUpQuestions = answerText.indexOf("$$$$") > 1 ? answerText.split("$$$$")[2].trim() : "";
 
             if (followUpQuestions) {
                 followUpQuestionsResults += followUpQuestions;
@@ -773,7 +776,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
         // Initialize a Set to store unique document paths
         const listedPaths = new Set();
 
-        console.log(`Azure OpenAI Results: ${azureOpenAIResults} `);
+        console.log(azureOpenAIResults);
 
         for (const choice of azureOpenAIResults[0].choices) {
 
@@ -789,20 +792,22 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
                     const docTitle = citation.title;
                     const docPath = `${storageUrl}/${docTitle}`;
 
-                    var answerText = citation.content.replace(" **", "").replace(/\s+/g, " ");
-                    answerText = answerText.split(docPath)[0];
+                    if (docTitle != "") {
+                        var answerText = citation.content.replace(" **", "").replace(/\s+/g, " ");
+                        answerText = answerText.split(docPath)[0];
 
-                    const footNoteLink = `<sup class="answer-citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                    const docLink = ` <a href="${docPath}?${sasToken}" class="supporting-content-link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
+                        const footNoteLink = `<sup class="answer-citations"><a href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                        const docLink = ` <a href="${docPath}?${sasToken}" class="supporting-content-link" title="${docTitle}" target="_blank">(${docTitle})</a>`;
 
-                    supportingContentResults += '<li class="answer-results">' + answerText + docLink + '</li>';
+                        supportingContentResults += '<li class="answer-results">' + answerText + docLink + '</li>';
 
-                    if (!listedPaths.has(docPath)) {
-                        listedPaths.add(docPath);
+                        if (!listedPaths.has(docPath)) {
+                            listedPaths.add(docPath);
 
-                        sourceNumber++;
-                    } else {
-                        console.log(`Document already listed: ${docPath}`);
+                            sourceNumber++;
+                        } else {
+                            console.log(`Document already listed: ${docPath}`);
+                        }
                     }
                 }
                 answerNumber++;
@@ -827,7 +832,7 @@ function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) 
         for (const choice of azureOpenAIResults[0].choices) {
 
             const answerText = choice.message.content.replace(/\*\*/g, "");
-            const thoughtProcess = answerText.split("$$$$")[1].trim();
+            const thoughtProcess = answerText.indexOf("$$$$") > 1 ? answerText.split("$$$$")[1].trim() : "";
 
             if (thoughtProcess) {
                 thoughtProcessResults += thoughtProcess;
@@ -884,8 +889,6 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     if (!userInput) return;
 
-    const config = await fetchConfig();
-
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
@@ -920,6 +923,8 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     if (dataSources.length > 0) {
 
+        openAIRequestBody.data_sources.length = 0;
+
         for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
             //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
@@ -948,7 +953,7 @@ async function getAnswersFromPublicInternet(userInput) {
 
     if (!userInput) return;
 
-    const config = await fetchConfig();
+
 
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiVersion = config.OPENAI_API_VERSION;
@@ -1036,7 +1041,7 @@ async function getAccessToken(clientId) {
 // Function to show responses to questions
 async function getChatResponse(questionBubble) {
 
-    const config = await fetchConfig();
+
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
@@ -1072,10 +1077,13 @@ async function getChatResponse(questionBubble) {
     // Temporarary attachment for testing
     const attachment = "";
 
+    const queryParam = getQueryParam('promptSuffix');
+
+    let promptSuffix = !queryParam ? config.PROMPT_SUFFIX : queryParam;
+
     if (chatInput) {
 
-        //const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <div class='followup-question'> elements and the entire set of followup questions surrounded by a parent <div id='followup-questions-list'> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.";
-        const prompt = chatInput + " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set of followup questions surrounded by <ol id='followup-questions-list'> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.";
+        const prompt = chatInput + promptSuffix;
         const message = { "role": "user", "content": prompt };
 
         addMessageToChatHistory(thread, message);
@@ -1223,7 +1231,7 @@ async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sa
 // Function to get SAS token from Azure Key Vault
 async function getSasToken() {
 
-    const config = await fetchConfig();
+
 
     const credential = new DefaultAzureCredential();
     const vaultName = config.KEY_VAULT_NAME;
@@ -1278,7 +1286,7 @@ async function getSecretFromKeyVault(keyVaultEndPoint, apiSecretName, apiVersion
 // Function to get the selected chat persona
 async function getSelectedChatPersona() {
 
-    const config = await fetchConfig();
+
 
     const selectedRadio = document.querySelector('input[name="chat-persona"]:checked');
 
@@ -1349,7 +1357,7 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
     let data = {};
 
-    const config = await fetchConfig();
+
     const keyVaultName = config.AZURE_KEY_VAULT_NAME;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
     const clientId = config.AZURE_CLIENT_APP_ID;
@@ -1428,7 +1436,7 @@ function logout() {
 // Function to post a question to the chat display
 async function postQuestion() {
 
-    const config = await fetchConfig();
+
 
     let chatInput = document.getElementById('chat-input').value;
 
@@ -1492,7 +1500,7 @@ async function postQuestion() {
 
 // Function to render chat personas
 async function renderChatPersonas() {
-    const config = await fetchConfig();
+
 
     const chatPersonas = config.CHAT_PERSONAS;
 
@@ -1645,7 +1653,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
 
 // Function to render panel icons
 async function renderPanelIcons() {
-    const config = await fetchConfig();
+
 
     const settingsIcon = config.ICONS.SETTINGS.MONOTONE;
     const userProfileIcon = config.ICONS.USER_PROFILE.MONOTONE;
@@ -1661,7 +1669,7 @@ async function renderPanelIcons() {
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
-    const config = await fetchConfig();
+
 
     const apiKey = config.AZURE_SEARCH_API_KEY;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
@@ -1738,7 +1746,7 @@ function setEqualHeightForTabContents() {
 // Function to set the site logo
 async function setSiteLogo() {
 
-    const config = await fetchConfig();
+
 
     const siteLogo = document.getElementsByClassName('site-logo')[0];
     const siteLogoText = document.getElementById('site-logo-text');
@@ -1974,6 +1982,10 @@ function truncateString(str, num) {
 
 // Function to truncate text
 function truncateText(text, maxLength) {
+    if (!text) {
+        return '';
+    }
+
     if (text.length > maxLength) {
         return text.substring(0, maxLength) + '...';
     }
@@ -2015,8 +2027,6 @@ function updatePlaceholder() {
 
 //code to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
-
-    const config = await fetchConfig();
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;

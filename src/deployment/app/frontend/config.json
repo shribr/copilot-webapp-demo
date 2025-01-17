@@ -36,6 +36,7 @@
   "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-005",
   "OPENAI_API_KEY": "a862f9d45a3a4c9aacea5a8500fb6391",
   "OPENAI_API_VERSION": "2024-08-01-preview",
+  "PROMPT_SUFFIX": " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set of followup questions surrounded by <ol id='followup-questions-list'> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.",
   "REGION": "eastus",
   "SEARCH_AZURE_OPENAI_MODEL": true,
   "SEARCH_PUBLIC_INTERNET_RESULTS": true,
