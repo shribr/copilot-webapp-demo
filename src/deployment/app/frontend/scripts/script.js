@@ -636,7 +636,12 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         answers += answerListHTML;
     }
 
-    answerContent.innerHTML += '<div id="openai-model-results-header">Search Results</div>';
+    if (previousPersona.Type != "Default") {
+        answerContent.innerHTML += `<div class="openai-model-results-header-container"><div class="openai-model-results-header">Search Results</div><div class="openai-model-results-header-persona">(${previousPersona.Type})</div></div>`;
+    }
+    else {
+        answerContent.innerHTML += `<div class="openai-model-results-header-container"><div class="openai-model-results-header">Search Results</div><div class="openai-model-results-header-persona"></div></div>`;
+    }
 
     const openAIModelResultsContainerId = `openai-model-results-container-${answerResponseNumber}`;
     openAIModelResultsId = `openai-model-results-${answerResponseNumber}`;
