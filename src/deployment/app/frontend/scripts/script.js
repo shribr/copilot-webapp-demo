@@ -926,7 +926,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
         openAIRequestBody.data_sources.length = 0;
 
         for (const source of dataSources) {
-            source.parameters.role_information = persona.Prompt;
+            source.role_information = persona.Prompt;
             //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
             source.parameters.authentication.key = searchApiKey;
             //source.parameters.authentication.key = apiKey
