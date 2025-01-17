@@ -1699,15 +1699,31 @@ async function renderPanelIcons() {
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
-
-
     const apiKey = config.AZURE_SEARCH_API_KEY;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
+    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
+    const keyVaultEndPoint = "https://vault.azure.net/.default"
+    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
+    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
+    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+
+    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
+
+    const tokenRequest = {
+        scopes: [`${keyVaultEndPoint}`],
+        account: activeAccount
+    };
+
+    const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+
+    const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+
+    // Insert a delay of 5 seconds
+    await new Promise(resolve => setTimeout(resolve, 5000));
 
     // Iterate over the search indexers and run each one
-    searchIndexers.forEach(searchIndexer => {
-
+    for (const searchIndexer of searchIndexers) {
         var searchIndexerName = searchIndexer.Name;
         //var searchIndexName = searchIndexer.IndexName;
         //var searchIndexerSchema = searchIndexer.Schema;
@@ -1715,24 +1731,23 @@ async function runSearchIndexer(searchIndexers) {
         var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
 
         var headers = {
-            'api-key': apiKey,
-            'Content-Type': 'application/json',
-            'mode': 'cors',
+            'api-key': searchApiKey,
+            'Content-Type': 'application/json'
         };
 
         // Invoke the REST method to run the search indexer
         try {
-            fetch(searchIndexerUrl, {
+            const response = await fetch(searchIndexerUrl, {
                 method: 'POST',
                 headers: headers
-            })
-                .then(response => response.json())
-                .then(data => console.log('Indexer run response:', data))
-                .catch(error => console.error('Error running indexer:', error));
+            });
+            //No need to return anything from the search indexer
+            const data = response;
+            console.log('Indexer run response:', data);
         } catch (error) {
             console.error(`Error running search indexer`, error.message);
         }
-    });
+    }
 }
 
 // Function to set the height of the chat display container
@@ -2068,12 +2083,11 @@ async function uploadFilesToAzure(files) {
     const deleteIcon = config.ICONS.DELETE.MONOTONE;
 
     const searchIndexers = config.SEARCH_INDEXERS;
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
-    const fullStorageUrl = `${storageUrl}?${sasToken}`;
+    const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
 
     for (const file of files) {
         const fileName = file.name.replace("#", "");

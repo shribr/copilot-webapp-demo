@@ -351,7 +351,7 @@
     "Website": "https://www.contoso.com"
   },
   "portalDashboardName": "portaldash-copilot-demo-005",
-  "previousResourceBaseName": "copilot-demo-001",
+  "previousResourceBaseName": "copilot-demo-004",
   "privateEndpoints": [
     {
       "Location": "east us",

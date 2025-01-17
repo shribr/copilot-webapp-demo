@@ -2619,7 +2619,7 @@ function New-Resources {
     # Create API Management Service
     
     # Commenting out for now because this resource is not being used in the deployment and it takes way too long to provision
-    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources
+    # New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
 }
 
