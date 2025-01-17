@@ -27,7 +27,7 @@
       "ApiKey": "xxx",
       "ApiVersion": "2024-08-01-preview",
       "Format": "OpenAI",
-      "ModelVersion": "0613",
+      "ModelVersion": "2024-08-06",
       "Name": "gpt-4o",
       "Sku": {
         "Capacity": 100,
@@ -91,7 +91,7 @@
     "ResourceGroup": "RG-COPILOT-DEMO-002",
     "SubscriptionKey": "cdbe83897e9c485baa86fa1f310b4166"
   },
-  "appRegistrationClientId": "",
+  "appRegistrationClientId": "1b8ecdeb-6df6-4667-a4f3-3dd00b135bde",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",

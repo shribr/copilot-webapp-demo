@@ -1,138 +1,128 @@
 {
-	"id": "99231502-ff2d-4354-a53e-b5893eb4b29c",
-	"deletedDateTime": null,
-	"appId": "a157200d-0915-44a6-89bc-f60540cbad09",
-	"applicationTemplateId": null,
-	"disabledByMicrosoftStatus": null,
-	"createdDateTime": "2025-01-13T16:57:53Z",
-	"displayName": "Custom Copilot Demo App",
-	"description": null,
-	"groupMembershipClaims": null,
-	"identifierUris": [
-		"api://a157200d-0915-44a6-89bc-f60540cbad09"
-	],
-	"isDeviceOnlyAuthSupported": null,
-	"isFallbackPublicClient": null,
-	"nativeAuthenticationApisEnabled": null,
-	"notes": null,
-	"publisherDomain": "FedAIRS.onmicrosoft.com",
-	"serviceManagementReference": null,
-	"signInAudience": "AzureADandPersonalMicrosoftAccount",
-	"tags": [
-		"apiConsumer",
-		"singlePageApp"
-	],
-	"tokenEncryptionKeyId": null,
-	"samlMetadataUrl": null,
-	"defaultRedirectUri": null,
-	"certification": null,
-	"optionalClaims": null,
-	"requestSignatureVerification": null,
-	"addIns": [],
-	"api": {
-		"acceptMappedClaims": null,
-		"knownClientApplications": [],
-		"requestedAccessTokenVersion": 2,
-		"oauth2PermissionScopes": [
-			{
-				"adminConsentDescription": "Allows admin to manage data in the key vault",
-				"adminConsentDisplayName": "Manage Key Vault Data",
-				"id": "68e8585a-8b1d-4666-8616-abd8a01cecd5",
-				"isEnabled": true,
-				"type": "User",
-				"userConsentDescription": "Allow the app to read secrets from the key vault",
-				"userConsentDisplayName": "Read Key Vault Secrets",
-				"value": "key_vault_read"
-			},
-			{
-				"adminConsentDescription": "Allow the app to read the signed-in users files.",
-				"adminConsentDisplayName": "Read User Files",
-				"id": "927ed603-7f0d-4521-b048-fe1aa0431e8b",
-				"isEnabled": true,
-				"type": "Admin",
-				"userConsentDescription": "Allow the app to read your files.",
-				"userConsentDisplayName": "Read your files",
-				"value": "access_as_user"
-			}
-		],
-		"preAuthorizedApplications": []
-	},
-	"appRoles": [
-		{
-			"allowedMemberTypes": [
-				"User",
-				"Application"
-			],
-			"description": "Readers have the ability to read tasks",
-			"displayName": "Readers",
-			"id": "3b45cc51-47bd-40e6-8928-2f659f5f6b08",
-			"isEnabled": true,
-			"origin": "Application",
-			"value": "Task.Read"
-		}
-	],
-	"info": {
-		"logoUrl": null,
-		"marketingUrl": null,
-		"privacyStatementUrl": null,
-		"supportUrl": null,
-		"termsOfServiceUrl": null
-	},
-	"keyCredentials": [],
-	"parentalControlSettings": {
-		"countriesBlockedForMinors": [],
-		"legalAgeGroupRule": "Allow"
-	},
-	"passwordCredentials": [],
-	"publicClient": {
-		"redirectUris": []
-	},
-	"requiredResourceAccess": [
-		{
-			"resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
-			"resourceAccess": [
-				{
-					"id": "f53da476-18e3-4152-8e01-aec403e6edc0",
-					"type": "Scope"
-				}
-			]
-		},
-		{
-			"resourceAppId": "00000003-0000-0000-c000-000000000000",
-			"resourceAccess": [
-				{
-					"id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-					"type": "Scope"
-				}
-			]
-		}
-	],
-	"verifiedPublisher": {
-		"displayName": null,
-		"verifiedPublisherId": null,
-		"addedDateTime": null
-	},
-	"web": {
-		"homePageUrl": null,
-		"logoutUrl": "https://app-copilot-demo-005.azurewebsites.net",
-		"redirectUris": [],
-		"implicitGrantSettings": {
-			"enableAccessTokenIssuance": false,
-			"enableIdTokenIssuance": false
-		},
-		"redirectUriSettings": []
-	},
-	"servicePrincipalLockConfiguration": {
-		"isEnabled": true,
-		"allProperties": true,
-		"credentialsWithUsageVerify": true,
-		"credentialsWithUsageSign": true,
-		"identifierUris": false,
-		"tokenEncryptionKeyId": true
-	},
-	"spa": {
-		"redirectUris": [
-			"https://app-copilot-demo-005.azurewebsites.net"
-		]
-	}
+  "id": "99231502-ff2d-4354-a53e-b5893eb4b29c",
+  "deletedDateTime": null,
+  "appId": "a157200d-0915-44a6-89bc-f60540cbad09",
+  "applicationTemplateId": null,
+  "disabledByMicrosoftStatus": null,
+  "createdDateTime": "2025-01-13T16:57:53Z",
+  "displayName": "Custom Copilot Demo App",
+  "description": null,
+  "groupMembershipClaims": null,
+  "identifierUris": ["api://a157200d-0915-44a6-89bc-f60540cbad09"],
+  "isDeviceOnlyAuthSupported": null,
+  "isFallbackPublicClient": null,
+  "nativeAuthenticationApisEnabled": null,
+  "notes": null,
+  "publisherDomain": "FedAIRS.onmicrosoft.com",
+  "serviceManagementReference": null,
+  "signInAudience": "AzureADandPersonalMicrosoftAccount",
+  "tags": ["apiConsumer", "singlePageApp"],
+  "tokenEncryptionKeyId": null,
+  "samlMetadataUrl": null,
+  "defaultRedirectUri": null,
+  "certification": null,
+  "optionalClaims": null,
+  "requestSignatureVerification": null,
+  "addIns": [],
+  "api": {
+    "acceptMappedClaims": null,
+    "knownClientApplications": [],
+    "requestedAccessTokenVersion": 2,
+    "oauth2PermissionScopes": [
+      {
+        "adminConsentDescription": "Allows admin to manage data in the key vault",
+        "adminConsentDisplayName": "Manage Key Vault Data",
+        "id": "68e8585a-8b1d-4666-8616-abd8a01cecd5",
+        "isEnabled": true,
+        "type": "User",
+        "userConsentDescription": "Allow the app to read secrets from the key vault",
+        "userConsentDisplayName": "Read Key Vault Secrets",
+        "value": "key_vault_read"
+      },
+      {
+        "adminConsentDescription": "Allow the app to read the signed-in users files.",
+        "adminConsentDisplayName": "Read User Files",
+        "id": "927ed603-7f0d-4521-b048-fe1aa0431e8b",
+        "isEnabled": true,
+        "type": "Admin",
+        "userConsentDescription": "Allow the app to read your files.",
+        "userConsentDisplayName": "Read your files",
+        "value": "access_as_user"
+      }
+    ],
+    "preAuthorizedApplications": []
+  },
+  "appRoles": [
+    {
+      "allowedMemberTypes": ["User", "Application"],
+      "description": "Readers have the ability to read tasks",
+      "displayName": "Readers",
+      "id": "3b45cc51-47bd-40e6-8928-2f659f5f6b08",
+      "isEnabled": true,
+      "origin": "Application",
+      "value": "Task.Read"
+    }
+  ],
+  "info": {
+    "logoUrl": null,
+    "marketingUrl": null,
+    "privacyStatementUrl": null,
+    "supportUrl": null,
+    "termsOfServiceUrl": null
+  },
+  "keyCredentials": [],
+  "parentalControlSettings": {
+    "countriesBlockedForMinors": [],
+    "legalAgeGroupRule": "Allow"
+  },
+  "passwordCredentials": [],
+  "publicClient": {
+    "redirectUris": []
+  },
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
+      "resourceAccess": [
+        {
+          "id": "f53da476-18e3-4152-8e01-aec403e6edc0",
+          "type": "Scope"
+        }
+      ]
+    },
+    {
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        }
+      ]
+    }
+  ],
+  "verifiedPublisher": {
+    "displayName": null,
+    "verifiedPublisherId": null,
+    "addedDateTime": null
+  },
+  "web": {
+    "homePageUrl": null,
+    "logoutUrl": "https://app-copilot-demo-002.azurewebsites.net",
+    "redirectUris": [],
+    "implicitGrantSettings": {
+      "enableAccessTokenIssuance": false,
+      "enableIdTokenIssuance": false
+    },
+    "redirectUriSettings": []
+  },
+  "servicePrincipalLockConfiguration": {
+    "isEnabled": true,
+    "allProperties": true,
+    "credentialsWithUsageVerify": true,
+    "credentialsWithUsageSign": true,
+    "identifierUris": false,
+    "tokenEncryptionKeyId": true
+  },
+  "spa": {
+    "redirectUris": ["https://app-copilot-demo-002.azurewebsites.net"]
+  }
 }

@@ -1450,52 +1450,66 @@ function New-App-Registration {
         Write-Host "API permissions set for app '$appServiceName'."
         Write-Log -message "API permissions set for app '$appServiceName'."
 
-        # Check and expose the API
-        $existingScopes = az ad app show --id $appId --query "oauth2Permissions[].value" --output tsv
-        $apiScopes = @()
-        foreach ($scope in $exposeApiScopes) {
-            if (-not ($existingScopes -contains $scope.value)) {
-                $apiScopes += @{
-                    "adminConsentDescription" = $scope.adminConsentDescription
-                    "adminConsentDisplayName" = $scope.adminConsentDisplayName
-                    "id"                      = [guid]::NewGuid().ToString()
-                    "isEnabled"               = $true
-                    "type"                    = "User"
-                    "userConsentDescription"  = $scope.userConsentDescription
-                    "userConsentDisplayName"  = $scope.userConsentDisplayName
-                    "value"                   = $scope.value
+
+        try {
+            # Check and expose the API
+            $existingScopes = az ad app show --id $appId --query "oauth2Permissions[].value" --output tsv
+            $apiScopes = @()
+            foreach ($scope in $exposeApiScopes) {
+                if (-not ($existingScopes -contains $scope.value)) {
+                    $apiScopes += @{
+                        "adminConsentDescription" = $scope.adminConsentDescription
+                        "adminConsentDisplayName" = $scope.adminConsentDisplayName
+                        "id"                      = [guid]::NewGuid().ToString()
+                        "isEnabled"               = $true
+                        "type"                    = "User"
+                        "userConsentDescription"  = $scope.userConsentDescription
+                        "userConsentDisplayName"  = $scope.userConsentDisplayName
+                        "value"                   = $scope.value
+                    }
                 }
             }
+    
+            # Retrieve the current application manifest
+            $app = az ad app show --id $appId | ConvertFrom-Json
+    
+            # NEED TO UPDATE CODE BELOW TO UPDATE THE MANIFEST ***
+    
+            # Update the identifierUris and oauth2PermissionScopes properties
+            $app.identifierUris = $identifierUrisArray
+            $app.api.oauth2PermissionScopes = $oauth2PermissionScopesArray
+    
+            # Convert the updated manifest back to JSON
+            $appJson = $app | ConvertTo-Json -Depth 10
+    
+            # Update the application with the modified manifest
+            $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
+            #az ad app update --id $appId --set @appManifest.json
+            az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
+    
+            Write-Host "Scope for app '$appServiceName' added successfully."
+            Write-Log -message "Scope for app '$appServiceName' added successfully." -logFilePath $global:LogFilePath
+        }
+        catch {
+            Write-Error "Failed to add scopes for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to add scopes for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
 
-        # Retrieve the current application manifest
-        $app = az ad app show --id $appId | ConvertFrom-Json
-
-        # NEED TO UPDATE CODE BELOW TO UPDATE THE MANIFEST ***
-
-        # Update the identifierUris and oauth2PermissionScopes properties
-        $app.identifierUris = $identifierUrisArray
-        $app.api.oauth2PermissionScopes = $oauth2PermissionScopesArray
-
-        # Convert the updated manifest back to JSON
-        $appJson = $app | ConvertTo-Json -Depth 10
-
-        # Update the application with the modified manifest
-        $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-        #az ad app update --id $appId --set @appManifest.json
-        az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
-        Write-Host "API exposed for app '$appServiceName'."
-        Write-Log -message "API exposed for app '$appServiceName'."
-
-        # Set Key Vault access policies
-        az keyvault set-policy --name $keyVaultName --object-id $objectId --secret-permissions get list set delete --key-permissions get list create delete --certificate-permissions get list create delete
-
-        Write-Host "Key Vault access policies set for app '$appServiceName'."
-        Write-Log -message "Key Vault access policies set for app '$appServiceName'."
+        try {
+            # Set Key Vault access policies
+            az keyvault set-policy --name $keyVaultName --object-id $objectId --secret-permissions get list set delete --key-permissions get list create delete --certificate-permissions get list create delete
+    
+            Write-Host "Key Vault access policies for app '$appServiceName' set successfully."
+            Write-Log -message "Key Vault access policies for app '$appServiceName' set successfully.." -logFilePath $global:LogFilePath
+        }
+        catch {
+            Write-Error "Failed to register app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to register app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
     catch {
-        Write-Error "Failed to register app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to register app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Error "Failed to set policies for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to set policies for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 

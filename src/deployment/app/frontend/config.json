@@ -5,7 +5,7 @@
   "AZURE_CLIENT_APP_ID": "a157200d-0915-44a6-89bc-f60540cbad09",
   "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-002",
   "AZURE_APIM_SUBSCRIPTION_KEY": "cdbe83897e9c485baa86fa1f310b4166",
-  "AZURE_APP_SERVICE_NAME": "app-copilot-demo-005",
+  "AZURE_APP_SERVICE_NAME": "app-copilot-demo-002",
   "AZURE_SEARCH_API_KEY": "BcNQk7E8KzIeESoFXuoEVKNBipXyJgASKoDSO5zaqwAzSeBmhp3t",
   "AZURE_SEARCH_API_VERSION": "2024-11-01-Preview",
   "AZURE_FUNCTION_API_KEY": null,
@@ -26,7 +26,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-15T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=ftbq&srt=co&sig=ynuDqum8JL6phKKVAZZZD/uuIFRG6f%2B5jEaz%2Bg%2BBLaM%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-15T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=qfbt&srt=co&sig=n%2BZnjLanlrw7aMstNCMiP9Gl439SlaiHiJjvqpFLa0M%3D",
   "AZURE_STORAGE_KEY": "fR4rgGO1v/8hpes09nu5WnQbirXRFBrps5+MLBrF0aEi/xKCMXapxQKLiYn/o06mi66y2faHXHeR+AStl+3Nuw==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -89,13 +89,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "ftbq",
+    "SS": "qfbt",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-01-15T23:59:59Z",
     "ST": "2025-01-15T23:59:59Z",
     "SPR": "https",
-    "SIG": "ynuDqum8JL6phKKVAZZZD/uuIFRG6f%2B5jEaz%2Bg%2BBLaM%3D",
+    "SIG": "n%2BZnjLanlrw7aMstNCMiP9Gl439SlaiHiJjvqpFLa0M%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -253,8 +253,8 @@
     {
       "type": "azure_search",
       "parameters": {
-        "endpoint": "https://srch-copilot-demo-005.search.windows.net",
-        "index_name": "vector-srch-index-copilot-demo-005",
+        "endpoint": "https://srch-copilot-demo-002.search.windows.net",
+        "index_name": "vector-srch-index-copilot-demo-002",
         "role_information": "",
         "authentication": {
           "type": "api_key",
