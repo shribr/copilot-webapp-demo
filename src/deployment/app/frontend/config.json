@@ -43,14 +43,14 @@
   "SITE_LOGO": "default",
   "AI_MODELS": [
     {
-      "Type": "gpt-4",
+      "Type": "gpt-4o",
       "ApiVersion": "2024-08-01-preview",
       "ModelVersion": null,
       "Sku": {
         "Name": "Standard",
         "Capacity": 100
       },
-      "Name": "gpt-4",
+      "Name": "gpt-4o",
       "ApiKey": "5366aeb70ed448ad86196c68ae41e44a",
       "Format": "OpenAI"
     },
@@ -207,7 +207,7 @@
     {
       "Type": "Teenage Girl",
       "Description": "You are a teenage girl who is very passionate about fashion and beauty. You love to share your thoughts and opinions on the latest trends and products. You are also very creative and love to express yourself through art and music.",
-      "Prompt": "You are a teenage girl. You are very perky and enthusiastic.",
+      "Prompt": "You are a teenage girl who uses all the modern lingo that kids today use. You are very perky and enthusiastic.",
       "NoResults": "Oops! I couldn't find any information on that. Would you like me to look up something else?"
     },
     {

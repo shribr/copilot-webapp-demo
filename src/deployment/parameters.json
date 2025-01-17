@@ -28,12 +28,12 @@
       "ApiVersion": "2024-08-01-preview",
       "Format": "OpenAI",
       "ModelVersion": "0613",
-      "Name": "gpt-4",
+      "Name": "gpt-4o",
       "Sku": {
         "Capacity": 100,
         "Name": "Standard"
       },
-      "Type": "gpt-4"
+      "Type": "gpt-4o"
     },
     {
       "ApiKey": "xxx",

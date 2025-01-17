@@ -11,6 +11,8 @@ let filteredDocumentCount = 0;
 let timerInterval;
 let startTime;
 
+let previousPersona = { "Type": "", "Prompt": "" };
+
 let msalInstance = {};
 let accessToken = {};
 
@@ -182,8 +184,6 @@ $(document).ready(async function () {
         }
     });
 
-    // ...existing code...
-
     window.addEventListener('resize', function () {
         const width = window.innerWidth;
         const height = window.innerHeight;
@@ -208,8 +208,6 @@ $(document).ready(async function () {
             Array.from(elements).forEach(element => element.classList.add('no-before'));
         }
     });
-
-    // ...existing code...
 
     const screen = getQueryParam('screen');
 
@@ -429,6 +427,13 @@ $(document).ready(async function () {
     });
 
     renderChatPersonas();
+
+    const persona = getSelectedChatPersona();
+
+    const system_message = { "role": "assistant", "content": persona.Prompt };
+    addMessageToChatHistory(thread, system_message);
+
+    previousPersona.Type = persona.Type;
 });
 
 // Function to build chat history
@@ -546,6 +551,8 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     var openAIModelResultsId = "";
     var answers = "";
 
+    let numOccurrences = 0;
+
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
 
@@ -562,11 +569,12 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
             const role = answer.role;
             var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
 
-            var followUpQuestions = answerText.indexOf("$$$$") > 1 ? answerText.split("$$$$")[2].trim() : "";
+            numOccurrences = countOccurrences(answerText, "[$$$$]");
+            var followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
 
             //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
-            answerText = answerText.indexOf("$$$$") > 0 ? answerText.split("$$$$")[0] : answerText;
+            answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
 
             const message = { "role": role, "content": answerText };
 
@@ -587,31 +595,29 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                 for (const citation of citations) {
                     const docTitle = citation.title;
-                    //const docTitle = toProperCase(citation.title);;
-                    const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
 
-                    //https://stcopilotdemo005.blob.core.windows.net/content/Fy22_all_staff-626645-v1-ecm_implementation__posted__pws__attachment_f_ecm_reference_and_target_architecture_final.docx?sv=2022-11-02&ss=bfqt&srt=co&sp=rwdxylacupfti&se=2026-01-05T23:59:59Z&spr=https&sig=7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D
-                    //https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fstcopilotdemo005.blob.core.windows.net%2Fcontent%2FFY22_ALL_STAFF-626662-v4-ECM_IMPLEMENTATION__POSTED__PWS.docx%3Fsv%3D2022-11-02%26ss%3Dbfqt%26srt%3Dco%26sp%3Drwdxylacupfti%26se%3D2026-01-05T23%3A59%3A59Z%26spr%3Dhttps%26sig%3D7Fbqeh9M%252B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%253D&wdOrigin=BROWSELINK
-                    //https://stcopilotdemo005.blob.core.windows.net/content/power-pages-guidance.pdf?sv=2022-11-02&ss=bfqt&srt=co&sp=rwdxylacupfti&se=2026-01-05T23:59:59Z&spr=https&sig=7Fbqeh9M%2B4be9Rbq38qrhUocLLZiiI9nOr9Fb6X7fGo%3D
+                    if (docTitle) {
+                        const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
 
-                    // Detect and replace [doc*] with [page *] and create hyperlink
-                    answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
-                        return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
-                    });
+                        // Detect and replace [doc*] with [page *] and create hyperlink
+                        answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
+                            return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
+                        });
 
-                    if (!listedPaths.has(docTitle) && docTitle != "") {
-                        listedPaths.add(docTitle);
+                        if (!listedPaths.has(docTitle) && docTitle != "") {
+                            listedPaths.add(docTitle);
 
-                        sourceNumber++;
+                            sourceNumber++;
 
-                        const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
+                            const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
 
-                        citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+                            citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
-                        footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                    }
-                    else {
-                        console.log(`Document already listed: ${docTitle}`);
+                            footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                        }
+                        else {
+                            console.log(`Document already listed: ${docTitle}`);
+                        }
                     }
 
                 }
@@ -674,6 +680,13 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 function collectChatResults(chatResultsId) {
     const chatDisplay = document.getElementById(`${chatResultsId} `);
     return chatDisplay.innerHTML;
+}
+
+// Function to count the number of occurrences of a string in another string
+function countOccurrences(mainString, searchString) {
+    const regex = new RegExp(searchString, 'g');
+    const matches = mainString.match(regex);
+    return matches ? matches.length : 0;
 }
 
 //function to create side navigation links
@@ -746,7 +759,9 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
         for (const choice of azureOpenAIResults[0].choices) {
 
             const answerText = choice.message.content.replace("**", "");
-            const followUpQuestions = answerText.indexOf("$$$$") > 1 ? answerText.split("$$$$")[2].trim() : "";
+
+            numOccurrences = countOccurrences(answerText, "[$$$$]");
+            const followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
 
             if (followUpQuestions) {
                 followUpQuestionsResults += followUpQuestions;
@@ -828,11 +843,14 @@ function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) 
     if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         var thoughtProcessResults = "";
+        let numOccurrences = 0;
 
         for (const choice of azureOpenAIResults[0].choices) {
 
             const answerText = choice.message.content.replace(/\*\*/g, "");
-            const thoughtProcess = answerText.indexOf("$$$$") > 1 ? answerText.split("$$$$")[1].trim() : "";
+
+            numOccurrences = countOccurrences(answerText, "[$$$$]");
+            const thoughtProcess = numOccurrences > 1 ? answerText.split("$$$$")[1].trim() : "";
 
             if (thoughtProcess) {
                 thoughtProcessResults += thoughtProcess;
@@ -926,7 +944,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
         openAIRequestBody.data_sources.length = 0;
 
         for (const source of dataSources) {
-            source.role_information = persona.Prompt;
+            source.parameters.role_information = persona.Prompt;
             //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
             source.parameters.authentication.key = searchApiKey;
             //source.parameters.authentication.key = apiKey
@@ -1041,8 +1059,6 @@ async function getAccessToken(clientId) {
 // Function to show responses to questions
 async function getChatResponse(questionBubble) {
 
-
-
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
@@ -1068,7 +1084,14 @@ async function getChatResponse(questionBubble) {
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 
     // Get the selected chat persona
-    const persona = await getSelectedChatPersona();
+    const persona = getSelectedChatPersona();
+
+    if (persona.Type != previousPersona.Type) {
+        const system_message = { "role": "assistant", "content": persona.Prompt };
+        addMessageToChatHistory(thread, system_message);
+
+        previousPersona.Type = persona.Type;
+    }
 
     // Show the loading animation
     const loadingAnimation = document.querySelector('.loading-animation');
@@ -1284,9 +1307,7 @@ async function getSecretFromKeyVault(keyVaultEndPoint, apiSecretName, apiVersion
 }
 
 // Function to get the selected chat persona
-async function getSelectedChatPersona() {
-
-
+function getSelectedChatPersona() {
 
     const selectedRadio = document.querySelector('input[name="chat-persona"]:checked');
 
@@ -1525,6 +1546,10 @@ async function renderChatPersonas() {
                 </div>`;
 
         chatPersonasContainer.appendChild(chatPersona);
+
+        // document.getElementById(`chat-persona-${persona.Type.replace(" ", "-")}`).addEventListener('click', function () {
+        //     selectedPersona = persona.type;
+        // });
     });
 
 

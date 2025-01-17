@@ -1698,6 +1698,7 @@ code {
   margin-left: 8px;
   margin-top: 2px;
   font-size: 0.9rem;
+  display: none;
 }
 
 #refresh-threads-button {
