@@ -249,3 +249,117 @@
 2025-01-17 17:01:13 - Key Vault access policies set for app 'func-copilot-demo-002'.
 2025-01-17 17:01:13 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 02 MIN : 56 SEC : 775 MS ***
 
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 01/17/2025 17:09:23 ***
+2025-01-17 17:09:24 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-17 17:09:27 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-01-17 17:09:27 - Identity 'id-copilot-demo-002' already exists.
+2025-01-17 17:09:29 - Storage account 'stcopilotdemo002' already exists.
+2025-01-17 17:09:31 - Subnet 'subnet-copilot-demo-002' already exists.
+2025-01-17 17:09:31 - App Service Plan 'asp-copilot-demo-002' already exists.
+2025-01-17 17:09:31 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2025-01-17 17:09:32 - Search Service 'srch-copilot-demo-002' already exists.
+2025-01-17 17:09:37 - Search Index 'srch-index-copilot-demo-002' already exists.
+2025-01-17 17:09:39 - Search Index 'vector-srch-index-copilot-demo-002' already exists.
+2025-01-17 17:09:40 - Search Index 'embeddings-srch-index-copilot-demo-002' already exists.
+2025-01-17 17:09:41 - Search Skill Set 'srch-skillset-copilot-demo-002' already exists.
+2025-01-17 17:09:42 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2025-01-17 17:09:44 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-002' already exists.
+2025-01-17 17:09:45 - Search Indexer 'srch-indexer-copilot-demo-002' already exists.
+2025-01-17 17:09:47 - Search Indexer 'vector-srch-indexer-copilot-demo-002' already exists.
+2025-01-17 17:09:48 - Search Indexer 'embeddings-srch-indexer-copilot-demo-002' already exists.
+2025-01-17 17:09:58 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2025-01-17 17:09:58 - Application Insights 'appi-copilot-demo-002' already exists.
+2025-01-17 17:09:58 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2025-01-17 17:09:58 - Container Registry 'crcopilotdemo002' already exists.
+2025-01-17 17:09:58 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2025-01-17 17:09:58 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2025-01-17 17:09:58 - API Management service 'apim-copilot-demo-002' already exists.
+2025-01-17 17:10:00 - API 'KeyVaultProxy' already exists.
+2025-01-17 17:10:00 - Key Vault 'kv-copilot-demo-002' already exists.
+2025-01-17 17:10:00 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2025-01-17 17:10:01 - AI Service 'ai-service-copilot-demo-002' already exists.
+2025-01-17 17:10:03 - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
+2025-01-17 17:10:04 - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
+2025-01-17 17:10:05 - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
+2025-01-17 17:10:05 - Machine Learning Workspace 'project-ai-copilot-demo-002' already exists.
+2025-01-17 17:10:17 - Model deployment 'gpt-4o' for 'ai-service-copilot-demo-002' already exists.
+2025-01-17 17:10:18 - Model deployment 'text-embedding' for 'ai-service-copilot-demo-002' already exists.
+2025-01-17 17:10:25 - Azure AIService 'ai-service-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2025-01-17 17:10:30 - Azure OpenAIService 'openai-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2025-01-17 17:10:35 - Azure StorageAccount 'stcopilotdemo002' connection for 'hub-ai-copilot-demo-002' already exists.
+2025-01-17 17:10:42 - Azure SearchService 'srch-copilot-demo-002' connection for 'hub-ai-copilot-demo-002' already exists.
+2025-01-17 17:10:53 - Config file updated successfully.
+2025-01-17 17:10:54 - App 'app-copilot-demo-002' is already registered with App ID: 48bfa293-855b-4b23-bf9c-14246d02a18d.
+2025-01-17 17:10:55 - parameters.json updated successfully.
+2025-01-17 17:10:59 - API permissions set for app 'app-copilot-demo-002'.
+2025-01-17 17:11:03 - Scope for app 'app-copilot-demo-002' added successfully.
+2025-01-17 17:11:05 - Key Vault access policies for app 'app-copilot-demo-002' set successfully..
+2025-01-17 17:11:06 - App 'func-copilot-demo-002' is already registered with App ID: 1b8ecdeb-6df6-4667-a4f3-3dd00b135bde.
+2025-01-17 17:11:07 - parameters.json updated successfully.
+2025-01-17 17:11:10 - API permissions set for app 'func-copilot-demo-002'.
+2025-01-17 17:11:15 - Scope for app 'func-copilot-demo-002' added successfully.
+2025-01-17 17:11:16 - Key Vault access policies for app 'func-copilot-demo-002' set successfully..
+2025-01-17 17:11:16 - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 01 MIN : 53 SEC : 630 MS ***
+
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 01/18/2025 18:21:37 ***
+2025-01-18 18:21:40 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-18 18:21:43 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-01-18 18:22:12 - Web app 'app-copilot-demo-002' deployed successfully.
+2025-01-18 18:22:44 - Function app 'func-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 01/18/2025 18:32:17 ***
+2025-01-18 18:32:19 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-18 18:32:22 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-01-18 18:32:42 - Web app 'app-copilot-demo-002' deployed successfully.
+2025-01-18 18:33:14 - Function app 'func-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 01/18/2025 18:54:28 ***
+2025-01-18 18:54:30 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-18 18:54:34 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-18 18:54:45 - Config file updated successfully.
+2025-01-18 18:55:11 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-18 18:55:53 - Function app 'func-copilot-demo-005' deployed successfully.
+*** LOG SEQUENCE: 10 ***
+*** SCRIPT START TIME: 01/18/2025 18:58:17 ***
+2025-01-18 18:58:18 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-18 18:58:25 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-18 18:58:35 - Config file updated successfully.
+2025-01-18 18:58:55 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-18 18:59:26 - Function app 'func-copilot-demo-005' deployed successfully.
+*** LOG SEQUENCE: 11 ***
+*** SCRIPT START TIME: 01/18/2025 18:59:48 ***
+2025-01-18 18:59:49 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-18 18:59:52 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-01-18 19:00:00 - Config file updated successfully.
+2025-01-18 19:00:36 - Web app 'app-copilot-demo-002' deployed successfully.
+2025-01-18 19:01:10 - Function app 'func-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 12 ***
+*** SCRIPT START TIME: 01/18/2025 19:08:07 ***
+2025-01-18 19:08:08 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-18 19:08:10 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-01-18 19:08:19 - Config file updated successfully.
+2025-01-18 19:08:46 - Web app 'app-copilot-demo-002' deployed successfully.
+2025-01-18 19:09:21 - Function app 'func-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 13 ***
+*** SCRIPT START TIME: 01/18/2025 19:17:48 ***
+2025-01-18 19:17:51 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-01-18 19:17:54 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-01-18 19:18:04 - Config file updated successfully.
+2025-01-18 19:18:24 - Web app 'app-copilot-demo-002' deployed successfully.
+2025-01-18 19:18:55 - Function app 'func-copilot-demo-002' deployed successfully.
+*** LOG SEQUENCE: 14 ***
+*** SCRIPT START TIME: 01/18/2025 19:19:19 ***
+2025-01-18 19:19:20 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-18 19:19:23 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-18 19:19:31 - Config file updated successfully.
+2025-01-18 19:19:49 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-18 19:20:45 - Function app 'func-copilot-demo-005' deployed successfully.
+*** LOG SEQUENCE: 15 ***
+*** SCRIPT START TIME: 01/18/2025 19:27:14 ***
+2025-01-18 19:27:15 - Resource Group 'RG-COPILOT-DEMO-005' already exists.
+2025-01-18 19:27:18 - Resource 'srch-copilot-demo-005' is provisioned successfully.
+2025-01-18 19:27:27 - Config file updated successfully.
+2025-01-18 19:27:48 - Web app 'app-copilot-demo-005' deployed successfully.
+2025-01-18 19:28:18 - Function app 'func-copilot-demo-005' deployed successfully.

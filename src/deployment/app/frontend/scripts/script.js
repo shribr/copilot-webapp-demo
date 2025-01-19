@@ -444,37 +444,10 @@ function addMessageToChatHistory(thread, message) {
     console.log(thread);
 }
 
-// API Test Call
-async function callApi() {
-
-
-
-    tokenRequest = await getAccessToken(config.AZURE_CLIENT_APP_ID);
-
-    msalInstance.acquireTokenSilent(tokenRequest)
-        .then(response => {
-            fetch("https://your-api-endpoint.com/data", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${response.accessToken}`
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("API data:", data);
-                })
-                .catch(error => {
-                    console.error("API call error:", error);
-                });
-        })
-        .catch(error => {
-            console.error("Token acquisition error:", error);
-        });
-}
-
 // Function to check if user is logged in
 async function checkIfLoggedIn() {
 
+    config = await fetchConfig();
 
     const userProfilePanel = document.getElementById('user-profile-panel');
 
@@ -940,7 +913,16 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
         account: activeAccount
     };
 
-    const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+    let tokenResponse;
+
+    try {
+        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        console.log("Token acquired silently");
+    } catch (silentError) {
+        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        console.log("Token acquired via popup");
+    }
 
     const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
 
@@ -1364,6 +1346,9 @@ async function initMSALInstance(config) {
 
     msalInstance = new msal.PublicClientApplication(msalConfig);
 
+    // Insert a delay of 5 seconds
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     msalInstance.handleRedirectPromise()
         .then(response => {
             if (response) {
@@ -1715,7 +1700,16 @@ async function runSearchIndexer(searchIndexers) {
         account: activeAccount
     };
 
-    const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+    let tokenResponse;
+
+    try {
+        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        console.log("Token acquired silently");
+    } catch (silentError) {
+        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        console.log("Token acquired via popup");
+    }
 
     const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
 

@@ -3844,6 +3844,20 @@ function Start-Deployment {
     Get-ResourceStatus -resourceGroupName $resourceGroupName -resourceName $searchServiceName -resourceType "Microsoft.Search/searchServices"
 
     if ($global:appDeploymentOnly -eq $true) {
+
+        # Update configuration file for web frontend
+        Update-ConfigFile - configFilePath "app/frontend/config.json" `
+            -resourceBaseName $resourceBaseName `
+            -resourceGroupName $resourceGroupName `
+            -storageAccountName $storageAccountName `
+            -searchServiceName $searchServiceName `
+            -openAIAccountName $openAIAccountName `
+            -aiServiceName $aiServiceName `
+            -functionAppName $functionAppServiceName `
+            -searchIndexers $global:searchIndexers `
+            -searchIndexes $global:searchIndexes `
+            -siteLogo $global:siteLogo
+        
         # Deploy web app and function app services
         foreach ($appService in $appServices) {
             Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $global:storageAccountName -deployZipResources $true
@@ -4730,6 +4744,21 @@ function Update-ConfigFile {
             $config.SEARCH_INDEXERS += $searchIndexer
         }
 
+        $config.DATA_SOURCES = @(
+            @{
+                "type"       = "azure_search"
+                "parameters" = @{
+                    "endpoint"         = "https://$global:searchServiceName.search.windows.net"
+                    "index_name"       = "$vectorSearchIndex.Name"
+                    "role_information" = ""
+                    "authentication"   = @{
+                        "type" = "api_key"
+                        "key"  = "$searchApiKey"
+                    }
+                }
+            }
+        )
+            
         # Define the AZURE_OPENAI_REQUEST_BODY
         #region AZURE_OPENAI_REQUEST_BODY
         $config.AZURE_OPENAI_REQUEST_BODY = @{
@@ -4738,7 +4767,7 @@ function Update-ConfigFile {
                     "type"       = "azure_search"
                     "parameters" = @{
                         "endpoint"       = "https://$global:searchServiceName.search.windows.net"
-                        "index_name"     = "$vectorSearchIndex"
+                        "index_name"     = "$vectorSearchIndex.Name"
                         "authentication" = @{
                             "type" = "api_key"
                             "key"  = "$searchApiKey"
