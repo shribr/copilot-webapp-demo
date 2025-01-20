@@ -439,12 +439,13 @@ There are several manual steps which need to be performed for a variety of reaso
    - **Search Service Index CORS:** Setting CORS to whatever your web app URL is for the Vector Search Index. It is not enough just to leave it open to "ALL". That will not work. Trust me. This was a nightmare to figure out and I learned a lot more about CORS than I ever really wanted to. In short, your web browser will enforce the SAME ORIGIN policy regardless of whether you want it to or not. So if your search service is **srch-copilot-demo-001.azurewebsites.net** and your app service is **app-copilot-demo-001.azurewebsites.net** then you will get a `Could not complete vectorization action. The vectorization endpoint returned status code '401' (Unauthorized).` error. You will NOT get this error when using a program like Postman because Postman is not a web browser so there is nothing to interfere with your http request. When the CORS setting is set to "All" then the Search Service basically doesn't send anything so your browser assumes that the two services communicating with one another are required to be of the same orgin (i.e. same FQDN). Now, to be fair, your web browser is kinda/sorta doing this for your own protection but it's still kind of annoying when you're trying to troubleshoot stuff. <sup>[2](#search_service_index_cors)</sup>
    - **Search Service Index Redacted API Key:** Remove the apiKey `<redacted>` entry from the vector search index json if it exists. Don't just remove the value `<redacted>`. Remove the entire property. <sup>[3](#search_service_index_redacted_api_key)</sup>
    - **Search Service Managed Identity:** You may need to remove and then re-add the search services managed identity user. <sup>[4](#search_managed_identity_remove)</sup>
-   - **Search Service Datasource Managed Identity:** Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed. You may need to remove and re-add the managed identity user to the Search service in order to run the indexer too.
-   - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[5](#search_service_skillset_connect_ai_service)</sup>
-   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. You also need to set the Authentication Type to "API Key". <sup>[6](#search_service_index_vectorizer_multi_service_account)</sup>
+   - **Search Service Datasource Managed Identity:** Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed. You may need to remove and re-add the managed identity user to the Search service in order to run the indexer too.<sup>[5](#search_service_datasource_managed_identity)</sup>
+   - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[6](#search_service_skillset_connect_ai_service)</sup>
+   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. You also need to set the Authentication Type to "API Key". <sup>[7](#search_service_index_vectorizer_multi_service_account)</sup>
 4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
-5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the ```apiManagementService.SubscriptionKey``` value in the parameters.json file which will then update the ```AZURE_APIM_SUBSCRIPTION_KEY``` value in the config.json value and used in the deployed app service. <sup>[7](#api_management_service_subscription_key)</sup>
+5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the ```apiManagementService.SubscriptionKey``` value in the parameters.json file which will then update the ```AZURE_APIM_SUBSCRIPTION_KEY``` value in the config.json value and used in the deployed app service. <sup>[8](#api_management_service_subscription_key)</sup>
 6. **Azure AI Project / Machine Learning Workspace:**
+   
    <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
@@ -470,11 +471,11 @@ NOTE: Another issue with the whole Azure AI project is that because the script c
 
 The next few screenshots outline the manual steps you need to take in order to configure the AI Project.
 
-1. Create new AI project and specify existing hub from your resource group. <sup>[8](#ai_studio_project_create)</sup>
-2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[9](#ai_studio_project_models_assets_menu)</sup>
-3. Select asset. <sup>[10](#ai_studio_project_select_assets)</sup>
-4. Select existing AI service from your resource group. <sup>[11](#ai_studio_project_select_ai_resource)</sup>
-5. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[12](#ai_studio_project_add_models)</sup>
+1. Create new AI project and specify existing hub from your resource group. <sup>[9](#ai_studio_project_create)</sup>
+2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[10](#ai_studio_project_models_assets_menu)</sup>
+3. Select asset. <sup>[11](#ai_studio_project_select_assets)</sup>
+4. Select existing AI service from your resource group. <sup>[12](#ai_studio_project_select_ai_resource)</sup>
+5. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[13](#ai_studio_project_add_models)</sup>
 
 <img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project-create.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
@@ -511,13 +512,13 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 
 <img id="search_service_index_redacted_api_key" width="600" alt="Multi-Service Account" src="src/deployment/images/azure-ai-demo-search-index-apikey-redacted.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-#### Search Service Datasource Managed Identity
-
-<img id="search_service_datasource_managed_identity" width="600" alt="Managed Identity" src="src/deployment/images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-
 #### Search Service Managed Identity Remove
 
 <img id="search_managed_identity_remove" width="600" alt="Removed and Re-Add Search Service Managed Idenity" src="src/deployment/images/azure-ai-demo-search-managed-identity-remove.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+#### Search Service Datasource Managed Identity
+
+<img id="search_service_datasource_managed_identity" width="600" alt="Managed Identity" src="src/deployment/images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 #### Search Service Skillset Connect to AI Service
 
