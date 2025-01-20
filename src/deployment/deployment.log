@@ -51,3 +51,10 @@
 2025-01-19 19:56:04 - Key Vault access policies for app 'func-copilot-demo-003' set successfully..
 2025-01-19 19:56:04 - *** TOTAL SCRIPT EXECUTION TIME: 04 HRS : 36 MIN : 43 SEC : 126 MS ***
 
+*** LOG SEQUENCE: 2 ***
+*** SCRIPT START TIME: 01/19/2025 20:03:28 ***
+2025-01-19 20:03:30 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-19 20:03:33 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-19 20:03:51 - Config file updated successfully.
+2025-01-19 20:04:10 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-19 20:04:59 - Function app 'func-copilot-demo-003' deployed successfully.

@@ -1438,8 +1438,6 @@ function New-App-Registration {
         # Update the parameters file with the new app registration details
         Update-ParametersFile-AppRegistration -parametersFile $parametersFile -appId $appId -appUri $appUri
 
-        az ad app update --id $appId --web-redirect-uris "https://$appServiceName.azurewebsites.net"
-
         $permissions = "User.Read.All"
 
         # Check and set API permissions
