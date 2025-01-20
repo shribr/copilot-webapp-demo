@@ -443,9 +443,10 @@ There are several manual steps which need to be performed for a variety of reaso
    - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[6](#search_service_skillset_connect_ai_service)</sup>
    - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. You also need to set the Authentication Type to "API Key". <sup>[7](#search_service_index_vectorizer_multi_service_account)</sup>
 4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
-5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the ```apiManagementService.SubscriptionKey``` value in the parameters.json file which will then update the ```AZURE_APIM_SUBSCRIPTION_KEY``` value in the config.json value and used in the deployed app service. Of the 3 keys that are shown you need to copy the value from the last one titled "Built-in all-access subscription". <sup>[8](#api_management_service_subscription_key)</sup>
-6. **Azure AI Project / Machine Learning Workspace:**
-   
+5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the `apiManagementService.SubscriptionKey` value in the parameters.json file which will then update the `AZURE_APIM_SUBSCRIPTION_KEY` value in the config.json value and used in the deployed app service. Of the 3 keys that are shown you need to copy the value from the last one titled "Built-in all-access subscription". <sup>[8](#api_management_service_subscription_key)</sup>
+6. **API Management CORS:** For each of the two API operations `Get OpenAI Service Api Key` and `Get Search Service Api Key`, you need to make sure you add the CORS policy to the Inbound Processing section and add the Url of your app service to the Allowed Origins section.
+7. **Azure AI Project / Machine Learning Workspace:**
+
    <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
@@ -531,6 +532,10 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 #### API Management Service Subscription Key
 
 <img id="api_management_service_subscription_key" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-subscription-key.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+#### API Management Service CORS
+
+<img id="api_management_service_cors" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 ### Contributing
 
