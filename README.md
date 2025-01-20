@@ -488,7 +488,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 
 <img id="ai_studio_project_add_models" width="600" alt="AI Studio Add AI Models" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-management.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-<img id="api_management_service_subscription_key" width="600" alt="Removed and Re-Add Search Service Managed Idenity" src="src/deployment/images/azure-ai-demo-search-managed-identity-remove.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+<img id="search_managed_identity_remove" width="600" alt="Removed and Re-Add Search Service Managed Idenity" src="src/deployment/images/azure-ai-demo-search-managed-identity-remove.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 ### Additional Notes
 
