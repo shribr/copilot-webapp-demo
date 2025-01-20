@@ -70,3 +70,10 @@
 2025-01-19 22:07:26 - Config file updated successfully.
 2025-01-19 22:07:51 - Web app 'app-copilot-demo-003' deployed successfully.
 2025-01-19 22:08:33 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 01/19/2025 22:53:06 ***
+2025-01-19 22:53:09 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-19 22:53:12 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-19 22:53:31 - Config file updated successfully.
+2025-01-19 22:53:59 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-19 22:54:43 - Function app 'func-copilot-demo-003' deployed successfully.
