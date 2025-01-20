@@ -199,7 +199,7 @@ $(document).ready(async function () {
             leftNavContainer.style.display = 'none';
         }
 
-        if (width < 1235) {
+        if (width < 1350) {
             const elements = document.getElementsByClassName('blob-name');
             Array.from(elements).forEach(element => element.classList.remove('no-before'));
         }
@@ -892,7 +892,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     const deploymentName = aiModelName;
     const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const clientId = config.AZURE_CLIENT_APP_ID;
+    const clientId = config.AZURE_APP_REG_CLIENT_APP_ID;
     const keyVaultEndPoint = "https://vault.azure.net/.default"
     const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
@@ -958,15 +958,13 @@ async function getAnswersFromPublicInternet(userInput) {
 
     if (!userInput) return;
 
-
-
     const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const apiVersion = config.OPENAI_API_VERSION;
     const aiModels = config.AI_MODELS;
     //const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
     const aiGPTModel = config.AI_MODELS[0];
     const deploymentName = aiGPTModel.Name;
-    const openAIRequestBody = config.OPENAI_REQUEST_BODY;
+    const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 
@@ -1329,7 +1327,7 @@ function hideLeftNav() {
 async function initMSALInstance(config) {
 
     const tenantId = config.AZURE_TENANT_ID;
-    const clientId = config.AZURE_CLIENT_APP_ID;
+    const clientId = config.AZURE_APP_REG_CLIENT_APP_ID;
     const appServiceName = config.AZURE_APP_SERVICE_NAME;
 
     const msalConfig = {
@@ -1371,7 +1369,7 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
     const keyVaultName = config.AZURE_KEY_VAULT_NAME;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const clientId = config.AZURE_CLIENT_APP_ID;
+    const clientId = config.AZURE_APP_REG_CLIENT_APP_ID;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
     const keyVaultEndPoint = "https://vault.azure.net/.default"
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
@@ -1939,7 +1937,7 @@ function toggleAllCheckboxes() {
 
 // Function to insert field title into search results
 function toggleBeforeAfter(width) {
-    if (width < 1236) {
+    if (width < 1350) {
         const elements = document.getElementsByClassName('document-cell-name');
         Array.from(elements).forEach(element => element.classList.add('no-before'));
 

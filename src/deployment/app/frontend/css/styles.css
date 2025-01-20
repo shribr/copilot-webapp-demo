@@ -193,8 +193,8 @@ body {
   }
 }
 
-/* THIS MEANS LESS THAN OR EQUAL TO 1236PX */
-@media (max-width: 1236px) {
+/* THIS MEANS LESS THAN OR EQUAL TO 1350px */
+@media (max-width: 1350px) {
   #document-table-header {
     display: none;
   }

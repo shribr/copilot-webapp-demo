@@ -1419,6 +1419,8 @@ function New-App-Registration {
 
             $appId = $existingApp
             $objectId = az ad app show --id $appId --query "objectId" --output tsv
+
+            $global:appRegistrationClientId = $appId
         }
         else {
             # Register the app
@@ -1427,6 +1429,8 @@ function New-App-Registration {
             $appId = $appRegistration.appId
             $objectId = $appRegistration.objectId
 
+            $global:appRegistrationClientId = $appId
+
             Write-Host "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
             Write-Log -message "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
         }
@@ -1434,14 +1438,36 @@ function New-App-Registration {
         # Update the parameters file with the new app registration details
         Update-ParametersFile-AppRegistration -parametersFile $parametersFile -appId $appId -appUri $appUri
 
+        az ad app update --id $appId --web-redirect-uris "https://$appServiceName.azurewebsites.net"
+
         $permissions = "User.Read.All"
 
         # Check and set API permissions
         foreach ($permission in $appRegRequiredResourceAccess) {
             $existingPermission = az ad app permission list --id $appId --query "[?resourceAppId=='$($permission.resourceAppId)'].{id:id, value:value}" --output tsv
             if (-not $existingPermission) {
-                az ad app permission add --id $appId --api $permission.resourceAppId --api-permissions $permissions
-                az ad app permission grant --id $appId --api $permission.resourceAppId --scope $permissions
+
+                try {
+                    az ad app permission add --id $appId --api $permission.resourceAppId --api-permissions $permissions
+
+                    Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully."
+                    Write-Log -message "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully." -logFilePath $global:LogFilePath
+                }
+                catch {
+                    Write-Error "Failed to add permission '$permissions' for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to add permission '$permissions' for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
+
+                try {
+                    az ad app permission grant --id $appId --api $permission.resourceAppId --scope $permissions
+
+                    Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId granted successfully."
+                    Write-Log -message "Permission '$permissions' for '$appServiceName' with App ID: $appId granted successfully." -logFilePath $global:LogFilePath
+                }
+                catch {
+                    Write-Error "Failed to grant permission '$permissions' for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed grant add permission '$permissions' for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                }
             }
         }
 
@@ -1449,7 +1475,6 @@ function New-App-Registration {
 
         Write-Host "API permissions set for app '$appServiceName'."
         Write-Log -message "API permissions set for app '$appServiceName'."
-
 
         try {
             # Check and expose the API
@@ -1473,20 +1498,26 @@ function New-App-Registration {
             # Retrieve the current application manifest
             $app = az ad app show --id $appId | ConvertFrom-Json
     
-            # NEED TO UPDATE CODE BELOW TO UPDATE THE MANIFEST ***
-    
+            # Define the identifierUrisArray
+            # $identifierUrisArray = @{"uri" = "https://app-$global:resourceBaseName.azurewebsites.net" }
+            #$identifierUris = "https://app-$global:resourceBaseName.azurewebsites.net api://$global:appRegistrationClientId"
+            $identifierUris = "api://$global:appRegistrationClientId"
+
             # Update the identifierUris and oauth2PermissionScopes properties
-            $app.identifierUris = $identifierUrisArray
-            $app.api.oauth2PermissionScopes = $oauth2PermissionScopesArray
+            $app.identifierUris = $identifierUris
+            $app.api.oauth2PermissionScopes += $apiScopes
     
             # Convert the updated manifest back to JSON
             $appJson = $app | ConvertTo-Json -Depth 10
     
             # Update the application with the modified manifest
             $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-            #az ad app update --id $appId --set @appManifest.json
+            #az ad app update --id $appId --set appManifest.json
+            
             az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
-    
+            az ad app update --id $appId --set "api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)"
+            az ad app update --id $appId --identifier-uris $identifierUris
+
             Write-Host "Scope for app '$appServiceName' added successfully."
             Write-Log -message "Scope for app '$appServiceName' added successfully." -logFilePath $global:LogFilePath
         }
@@ -2815,7 +2846,7 @@ function New-SearchIndexer {
         $jsonContent.name = $searchIndexerName
         $jsonContent.dataSourceName = $searchDatasourceName
         $jsonContent.targetIndexName = $searchIndexName
-        #$jsonContent.skillsetName = $searchSkillSetName
+        $jsonContent.skillsetName = $searchSkillSetName
         $jsonContent.targetIndexName = $searchIndexName
 
         if ($jsonContent.PSObject.Properties.Match('cache')) {
@@ -4614,14 +4645,20 @@ function Update-ConfigFile {
     )
 
     try {
+
+        $appServiceName = "app-$global:resourceBaseName"
+        $functionAppName = "func-$global:resourceBaseName"
+
         $storageKey = az storage account keys list --resource-group  $global:resourceGroupName --account-name $global:storageAccountName --query "[0].value" --output tsv
         $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $searchApiKey = az search admin-key show --resource-group $global:resourceGroupName --service-name $global:searchServiceName --query "primaryKey" --output tsv
         $openAIApiKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $global:openAIAccountName --query "key1" --output tsv
         $aiServiceKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $aiServiceName --query "key1" --output tsv
-        #$functionAppKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
-        #$functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        $functionApiKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
+        $functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        
+        $appRegistrationClientId = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
 
         # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
         $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services btfq --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
@@ -4688,11 +4725,13 @@ function Update-ConfigFile {
         # Update the config with the new key-value pair
         # Update the config with the new key-value pair
         $config.AZURE_OPENAI_SERVICE_API_KEY = $aiServiceKey
-        #$config.AZURE_FUNCTION_API_KEY = $functionAppKey
-        #$config.AZURE_FUNCTION_APP_NAME = $functionAppName
-        #$config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
+        $config.AZURE_FUNCTION_API_KEY = $functionApiKey
+        $config.AZURE_FUNCTION_APP_NAME = $functionAppName
+        $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
         $config.AZURE_APIM_SUBSCRIPTION_KEY = $global:apiManagementService.SubscriptionKey
+        $config.AZURE_APP_REG_CLIENT_APP_ID = $appRegistrationClientId
+        $config.AZURE_APP_SERVICE_NAME = "app-$global:resourceBaseName"
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
         $config.AZURE_KEY_VAULT_API_VERSION = $global:keyVaultApiVersion
         $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
@@ -4700,7 +4739,7 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
         $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
         $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
-        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-" + $resourceBaseName + "-semantic-configuration" -join ""
+        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$resourceBaseName-semantic-configuration" -join ""
         $config.AZURE_SEARCH_SERVICE_NAME = $global:searchServiceName
         $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
         $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
@@ -4726,6 +4765,7 @@ function Update-ConfigFile {
         $config.SEARCH_INDEXES = @()
 
         $vectorSearchIndex = $null
+        $vectorSearchIndexName = $null
 
         # Loop through the search indexes collection from global:searchIndexes
         foreach ($searchIndex in $global:searchIndexes) {
@@ -4733,6 +4773,7 @@ function Update-ConfigFile {
 
             if ($searchIndex.Name -match "vector") {
                 $vectorSearchIndex = $searchIndex
+                $vectorSearchIndexName = $searchIndex.Name
             }
         }
 
@@ -4749,7 +4790,7 @@ function Update-ConfigFile {
                 "type"       = "azure_search"
                 "parameters" = @{
                     "endpoint"         = "https://$global:searchServiceName.search.windows.net"
-                    "index_name"       = "$vectorSearchIndex.Name"
+                    "index_name"       = "$vectorSearchIndexName"
                     "role_information" = ""
                     "authentication"   = @{
                         "type" = "api_key"
@@ -4767,7 +4808,7 @@ function Update-ConfigFile {
                     "type"       = "azure_search"
                     "parameters" = @{
                         "endpoint"       = "https://$global:searchServiceName.search.windows.net"
-                        "index_name"     = "$vectorSearchIndex.Name"
+                        "index_name"     = "$vectorSearchIndexName"
                         "authentication" = @{
                             "type" = "api_key"
                             "key"  = "$searchApiKey"

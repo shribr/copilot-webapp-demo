@@ -4,23 +4,44 @@
   "api": {
     "acceptMappedClaims": null,
     "knownClientApplications": [],
-    "oauth2PermissionScopes": null,
+    "oauth2PermissionScopes": [
+      {
+        "adminConsentDisplayName": "Access API as user",
+        "userConsentDisplayName": "Access API as user",
+        "isEnabled": true,
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "id": "b17c4505-92e7-413f-802f-93131fb0793c",
+        "type": "User",
+        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
+        "value": "access_as_user"
+      },
+      {
+        "adminConsentDisplayName": "Read data from API",
+        "userConsentDisplayName": "Read data from API",
+        "isEnabled": true,
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "id": "b7fce618-5afc-4d3a-b465-1a01edde1e68",
+        "type": "User",
+        "adminConsentDescription": "Allow the application to read data from the API.",
+        "value": "read_data"
+      }
+    ],
     "preAuthorizedApplications": [],
     "requestedAccessTokenVersion": 2
   },
-  "appId": "1b8ecdeb-6df6-4667-a4f3-3dd00b135bde",
+  "appId": "18f666b1-a578-40b5-81bd-678c86783715",
   "appRoles": [],
   "applicationTemplateId": null,
   "certification": null,
-  "createdDateTime": "2025-01-17T18:18:06Z",
+  "createdDateTime": "2025-01-19T18:01:40Z",
   "defaultRedirectUri": null,
   "deletedDateTime": null,
   "description": null,
   "disabledByMicrosoftStatus": null,
-  "displayName": "func-copilot-demo-002",
+  "displayName": "func-copilot-demo-003",
   "groupMembershipClaims": null,
-  "id": "a80d366c-fcaf-4b7b-80bc-8a9f47e806ba",
-  "identifierUris": null,
+  "id": "759c7b31-3442-4b3c-8787-359c821a8412",
+  "identifierUris": "api://18f666b1-a578-40b5-81bd-678c86783715",
   "info": {
     "logoUrl": null,
     "marketingUrl": null,
