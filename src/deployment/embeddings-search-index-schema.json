@@ -79,7 +79,9 @@
   ],
   "scoringProfiles": [],
   "corsOptions": {
-    "allowedOrigins": ["*"],
+    "allowedOrigins": [
+      "*"
+    ],
     "maxAgeInSeconds": 300
   },
   "suggesters": [],

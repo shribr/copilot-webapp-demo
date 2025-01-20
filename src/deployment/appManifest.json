@@ -6,24 +6,24 @@
     "knownClientApplications": [],
     "oauth2PermissionScopes": [
       {
+        "id": "a8b8a206-e4db-4b76-ae35-e21d3a8f2bf0",
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "isEnabled": true,
+        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
         "adminConsentDisplayName": "Access API as user",
         "userConsentDisplayName": "Access API as user",
-        "isEnabled": true,
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
-        "id": "b17c4505-92e7-413f-802f-93131fb0793c",
-        "type": "User",
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "value": "access_as_user"
+        "value": "access_as_user",
+        "type": "User"
       },
       {
+        "id": "118c8f8c-e5a1-4f13-b3df-3b7e08437c11",
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "isEnabled": true,
+        "adminConsentDescription": "Allow the application to read data from the API.",
         "adminConsentDisplayName": "Read data from API",
         "userConsentDisplayName": "Read data from API",
-        "isEnabled": true,
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-        "id": "b7fce618-5afc-4d3a-b465-1a01edde1e68",
-        "type": "User",
-        "adminConsentDescription": "Allow the application to read data from the API.",
-        "value": "read_data"
+        "value": "read_data",
+        "type": "User"
       }
     ],
     "preAuthorizedApplications": [],

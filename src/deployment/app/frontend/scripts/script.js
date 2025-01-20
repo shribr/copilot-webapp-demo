@@ -546,82 +546,101 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
 
-    var footNoteLinks = "";
+    let footNoteLinks = "";
+    let followUpQuestions = "";
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error && azureOpenAIResults[0].choices) {
 
         // Loop through the answers and create the response content   
-        for (const choice of azureOpenAIResults[0].choices) {
+        try {
+            for (const choice of azureOpenAIResults[0].choices) {
 
-            console.log(choice);
+                console.log(choice);
 
-            const answer = choice.message;
-            const role = answer.role;
-            var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
+                const answer = choice.message;
+                const role = answer.role;
+                var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
 
-            numOccurrences = countOccurrences(answerText, "[$$$$]");
-            var followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
+                numOccurrences = countOccurrences(answerText, "[$$$$]");
+                followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
 
-            //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
+                //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
-            answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
+                answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
 
-            const message = { "role": role, "content": answerText };
+                const message = { "role": role, "content": answerText };
 
-            if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
-                answerText = persona.NoResults;
-            }
-            else {
-                addMessageToChatHistory(thread, message);
-            }
-
-            const context = answer.context;
-
-            const citations = context.citations;
-
-            if (citations) {
-
-                console.log(citations);
-
-                for (const citation of citations) {
-                    const docTitle = citation.title;
-
-                    if (docTitle) {
-                        const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
-
-                        // Detect and replace [doc*] with [page *] and create hyperlink
-                        answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
-                            return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
-                        });
-
-                        if (!listedPaths.has(docTitle) && docTitle != "") {
-                            listedPaths.add(docTitle);
-
-                            sourceNumber++;
-
-                            const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
-
-                            citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
-
-                            footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                        }
-                        else {
-                            console.log(`Document already listed: ${docTitle}`);
-                        }
-                    }
-
+                if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
+                    answerText = persona.NoResults;
                 }
-            }
+                else {
+                    addMessageToChatHistory(thread, message);
+                }
 
-            const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+                const context = answer.context;
+
+                const citations = context.citations;
+
+                if (citations) {
+
+                    console.log(citations);
+
+                    for (const citation of citations) {
+                        const docTitle = citation.title;
+
+                        if (docTitle) {
+                            const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
+
+                            // Detect and replace [doc*] with [page *] and create hyperlink
+                            answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
+                                return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
+                            });
+
+                            if (!listedPaths.has(docTitle) && docTitle != "") {
+                                listedPaths.add(docTitle);
+
+                                sourceNumber++;
+
+                                const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
+
+                                citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+
+                                footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                            }
+                            else {
+                                console.log(`Document already listed: ${docTitle}`);
+                            }
+                        }
+
+                    }
+                }
+
+                const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+
+                answers += answerListHTML;
+
+            }
+        } catch (error) {
+            const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
 
             answers += answerListHTML;
-
+            console.error(error);
         }
 
     }
     else {
-        const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+
+        let answerListHTML = '';
+
+        if (azureOpenAIResults[0].error && azureOpenAIResults[0].error.code == 429) {
+
+            answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
+            console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
+        }
+        else {
+            answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+            console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
+        }
 
         answers += answerListHTML;
     }
@@ -687,8 +706,6 @@ function countOccurrences(mainString, searchString) {
 //function to create side navigation links
 async function createSidenavLinks() {
 
-
-
     try {
 
 
@@ -747,7 +764,7 @@ function createTabs(responseTabs) {
 // Function to create tab contents for follow-up questions
 function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsContent) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         var followUpQuestionsResults = "";
 
@@ -775,7 +792,7 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
 // Function to create tab contents for supporting content results returned from Azure Search
 function createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         //var answerResults = "";
         var citationContentResults = "";
@@ -835,7 +852,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 // Function to create tab contents for thought process content
 function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         var thoughtProcessResults = "";
         let numOccurrences = 0;
@@ -1467,8 +1484,6 @@ function logout() {
 
 // Function to post a question to the chat display
 async function postQuestion() {
-
-
 
     let chatInput = document.getElementById('chat-input').value;
 
