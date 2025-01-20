@@ -527,7 +527,7 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 
 #### API Management Service Subscription Key
 
-<img id="search_service_index_vectorizer_multi_service_account" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-subscription-key.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+<img id="api_management_service_subscription_key" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-subscription-key.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 ### Contributing
 
