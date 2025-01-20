@@ -4656,6 +4656,9 @@ function Update-ConfigFile {
         $functionApiKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
         $functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
         
+        #$apimSubscriptionKey = az apim api list --resource-group $resourceGroupName --service-name $global:apiManagementService.Name --query "SubscriptionKey" --output tsv
+        #$global:applicationManagementService.SubscriptionKey = $apimSubscriptionKey
+
         $appRegistrationClientId = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
 
         # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
@@ -4727,7 +4730,11 @@ function Update-ConfigFile {
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
         $config.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
-        $config.AZURE_APIM_SUBSCRIPTION_KEY = $global:apiManagementService.SubscriptionKey
+
+        if ($global:apiManagementService.SubscriptionKey) {
+            $config.AZURE_APIM_SUBSCRIPTION_KEY = $global:apiManagementService.SubscriptionKey
+        }
+
         $config.AZURE_APP_REG_CLIENT_APP_ID = $appRegistrationClientId
         $config.AZURE_APP_SERVICE_NAME = "app-$global:resourceBaseName"
         $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName

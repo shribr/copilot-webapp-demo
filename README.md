@@ -443,7 +443,8 @@ There are several manual steps which need to be performed for a variety of reaso
    - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[4](#search_service_skillset_connect_ai_service)</sup>
    - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. You also need to set the Authentication Type to "API Key". <sup>[5](#search_service_index_vectorizer_multi_service_account)</sup>
 4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
-5. **Azure AI Project / Machine Learning Workspace:**
+5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the apiManagementService.SubscriptionKey value in the parameters.json file which will then update the AZURE_APIM_SUBSCRIPTION_KEY value in the config.json value and used in the deployed app service. <sup>[6](#api_management_service_subscription_key)</sup>
+6. **Azure AI Project / Machine Learning Workspace:**
    <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
@@ -487,7 +488,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 
 <img id="ai_studio_project_add_models" width="600" alt="AI Studio Add AI Models" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-management.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-<img id="search_managed_identity_remove" width="600" alt="Removed and Re-Add Search Service Managed Idenity" src="src/deployment/images/azure-ai-demo-search-managed-identity-remove.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+<img id="api_management_service_subscription_key" width="600" alt="Removed and Re-Add Search Service Managed Idenity" src="src/deployment/images/azure-ai-demo-search-managed-identity-remove.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 ### Additional Notes
 
@@ -518,11 +519,15 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 
 #### Search Service Skillset Connect to AI Service
 
-<img id="search_service_skillset_connect_ai_service" width="600" alt="Managed Identity" src="src/deployment/images/azure-ai-demo-search-skillset-connect-ai-service.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+<img id="search_service_skillset_connect_ai_service" width="600" alt="Skillset Connect AI Service" src="src/deployment/images/azure-ai-demo-search-skillset-connect-ai-service.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 #### Search Service Index Vectorizer Multi-Service Account
 
 <img id="search_service_index_vectorizer_multi_service_account" width="600" alt="Multi-Service Account" src="src/deployment/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+#### API Management Service Subscription Key
+
+<img id="search_service_index_vectorizer_multi_service_account" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-subscription-key.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 ### Contributing
 

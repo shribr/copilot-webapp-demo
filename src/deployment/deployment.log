@@ -58,3 +58,15 @@
 2025-01-19 20:03:51 - Config file updated successfully.
 2025-01-19 20:04:10 - Web app 'app-copilot-demo-003' deployed successfully.
 2025-01-19 20:04:59 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 3 ***
+*** SCRIPT START TIME: 01/19/2025 20:58:53 ***
+2025-01-19 20:58:56 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-19 20:58:59 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-19 22:04:27 - Failed to update the config file: : (Line 4661) : The property 'SubscriptionKey' cannot be found on this object. Verify that the property exists and can be set.
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 01/19/2025 22:07:06 ***
+2025-01-19 22:07:08 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-19 22:07:10 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-19 22:07:26 - Config file updated successfully.
+2025-01-19 22:07:51 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-19 22:08:33 - Function app 'func-copilot-demo-003' deployed successfully.
