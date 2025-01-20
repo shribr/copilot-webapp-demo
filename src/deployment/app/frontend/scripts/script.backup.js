@@ -8,8 +8,6 @@ let originalDocumentCount = 0;
 let existingDocumentCount = 0;
 let filteredDocumentCount = 0;
 
-let authMode = '';
-
 let timerInterval;
 let startTime;
 
@@ -71,13 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 $(document).ready(async function () {
 
+    //setChatDisplayHeight();
+    //logout();
+
     config = await fetchConfig();
 
-    authMode = config.AUTHENTICATION_MODE;
-
-    if (authMode === 'MSAL') {
-        await checkIfLoggedIn();
-    }
+    await checkIfLoggedIn();
 
     hideLeftNav();
 
@@ -437,12 +434,6 @@ $(document).ready(async function () {
     addMessageToChatHistory(thread, system_message);
 
     previousPersona.Type = persona.Type;
-
-    if (authMode != 'MSAL') {
-        document.getElementById('user-profile-panel').style.display = 'none';
-        document.getElementById('link-user-profile').style.display = 'none';
-        document.getElementById('user-profile-icon').style.display = 'none';
-    }
 });
 
 // Function to build chat history
@@ -458,8 +449,6 @@ async function checkIfLoggedIn() {
 
     config = await fetchConfig();
 
-    authMode = config.AUTHENTICATION_MODE;
-
     const userProfilePanel = document.getElementById('user-profile-panel');
 
     const userProfileName = document.getElementById('user-profile-info-name-value');
@@ -469,30 +458,24 @@ async function checkIfLoggedIn() {
 
     const body = document.querySelector('body');
 
-    if (authMode === 'MSAL') {
-        const accounts = msalInstance.getAllAccounts();
+    const accounts = msalInstance.getAllAccounts();
 
-        if (accounts.length > 0) {
-            msalInstance.setActiveAccount(accounts[0]);
-            console.log("User is logged in:", accounts[0]);
-            userProfileName.innerText = accounts[0].name;
-            userProfileEmail.innerText = accounts[0].username;
+    if (accounts.length > 0) {
+        msalInstance.setActiveAccount(accounts[0]);
+        console.log("User is logged in:", accounts[0]);
+        userProfileName.innerText = accounts[0].name;
+        userProfileEmail.innerText = accounts[0].username;
 
-            activeAccount = accounts[0];
+        activeAccount = accounts[0];
 
-            body.style.display = 'flex';
-            //msalInstance.loginRedirect(loginRequest);
-            loggedIn = true;
-        } else {
-            console.log("No user is logged in.");
-
-            await login();
-            loggedIn = false;
-        }
-    }
-    else {
         body.style.display = 'flex';
+        //msalInstance.loginRedirect(loginRequest);
         loggedIn = true;
+    } else {
+        console.log("No user is logged in.");
+
+        await login();
+        loggedIn = false;
     }
 }
 
@@ -902,6 +885,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     if (!userInput) return;
 
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const apiVersion = config.OPENAI_API_VERSION;
@@ -915,7 +899,6 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
 
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
 
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
@@ -925,25 +908,23 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     openAIRequestBody.messages = [];
     openAIRequestBody.messages = thread.messages;
 
-    if (authMode === "MSAL") {
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
+    const tokenRequest = {
+        scopes: [`${keyVaultEndPoint}`],
+        account: activeAccount
+    };
 
-        let tokenResponse;
+    let tokenResponse;
 
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+    try {
+        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        console.log("Token acquired silently");
+    } catch (silentError) {
+        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        console.log("Token acquired via popup");
     }
+
+    const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
 
     if (dataSources.length > 0) {
 
@@ -951,16 +932,14 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
         for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
-            //If authMode is MSAL then we usw the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
-            //If the authMode is API_KEY then we just use the search API key directly from the config.json file.
+            //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
             source.parameters.authentication.key = searchApiKey;
             //source.parameters.authentication.key = apiKey
             openAIRequestBody.data_sources.push(source);
 
             const jsonString = JSON.stringify(openAIRequestBody);
 
-            //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
-            //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
+            //We need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API
             const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
 
             results.push(result);
@@ -1226,7 +1205,7 @@ async function getChatResponse(questionBubble) {
     answerResponseNumber++;
 }
 
-//Function to get documents from Azure Storage. This needs to be updated to have option to use MSAL in addition to API_KEY.
+//code to get documents from Azure Storage
 async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
     try {
@@ -1386,7 +1365,7 @@ async function initMSALInstance(config) {
 async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
     let data = {};
-    let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+
 
     const keyVaultName = config.AZURE_KEY_VAULT_NAME;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
@@ -1402,27 +1381,25 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
     };
 
     try {
+        let tokenResponse;
 
-        if (authMode === "MSAL") {
-            let tokenResponse;
-
-            try {
-                tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-                console.log("Token acquired silently");
-            } catch (silentError) {
-                console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-                tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-                console.log("Token acquired via popup");
-            }
-
-            openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+        try {
+            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+            console.log("Token acquired silently");
+        } catch (silentError) {
+            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+            console.log("Token acquired via popup");
         }
+
+        const apiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+        //const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': `${openAiApiKey}`,
+                'api-key': `${apiKey}`,
                 'http2': 'true'
             },
             body: jsonString

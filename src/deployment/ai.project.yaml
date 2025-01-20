@@ -1,5 +1,5 @@
 $schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json
-name: project-ai-copilot-demo-001
+name: project-ai-copilot-demo-003
 description: This configuration specifies a workspace configuration with existing dependent resources
 display_name: project-ai-copilot-demo-001
 location: east us

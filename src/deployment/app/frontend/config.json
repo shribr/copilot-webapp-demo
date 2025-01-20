@@ -1,5 +1,5 @@
 {
-  "AUTHENTICATION_MODE": "MSAL",
+  "AUTHENTICATION_MODE": "API_KEY",
   "AZURE_OPENAI_SERVICE_API_KEY": "7b383fe6319c4df599b4d5785ff91a08",
   "AZURE_OPENAI_SERVICE_SECRET_NAME": "OpenAIServiceApiKey",
   "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-003",
@@ -26,7 +26,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-17T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bqft&srt=co&sig=CUCJOlq2vY3Sy6tAyZarzA4D5hbwucD0Ei8LSkdHyPQ%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-17T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tqbf&srt=co&sig=N6fjciVLadYf7zBLDEvedpHdH9seIYTkZ9y3O8rMXT4%3D",
   "AZURE_STORAGE_KEY": "jYy8/ofa3EjnJZ8FJxXPA2VgCbiME3PPwqHyTkOBhaGi4Cu445C3gFjdO3hqZIV4T3l/v+sJCec3+AStIfq/eA==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -89,13 +89,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "bqft",
+    "SS": "tqbf",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-01-17T23:59:59Z",
     "ST": "2025-01-17T23:59:59Z",
     "SPR": "https",
-    "SIG": "CUCJOlq2vY3Sy6tAyZarzA4D5hbwucD0Ei8LSkdHyPQ%3D",
+    "SIG": "N6fjciVLadYf7zBLDEvedpHdH9seIYTkZ9y3O8rMXT4%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
