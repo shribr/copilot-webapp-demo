@@ -470,11 +470,11 @@ NOTE: Another issue with the whole Azure AI project is that because the script c
 
 The next few screenshots outline the manual steps you need to take in order to configure the AI Project.
 
-1. Create new AI project and specify existing hub from your resource group. <sup>[6](#ai_studio_project_create)</sup>
-2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[7](#ai_studio_project_models_assets_menu)</sup>
-3. Select asset. <sup>[8](#ai_studio_project_select_assets)</sup>
-4. Select existing AI service from your resource group. <sup>[9](#ai_studio_project_select_ai_resource)</sup>
-5. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[10](#ai_studio_project_add_models)</sup>
+1. Create new AI project and specify existing hub from your resource group. <sup>[7](#ai_studio_project_create)</sup>
+2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[8](#ai_studio_project_models_assets_menu)</sup>
+3. Select asset. <sup>[9](#ai_studio_project_select_assets)</sup>
+4. Select existing AI service from your resource group. <sup>[10](#ai_studio_project_select_ai_resource)</sup>
+5. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[11](#ai_studio_project_add_models)</sup>
 
 <img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project-create.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
