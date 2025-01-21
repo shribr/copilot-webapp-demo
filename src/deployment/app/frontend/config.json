@@ -26,7 +26,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-18T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=qfbt&srt=co&sig=SFr0sGqLCj3buf1sh4VSzLuwoXVplqnw9sLXto00ZqU%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=btfq&srt=co&sig=zBQAOCLtV22GGjQFEg63/Dr1WcV/CmY3emqc1JekLWY%3D",
   "AZURE_STORAGE_KEY": "jYy8/ofa3EjnJZ8FJxXPA2VgCbiME3PPwqHyTkOBhaGi4Cu445C3gFjdO3hqZIV4T3l/v+sJCec3+AStIfq/eA==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -43,28 +43,28 @@
   "SITE_LOGO": "default",
   "AI_MODELS": [
     {
-      "Format": "OpenAI",
       "Name": "gpt-4o",
-      "Type": "gpt-4o",
-      "ApiKey": "7b383fe6319c4df599b4d5785ff91a08",
-      "ApiVersion": "2024-08-01-preview",
-      "ModelVersion": null,
       "Sku": {
         "Name": "Standard",
         "Capacity": 100
-      }
+      },
+      "ApiKey": "7b383fe6319c4df599b4d5785ff91a08",
+      "ModelVersion": null,
+      "Type": "gpt-4o",
+      "ApiVersion": "2024-08-01-preview",
+      "Format": "OpenAI"
     },
     {
-      "Format": "OpenAI",
       "Name": "text-embedding",
-      "Type": "text-embedding-3-large",
-      "ApiKey": "7b383fe6319c4df599b4d5785ff91a08",
-      "ApiVersion": "2023-05-15",
-      "ModelVersion": null,
       "Sku": {
         "Name": "Standard",
         "Capacity": 100
-      }
+      },
+      "ApiKey": "7b383fe6319c4df599b4d5785ff91a08",
+      "ModelVersion": null,
+      "Type": "text-embedding-3-large",
+      "ApiVersion": "2023-05-15",
+      "Format": "OpenAI"
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -89,20 +89,19 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "qfbt",
+    "SS": "btfq",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-01-18T23:59:59Z",
-    "ST": "2025-01-18T23:59:59Z",
+    "SE": "2026-01-19T23:59:59Z",
+    "ST": "2025-01-19T23:59:59Z",
     "SPR": "https",
-    "SIG": "SFr0sGqLCj3buf1sh4VSzLuwoXVplqnw9sLXto00ZqU%3D",
+    "SIG": "zBQAOCLtV22GGjQFEg63/Dr1WcV/CmY3emqc1JekLWY%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
-    "top_p": 0.95,
-    "presence_penalty": 0,
+    "stop": null,
     "messages": [
       {
         "role_information": "You are a helpful assistant",
@@ -110,28 +109,29 @@
         "role": "system"
       },
       {
-        "content": "",
-        "role": "user"
+        "role": "user",
+        "content": ""
       }
     ],
+    "presence_penalty": 0,
+    "top_p": 0.95,
     "temperature": 0.7,
-    "stop": null,
-    "max_tokens": 800,
-    "stream": false,
     "frequency_penalty": 0,
     "data_sources": [
       {
         "type": "azure_search",
         "parameters": {
-          "endpoint": "https://srch-copilot-demo-003.search.windows.net",
           "index_name": "vector-srch-index-copilot-demo-003",
           "authentication": {
             "type": "api_key",
             "key": "SGiX1GaeJLIA7YMJ55ZLZqOnqnCC7PEsXugYhHCE2QAzSeCCe5DK"
-          }
+          },
+          "endpoint": "https://srch-copilot-demo-003.search.windows.net"
         }
       }
-    ]
+    ],
+    "stream": false,
+    "max_tokens": 800
   },
   "CHAT_PERSONAS": [
     {
@@ -209,7 +209,7 @@
     {
       "Type": "Tech Enthusiast",
       "Description": "You are a tech enthusiast who loves to talk about the latest tech trends and gadgets. You are very knowledgeable about the latest tech news and tips. Your primary focus is on network threats and security.",
-      "Prompt": "You area a tech enthusiast who is snarky, obnoxious, sarcastic and condescending.",
+      "Prompt": "You area a tech enthusiast who is snarky, extrmely obnoxious, sarcastic and condescending. You discuss the topic at hand but not with much enthusiasm.",
       "NoResults": "Um...yeah, I'm gonna have to say no to that one."
     },
     {
@@ -253,13 +253,13 @@
     {
       "type": "azure_search",
       "parameters": {
-        "role_information": "",
-        "endpoint": "https://srch-copilot-demo-003.search.windows.net",
         "index_name": "vector-srch-index-copilot-demo-003",
         "authentication": {
           "type": "api_key",
           "key": "SGiX1GaeJLIA7YMJ55ZLZqOnqnCC7PEsXugYhHCE2QAzSeCCe5DK"
-        }
+        },
+        "role_information": "",
+        "endpoint": "https://srch-copilot-demo-003.search.windows.net"
       }
     }
   ],

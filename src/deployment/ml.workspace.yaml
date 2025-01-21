@@ -1,19 +1,19 @@
 $schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json
-name: project-ai-copilot-demo-001
-resource_group: RG-COPILOT-DEMO-001
+name: project-ai-copilot-demo-003
+resource_group: RG-COPILOT-DEMO-003
 location: eastus
-display_name: project-ai-copilot-demo-001
+display_name: project-ai-copilot-demo-003
 description: This configuration specifies a workspace configuration with existing dependent resources
-storage_account: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-001/providers/Microsoft.Storage/storageAccounts/stcopilotdemo001
-container_registry: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-001/providers/Microsoft.ContainerRegistry/registries/crcopilotdemo001
-key_vault: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-001/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-001
-application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-001/providers/Microsoft.insights/components/appi-copilot-demo-001
-#workspace_hub: hub-ai-copilot-demo-001
+storage_account: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.Storage/storageAccounts/stcopilotdemo003
+container_registry: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.ContainerRegistry/registries/crcopilotdemo003
+key_vault: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.KeyVault/vaults/kv-copilot-demo-003
+application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.insights/components/appi-copilot-demo-003
+#workspace_hub: hub-ai-copilot-demo-003
 identity:
   type: user_assigned
   tenant_id: e362c86f-e64a-4e58-b26a-c8bf314b1093
   principal_id: f845ebcf-1b17-4e94-a21e-f1e350c96875
   user_assigned_identities: 
-    /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-copilot-demo-001: {}
+    /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-003/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-copilot-demo-003: {}
 #tags:
 #  purpose: Azure AI Hub Project

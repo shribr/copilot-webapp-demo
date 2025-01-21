@@ -2899,8 +2899,8 @@ function New-SearchService {
         [array]$existingResources
     )
 
-    az provider show --namespace Microsoft.Search --query "resourceTypes[?resourceType=='searchServices'].apiVersions"
-
+    #az provider show --namespace Microsoft.Search --query "resourceTypes[?resourceType=='searchServices'].apiVersions"
+    
     if ($existingResources -notcontains $searchServiceName) {
         $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
         #$searchServiceSku = "basic"

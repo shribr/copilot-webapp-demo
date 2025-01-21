@@ -71,7 +71,11 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": ["text", "hybrid", "vector"],
+    "RetrievalModel": [
+      "text",
+      "hybrid",
+      "vector"
+    ],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -87,7 +91,7 @@
     "ResourceGroup": "RG-COPILOT-DEMO-003",
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
   },
-  "appRegistrationClientId": "18f666b1-a578-40b5-81bd-678c86783715",
+  "appRegistrationClientId": "1b8ecdeb-6df6-4667-a4f3-3dd00b135bde",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
@@ -221,7 +225,7 @@
     },
     {
       "Description": "You are a tech enthusiast who loves to talk about the latest tech trends and gadgets. You are very knowledgeable about the latest tech news and tips. You are also very friendly and love to meet new people.",
-      "Prompt": "You area a tech enthusiast who is snarky, obnoxious, sarcastic and condescending.",
+      "Prompt": "You area a tech enthusiast who is snarky, extrmely obnoxious, sarcastic and condescending. You discuss the topic at hand but not with much enthusiasm.",
       "Type": "Tech Enthusiast"
     },
     {
@@ -351,7 +355,7 @@
     "Website": "https://www.contoso.com"
   },
   "portalDashboardName": "portaldash-copilot-demo-003",
-  "previousResourceBaseName": "copilot-demo-005",
+  "previousResourceBaseName": "copilot-demo-002",
   "privateEndpoints": [
     {
       "Location": "east us",
