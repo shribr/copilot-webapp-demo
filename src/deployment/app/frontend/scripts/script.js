@@ -632,7 +632,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
         let answerListHTML = '';
 
-        if (azureOpenAIResults[0].error && azureOpenAIResults[0].error.code == 429) {
+        if (azureOpenAIResults[0].error && (azureOpenAIResults[0].error.code == 429 || azureOpenAIResults[0].error.code == 400)) {
 
             answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
             console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
@@ -1450,7 +1450,7 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
         return data;
     }
     catch (error) {
-        if (error.code == 429) {
+        if (error.code == 429 || error.code == 400) {
 
             const data = { error: 'Token rate limit exceeded. Please try again later.' };
             console.error('Token rate limit exceeded. Please try again later.', error);

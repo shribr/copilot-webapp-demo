@@ -1,5 +1,5 @@
 {
-  "AUTHENTICATION_MODE": "API_KEY",
+  "AUTHENTICATION_MODE": "MSAL",
   "AZURE_OPENAI_SERVICE_API_KEY": "7b383fe6319c4df599b4d5785ff91a08",
   "AZURE_OPENAI_SERVICE_SECRET_NAME": "OpenAIServiceApiKey",
   "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-003",
@@ -26,7 +26,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-18T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=qfbt&srt=co&sig=SFr0sGqLCj3buf1sh4VSzLuwoXVplqnw9sLXto00ZqU%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-18T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=qbft&srt=co&sig=Z6N2xQAiD3J48ROOPXpbku/X7CA0JTShGGA38fSswkk%3D",
   "AZURE_STORAGE_KEY": "jYy8/ofa3EjnJZ8FJxXPA2VgCbiME3PPwqHyTkOBhaGi4Cu445C3gFjdO3hqZIV4T3l/v+sJCec3+AStIfq/eA==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -89,13 +89,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "qfbt",
+    "SS": "qbft",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-01-18T23:59:59Z",
     "ST": "2025-01-18T23:59:59Z",
     "SPR": "https",
-    "SIG": "SFr0sGqLCj3buf1sh4VSzLuwoXVplqnw9sLXto00ZqU%3D",
+    "SIG": "Z6N2xQAiD3J48ROOPXpbku/X7CA0JTShGGA38fSswkk%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -209,7 +209,7 @@
     {
       "Type": "Tech Enthusiast",
       "Description": "You are a tech enthusiast who loves to talk about the latest tech trends and gadgets. You are very knowledgeable about the latest tech news and tips. Your primary focus is on network threats and security.",
-      "Prompt": "You area a tech enthusiast who is snarky, obnoxious, sarcastic and condescending.",
+      "Prompt": "You area a tech enthusiast who speals in a snarky, obnoxious, sarcastic and condescending tone.",
       "NoResults": "Um...yeah, I'm gonna have to say no to that one."
     },
     {
