@@ -104,7 +104,7 @@ $(document).ready(async function () {
 
     const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
 
-    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+    getDocuments(storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
 
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatDisplay = document.getElementById('chat-display');
@@ -1206,7 +1206,7 @@ async function getChatResponse(questionBubble) {
 }
 
 //code to get documents from Azure Storage
-async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
+async function getDocuments(storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
     try {
         const response = await fetch(`${fullStorageUrl}`, {
@@ -1222,7 +1222,7 @@ async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sa
             // Parse the XML response
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(data, "text/xml");
-            blobs = xmlDoc.getElementsByTagName("Blob");
+            const blobs = xmlDoc.getElementsByTagName("Blob");
 
             // Render documents
             //renderDocuments(blobs);
@@ -2104,7 +2104,7 @@ async function uploadFilesToAzure(files) {
             if (response.ok) {
                 showToastNotification(`Upload successful for ${file.name}.`, true);
                 console.log(`Upload successful for ${file.name}.`);
-                getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
+                getDocuments(storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
             } else {
                 const errorText = await response.text();
                 showToastNotification(`Error uploading file ${file.name} to Azure Storage: ${errorText}`, false);

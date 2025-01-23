@@ -845,6 +845,7 @@ function Initialize-Parameters {
     $global:appServicePlanName = $parametersObject.appServicePlanName
     $global:appServicePlanSku = $parametersObject.appServicePlanSku
     $global:appServices = $parametersObject.appServices
+    $global:azureManagement = $parametersObject.azureManagement
     $global:blobStorageAccountName = $parametersObject.blobStorageAccountName
     $global:blobStorageContainerName = $parametersObject.blobStorageContainerName
     $global:cognitiveServiceName = $parametersObject.cognitiveServiceName
@@ -988,6 +989,7 @@ function Initialize-Parameters {
         appServicePlanName           = $appServicePlanName
         appServicePlanSku            = $appServicePlanSku
         appServices                  = $appServices
+        azureManagement              = $azureManagement
         blobStorageAccountName       = $blobStorageAccountName
         blobStorageContainerName     = $blobStorageContainerName
         cognitiveServiceName         = $cognitiveServiceName
@@ -1329,14 +1331,42 @@ function New-ApiManagementService {
     if ($existingResources -notcontains $apiManagementServiceName) {
         try {
             $ErrorActionPreference = 'Stop'
-            $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait
+            $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait --output none 2>&1
 
             Write-Host $jsonOutput
 
-            $global:resourceCounter += 1
-            Write-Host "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]"
-            Write-Log -message "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+            if ($jsonOutput -match "error") {
 
+                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+
+                $errorName = $errorInfo["Error"]
+                $errorCode = $errorInfo["Code"]
+                $errorDetails = $errorInfo["Message"]
+
+                $errorMessage = "Failed to create API Management Service '$apiManagementServiceName'. `
+        Error: $errorName `
+        Code: $errorCode `
+        Message: $errorDetails"
+
+                # Check if the error is due to soft deletion
+                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
+                    # Attempt to restore the soft-deleted Cognitive Services account
+                    Restore-SoftDeletedResource -resourceName $apiManagementServiceName -resourceType "ApiManagementService" -location $location -resourceGroupName $resourceGroupName
+                }
+                else {
+                    Write-Error "Failed to create API Management Service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create API Management Service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                }
+            }
+            else {
+
+                $global:resourceCounter += 1
+                Write-Host "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]"
+                Write-Log -message "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+            }
             # Check if the API already exists
             $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
             if (-not $apiExists) {
@@ -1446,7 +1476,15 @@ function New-App-Registration {
             if (-not $existingPermission) {
 
                 try {
-                    az ad app permission add --id $appId --api $permission.resourceAppId --api-permissions $permissions
+
+                    $permissionResourceAppId = $permission.resourceAppId
+
+                    $apiPermissions = "$($permission.resourceAccess.id)=$($permission.resourceAccess.type)"
+                    Write-Host "API Permissions: $apiPermissions"
+
+                    #For some reason using the variables is not working with the command below
+                    az ad app permission add --id $appId --api $permissionResourceAppId --api-permissions $apiPermissions
+                    #az ad app permission add --id $appId --api $permission.resourceAppId --api-permissions $permissions=Scope
 
                     Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully."
                     Write-Log -message "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully." -logFilePath $global:LogFilePath
@@ -1457,7 +1495,7 @@ function New-App-Registration {
                 }
 
                 try {
-                    az ad app permission grant --id $appId --api $permission.resourceAppId --scope $permissions
+                    az ad app permission grant --id $appId --api $permissionResourceAppId --scope $permissions
 
                     Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId granted successfully."
                     Write-Log -message "Permission '$permissions' for '$appServiceName' with App ID: $appId granted successfully." -logFilePath $global:LogFilePath
@@ -1502,7 +1540,7 @@ function New-App-Registration {
             $identifierUris = "api://$global:appRegistrationClientId"
 
             # Update the identifierUris and oauth2PermissionScopes properties
-            $app.identifierUris = $identifierUris
+            #$app.identifierUris = $identifierUris
             $app.api.oauth2PermissionScopes += $apiScopes
     
             # Convert the updated manifest back to JSON
@@ -1514,7 +1552,7 @@ function New-App-Registration {
             
             az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
             az ad app update --id $appId --set "api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)"
-            az ad app update --id $appId --identifier-uris $identifierUris
+            #az ad app update --id $appId --identifier-uris $identifierUris
 
             Write-Host "Scope for app '$appServiceName' added successfully."
             Write-Log -message "Scope for app '$appServiceName' added successfully." -logFilePath $global:LogFilePath
@@ -1806,6 +1844,12 @@ function New-CognitiveServicesAccount {
                 $global:resourceCounter += 1
                 Write-Host "Cognitive Services account '$cognitiveServiceName' created successfully. [$global:resourceCounter]"
                 Write-Log -message "Cognitive Services account '$cognitiveServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+
+                # Assign managed identity to the Cognitive Services account
+                az cognitiveservices account identity assign --name $cognitiveServiceName --resource-group $resourceGroupName
+
+                Write-Host "Managed identity '$userAssignedIdentityName' assigned to Cognitive Services account '$cognitiveServiceName'."
+                Write-Log -message "Managed identity '$userAssignedIdentityName' assigned to Cognitive Services account '$cognitiveServiceName'."
             }
         }
         catch {
@@ -2704,13 +2748,11 @@ function New-SearchDataSource {
             }
         }
 
-        # I need to add the identity property to the body hashtable
-        <#
- # {        identity    = @{
-                odata                = "#Microsoft.Azure.Search.DataUserAssignedIdentity"
-                userAssignedIdentity = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
-            }:Enter a comment or description}
-#>
+        # The code below is not supported by the Azure CLI
+        # identity    = @{
+        #     odata                = "#Microsoft.Azure.Search.DataUserAssignedIdentity"
+        #     userAssignedIdentity = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
+        # }
 
         # Convert the body hashtable to JSON
         $jsonBody = $body | ConvertTo-Json -Depth 10
@@ -2726,6 +2768,7 @@ function New-SearchDataSource {
             return true
         }
         catch {
+
             Write-Error "Failed to create datasource '$searchDatasourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create datasource '$searchDatasourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
@@ -2926,7 +2969,7 @@ function New-SearchService {
             $global:KeyVaultSecrets.SearchServiceApiKey = $global:searchServiceApiKey
 
             $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
-            $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
+            $searchManagementUrl += "?api-version=$global:azureManagement.ApiVersion"
 
             #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
             # az search service update --name $searchServiceName --resource-group $resourceGroupName --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
@@ -2934,41 +2977,37 @@ function New-SearchService {
 
             try {
                 $ErrorActionPreference = 'Continue'
-
-                <#
-                # {                $body = @{
-                                    location   = $location.Replace(" ", "")
-                                    sku        = @{
-                                        name = "basic"
-                                    }
-                                    properties = @{
-                                        replicaCount   = 1
-                                        partitionCount = 1
-                                        hostingMode    = "default"
-                                    }
-                                    identity   = @{
-                                        type                   = "UserAssigned, SystemAssigned"
-                                        userAssignedIdentities = @{
-                                            "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
-                                        }
-                                    }
-                                }:Enter a comment or description}
-                #>
+                $body = @{
+                    location   = $location.Replace(" ", "")
+                    sku        = @{
+                        name = "basic"
+                    }
+                    properties = @{
+                        replicaCount   = 1
+                        partitionCount = 1
+                        hostingMode    = "default"
+                    }
+                    identity   = @{
+                        type                   = "SystemAssigned, UserAssigned"
+                        userAssignedIdentities = @{
+                            "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+                        }
+                    }
+                }
 
                 # Convert the body hashtable to JSON
-                <#
-                # {                $jsonBody = $body | ConvertTo-Json -Depth 10
+            
+                $jsonBody = $body | ConvertTo-Json -Depth 10
 
-                                $accessToken = (az account get-access-token --query accessToken -o tsv)
+                $accessToken = (az account get-access-token --query accessToken -o tsv)
 
-                                $headers = @{
-                                    "api-key"       = $searchServiceApiKey
-                                    "Authorization" = "Bearer $accessToken"  # Add the authorization header
-                                }:Enter a comment or description}
-                #>
+                $headers = @{
+                    "api-key"       = $searchServiceApiKey
+                    "Authorization" = "Bearer $accessToken"  # Add the authorization header
+                }
 
                 #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-                #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+                Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
 
             }
             catch {
@@ -3076,51 +3115,47 @@ function New-SearchService {
         $global:KeyVaultSecrets.SearchServiceApiKey = $global:searchServiceApiKey
 
         $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
-        $searchManagementUrl += "?api-version=$global:searchServiceApiVersion"
+        $searchManagementUrl += "?api-version=$global:azureManagement.ApiVersion"
 
-        try {
-            $ErrorActionPreference = 'Continue'
+        # try {
+        #     $ErrorActionPreference = 'Continue'
 
-            <#
-            # {            $body = @{
-                            location   = $location.Replace(" ", "")
-                            sku        = @{
-                                name = "basic"
-                            }
-                            properties = @{
-                                replicaCount   = 1
-                                partitionCount = 1
-                                hostingMode    = "default"
-                            }
-                            identity   = @{
-                                type                   = "UserAssigned, SystemAssigned"
-                                userAssignedIdentities = @{
-                                    "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
-                                }
-                            }
-                        }:Enter a comment or description}
-            #>
+        #     $body = @{
+        #         location   = $location.Replace(" ", "")
+        #         sku        = @{
+        #             name = "basic"
+        #         }
+        #         properties = @{
+        #             replicaCount   = 1
+        #             partitionCount = 1
+        #             hostingMode    = "default"
+        #         }
+        #         identity   = @{
+        #             type                   = "SystemAssigned, UserAssigned"
+        #             userAssignedIdentities = @{
+        #                 "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+        #             }
+        #         }
+        #     }
 
-            # Convert the body hashtable to JSON
-            <#
-            # {            $jsonBody = $body | ConvertTo-Json -Depth 10
+        #     # Convert the body hashtable to JSON
+        #     $jsonBody = $body | ConvertTo-Json -Depth 10
 
-                        $accessToken = (az account get-access-token --query accessToken -o tsv)
+        #     $accessToken = (az account get-access-token --query accessToken -o tsv)
 
-                        $headers = @{
-                            "api-key"       = $searchServiceApiKey
-                            "Authorization" = "Bearer $accessToken"  # Add the authorization header
-                        }:Enter a comment or description}
-            #>
+        #     $headers = @{
+        #         "api-key"       = $searchServiceApiKey
+        #         "Authorization" = "Bearer $accessToken"  # Add the authorization header
+        #     }
 
-            #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-            # Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+        #     #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+        #     Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
 
-        }
-        catch {
-            Write-Error "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        }
+        # }
+        # catch {
+        #     Write-Error "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        #     Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        # }
     }
 
     try {
@@ -3191,6 +3226,9 @@ function New-SearchService {
                 }
 
                 Start-Sleep -Seconds 10
+            }
+            else {
+                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
             }
         }
         catch {
@@ -3529,6 +3567,21 @@ function Restore-SoftDeletedResource {
             # Code to restore Storage Account
             Write-Output "Restoring Storage Account: $resourceName"
 
+        }
+        "ApiManagementService" {
+            # Code to restore Cognitive Service
+            try {
+                Write-Output "Restoring API Management Service: $resourceName"
+                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
+
+                $global:resourceCounter += 1
+                Write-Host "API Management Service '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "API Management Service '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to restore API Management Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore  API Management Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
         "AppService" {
             # Code to restore App Service
@@ -4086,7 +4139,9 @@ function Start-Deployment {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
         }
 
-        New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
+        if ($appService.Name -ne $functionAppServiceName) {
+            New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
+        }
     }
 
     # End the timer

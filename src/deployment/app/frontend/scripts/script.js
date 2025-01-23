@@ -1720,7 +1720,7 @@ async function renderPanelIcons() {
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
-    const apiKey = config.AZURE_SEARCH_API_KEY;
+    let searchApiKey = config.AZURE_SEARCH_API_KEY;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
@@ -1729,28 +1729,31 @@ async function runSearchIndexer(searchIndexers) {
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
 
-    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
+    if (authMode === 'MSAL') {
 
-    const tokenRequest = {
-        scopes: [`${keyVaultEndPoint}`],
-        account: activeAccount
-    };
+        const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
 
-    let tokenResponse;
+        const tokenRequest = {
+            scopes: [`${keyVaultEndPoint}`],
+            account: activeAccount
+        };
 
-    try {
-        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-        console.log("Token acquired silently");
-    } catch (silentError) {
-        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-        console.log("Token acquired via popup");
+        let tokenResponse;
+
+        try {
+            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+            console.log("Token acquired silently");
+        } catch (silentError) {
+            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+            console.log("Token acquired via popup");
+        }
+
+        const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+
+        // Insert a delay of 5 seconds
+        await new Promise(resolve => setTimeout(resolve, 5000));
     }
-
-    const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-
-    // Insert a delay of 5 seconds
-    await new Promise(resolve => setTimeout(resolve, 5000));
 
     // Iterate over the search indexers and run each one
     for (const searchIndexer of searchIndexers) {

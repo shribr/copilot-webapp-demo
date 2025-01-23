@@ -6,42 +6,64 @@
     "knownClientApplications": [],
     "oauth2PermissionScopes": [
       {
-        "id": "a8b8a206-e4db-4b76-ae35-e21d3a8f2bf0",
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "adminConsentDescription": "Allows admin to manage data in the key vault",
+        "adminConsentDisplayName": "Manage Key Vault Data",
+        "id": "5db40993-622b-48e9-81a4-a4caf9af9ebc",
         "isEnabled": true,
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "adminConsentDisplayName": "Access API as user",
-        "userConsentDisplayName": "Access API as user",
-        "value": "access_as_user",
-        "type": "User"
+        "type": "User",
+        "userConsentDescription": null,
+        "userConsentDisplayName": "Read Key Vault Secrets",
+        "value": "key_vault_read"
       },
       {
-        "id": "118c8f8c-e5a1-4f13-b3df-3b7e08437c11",
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "adminConsentDescription": "Allow the app to read the signed-in users files.",
+        "adminConsentDisplayName": "Read User Files",
+        "id": "f2d6c95f-f070-46c0-abe4-1dd5e27608e3",
         "isEnabled": true,
-        "adminConsentDescription": "Allow the application to read data from the API.",
-        "adminConsentDisplayName": "Read data from API",
+        "type": "User",
+        "userConsentDescription": "Allow the app to read your files.",
+        "userConsentDisplayName": "Read your files",
+        "value": "access_as_user"
+      },
+      {
+        "userConsentDisplayName": "Access API as user",
+        "type": "User",
+        "adminConsentDisplayName": "Access API as user",
+        "id": "c205e8da-9782-4760-94fa-8fd53fc15537",
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
+        "value": "access_as_user",
+        "isEnabled": true
+      },
+      {
         "userConsentDisplayName": "Read data from API",
+        "type": "User",
+        "adminConsentDisplayName": "Read data from API",
+        "id": "94b538bf-af91-4507-8982-89f3dfa8d5b9",
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "adminConsentDescription": "Allow the application to read data from the API.",
         "value": "read_data",
-        "type": "User"
+        "isEnabled": true
       }
     ],
     "preAuthorizedApplications": [],
     "requestedAccessTokenVersion": 2
   },
-  "appId": "18f666b1-a578-40b5-81bd-678c86783715",
+  "appId": "5e552b83-64ea-4fd2-bbcf-2075ec24af50",
   "appRoles": [],
   "applicationTemplateId": null,
   "certification": null,
-  "createdDateTime": "2025-01-19T18:01:40Z",
+  "createdDateTime": "2025-01-21T18:42:42Z",
   "defaultRedirectUri": null,
   "deletedDateTime": null,
   "description": null,
   "disabledByMicrosoftStatus": null,
-  "displayName": "func-copilot-demo-003",
+  "displayName": "app-copilot-demo-004",
   "groupMembershipClaims": null,
-  "id": "759c7b31-3442-4b3c-8787-359c821a8412",
-  "identifierUris": "api://18f666b1-a578-40b5-81bd-678c86783715",
+  "id": "15f60757-c91f-49f5-b807-53b3241b3b01",
+  "identifierUris": [
+    "api://5e552b83-64ea-4fd2-bbcf-2075ec24af50"
+  ],
   "info": {
     "logoUrl": null,
     "marketingUrl": null,
@@ -66,6 +88,15 @@
   "publisherDomain": "FedAIRS.onmicrosoft.com",
   "requestSignatureVerification": null,
   "requiredResourceAccess": [
+    {
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        }
+      ],
+      "resourceAppId": "00000004-0000-0000-c000-000000000000"
+    },
     {
       "resourceAccess": [
         {
