@@ -108,7 +108,7 @@
       ]
     }
   ],
-  "appDeploymentOnly": false,
+  "appDeploymentOnly": true,
   "appInsightsName": "appi-copilot-demo-004",
   "appServiceEnvironmentName": "ase-copilot-demo-004",
   "appServicePlanName": "asp-copilot-demo-004",

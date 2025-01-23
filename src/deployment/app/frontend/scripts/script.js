@@ -559,10 +559,28 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                 const answer = choice.message;
                 const role = answer.role;
-                var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
+                let rawText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
 
-                numOccurrences = countOccurrences(answerText, "[$$$$]");
-                followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
+                //let answerText = ensureDollarSigns(rawText);
+                let answerText = rawText;
+
+                console.log(answerText);
+
+                //numOccurrences = countOccurrences(answerText, "[$$$$]");
+                numOccurrences = countQuadrupleDollarSigns(answerText);
+
+                if (numOccurrences != 2) {
+                    answerText = insertDollarSigns(answerText);
+                    numOccurrences = countQuadrupleDollarSigns(answerText);
+                }
+
+                followUpQuestions = numOccurrences > 1 ? answerText.split("$$$$")[2] : "";
+
+                console.log('Number of occurrences of $$$$:', numOccurrences);
+
+                if (followUpQuestions.length > 0) {
+                    followUpQuestions = followUpQuestions.trim();
+                }
 
                 //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
@@ -698,9 +716,23 @@ function collectChatResults(chatResultsId) {
 
 // Function to count the number of occurrences of a string in another string
 function countOccurrences(mainString, searchString) {
-    const regex = new RegExp(searchString, 'g');
+
+    //const count = countQuadrupleDollarSigns(mainString);
+
+    const regex = new RegExp(searchString.replace(/\$/g, '\\$'), 'g');
     const matches = mainString.match(regex);
     return matches ? matches.length : 0;
+}
+
+function countQuadrupleDollarSigns(str) {
+    const regex = /\$\$\$\$/g;
+    let count = 0;
+    let match;
+    while ((match = regex.exec(str)) !== null) {
+        count++;
+    }
+
+    return count;
 }
 
 //function to create side navigation links
@@ -761,10 +793,10 @@ function createTabs(responseTabs) {
     return tabs;
 }
 
-// Function to create tab contents for follow-up questions
+// Function to create tab contents for follow-up questions [NOT USED]
 function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsContent) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error && azureOpenAIResults[0].choices) {
 
         var followUpQuestionsResults = "";
 
@@ -772,10 +804,18 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
 
             const answerText = choice.message.content.replace("**", "");
 
-            numOccurrences = countOccurrences(answerText, "[$$$$]");
-            const followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
+            //numOccurrences = countOccurrences(answerText, "[$$$$]");
+            numOccurrences = countQuadrupleDollarSigns(answerText);
 
-            if (followUpQuestions) {
+            if (numOccurrences != 2) {
+                answerText = insertDollarSigns(answerText);
+                numOccurrences = countQuadrupleDollarSigns(answerText);
+            }
+
+            const followUpQuestions = numOccurrences > 1 ? answerText.split("$$$$")[2] : "";
+
+            if (followUpQuestions.length > 0) {
+                followUpQuestions = followUpQuestions.trim();
                 followUpQuestionsResults += followUpQuestions;
             }
         }
@@ -861,7 +901,14 @@ function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) 
 
             const answerText = choice.message.content.replace(/\*\*/g, "");
 
-            numOccurrences = countOccurrences(answerText, "[$$$$]");
+            //numOccurrences = countOccurrences(answerText, "[$$$$]");
+            numOccurrences = countQuadrupleDollarSigns(answerText);
+
+            if (numOccurrences != 2) {
+                answerText = insertDollarSigns(answerText);
+                numOccurrences = countQuadrupleDollarSigns(answerText);
+            }
+
             const thoughtProcess = numOccurrences > 1 ? answerText.split("$$$$")[1].trim() : "";
 
             if (thoughtProcess) {
@@ -897,6 +944,21 @@ function downloadChatResults(event) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+// Function to make sure $$$$ exists in query response.
+function ensureDollarSigns(text) {
+    // Split the text into paragraphs
+    let paragraphs = text.split('\n\n');
+
+    // Check if the second paragraph starts with $$$$
+    if (!paragraphs[1].startsWith('$$$$')) {
+        // Insert $$$$ at the beginning of the second paragraph
+        paragraphs[1] = '$$$$\n\n' + paragraphs[1];
+    }
+
+    // Join the paragraphs back into a single string
+    return paragraphs.join('\n\n');
 }
 
 // Function to fetch the configuration
@@ -1399,6 +1461,37 @@ async function initMSALInstance(config) {
         });
 }
 
+// Function to insert dollar signs at the end of the last sentence before an ordered list
+function insertDollarSigns(str) {
+    // Find the index of the <ol> tag
+    const olIndex = str.indexOf('<ol');
+
+    if (olIndex === -1) {
+        // If no <ol> tag is found, return the original string
+        return str;
+    }
+
+    // Find the last period before the <ol> tag (we look for the last period before the <ol> tag starts)
+    const lastPeriodIndex = str.lastIndexOf('.', olIndex);
+
+    if (lastPeriodIndex === -1) {
+        // If there's no period before the <ol> tag, return the original string (no sentence end found)
+        return str;
+    }
+
+    // Extract the last sentence before the <ol> tag
+    const lastSentence = str.slice(lastPeriodIndex + 1, olIndex).trim();
+
+    // Check if the last sentence contains $$$$
+    if (!lastSentence.includes('$$$$')) {
+        // If $$$$ is not present, insert $$$$ after the period at the end of the last sentence
+        return str.slice(0, lastPeriodIndex + 1) + ' $$$$' + str.slice(lastPeriodIndex + 1);
+    }
+
+    // If $$$$ is already present, return the string as is
+    return str;
+}
+
 // Function to call the rest API
 async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
@@ -1653,7 +1746,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             const nameLink = document.createElement('a');
             nameLink.href = blobUrl;
 
-            blobName = truncateString(blobName, 60);
+            blobName = truncateString(blobName, 40);
 
             nameLink.textContent = blobName;
             nameLink.target = '_blank';
