@@ -8,6 +8,8 @@ let originalDocumentCount = 0;
 let existingDocumentCount = 0;
 let filteredDocumentCount = 0;
 
+let authMode = '';
+
 let timerInterval;
 let startTime;
 
@@ -69,12 +71,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 $(document).ready(async function () {
 
-    //setChatDisplayHeight();
-    //logout();
-
     config = await fetchConfig();
 
-    await checkIfLoggedIn();
+    authMode = config.AUTHENTICATION_MODE;
+
+    if (authMode === 'MSAL') {
+        await checkIfLoggedIn();
+    }
 
     hideLeftNav();
 
@@ -104,7 +107,7 @@ $(document).ready(async function () {
 
     const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
 
-    getDocuments(storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
 
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatDisplay = document.getElementById('chat-display');
@@ -434,6 +437,12 @@ $(document).ready(async function () {
     addMessageToChatHistory(thread, system_message);
 
     previousPersona.Type = persona.Type;
+
+    if (authMode != 'MSAL') {
+        document.getElementById('user-profile-panel').style.display = 'none';
+        document.getElementById('link-user-profile').style.display = 'none';
+        document.getElementById('user-profile-icon').style.display = 'none';
+    }
 });
 
 // Function to build chat history
@@ -449,6 +458,8 @@ async function checkIfLoggedIn() {
 
     config = await fetchConfig();
 
+    authMode = config.AUTHENTICATION_MODE;
+
     const userProfilePanel = document.getElementById('user-profile-panel');
 
     const userProfileName = document.getElementById('user-profile-info-name-value');
@@ -458,24 +469,30 @@ async function checkIfLoggedIn() {
 
     const body = document.querySelector('body');
 
-    const accounts = msalInstance.getAllAccounts();
+    if (authMode === 'MSAL') {
+        const accounts = msalInstance.getAllAccounts();
 
-    if (accounts.length > 0) {
-        msalInstance.setActiveAccount(accounts[0]);
-        console.log("User is logged in:", accounts[0]);
-        userProfileName.innerText = accounts[0].name;
-        userProfileEmail.innerText = accounts[0].username;
+        if (accounts.length > 0) {
+            msalInstance.setActiveAccount(accounts[0]);
+            console.log("User is logged in:", accounts[0]);
+            userProfileName.innerText = accounts[0].name;
+            userProfileEmail.innerText = accounts[0].username;
 
-        activeAccount = accounts[0];
+            activeAccount = accounts[0];
 
+            body.style.display = 'flex';
+            //msalInstance.loginRedirect(loginRequest);
+            loggedIn = true;
+        } else {
+            console.log("No user is logged in.");
+
+            await login();
+            loggedIn = false;
+        }
+    }
+    else {
         body.style.display = 'flex';
-        //msalInstance.loginRedirect(loginRequest);
         loggedIn = true;
-    } else {
-        console.log("No user is logged in.");
-
-        await login();
-        loggedIn = false;
     }
 }
 
@@ -529,82 +546,101 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
 
-    var footNoteLinks = "";
+    let footNoteLinks = "";
+    let followUpQuestions = "";
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error && azureOpenAIResults[0].choices) {
 
         // Loop through the answers and create the response content   
-        for (const choice of azureOpenAIResults[0].choices) {
+        try {
+            for (const choice of azureOpenAIResults[0].choices) {
 
-            console.log(choice);
+                console.log(choice);
 
-            const answer = choice.message;
-            const role = answer.role;
-            var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
+                const answer = choice.message;
+                const role = answer.role;
+                var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
 
-            numOccurrences = countOccurrences(answerText, "[$$$$]");
-            var followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
+                numOccurrences = countOccurrences(answerText, "[$$$$]");
+                followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
 
-            //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
+                //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
-            answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
+                answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
 
-            const message = { "role": role, "content": answerText };
+                const message = { "role": role, "content": answerText };
 
-            if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
-                answerText = persona.NoResults;
-            }
-            else {
-                addMessageToChatHistory(thread, message);
-            }
-
-            const context = answer.context;
-
-            const citations = context.citations;
-
-            if (citations) {
-
-                console.log(citations);
-
-                for (const citation of citations) {
-                    const docTitle = citation.title;
-
-                    if (docTitle) {
-                        const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
-
-                        // Detect and replace [doc*] with [page *] and create hyperlink
-                        answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
-                            return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
-                        });
-
-                        if (!listedPaths.has(docTitle) && docTitle != "") {
-                            listedPaths.add(docTitle);
-
-                            sourceNumber++;
-
-                            const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
-
-                            citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
-
-                            footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                        }
-                        else {
-                            console.log(`Document already listed: ${docTitle}`);
-                        }
-                    }
-
+                if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
+                    answerText = persona.NoResults;
                 }
-            }
+                else {
+                    addMessageToChatHistory(thread, message);
+                }
 
-            const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+                const context = answer.context;
+
+                const citations = context.citations;
+
+                if (citations) {
+
+                    console.log(citations);
+
+                    for (const citation of citations) {
+                        const docTitle = citation.title;
+
+                        if (docTitle) {
+                            const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
+
+                            // Detect and replace [doc*] with [page *] and create hyperlink
+                            answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
+                                return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
+                            });
+
+                            if (!listedPaths.has(docTitle) && docTitle != "") {
+                                listedPaths.add(docTitle);
+
+                                sourceNumber++;
+
+                                const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
+
+                                citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+
+                                footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                            }
+                            else {
+                                console.log(`Document already listed: ${docTitle}`);
+                            }
+                        }
+
+                    }
+                }
+
+                const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+
+                answers += answerListHTML;
+
+            }
+        } catch (error) {
+            const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
 
             answers += answerListHTML;
-
+            console.error(error);
         }
 
     }
     else {
-        const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+
+        let answerListHTML = '';
+
+        if (azureOpenAIResults[0].error && (azureOpenAIResults[0].error.code == 429 || azureOpenAIResults[0].error.code == 400)) {
+
+            answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
+            console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
+        }
+        else {
+            answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+            console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
+        }
 
         answers += answerListHTML;
     }
@@ -670,8 +706,6 @@ function countOccurrences(mainString, searchString) {
 //function to create side navigation links
 async function createSidenavLinks() {
 
-
-
     try {
 
 
@@ -730,7 +764,7 @@ function createTabs(responseTabs) {
 // Function to create tab contents for follow-up questions
 function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsContent) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         var followUpQuestionsResults = "";
 
@@ -758,7 +792,7 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
 // Function to create tab contents for supporting content results returned from Azure Search
 function createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         //var answerResults = "";
         var citationContentResults = "";
@@ -818,7 +852,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 // Function to create tab contents for thought process content
 function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         var thoughtProcessResults = "";
         let numOccurrences = 0;
@@ -885,7 +919,6 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     if (!userInput) return;
 
-    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const apiVersion = config.OPENAI_API_VERSION;
@@ -899,6 +932,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
 
+    let searchApiKey = config.AZURE_SEARCH_API_KEY;
 
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
@@ -908,23 +942,25 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     openAIRequestBody.messages = [];
     openAIRequestBody.messages = thread.messages;
 
-    const tokenRequest = {
-        scopes: [`${keyVaultEndPoint}`],
-        account: activeAccount
-    };
+    if (authMode === "MSAL") {
+        const tokenRequest = {
+            scopes: [`${keyVaultEndPoint}`],
+            account: activeAccount
+        };
 
-    let tokenResponse;
+        let tokenResponse;
 
-    try {
-        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-        console.log("Token acquired silently");
-    } catch (silentError) {
-        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-        console.log("Token acquired via popup");
+        try {
+            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+            console.log("Token acquired silently");
+        } catch (silentError) {
+            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+            console.log("Token acquired via popup");
+        }
+
+        searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
     }
-
-    const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
 
     if (dataSources.length > 0) {
 
@@ -932,14 +968,16 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
         for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
-            //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
+            //If authMode is MSAL then we usw the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
+            //If the authMode is API_KEY then we just use the search API key directly from the config.json file.
             source.parameters.authentication.key = searchApiKey;
             //source.parameters.authentication.key = apiKey
             openAIRequestBody.data_sources.push(source);
 
             const jsonString = JSON.stringify(openAIRequestBody);
 
-            //We need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API
+            //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
+            //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
             const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
 
             results.push(result);
@@ -1205,8 +1243,8 @@ async function getChatResponse(questionBubble) {
     answerResponseNumber++;
 }
 
-//code to get documents from Azure Storage
-async function getDocuments(storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
+//Function to get documents from Azure Storage. This needs to be updated to have option to use MSAL in addition to API_KEY.
+async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
     try {
         const response = await fetch(`${fullStorageUrl}`, {
@@ -1222,7 +1260,7 @@ async function getDocuments(storageUrl, fullStorageUrl, containerName, sasToken,
             // Parse the XML response
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(data, "text/xml");
-            const blobs = xmlDoc.getElementsByTagName("Blob");
+            blobs = xmlDoc.getElementsByTagName("Blob");
 
             // Render documents
             //renderDocuments(blobs);
@@ -1365,7 +1403,7 @@ async function initMSALInstance(config) {
 async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
     let data = {};
-
+    let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
     const keyVaultName = config.AZURE_KEY_VAULT_NAME;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
@@ -1381,25 +1419,27 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
     };
 
     try {
-        let tokenResponse;
 
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
+        if (authMode === "MSAL") {
+            let tokenResponse;
+
+            try {
+                tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+                console.log("Token acquired silently");
+            } catch (silentError) {
+                console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+                tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+                console.log("Token acquired via popup");
+            }
+
+            openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
         }
-
-        const apiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-        //const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': `${apiKey}`,
+                'api-key': `${openAiApiKey}`,
                 'http2': 'true'
             },
             body: jsonString
@@ -1410,7 +1450,7 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
         return data;
     }
     catch (error) {
-        if (error.code == 429) {
+        if (error.code == 429 || error.code == 400) {
 
             const data = { error: 'Token rate limit exceeded. Please try again later.' };
             console.error('Token rate limit exceeded. Please try again later.', error);
@@ -1444,8 +1484,6 @@ function logout() {
 
 // Function to post a question to the chat display
 async function postQuestion() {
-
-
 
     let chatInput = document.getElementById('chat-input').value;
 
@@ -2104,7 +2142,7 @@ async function uploadFilesToAzure(files) {
             if (response.ok) {
                 showToastNotification(`Upload successful for ${file.name}.`, true);
                 console.log(`Upload successful for ${file.name}.`);
-                getDocuments(storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
+                getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
             } else {
                 const errorText = await response.text();
                 showToastNotification(`Error uploading file ${file.name} to Azure Storage: ${errorText}`, false);

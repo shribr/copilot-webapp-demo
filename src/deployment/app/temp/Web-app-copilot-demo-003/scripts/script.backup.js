@@ -1,4 +1,4 @@
-let iconStyle = "color";
+var iconStyle = "color";
 let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
@@ -21,7 +21,6 @@ let activeAccount = {};
 let loggedIn = false;
 
 let config = {};
-let authMode = '';
 
 const loginRequest = {
     scopes: ["user.read"]
@@ -40,24 +39,20 @@ let tool_resources = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+await checkIfLoggedIn();
 
-    config = await fetchConfig();
+document.addEventListener("DOMContentLoaded", function () {
 
-    authMode = config.AUTHENTICATION_MODE;
-
-    await checkIfLoggedIn();
-
-    getQueryParam('status');
-
+    var status = getQueryParam('status');
     var screen = getQueryParam('screen');
-
-    toggleDisplay(screen);
 
     var loginContainer = document.getElementById("login-container");
     var leftNavContainer = document.getElementById("left-nav-container");
     var settingsIcon = document.getElementById("settings-icon");
     var topNavToolbarLinkContainer = document.getElementById("top-navigation-toolbar-link-container");
+    // var documentContainer = document.getElementById("document-container");
+    // var chatContainer = document.getElementById("chat-container");
+    // var homeContainer = document.getElementById("home-container");
 
     if (window.getComputedStyle(loginContainer).display === "flex" || status === "login" || screen === "login") {
         loginContainer.style.display = "flex !important";
@@ -66,15 +61,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         settingsIcon.style.display = "none";
 
         document.getElementById('hamburger-menu').style.display = 'none';
+        // documentContainer.style.display = "none";
+        // chatContainer.style.display = "none";
+        // homeContainer.style.display = "none";
     }
+});
 
-    document.getElementById('site-logo-container').innerHTML = config.ICONS.BUILDING.SVG;
+$(document).ready(async function () {
+
+    //setChatDisplayHeight();
+    //logout();
+
+    config = await fetchConfig();
+
+    await checkIfLoggedIn();
 
     hideLeftNav();
 
     setSiteLogo();
 
-    // Add event listeners to the buttons
+    //renderPanelIcons();
+
+    const width = window.innerWidth;
+
+    //toggleBeforeAfter(width);
+
     const elements = document.getElementsByClassName('document-cell-name');
     Array.from(elements).forEach(element => element.classList.add('no-before'));
 
@@ -108,15 +119,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('clear-button').style.display = 'none';
     }
 
-    document.getElementById('send-button').addEventListener('click', postQuestion);
-    document.getElementById('clear-button').addEventListener('click', clearChatDisplay);
-    document.getElementById('login-button').addEventListener('click', login);
+    $('#send-button').on('click', postQuestion);
+    $('#clear-button').on('click', clearChatDisplay);
+
+    $('#login-button').on('click', login);
 
     if (document.getElementById('chat-input').value.trim() === '') {
-        document.getElementById('send-button').disabled = true;
+        $('#send-button').prop('disabled', true);
     }
     else {
-        document.getElementById('send-button').disabled = false;
+        $('#send-button').prop('disabled', false);
     }
 
     document.getElementById('hamburger-menu').addEventListener('click', function () {
@@ -128,14 +140,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     chatInput.addEventListener('keyup', function () {
         if (chatInput.value.trim() === '') {
-            document.getElementById('send-button').disabled = true;
+            $('#send-button').prop('disabled', true);
+            //$('#send-button').addClass('button-disabled');
         }
         else {
-            document.getElementById('send-button').disabled = false;
+            $('#send-button').prop('disabled', false);
+            //$('#send-button').removeClass('button-disabled');
         }
     });
 
-    document.addEventListener('keydown', function (event) {
+    $(document).on('keydown', function (event) {
         if (event.key === 'Enter') {
             postQuestion();
         }
@@ -195,27 +209,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // Add event listeners to navigation links
-    // document.querySelector("#left-nav-menu > ul > li").addEventListener('click', function (event) {
-    //     const link = $(this).find('a')[0];
-    //     if (link) {
-    //         event.preventDefault();
-    //         const screen = new URL(link.href).searchParams.get('screen');
-    //         toggleDisplay(screen);
-    //         history.pushState(null, '', link.href);
-    //     }
-    // });
+    const screen = getQueryParam('screen');
 
-    document.querySelectorAll('#left-nav-container nav ul li').forEach(function (item) {
-        item.addEventListener('click', function (event) {
-            const link = item.querySelector('a');
-            if (link) {
-                event.preventDefault();
-                const screen = new URL(link.href).searchParams.get('screen');
-                toggleDisplay(screen);
-                history.pushState(null, '', link.href);
-            }
-        });
+    toggleDisplay(screen);
+
+    // Add event listeners to navigation links
+    $('#left-nav-container nav ul li').on('click', function (event) {
+        const link = $(this).find('a')[0];
+        if (link) {
+            event.preventDefault();
+            const screen = new URL(link.href).searchParams.get('screen');
+            toggleDisplay(screen);
+            history.pushState(null, '', link.href);
+        }
     });
 
     document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
@@ -428,12 +434,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     addMessageToChatHistory(thread, system_message);
 
     previousPersona.Type = persona.Type;
-
-    if (authMode != 'MSAL') {
-        document.getElementById('user-profile-panel').style.display = 'none';
-        document.getElementById('link-user-profile').style.display = 'none';
-        document.getElementById('user-profile-icon').style.display = 'none';
-    }
 });
 
 // Function to build chat history
@@ -449,8 +449,6 @@ async function checkIfLoggedIn() {
 
     config = await fetchConfig();
 
-    authMode = config.AUTHENTICATION_MODE;
-
     const userProfilePanel = document.getElementById('user-profile-panel');
 
     const userProfileName = document.getElementById('user-profile-info-name-value');
@@ -460,30 +458,24 @@ async function checkIfLoggedIn() {
 
     const body = document.querySelector('body');
 
-    if (authMode === 'MSAL') {
-        const accounts = msalInstance.getAllAccounts();
+    const accounts = msalInstance.getAllAccounts();
 
-        if (accounts.length > 0) {
-            msalInstance.setActiveAccount(accounts[0]);
-            console.log("User is logged in:", accounts[0]);
-            userProfileName.innerText = accounts[0].name;
-            userProfileEmail.innerText = accounts[0].username;
+    if (accounts.length > 0) {
+        msalInstance.setActiveAccount(accounts[0]);
+        console.log("User is logged in:", accounts[0]);
+        userProfileName.innerText = accounts[0].name;
+        userProfileEmail.innerText = accounts[0].username;
 
-            activeAccount = accounts[0];
+        activeAccount = accounts[0];
 
-            body.style.display = 'flex';
-            //msalInstance.loginRedirect(loginRequest);
-            loggedIn = true;
-        } else {
-            console.log("No user is logged in.");
-
-            await login();
-            loggedIn = false;
-        }
-    }
-    else {
         body.style.display = 'flex';
+        //msalInstance.loginRedirect(loginRequest);
         loggedIn = true;
+    } else {
+        console.log("No user is logged in.");
+
+        await login();
+        loggedIn = false;
     }
 }
 
@@ -537,119 +529,82 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
 
-    let footNoteLinks = "";
-    let followUpQuestions = "";
+    var footNoteLinks = "";
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error && azureOpenAIResults[0].choices) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         // Loop through the answers and create the response content   
-        try {
-            for (const choice of azureOpenAIResults[0].choices) {
+        for (const choice of azureOpenAIResults[0].choices) {
 
-                console.log(choice);
+            console.log(choice);
 
-                const answer = choice.message;
-                const role = answer.role;
-                let rawText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
+            const answer = choice.message;
+            const role = answer.role;
+            var answerText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
 
-                //let answerText = ensureDollarSigns(rawText);
-                let answerText = rawText;
+            numOccurrences = countOccurrences(answerText, "[$$$$]");
+            var followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
 
-                console.log(answerText);
+            //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
-                //numOccurrences = countOccurrences(answerText, "[$$$$]");
-                numOccurrences = countQuadrupleDollarSigns(answerText);
+            answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
 
-                if (numOccurrences != 2) {
-                    answerText = insertDollarSigns(answerText);
-                    numOccurrences = countQuadrupleDollarSigns(answerText);
-                }
+            const message = { "role": role, "content": answerText };
 
-                followUpQuestions = numOccurrences > 1 ? answerText.split("$$$$")[2] : "";
-
-                console.log('Number of occurrences of $$$$:', numOccurrences);
-
-                if (followUpQuestions.length > 0) {
-                    followUpQuestions = followUpQuestions.trim();
-                }
-
-                //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
-
-                answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
-
-                const message = { "role": role, "content": answerText };
-
-                if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
-                    answerText = persona.NoResults;
-                }
-                else {
-                    addMessageToChatHistory(thread, message);
-                }
-
-                const context = answer.context;
-
-                const citations = context.citations;
-
-                if (citations) {
-
-                    console.log(citations);
-
-                    for (const citation of citations) {
-                        const docTitle = citation.title;
-
-                        if (docTitle) {
-                            const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
-
-                            // Detect and replace [doc*] with [page *] and create hyperlink
-                            answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
-                                return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
-                            });
-
-                            if (!listedPaths.has(docTitle) && docTitle != "") {
-                                listedPaths.add(docTitle);
-
-                                sourceNumber++;
-
-                                const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
-
-                                citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
-
-                                footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                            }
-                            else {
-                                console.log(`Document already listed: ${docTitle}`);
-                            }
-                        }
-
-                    }
-                }
-
-                const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
-
-                answers += answerListHTML;
-
+            if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
+                answerText = persona.NoResults;
             }
-        } catch (error) {
-            const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+            else {
+                addMessageToChatHistory(thread, message);
+            }
+
+            const context = answer.context;
+
+            const citations = context.citations;
+
+            if (citations) {
+
+                console.log(citations);
+
+                for (const citation of citations) {
+                    const docTitle = citation.title;
+
+                    if (docTitle) {
+                        const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
+
+                        // Detect and replace [doc*] with [page *] and create hyperlink
+                        answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
+                            return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
+                        });
+
+                        if (!listedPaths.has(docTitle) && docTitle != "") {
+                            listedPaths.add(docTitle);
+
+                            sourceNumber++;
+
+                            const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
+
+                            citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+
+                            footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                        }
+                        else {
+                            console.log(`Document already listed: ${docTitle}`);
+                        }
+                    }
+
+                }
+            }
+
+            const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
 
             answers += answerListHTML;
-            console.error(error);
+
         }
 
     }
     else {
-
-        let answerListHTML = '';
-
-        if (azureOpenAIResults[0].error && (azureOpenAIResults[0].error.code == 429 || azureOpenAIResults[0].error.code == 400)) {
-
-            answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
-            console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
-        }
-        else {
-            answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
-            console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
-        }
+        const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
 
         answers += answerListHTML;
     }
@@ -707,27 +662,15 @@ function collectChatResults(chatResultsId) {
 
 // Function to count the number of occurrences of a string in another string
 function countOccurrences(mainString, searchString) {
-
-    //const count = countQuadrupleDollarSigns(mainString);
-
-    const regex = new RegExp(searchString.replace(/\$/g, '\\$'), 'g');
+    const regex = new RegExp(searchString, 'g');
     const matches = mainString.match(regex);
     return matches ? matches.length : 0;
 }
 
-function countQuadrupleDollarSigns(str) {
-    const regex = /\$\$\$\$/g;
-    let count = 0;
-    let match;
-    while ((match = regex.exec(str)) !== null) {
-        count++;
-    }
-
-    return count;
-}
-
 //function to create side navigation links
 async function createSidenavLinks() {
+
+
 
     try {
 
@@ -784,29 +727,21 @@ function createTabs(responseTabs) {
     return tabs;
 }
 
-// Function to create tab contents for follow-up questions [NOT USED]
+// Function to create tab contents for follow-up questions
 function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsContent) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error && azureOpenAIResults[0].choices) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         var followUpQuestionsResults = "";
 
         for (const choice of azureOpenAIResults[0].choices) {
 
-            let answerText = choice.message.content.replace("**", "");
+            const answerText = choice.message.content.replace("**", "");
 
-            //numOccurrences = countOccurrences(answerText, "[$$$$]");
-            numOccurrences = countQuadrupleDollarSigns(answerText);
+            numOccurrences = countOccurrences(answerText, "[$$$$]");
+            const followUpQuestions = numOccurrences > 2 ? answerText.split("$$$$")[2].trim() : "";
 
-            if (numOccurrences != 2) {
-                answerText = insertDollarSigns(answerText);
-                numOccurrences = countQuadrupleDollarSigns(answerText);
-            }
-
-            const followUpQuestions = numOccurrences > 1 ? answerText.split("$$$$")[2] : "";
-
-            if (followUpQuestions.length > 0) {
-                followUpQuestions = followUpQuestions.trim();
+            if (followUpQuestions) {
                 followUpQuestionsResults += followUpQuestions;
             }
         }
@@ -823,7 +758,7 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
 // Function to create tab contents for supporting content results returned from Azure Search
 function createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         //var answerResults = "";
         var citationContentResults = "";
@@ -883,23 +818,16 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
 // Function to create tab contents for thought process content
 function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) {
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
 
         var thoughtProcessResults = "";
         let numOccurrences = 0;
 
         for (const choice of azureOpenAIResults[0].choices) {
 
-            let answerText = choice.message.content.replace(/\*\*/g, "");
+            const answerText = choice.message.content.replace(/\*\*/g, "");
 
-            //numOccurrences = countOccurrences(answerText, "[$$$$]");
-            numOccurrences = countQuadrupleDollarSigns(answerText);
-
-            if (numOccurrences != 2) {
-                answerText = insertDollarSigns(answerText);
-                numOccurrences = countQuadrupleDollarSigns(answerText);
-            }
-
+            numOccurrences = countOccurrences(answerText, "[$$$$]");
             const thoughtProcess = numOccurrences > 1 ? answerText.split("$$$$")[1].trim() : "";
 
             if (thoughtProcess) {
@@ -937,21 +865,6 @@ function downloadChatResults(event) {
     URL.revokeObjectURL(url);
 }
 
-// Function to make sure $$$$ exists in query response.
-function ensureDollarSigns(text) {
-    // Split the text into paragraphs
-    let paragraphs = text.split('\n\n');
-
-    // Check if the second paragraph starts with $$$$
-    if (!paragraphs[1].startsWith('$$$$')) {
-        // Insert $$$$ at the beginning of the second paragraph
-        paragraphs[1] = '$$$$\n\n' + paragraphs[1];
-    }
-
-    // Join the paragraphs back into a single string
-    return paragraphs.join('\n\n');
-}
-
 // Function to fetch the configuration
 async function fetchConfig() {
 
@@ -972,6 +885,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     if (!userInput) return;
 
+    const apiKey = config.AZURE_AI_SERVICE_API_KEY;
     const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const apiVersion = config.OPENAI_API_VERSION;
@@ -985,7 +899,6 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
 
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
 
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
@@ -995,25 +908,23 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     openAIRequestBody.messages = [];
     openAIRequestBody.messages = thread.messages;
 
-    if (authMode === "MSAL") {
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
+    const tokenRequest = {
+        scopes: [`${keyVaultEndPoint}`],
+        account: activeAccount
+    };
 
-        let tokenResponse;
+    let tokenResponse;
 
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+    try {
+        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        console.log("Token acquired silently");
+    } catch (silentError) {
+        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        console.log("Token acquired via popup");
     }
+
+    const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
 
     if (dataSources.length > 0) {
 
@@ -1021,16 +932,14 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
 
         for (const source of dataSources) {
             source.parameters.role_information = persona.Prompt;
-            //If authMode is MSAL then we usw the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
-            //If the authMode is API_KEY then we just use the search API key directly from the config.json file.
+            //We are using the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
             source.parameters.authentication.key = searchApiKey;
             //source.parameters.authentication.key = apiKey
             openAIRequestBody.data_sources.push(source);
 
             const jsonString = JSON.stringify(openAIRequestBody);
 
-            //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
-            //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
+            //We need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API
             const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
 
             results.push(result);
@@ -1296,7 +1205,7 @@ async function getChatResponse(questionBubble) {
     answerResponseNumber++;
 }
 
-//Function to get documents from Azure Storage. This needs to be updated to have option to use MSAL in addition to API_KEY.
+//code to get documents from Azure Storage
 async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
 
     try {
@@ -1452,42 +1361,11 @@ async function initMSALInstance(config) {
         });
 }
 
-// Function to insert dollar signs at the end of the last sentence before an ordered list
-function insertDollarSigns(str) {
-    // Find the index of the <ol> tag
-    const olIndex = str.indexOf('<ol');
-
-    if (olIndex === -1) {
-        // If no <ol> tag is found, return the original string
-        return str;
-    }
-
-    // Find the last period before the <ol> tag (we look for the last period before the <ol> tag starts)
-    const lastPeriodIndex = str.lastIndexOf('.', olIndex);
-
-    if (lastPeriodIndex === -1) {
-        // If there's no period before the <ol> tag, return the original string (no sentence end found)
-        return str;
-    }
-
-    // Extract the last sentence before the <ol> tag
-    const lastSentence = str.slice(lastPeriodIndex + 1, olIndex).trim();
-
-    // Check if the last sentence contains $$$$
-    if (!lastSentence.includes('$$$$')) {
-        // If $$$$ is not present, insert $$$$ after the period at the end of the last sentence
-        return str.slice(0, lastPeriodIndex + 1) + ' $$$$' + str.slice(lastPeriodIndex + 1);
-    }
-
-    // If $$$$ is already present, return the string as is
-    return str;
-}
-
 // Function to call the rest API
 async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
     let data = {};
-    let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+
 
     const keyVaultName = config.AZURE_KEY_VAULT_NAME;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
@@ -1503,27 +1381,25 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
     };
 
     try {
+        let tokenResponse;
 
-        if (authMode === "MSAL") {
-            let tokenResponse;
-
-            try {
-                tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-                console.log("Token acquired silently");
-            } catch (silentError) {
-                console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-                tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-                console.log("Token acquired via popup");
-            }
-
-            openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+        try {
+            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+            console.log("Token acquired silently");
+        } catch (silentError) {
+            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+            console.log("Token acquired via popup");
         }
+
+        const apiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+        //const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': `${openAiApiKey}`,
+                'api-key': `${apiKey}`,
                 'http2': 'true'
             },
             body: jsonString
@@ -1534,7 +1410,7 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
         return data;
     }
     catch (error) {
-        if (error.code == 429 || error.code == 400) {
+        if (error.code == 429) {
 
             const data = { error: 'Token rate limit exceeded. Please try again later.' };
             console.error('Token rate limit exceeded. Please try again later.', error);
@@ -1568,6 +1444,8 @@ function logout() {
 
 // Function to post a question to the chat display
 async function postQuestion() {
+
+
 
     let chatInput = document.getElementById('chat-input').value;
 
@@ -1737,7 +1615,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             const nameLink = document.createElement('a');
             nameLink.href = blobUrl;
 
-            blobName = truncateString(blobName, 40);
+            blobName = truncateString(blobName, 60);
 
             nameLink.textContent = blobName;
             nameLink.target = '_blank';
@@ -1804,7 +1682,7 @@ async function renderPanelIcons() {
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
+    const apiKey = config.AZURE_SEARCH_API_KEY;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
@@ -1813,31 +1691,28 @@ async function runSearchIndexer(searchIndexers) {
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
 
-    if (authMode === 'MSAL') {
+    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
 
-        const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
+    const tokenRequest = {
+        scopes: [`${keyVaultEndPoint}`],
+        account: activeAccount
+    };
 
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
+    let tokenResponse;
 
-        let tokenResponse;
-
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-
-        // Insert a delay of 5 seconds
-        await new Promise(resolve => setTimeout(resolve, 5000));
+    try {
+        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        console.log("Token acquired silently");
+    } catch (silentError) {
+        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        console.log("Token acquired via popup");
     }
+
+    const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+
+    // Insert a delay of 5 seconds
+    await new Promise(resolve => setTimeout(resolve, 5000));
 
     // Iterate over the search indexers and run each one
     for (const searchIndexer of searchIndexers) {
@@ -1908,7 +1783,12 @@ function setEqualHeightForTabContents() {
 // Function to set the site logo
 async function setSiteLogo() {
 
+
+
     const siteLogo = document.getElementsByClassName('site-logo')[0];
+    const siteLogoText = document.getElementById('site-logo-text');
+    const siteLogoTextCopy = document.getElementById('site-logo-text-copy');
+
 
 
     if (config.SITE_LOGO == "default" || getQueryParam('sitelogo') == "default") {
@@ -2070,44 +1950,44 @@ function toggleBeforeAfter(width) {
     }
 }
 
-// Function to toggle between chat and document screens
+//code to toggle between chat and document screens
 function toggleDisplay(screen) {
-    const chatContainer = document.getElementById('chat-container');
-    const documentContainer = document.getElementById('document-container');
-    const homeContainer = document.getElementById('home-container');
-    const loginContainer = document.getElementById('login-container');
-    const leftNavContainer = document.getElementById('left-nav-container');
-    const topNavToolbarLinkContainer = document.getElementById('top-navigation-toolbar-link-container');
-    const settingsIcon = document.getElementById('settings-icon');
-    const userProfileIcon = document.getElementById('user-profile-icon');
+    const chatContainer = $('#chat-container');
+    const documentContainer = $('#document-container');
+    const homeContainer = $('#home-container');
+    const loginContainer = $('#login-container');
+    const leftNavContainer = $('#left-nav-container');
+    const topNavToolbarLinkContainer = $('#top-navigation-toolbar-link-container');
+    const settingsIcon = $('#settings-icon');
+    const userProfileIcon = $('#user-profile-icon');
 
     const status = getQueryParam('status');
 
     //Remove "true" for production
     if (loggedIn) {
         if (screen === 'chat') {
-            chatContainer.style.display = 'block';
-            documentContainer.style.display = 'none';
-            homeContainer.style.display = 'none';
+            chatContainer.show();
+            documentContainer.hide();
+            homeContainer.hide();
         } else if (screen === 'documents') {
-            chatContainer.style.display = 'none';
-            homeContainer.style.display = 'none';
-            documentContainer.style.display = 'block';
+            chatContainer.hide();
+            homeContainer.hide();
+            documentContainer.show();
         } else {
-            chatContainer.style.display = 'none';
-            documentContainer.style.display = 'none';
-            homeContainer.style.display = 'block';
+            chatContainer.hide();
+            documentContainer.hide();
+            homeContainer.show();
         }
     }
     else {
-        chatContainer.style.display = 'none';
-        documentContainer.style.display = 'none';
-        homeContainer.style.display = 'none';
-        topNavToolbarLinkContainer.style.display = 'none';
-        leftNavContainer.style.display = 'none';
-        loginContainer.style.display = 'none';
-        settingsIcon.style.display = 'none';
-        userProfileIcon.style.display = 'none';
+        chatContainer.hide();
+        documentContainer.hide();
+        homeContainer.hide();
+        topNavToolbarLinkContainer.hide();
+        leftNavContainer.hide();
+        loginContainer.hide();
+        settingsIcon.hide();
+        userProfileIcon.hide();
     }
 }
 

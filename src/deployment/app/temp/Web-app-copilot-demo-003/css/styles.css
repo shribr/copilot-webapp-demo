@@ -61,6 +61,12 @@ body {
     display: none;
   }
 
+  #site-logo-container {
+    display: flex !important;
+    margin-left: auto !important;
+    flex: 1 !important;
+  }
+
   .followup-questions {
     margin-bottom: 2px !important;
   }
@@ -106,6 +112,11 @@ body {
     margin-left: auto !important;
     flex: 1 !important;
   }
+
+  /* #main-header-title {
+    font-size: 1.4em;
+    margin-left: 0px;
+  } */
 }
 
 /* THIS MEANS LESS THAN OR EQUAL TO 600PX */
