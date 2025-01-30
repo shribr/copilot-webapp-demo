@@ -666,6 +666,37 @@ code {
   margin-left: -4px !important;
 }
 
+.presence-icon
+  .presence-icon-circle
+  .presence-icon-circle-inner
+  .presence-icon-circle-inner-fill {
+  fill: #00ff00;
+}
+
+.presence-text {
+  color: black;
+}
+
+.presence-text green {
+  color: green;
+}
+
+.presence-text red {
+  color: red;
+}
+
+.presence-text yellow {
+  color: yellow;
+}
+
+.presence-text orange {
+  color: orange;
+}
+
+.presence-text gray {
+  color: gray;
+}
+
 .question-bubble-date {
   font-size: 12px;
   font-style: italic;
@@ -1786,6 +1817,18 @@ code {
 
 #user-profile-content {
   padding: 20px;
+}
+
+#user-profile-info-name-value {
+  font-weight: bold;
+}
+
+#user-profile-info-email-value {
+  font-size: 0.8rem;
+}
+
+#user-profile-info-chat-history {
+  margin-top: 20px;
 }
 
 #panel-overlay {

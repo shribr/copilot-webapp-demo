@@ -14,9 +14,46 @@ let startTime;
 let previousPersona = { "Type": "", "Prompt": "" };
 
 let msalInstance = {};
-let accessToken = {};
-
+let accessToken = '';
 let activeAccount = {};
+let profilePic = '';
+let presence = '';
+
+let presenceIndicators = [{
+    "name": "Available",
+    "color": "green",
+    "icon": "🟢"
+},
+{
+    "name": "Busy",
+    "color": "red",
+    "icon": "🔴"
+},
+{
+    "name": "Do Not Disturb",
+    "color": "red",
+    "icon": "🔴"
+},
+{
+    "name": "Be Right Back",
+    "color": "yellow",
+    "icon": "🟡"
+},
+{
+    "name": "Away",
+    "color": "orange",
+    "icon": "🟠"
+},
+{
+    "name": "Offline",
+    "color": "gray",
+    "icon": "⚪"
+},
+{
+    "name": "Presence Unknown",
+    "color": "gray",
+    "icon": "⚪"
+}];
 
 let loggedIn = false;
 
@@ -24,7 +61,7 @@ let config = {};
 let authMode = '';
 
 const loginRequest = {
-    scopes: ["user.read"]
+    scopes: [`Presence.Read`, `User.Read`, `Files.Read.All`, `Sites.Read.All`, `Sites.Selected`]
 };
 
 let thread = { "messages": [] };
@@ -455,21 +492,51 @@ async function checkIfLoggedIn() {
 
     const userProfileName = document.getElementById('user-profile-info-name-value');
     const userProfileEmail = document.getElementById('user-profile-info-email-value');
-
-    await initMSALInstance(config);
+    const userProfilePic = document.getElementById('user-profile-info-pic-value');
+    const userPresence = document.getElementById('user-profile-info-presence-value');
 
     const body = document.querySelector('body');
 
     if (authMode === 'MSAL') {
+
+        await initMSALInstance(config);
+
         const accounts = msalInstance.getAllAccounts();
+
+        const scopes = [`Presence.Read`, `User.Read`, `Files.Read.All`, `Sites.Read.All`, `Sites.Selected`];
+
+        const tokenRequest = {
+            scopes: scopes,
+            account: activeAccount
+        };
+
+        let tokenResponse;
+
+        try {
+            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+            console.log("Token acquired silently");
+        } catch (silentError) {
+            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+            console.log("Token acquired via popup");
+        }
+
+        accessToken = tokenResponse.accessToken;
 
         if (accounts.length > 0) {
             msalInstance.setActiveAccount(accounts[0]);
+
+            activeAccount = accounts[0];
+
             console.log("User is logged in:", accounts[0]);
             userProfileName.innerText = accounts[0].name;
             userProfileEmail.innerText = accounts[0].username;
 
-            activeAccount = accounts[0];
+            //profilePic = await getUserProfilePic();
+            presence = await getUserPresence();
+
+            //userProfilePic.innerHTML = `<img src="${profilePic}" alt="User profile picture" class="user-profile-pic">`;
+            userPresence.innerHTML = presence;
 
             body.style.display = 'flex';
             //msalInstance.loginRedirect(loginRequest);
@@ -1273,13 +1340,15 @@ async function getChatResponse(questionBubble) {
         }
 
         // Scroll to the position right above the newest questionBubble
-        const questionBubbleTop = chatResponse.offsetTop;
-        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+        //const questionBubbleTop = chatResponse.offsetTop;
+        //chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
+        scrollToNewestQuestionBubble();
 
         questionBubble.style.display = 'block'; // Show the question bubble
 
         // Scroll to the position right above the newest questionBubble
-        chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+        //chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
 
         chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
 
@@ -1348,6 +1417,61 @@ async function getSasToken() {
     return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 }
 
+// Function to get user presence
+async function getUserPresence() {
+    const endpoint = 'https://graph.microsoft.com/v1.0/me/presence';
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+    };
+
+    const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: headers
+    });
+
+    let presence = '';
+    let presenceIndicator = '';
+
+    if (response.ok) {
+        const data = await response.json();
+
+        presenceIndicator = presenceIndicators.find(icon => icon.name === data.availability);
+
+    } else {
+
+        presenceIndicator = presenceIndicators.find(icon => icon.name === "Presence Unknown");
+
+        console.error('Error fetching presence data:', response.statusText);
+    }
+
+    presence = `<span class="presence-icon">${presenceIndicator.icon}</span><span class="presence-text ${presenceIndicator.color}">${presenceIndicator.name}</span>`;
+
+    return presence;
+
+}
+
+// Function to get user profile picture
+async function getUserProfilePic() {
+
+    const endpoint = 'https://graph.microsoft.com/v1.0/me/photo/$value';
+
+    const headers = {
+        'Content-Type': 'image/jpg',
+        'Authorization': `Bearer ${accessToken}`
+    };
+
+    const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: headers
+    });
+
+    const data = await response.json();
+
+    return data;
+}
+
 //code to toggle between chat and document screens
 function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -1365,7 +1489,8 @@ async function getSecretFromKeyVault(keyVaultEndPoint, apiSecretName, apiVersion
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
-                'Ocp-Apim-Subscription-Key': `${apimSubscriptionKey}`
+                'Ocp-Apim-Subscription-Key': `${apimSubscriptionKey}`,
+                'mode': 'no-cors'
             }
         });
 
@@ -1509,14 +1634,16 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
             try {
                 tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+                accessToken = tokenResponse.accessToken;
                 console.log("Token acquired silently");
             } catch (silentError) {
                 console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
                 tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+                accessToken = tokenResponse.accessToken;
                 console.log("Token acquired via popup");
             }
 
-            openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+            openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, accessToken);
         }
 
         const response = await fetch(endpoint, {
@@ -1865,6 +1992,37 @@ async function runSearchIndexer(searchIndexers) {
             console.error(`Error running search indexer`, error.message);
         }
     }
+}
+
+// Function to scroll to the newest question bubble
+function scrollToNewestQuestionBubble() {
+
+    // Get all elements with the specified class name
+    const elements = document.getElementsByClassName("chat-response user slide-up");
+
+    // Access the last element in the HTMLCollection
+    const lastElement = elements[elements.length - 1];
+
+    // Get the bounding rectangle of the last element
+    const rect = lastElement.getBoundingClientRect();
+
+    // Access the position properties
+    const top = rect.top;
+    const left = rect.left;
+    const bottom = rect.bottom;
+    const right = rect.right;
+
+    // Get the top coordinate of the element
+    const topPosition = top + window.scrollY;
+
+    // Scroll to the top coordinate of the element
+    window.scrollTo({
+        top: topPosition,
+        behavior: 'smooth' // This makes the scroll smooth
+    });
+
+    console.log(`Top: ${top}, Left: ${left}, Bottom: ${bottom}, Right: ${right}`);
+
 }
 
 // Function to set the height of the chat display container

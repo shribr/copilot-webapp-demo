@@ -2723,6 +2723,8 @@ function New-SearchDataSource {
         [string]$searchDatasourceDataDeletionDetectionPolicy = "SoftDeleteColumn"
     )
 
+    # https://learn.microsoft.com/en-us/azure/search/search-howto-index-sharepoint-online
+    
     try {
         $ErrorActionPreference = 'Continue'
 
@@ -4863,6 +4865,22 @@ function Update-ConfigFile {
         # Define the AZURE_OPENAI_REQUEST_BODY
         #region AZURE_OPENAI_REQUEST_BODY
         $config.AZURE_OPENAI_REQUEST_BODY = @{
+            "stop"              = $null
+            "messages"          = @(
+                @{
+                    "role"             = "system"
+                    "role_information" = "You are a helpful assistant"
+                    "content"          = ""
+                }
+                @{
+                    "role"    = "user"
+                    "content" = ""
+                }
+            )
+            "presence_penalty"  = 0
+            "top_p"             = 0.95
+            "temperature"       = 0.7
+            "frequency_penalty" = 0
             "data_sources"      = @(
                 @{
                     "type"       = "azure_search"
@@ -4876,24 +4894,8 @@ function Update-ConfigFile {
                     }
                 }
             )
-            "messages"          = @(
-                @{
-                    "role"             = "system"
-                    "role_information" = "You are a helpful assistant"
-                    "content"          = ""
-                }
-                @{
-                    "role"    = "user"
-                    "content" = ""
-                }
-            )
-            "temperature"       = 0.7
-            "top_p"             = 0.95
-            "frequency_penalty" = 0
-            "presence_penalty"  = 0
-            "max_tokens"        = 800
-            "stop"              = $null
             "stream"            = $false
+            "max_tokens"        = 800
         }
         #endregion
 
