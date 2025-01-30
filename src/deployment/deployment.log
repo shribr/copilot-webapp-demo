@@ -500,3 +500,121 @@
 2025-01-29 23:14:33 - Config file updated successfully.
 2025-01-29 23:14:50 - Web app 'app-copilot-demo-003' deployed successfully.
 2025-01-29 23:15:41 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 65 ***
+*** SCRIPT START TIME: 01/29/2025 23:17:13 ***
+2025-01-29 23:17:15 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-29 23:17:18 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-29 23:17:31 - Config file updated successfully.
+2025-01-29 23:17:58 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-29 23:18:36 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 66 ***
+*** SCRIPT START TIME: 01/29/2025 23:25:01 ***
+2025-01-29 23:25:03 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-29 23:25:05 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-29 23:25:19 - Config file updated successfully.
+2025-01-29 23:25:35 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-29 23:26:17 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 67 ***
+*** SCRIPT START TIME: 01/30/2025 00:34:25 ***
+2025-01-30 00:34:26 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 00:34:29 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 00:34:43 - Config file updated successfully.
+2025-01-30 00:35:12 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 00:35:56 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 68 ***
+*** SCRIPT START TIME: 01/30/2025 00:37:43 ***
+2025-01-30 00:37:44 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 00:37:47 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 00:38:00 - Config file updated successfully.
+2025-01-30 00:38:16 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 00:39:07 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 69 ***
+*** SCRIPT START TIME: 01/30/2025 00:47:02 ***
+2025-01-30 00:47:03 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 00:47:06 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 00:47:20 - Config file updated successfully.
+2025-01-30 00:47:36 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 00:48:18 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 70 ***
+*** SCRIPT START TIME: 01/30/2025 00:53:17 ***
+2025-01-30 00:53:18 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 00:53:20 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 00:53:35 - Config file updated successfully.
+2025-01-30 00:53:50 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 00:54:33 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 71 ***
+*** SCRIPT START TIME: 01/30/2025 00:55:17 ***
+2025-01-30 00:55:18 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 00:55:21 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 00:55:35 - Config file updated successfully.
+2025-01-30 00:55:53 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 00:56:35 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 72 ***
+*** SCRIPT START TIME: 01/30/2025 01:23:10 ***
+2025-01-30 01:23:13 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:23:17 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:23:35 - Config file updated successfully.
+2025-01-30 01:23:58 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 01:24:52 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 73 ***
+*** SCRIPT START TIME: 01/30/2025 01:27:02 ***
+2025-01-30 01:27:05 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:27:07 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:27:27 - Config file updated successfully.
+2025-01-30 01:27:43 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 01:28:24 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 74 ***
+*** SCRIPT START TIME: 01/30/2025 01:29:47 ***
+2025-01-30 01:29:48 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:29:51 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:30:10 - Config file updated successfully.
+2025-01-30 01:30:27 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 01:31:16 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 75 ***
+*** SCRIPT START TIME: 01/30/2025 01:39:55 ***
+2025-01-30 01:39:56 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:39:59 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:40:16 - Config file updated successfully.
+2025-01-30 01:40:32 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 01:41:13 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 76 ***
+*** SCRIPT START TIME: 01/30/2025 01:42:11 ***
+2025-01-30 01:42:13 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:42:17 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:42:37 - Config file updated successfully.
+2025-01-30 01:42:52 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 01:43:33 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 77 ***
+*** SCRIPT START TIME: 01/30/2025 01:50:17 ***
+2025-01-30 01:50:19 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:50:22 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:50:37 - Config file updated successfully.
+2025-01-30 01:50:52 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 01:51:39 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 78 ***
+*** SCRIPT START TIME: 01/30/2025 01:54:57 ***
+2025-01-30 01:54:59 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:55:03 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:55:21 - Config file updated successfully.
+2025-01-30 01:55:37 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 01:56:18 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 79 ***
+*** SCRIPT START TIME: 01/30/2025 01:57:53 ***
+2025-01-30 01:57:55 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:57:58 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:58:17 - Config file updated successfully.
+2025-01-30 01:58:31 - Web app 'app-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 80 ***
+*** SCRIPT START TIME: 01/30/2025 01:59:00 ***
+2025-01-30 01:59:01 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 01:59:04 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 01:59:18 - Config file updated successfully.
+2025-01-30 01:59:33 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 02:00:31 - Function app 'func-copilot-demo-003' deployed successfully.
+*** LOG SEQUENCE: 81 ***
+*** SCRIPT START TIME: 01/30/2025 02:01:23 ***
+2025-01-30 02:01:24 - Resource Group 'RG-COPILOT-DEMO-003' already exists.
+2025-01-30 02:01:27 - Resource 'srch-copilot-demo-003' is provisioned successfully.
+2025-01-30 02:01:43 - Config file updated successfully.
+2025-01-30 02:01:58 - Web app 'app-copilot-demo-003' deployed successfully.
+2025-01-30 02:02:39 - Function app 'func-copilot-demo-003' deployed successfully.

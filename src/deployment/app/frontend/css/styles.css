@@ -666,15 +666,16 @@ code {
   margin-left: -4px !important;
 }
 
-.presence-icon
-  .presence-icon-circle
-  .presence-icon-circle-inner
-  .presence-icon-circle-inner-fill {
-  fill: #00ff00;
+.presence-icon {
+  padding-left: 16px;
+  font-size: 0.8rem;
 }
 
 .presence-text {
   color: black;
+  font-size: 0.8rem;
+  padding-left: 6px;
+  font-weight: normal;
 }
 
 .presence-text green {
@@ -1819,16 +1820,23 @@ code {
   padding: 20px;
 }
 
-#user-profile-info-name-value {
-  font-weight: bold;
-}
-
-#user-profile-info-email-value {
+#user-profile-info-chat-history {
+  margin-top: 20px;
   font-size: 0.8rem;
 }
 
-#user-profile-info-chat-history {
-  margin-top: 20px;
+#user-profile-info-chat-history a {
+  text-decoration: underline;
+}
+
+#user-profile-info-email-value,
+#user-profile-info-presence-value {
+  font-size: 0.8rem;
+  padding-top: 4px;
+}
+
+#user-profile-info-name-value {
+  font-weight: bold;
 }
 
 #panel-overlay {

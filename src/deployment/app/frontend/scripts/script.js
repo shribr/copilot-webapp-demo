@@ -19,6 +19,8 @@ let activeAccount = {};
 let profilePic = '';
 let presence = '';
 
+let presenceIndicatorIcons;
+
 let presenceIndicators = [{
     "name": "Available",
     "color": "green",
@@ -30,12 +32,12 @@ let presenceIndicators = [{
     "icon": "🔴"
 },
 {
-    "name": "Do Not Disturb",
+    "name": "Do not disturb",
     "color": "red",
     "icon": "🔴"
 },
 {
-    "name": "Be Right Back",
+    "name": "Be right back",
     "color": "yellow",
     "icon": "🟡"
 },
@@ -50,7 +52,7 @@ let presenceIndicators = [{
     "icon": "⚪"
 },
 {
-    "name": "Presence Unknown",
+    "name": "Presence unknown",
     "color": "gray",
     "icon": "⚪"
 }];
@@ -395,19 +397,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log('Settings clicked');
     });
 
-    document.getElementById('link-user-profile').addEventListener('click', function (event) {
+    document.getElementById('link-user-profile').addEventListener('click', async function (event) {
         event.preventDefault();
 
         togglePanel('user-profile-panel');
+
+        await getUserPresence();
 
         // Handle profile click
         console.log('User Profile clicked');
     });
 
-    document.getElementById('user-profile-icon').addEventListener('click', function (event) {
+    document.getElementById('user-profile-icon').addEventListener('click', async function (event) {
         event.preventDefault();
 
         togglePanel('user-profile-panel');
+
+        await getUserPresence();
 
         // Handle settings click
         console.log('User Profile clicked');
@@ -488,6 +494,8 @@ async function checkIfLoggedIn() {
 
     authMode = config.AUTHENTICATION_MODE;
 
+    presenceIndicatorIcons = config.ICONS.PRESENCE_INDICATORS;
+
     const userProfilePanel = document.getElementById('user-profile-panel');
 
     const userProfileName = document.getElementById('user-profile-info-name-value');
@@ -528,15 +536,20 @@ async function checkIfLoggedIn() {
 
             activeAccount = accounts[0];
 
-            console.log("User is logged in:", accounts[0]);
-            userProfileName.innerText = accounts[0].name;
-            userProfileEmail.innerText = accounts[0].username;
+            let email = activeAccount.username.toLowerCase();
+            let username = activeAccount.name.trim();
+
+            console.log("User is logged in:", activeAccount);
+
+            userProfileEmail.innerHTML = `<a href="mailto:${email}">${email}</a>`;
 
             //profilePic = await getUserProfilePic();
             presence = await getUserPresence();
 
+            userProfileName.innerHTML = username + ' ' + presence;
+
             //userProfilePic.innerHTML = `<img src="${profilePic}" alt="User profile picture" class="user-profile-pic">`;
-            userPresence.innerHTML = presence;
+            //userPresence.innerHTML = presence;
 
             body.style.display = 'flex';
             //msalInstance.loginRedirect(loginRequest);
@@ -1419,7 +1432,12 @@ async function getSasToken() {
 
 // Function to get user presence
 async function getUserPresence() {
+
+    const userProfileName = document.getElementById('user-profile-info-name-value');
+
     const endpoint = 'https://graph.microsoft.com/v1.0/me/presence';
+
+    const username = activeAccount.name.trim();
 
     const headers = {
         'Content-Type': 'application/json',
@@ -1433,20 +1451,26 @@ async function getUserPresence() {
 
     let presence = '';
     let presenceIndicator = '';
+    let presenceIndicatorIcon = '';
 
     if (response.ok) {
         const data = await response.json();
 
-        presenceIndicator = presenceIndicators.find(icon => icon.name === data.availability);
+        const availability = data.availability.toLowerCase().replace(/\s+/g, '');
 
+        presenceIndicator = await presenceIndicators.find(icon => icon.name.toLowerCase().replace(/\s+/g, '') === availability);
+        presenceIndicatorIcon = await presenceIndicatorIcons.find(icon => icon.TEXT.toLowerCase().replace(/\s+/g, '') === availability);
     } else {
 
-        presenceIndicator = presenceIndicators.find(icon => icon.name === "Presence Unknown");
+        presenceIndicator = await presenceIndicators.find(icon => icon.name === "Presence Unknown");
+        presenceIndicatorIcon = await presenceIndicatorIcons.find(icon => icon.TEXT === "Presence Unknown");
 
         console.error('Error fetching presence data:', response.statusText);
     }
 
     presence = `<span class="presence-icon">${presenceIndicator.icon}</span><span class="presence-text ${presenceIndicator.color}">${presenceIndicator.name}</span>`;
+
+    userProfileName.innerHTML = username + ' ' + presence;
 
     return presence;
 

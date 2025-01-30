@@ -26,7 +26,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-27T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fqtb&srt=co&sig=HQWju3rRG/uzu%2BwfaPgNMJGaJU0mYczA0bi8BBqtfms%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo003.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-28T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fqtb&srt=co&sig=KBV4izXEP6QAN/DbaDNOj0ctAQ73VSitcv1t58FlxdU%3D",
   "AZURE_STORAGE_KEY": "jYy8/ofa3EjnJZ8FJxXPA2VgCbiME3PPwqHyTkOBhaGi4Cu445C3gFjdO3hqZIV4T3l/v+sJCec3+AStIfq/eA==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -92,10 +92,10 @@
     "SS": "fqtb",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-01-27T23:59:59Z",
-    "ST": "2025-01-27T23:59:59Z",
+    "SE": "2026-01-28T23:59:59Z",
+    "ST": "2025-01-28T23:59:59Z",
     "SPR": "https",
-    "SIG": "HQWju3rRG/uzu%2BwfaPgNMJGaJU0mYczA0bi8BBqtfms%3D",
+    "SIG": "KBV4izXEP6QAN/DbaDNOj0ctAQ73VSitcv1t58FlxdU%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -375,7 +375,49 @@
     "DOWNLOAD_BUTTON": {
       "TEXT": "Download",
       "SVG": "<svg class=\"download-button\" width=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12ZM12 6.25C12.4142 6.25 12.75 6.58579 12.75 7V12.1893L14.4697 10.4697C14.7626 10.1768 15.2374 10.1768 15.5303 10.4697C15.8232 10.7626 15.8232 11.2374 15.5303 11.5303L12.5303 14.5303C12.3897 14.671 12.1989 14.75 12 14.75C11.8011 14.75 11.6103 14.671 11.4697 14.5303L8.46967 11.5303C8.17678 11.2374 8.17678 10.7626 8.46967 10.4697C8.76256 10.1768 9.23744 10.1768 9.53033 10.4697L11.25 12.1893V7C11.25 6.58579 11.5858 6.25 12 6.25ZM8 16.25C7.58579 16.25 7.25 16.5858 7.25 17C7.25 17.4142 7.58579 17.75 8 17.75H16C16.4142 17.75 16.75 17.4142 16.75 17C16.75 16.5858 16.4142 16.25 16 16.25H8Z\" fill=\"#0D0C34\"></path></g></svg>"
-    }
+    },
+    "PRESENCE_INDICATORS": [
+      {
+        "ID": "presence-indicator-available",
+        "TEXT": "Available",
+        "SVG": "<svg id=\"presence-indicator-available-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>available</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#00C985\"></circle></g></svg>"
+      },
+      {
+        "ID": "presence-indicator-away",
+        "TEXT": "Away",
+        "SVG": "<svg id=\"presence-indicator-away-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>away</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#FFC107\"></circle></g></svg>"
+      },
+      {
+        "ID": "presence-indicator-busy",
+        "TEXT": "Busy",
+        "SVG": "<svg id=\"presence-indicator-busy-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>busy</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#FF3B30\"></circle></g></svg>"
+      },
+      {
+        "ID": "presence-indicator-offline",
+        "TEXT": "Offline",
+        "SVG": "<svg id=\"presence-indicator-offline-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>offline</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#8E8E93\"></circle></g></svg>"
+      },
+      {
+        "ID": "presence-indicator-invisible",
+        "TEXT": "Invisible",
+        "SVG": "<svg id=\"presence-indicator-invisible-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>invisible</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#8E8E93\"></circle></g></svg>"
+      },
+      {
+        "ID": "presence-indicator-do-not-disturb",
+        "TEXT": "Do Not Disturb",
+        "SVG": "<svg id=\"presence-indicator-do-not-disturb-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>do-not-disturb</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#FF3B30\"></circle></g></svg>"
+      },
+      {
+        "ID": "presence-indicator-be-right-back",
+        "TEXT": "Be Right Back",
+        "SVG": "<svg id=\"presence-indicator-be-right-back-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>be-right-back</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#FFC107\"></circle></g></svg>"
+      },
+      {
+        "ID": "presence-indicator-unknown",
+        "TEXT": "Presence Unknown",
+        "SVG": "<svg id=\"presence-indicator-unknown-svg\" class=\"icon-svg\" viewBox=\"0 0 16 16\"><g><title>presence-unknown</title><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#8E8E93\"></circle></g></svg>"
+      }
+    ]
   },
   "OPENAI_PAYLOAD": {
     "messages": [
