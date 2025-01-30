@@ -432,29 +432,9 @@ function Get-DataSources {
         return $datasources
     }
     catch {
-        Write-Error "Failed to query search indexes: $_"
+        Write-Error "Failed to query search datasources: $_"
         return $false
     }
-
-    <#
- # {    try {
-        # List data sources in the search service
-        $dataSources = az rest --method get --url "https://$searchServiceName.search.windows.net/datasources?api-version=2024-07-01" --headers "apikey=$apiKey"  --output tsv
-        $dataSources = az rest --method get --uri "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName/datasources/?api-version=2024-07-01" --headers "apikey=$apiKey" --output tsv
-
-        # Check if the data source exists
-        if ($dataSources -contains $dataSourceName) {
-            return $true
-        }
-        else {
-            return $false
-        }
-    }
-    catch {
-        Write-Error "Failed to query search data sources: $_"
-        return $false
-    }:Enter a comment or description}
-#>
 
 }
 
@@ -883,6 +863,7 @@ function Initialize-Parameters {
     $global:resourceSuffix = $parametersObject.resourceSuffix
     $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
     $global:searchDataSourceName = $parametersObject.searchDataSourceName
+    $global:searchDataSources = $parametersObject.searchDataSources
     $global:searchEndpoint = $parametersObject.searchEndpoint
     $global:searchIndexFieldNames = $parametersObject.searchIndexFieldNames
     $global:searchIndexName = $parametersObject.searchIndexName
@@ -1031,6 +1012,7 @@ function Initialize-Parameters {
         restoreSoftDeletedResource   = $restoreSoftDeletedResource
         result                       = $result
         searchDataSourceName         = $searchDataSourceName
+        searchDataSources            = $searchDataSources
         searchEndpoint               = $searchEndpoint
         searchIndexFieldNames        = $searchIndexFieldNames
         searchIndexName              = $searchIndexName
@@ -2715,22 +2697,52 @@ function New-SearchDataSource {
     param(
         [string]$searchServiceName,
         [string]$resourceGroupName,
-        [string]$searchDatasourceName,
-        [string]$searchDatasourceType = "azureblob",
+        [psobject]$searchDatasource,
         [string]$searchDatasourceContainerName = "content",
         [string]$searchDatasourceQuery = "*",
         [string]$searchDatasourceDataChangeDetectionPolicy = "HighWaterMark",
-        [string]$searchDatasourceDataDeletionDetectionPolicy = "SoftDeleteColumn"
+        [string]$searchDatasourceDataDeletionDetectionPolicy = "SoftDeleteColumn",
+        [string]$appId = ""
     )
 
     # https://learn.microsoft.com/en-us/azure/search/search-howto-index-sharepoint-online
-    
+
     try {
         $ErrorActionPreference = 'Continue'
+
+        $searchDataSourceName = $searchDatasource.Name
+        $searchDatasourceType = $searchDatasource.Type
+        $searchDatasourceQuery = $searchDatasource.Query
+        $searchDatasourceContainerName = $searchDatasource.ContainerName
+        $searchDatasourceConnectionString = ""
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
 
         $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
+
+        switch ($searchDatasourceType) {
+            "azureblob" {
+                $searchDatasourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
+            }
+            "azuresql" {
+                $searchDatasourceConnectionString = "Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlServerAdmin;Password=$sqlServerAdminPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+            }
+            "cosmosdb" {
+                $searchDatasourceConnectionString = "AccountEndpoint=https://$cosmosDBAccountName.documents.azure.com:443/;AccountKey=$cosmosDBAccountKey;"
+            }
+            "documentdb" {
+                $searchDatasourceConnectionString = "AccountEndpoint=https://$documentDBAccountName.documents.azure.com:443/;AccountKey=$documentDBAccountKey;"
+            }
+            "mysql" {
+                $searchDatasourceConnectionString = "Server=$mysqlServerName.mysql.database.azure.com;Database=$mysqlDatabaseName;Uid=$mysqlServerAdmin@$mysqlServerName;Pwd=$mysqlServerAdminPassword;SslMode=Preferred;"
+            }
+            "sharepoint" {
+                $searchDatasourceConnectionString = "SharePointOnlineEndpoint=$searchDataSource.Url;AppId=$appId;TenantId=$global:tenantId"
+            }
+            "sql" {
+                $searchDatasourceConnectionString = "Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlServerAdmin;Password=$sqlServerAdminPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+            }
+        }
 
         $searchDatasourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
 
@@ -2738,15 +2750,32 @@ function New-SearchDataSource {
 
         Write-Host "searchDatasourceUrl: $searchDatasourceUrl"
 
-        $body = @{
-            name        = $searchDatasourceName
-            type        = $searchDatasourceType
-            credentials = @{
-                connectionString = $searchDatasourceConnectionString
+        if ($searchDatasourceType -eq "sharepoint") {
+
+            $body = @{
+                name        = $searchDatasourceName
+                type        = $searchDatasourceType
+                "admin-key" = $searchServiceApiKey
+                credentials = @{
+                    connectionString = $searchDatasourceConnectionString
+                }
+                container   = @{
+                    name  = $searchDatasourceContainerName
+                    query = $searchDatasourceQuery
+                }
             }
-            container   = @{
-                name  = $searchDatasourceContainerName
-                query = $searchDatasourceQuery
+        }
+        else {
+            $body = @{
+                name        = $searchDatasourceName
+                type        = $searchDatasourceType
+                credentials = @{
+                    connectionString = $searchDatasourceConnectionString
+                }
+                container   = @{
+                    name  = $searchDatasourceContainerName
+                    query = $searchDatasourceQuery
+                }
             }
         }
 
@@ -2762,10 +2791,12 @@ function New-SearchDataSource {
         try {
             $ErrorActionPreference = 'Continue'
 
-            Invoke-RestMethod -Uri $searchDatasourceUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+            if ($searchDataSourceType -ne "sharepoint" || $appId -ne "") {
+                Invoke-RestMethod -Uri $searchDatasourceUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
 
-            Write-Host "Datasource '$searchDatasourceName' created successfully."
-            Write-Log -message "Datasource '$searchDatasourceName' created successfully."
+                Write-Host "Datasource '$searchDatasourceName' created successfully."
+                Write-Log -message "Datasource '$searchDatasourceName' created successfully."
+            }
 
             return true
         }
@@ -2889,15 +2920,17 @@ function New-SearchIndexer {
         $jsonContent.name = $searchIndexerName
         $jsonContent.dataSourceName = $searchDatasourceName
         $jsonContent.targetIndexName = $searchIndexName
-        $jsonContent.skillsetName = $searchSkillSetName
-        $jsonContent.targetIndexName = $searchIndexName
 
         if ($jsonContent.PSObject.Properties.Match('cache')) {
             $jsonContent.PSObject.Properties.Remove('cache')
         }
 
-        if ($jsonContent.PSObject.Properties.Match('vectorSearch')) {
-            $jsonContent.PSObject.Properties.Remove('vectorSearch')
+        if ($jsonContent.PSObject.Properties.Match('cache')) {
+            $jsonContent.PSObject.Properties.Remove('cache')
+        }
+
+        if ($jsonContent.PSObject.Properties.Name -contains "skillsetName") {
+            $jsonContent.skillsetName = $searchSkillSetName
         }
 
         if ($jsonContent.PSObject.Properties.Match('normalizer')) {
@@ -3017,15 +3050,20 @@ function New-SearchService {
                 Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
 
+            # Example for how to obtain the sharepoint siteid for use with the REST Api: https://fedairs.sharepoint.com/sites/MicrosoftCopilotDemo/_api/site
             $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
-            $dataSourceExists = $dataSources -contains $searchDataSourceName
 
-            if ($dataSourceExists -eq $false) {
-                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
-            }
-            else {
-                Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
-                Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+            foreach ($searchDataSource in $global:searchDataSources) {
+                $searchDataSourceName = $searchDataSource.Name
+                $dataSourceExists = $dataSources -contains $searchDataSourceName
+
+                if ($dataSourceExists -eq $false) {
+                    New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $storageAccountName
+                }
+                else {
+                    Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                    Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+                }
             }
 
             #$dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
@@ -3183,6 +3221,21 @@ function New-SearchService {
         }
 
         #Start-Sleep -Seconds 15
+        
+        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+
+        foreach ($searchDataSource in $global:searchDataSources) {
+            $searchDataSourceName = $searchDataSource.Name
+            $dataSourceExists = $dataSources -contains $searchDataSourceName
+
+            if ($dataSourceExists -eq $false) {
+                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $storageAccountName
+            }
+            else {
+                Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+            }
+        }
 
         foreach ($searchSkillSet in $searchSkillSets) {
 
@@ -3204,34 +3257,28 @@ function New-SearchService {
         }
 
         try {
-            if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
 
-                foreach ($indexer in $global:searchIndexers) {
-                    $indexName = $indexer.IndexName
-                    $indexerName = $indexer.Name
-                    $indexerSchema = $indexer.Schema
-                    $indexerSkillSetName = $indexer.SkillSetName
+            foreach ($indexer in $global:searchIndexers) {
+                $indexName = $indexer.IndexName
+                $indexerName = $indexer.Name
+                $indexerSchema = $indexer.Schema
+                $indexerSkillSetName = $indexer.SkillSetName
 
-                    $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
-                    $searchIndexerExists = $searchIndexers -contains $indexerName
+                $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+                $searchIndexerExists = $searchIndexers -contains $indexerName
 
-                    if ($searchIndexerExists -eq $false) {
-                        New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
-                    }
-                    else {
-                        Write-Host "Search Indexer '$indexerName' already exists."
-                        Write-Log -message "Search Indexer '$indexerName' already exists."
-                    }
-
-                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
-
+                if ($searchIndexerExists -eq $false) {
+                    New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
+                }
+                else {
+                    Write-Host "Search Indexer '$indexerName' already exists."
+                    Write-Log -message "Search Indexer '$indexerName' already exists."
                 }
 
-                Start-Sleep -Seconds 10
+                Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+
             }
-            else {
-                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSourceName $searchDataSourceName -storageAccountName $storageAccountName
-            }
+
         }
         catch {
             Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -4034,6 +4081,9 @@ function Start-Deployment {
     foreach ($appService in $appServices) {
         if ($existingResources -notcontains $appService.Name) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $false
+
+            $appId = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "id" --output tsv
+            Write-Host "App ID for $appService.Name: $appId"
         }
     }
 
@@ -4140,9 +4190,27 @@ function Start-Deployment {
         if ($existingResources -notcontains $appService.Name) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $true
         }
-
+            
         if ($appService.Name -ne $functionAppServiceName) {
             New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
+        
+            $appId = az webapp show --name $appService.Name --resource-group $resourceGroupName --query "id" --output tsv
+            Write-Host "App ID for $appService.Name: $appId"
+
+            $dataSources = Get-DataSources -resourceGroupName $resourceGroupName -searchServiceName $searchServiceName
+
+            foreach ($searchDataSource in $global:searchDataSources) {
+                $searchDataSourceName = $searchDataSource.Name
+                $dataSourceExists = $dataSources -contains $searchDataSourceName
+
+                if ($dataSourceExists -eq $false) {
+                    New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $storageAccountName -appId $appId
+                }
+                else {
+                    Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                    Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+                }
+            }
         }
     }
 
@@ -4653,7 +4721,7 @@ function Update-SearchIndexFiles {
 
     $resourceBaseName = $global:resourceBaseName
 
-    $searchIndexFiles = @("search-index-schema-template.json,search-indexer-schema-template.json,vector-search-index-schema-template.json,vector-search-indexer-schema-template.json" )
+    $searchIndexFiles = @("search-index-schema-template.json,search-indexer-schema-template.json,vector-search-index-schema-template.json,vector-search-indexer-schema-template.json,embeddings-search-index-schema-template.json,embeddings-search-indexer-schema-template.json,sharepoint-search-index-schema-template.json,sharepoint-search-indexer-schema-template.json" )
 
     foreach ($fileName in $searchIndexFiles) {
         $searchIndexFilePath = $fileName -replace "-template", ""

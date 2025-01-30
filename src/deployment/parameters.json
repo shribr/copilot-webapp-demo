@@ -87,7 +87,7 @@
     "ResourceGroup": "RG-COPILOT-DEMO-003",
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
   },
-  "appRegistrationClientId": "5e552b83-64ea-4fd2-bbcf-2075ec24af50",
+  "appRegistrationClientId": "67ef2f38-a5c1-44ec-b907-6b7e9576b4c0",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
@@ -136,7 +136,7 @@
       ]
     }
   ],
-  "appDeploymentOnly": true,
+  "appDeploymentOnly": false,
   "appInsightsName": "appi-copilot-demo-003",
   "appServiceEnvironmentName": "ase-copilot-demo-003",
   "appServicePlanName": "asp-copilot-demo-003",
@@ -411,6 +411,8 @@
   "searchDataSources": [
     {
       "Name": "srch-datasource-blob-copilot-demo-003",
+      "ContainerName": "content",
+      "Query": "*",
       "Schema": "search-datasource-blob-schema.json",
       "Type": "azureblob",
       "Url": "https://stcopilotdemo003.blob.core.windows.net/content",
@@ -418,9 +420,13 @@
     },
     {
       "Name": "srch-datasource-sharepoint-copilot-demo-003",
+      "ContainerName": "defaultSiteLibrary",
+      "Query": null,
       "Schema": "search-datasource-sharepoint-schema.json",
       "Type": "sharepoint",
       "Url": "https://fedairs.sharepoint.com/sites/MicrosoftCopilotDemo",
+      "RestUrl": "https://graph.microsoft.com/v1.0/sites/fedairs.sharepoint.com:/sites/MicrosoftCopilotDemo",
+      "ListUrl": "https://graph.microsoft.com/v1.0/sites/{64290738-5830-4b8b-8447-1d77f666421b}/lists/f977d36f-f1a0-420c-9209-bf44b08fb40a/items",
       "YamlFileName": "search.datasource.sharepoint.yaml"
     }
   ],
@@ -446,6 +452,12 @@
       "Name": "embeddings-srch-indexer-copilot-demo-003",
       "Schema": "embeddings-search-indexer-schema.json",
       "SkillSetName": "embeddings-srch-skillset-copilot-demo-003"
+    },
+    {
+      "IndexName": "sharepoint-srch-index-copilot-demo-003",
+      "Name": "sharepoint-srch-indexer-copilot-demo-003",
+      "Schema": "sharepoint-search-indexer-schema.json",
+      "SkillSetName": ""
     }
   ],
   "searchIndexes": [
@@ -463,6 +475,11 @@
       "Model": "text-embedding-3-large",
       "Name": "embeddings-srch-index-copilot-demo-003",
       "Schema": "embeddings-search-index-schema.json"
+    },
+    {
+      "Model": "gpt-4o",
+      "Name": "sharepoint-srch-index-copilot-demo-003",
+      "Schema": "sharepoint-search-index-schema.json"
     }
   ],
   "searchPublicInternetResults": true,

@@ -6,19 +6,9 @@
     "knownClientApplications": [],
     "oauth2PermissionScopes": [
       {
-        "adminConsentDescription": "Allows admin to manage data in the key vault",
-        "adminConsentDisplayName": "Manage Key Vault Data",
-        "id": "5db40993-622b-48e9-81a4-a4caf9af9ebc",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": null,
-        "userConsentDisplayName": "Read Key Vault Secrets",
-        "value": "key_vault_read"
-      },
-      {
         "adminConsentDescription": "Allow the app to read the signed-in users files.",
         "adminConsentDisplayName": "Read User Files",
-        "id": "f2d6c95f-f070-46c0-abe4-1dd5e27608e3",
+        "id": "58d218ee-b1b7-46d0-bc2d-91e1d24d401f",
         "isEnabled": true,
         "type": "User",
         "userConsentDescription": "Allow the app to read your files.",
@@ -26,43 +16,61 @@
         "value": "access_as_user"
       },
       {
-        "userConsentDisplayName": "Access API as user",
+        "adminConsentDescription": "Allows admin to manage data in the key vault",
+        "adminConsentDisplayName": "Manage Key Vault Data",
+        "id": "5c98b0d6-8c55-4a83-8600-b4b0b0f8023b",
+        "isEnabled": true,
         "type": "User",
-        "adminConsentDisplayName": "Access API as user",
-        "id": "c205e8da-9782-4760-94fa-8fd53fc15537",
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "value": "access_as_user",
-        "isEnabled": true
+        "userConsentDescription": null,
+        "userConsentDisplayName": "Read Key Vault Secrets",
+        "value": "key_vault_read"
       },
       {
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "isEnabled": true,
+        "adminConsentDisplayName": "Access API as user",
+        "userConsentDisplayName": "Access API as user",
+        "type": "User",
+        "id": "cc33970c-9e7a-43e6-8ec2-73ed62a6f61b",
+        "value": "access_as_user",
+        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user."
+      },
+      {
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "isEnabled": true,
+        "adminConsentDisplayName": "Read data from API",
         "userConsentDisplayName": "Read data from API",
         "type": "User",
-        "adminConsentDisplayName": "Read data from API",
-        "id": "94b538bf-af91-4507-8982-89f3dfa8d5b9",
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-        "adminConsentDescription": "Allow the application to read data from the API.",
+        "id": "c063d507-115d-4d19-8696-cfc78dd99de1",
         "value": "read_data",
-        "isEnabled": true
+        "adminConsentDescription": "Allow the application to read data from the API."
       }
     ],
-    "preAuthorizedApplications": [],
+    "preAuthorizedApplications": [
+      {
+        "appId": "67ef2f38-a5c1-44ec-b907-6b7e9576b4c0",
+        "delegatedPermissionIds": [
+          "5c98b0d6-8c55-4a83-8600-b4b0b0f8023b",
+          "58d218ee-b1b7-46d0-bc2d-91e1d24d401f"
+        ]
+      }
+    ],
     "requestedAccessTokenVersion": 2
   },
-  "appId": "5e552b83-64ea-4fd2-bbcf-2075ec24af50",
+  "appId": "67ef2f38-a5c1-44ec-b907-6b7e9576b4c0",
   "appRoles": [],
   "applicationTemplateId": null,
   "certification": null,
-  "createdDateTime": "2025-01-21T18:42:42Z",
+  "createdDateTime": "2025-01-19T17:57:51Z",
   "defaultRedirectUri": null,
   "deletedDateTime": null,
   "description": null,
   "disabledByMicrosoftStatus": null,
-  "displayName": "app-copilot-demo-004",
+  "displayName": "app-copilot-demo-003",
   "groupMembershipClaims": null,
-  "id": "15f60757-c91f-49f5-b807-53b3241b3b01",
+  "id": "f8801d72-df05-4533-a887-3b6efb6dee2b",
   "identifierUris": [
-    "api://5e552b83-64ea-4fd2-bbcf-2075ec24af50"
+    "api://67ef2f38-a5c1-44ec-b907-6b7e9576b4c0"
   ],
   "info": {
     "logoUrl": null,
@@ -91,14 +99,37 @@
     {
       "resourceAccess": [
         {
-          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "id": "c67b52c5-7c69-48b6-9d48-7b3af3ded914",
           "type": "Scope"
-        }
-      ],
-      "resourceAppId": "00000004-0000-0000-c000-000000000000"
-    },
-    {
-      "resourceAccess": [
+        },
+        {
+          "id": "c79f8feb-a9db-4090-85f9-90d820caa0eb",
+          "type": "Scope"
+        },
+        {
+          "id": "bdfbf15f-ee85-4955-8675-146e8e5296b5",
+          "type": "Scope"
+        },
+        {
+          "id": "df85f4d6-205c-4ac5-a5ea-6bf408dba283",
+          "type": "Scope"
+        },
+        {
+          "id": "76bc735e-aecd-4a1d-8b4c-2b915deabb79",
+          "type": "Scope"
+        },
+        {
+          "id": "469cd065-729e-4dee-b1fa-d92e0fab6310",
+          "type": "Scope"
+        },
+        {
+          "id": "205e70e5-aba6-4c52-a976-6d2d46c48043",
+          "type": "Scope"
+        },
+        {
+          "id": "f89c84ef-20d0-4b54-87e9-02e856d66d53",
+          "type": "Scope"
+        },
         {
           "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
           "type": "Scope"
@@ -121,7 +152,9 @@
   "servicePrincipalLockConfiguration": null,
   "signInAudience": "AzureADandPersonalMicrosoftAccount",
   "spa": {
-    "redirectUris": []
+    "redirectUris": [
+      "https://app-copilot-demo-003.azurewebsites.net"
+    ]
   },
   "tags": [],
   "tokenEncryptionKeyId": null,
