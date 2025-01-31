@@ -1433,7 +1433,7 @@ function New-App-Registration {
         $exposeApiScopesObj = $exposeApiScopesJson | ConvertFrom-Json
 
         # Check if the app is already registered
-        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --query "[].id" --output tsv
+        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
 
         if ($existingApp) {
             Write-Host "App '$appServiceName' is already registered with App ID: $existingApp."
@@ -1444,7 +1444,7 @@ function New-App-Registration {
         }
         else {
             # Register the app
-            $appRegistration = az ad app create --display-name $appServiceName --output tsv | ConvertFrom-Json
+            $appRegistration = az ad app create --display-name $appServiceName --sign-in-audience AzureADandPersonalMicrosoftAccount --output tsv | ConvertFrom-Json
 
             $appId = $appRegistration.appId
             $objectId = $appRegistration.objectId
@@ -1544,9 +1544,11 @@ function New-App-Registration {
             #az ad app update --id $appId --set appManifest.json
             
             az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
-            az ad app update --id $appId --set "api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)"
+            az ad app update --id $appId --set api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)
             az ad app update --id $appId --required-resource-accesses $appRegRequiredResourceAccessJson
             #az ad app update --id $appId --identifier-uris $identifierUris
+            #az ad app update --id $appId --set displayName=app-copilot-demo-002
+            #az ad app update --id $appId --set notes=test
 
             Write-Host "Scope for app '$appServiceName' added successfully."
             Write-Log -message "Scope for app '$appServiceName' added successfully." -logFilePath $global:LogFilePath

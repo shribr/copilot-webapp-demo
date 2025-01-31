@@ -71,11 +71,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -91,7 +87,7 @@
     "ResourceGroup": "RG-COPILOT-DEMO-002",
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
   },
-  "appRegistrationClientId": "9fd689ca-e7dc-43f8-a710-e7f7df0b8d2f",
+  "appRegistrationClientId": "ec0c2272-c9b3-4c30-9121-c7bd8b3576bc",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
@@ -140,7 +136,7 @@
       ]
     }
   ],
-  "appDeploymentOnly": false,
+  "appDeploymentOnly": true,
   "appInsightsName": "appi-copilot-demo-002",
   "appServiceEnvironmentName": "ase-copilot-demo-002",
   "appServicePlanName": "asp-copilot-demo-002",

@@ -6,30 +6,10 @@
     "knownClientApplications": [],
     "oauth2PermissionScopes": [
       {
-        "adminConsentDescription": "Allow the app to read the signed-in users files.",
-        "adminConsentDisplayName": "Read User Files",
-        "id": "58d218ee-b1b7-46d0-bc2d-91e1d24d401f",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": "Allow the app to read your files.",
-        "userConsentDisplayName": "Read your files",
-        "value": "access_as_user"
-      },
-      {
-        "adminConsentDescription": "Allows admin to manage data in the key vault",
-        "adminConsentDisplayName": "Manage Key Vault Data",
-        "id": "5c98b0d6-8c55-4a83-8600-b4b0b0f8023b",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": null,
-        "userConsentDisplayName": "Read Key Vault Secrets",
-        "value": "key_vault_read"
-      },
-      {
         "value": "access_as_user",
         "isEnabled": true,
         "userConsentDisplayName": "Access API as user",
-        "id": "56200d24-6910-47b7-a4db-b984309c52e8",
+        "id": "7a747fa4-7c6d-4ead-8557-dbab55059178",
         "userConsentDescription": "Allow the application to access the API on your behalf.",
         "type": "User",
         "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
@@ -39,38 +19,30 @@
         "value": "read_data",
         "isEnabled": true,
         "userConsentDisplayName": "Read data from API",
-        "id": "aad83938-b92f-4cc2-8913-e57d02da58c0",
+        "id": "7e95be52-23d1-43ea-839a-c224f6bb57a6",
         "userConsentDescription": "Allow the application to read data from the API on your behalf.",
         "type": "User",
         "adminConsentDescription": "Allow the application to read data from the API.",
         "adminConsentDisplayName": "Read data from API"
       }
     ],
-    "preAuthorizedApplications": [
-      {
-        "appId": "67ef2f38-a5c1-44ec-b907-6b7e9576b4c0",
-        "delegatedPermissionIds": [
-          "5c98b0d6-8c55-4a83-8600-b4b0b0f8023b",
-          "58d218ee-b1b7-46d0-bc2d-91e1d24d401f"
-        ]
-      }
-    ],
-    "requestedAccessTokenVersion": 2
+    "preAuthorizedApplications": [],
+    "requestedAccessTokenVersion": null
   },
-  "appId": "67ef2f38-a5c1-44ec-b907-6b7e9576b4c0",
+  "appId": "ec0c2272-c9b3-4c30-9121-c7bd8b3576bc",
   "appRoles": [],
   "applicationTemplateId": null,
   "certification": null,
-  "createdDateTime": "2025-01-19T17:57:51Z",
+  "createdDateTime": "2025-01-31T04:58:29Z",
   "defaultRedirectUri": null,
   "deletedDateTime": null,
-  "description": null,
+  "description": "test",
   "disabledByMicrosoftStatus": null,
-  "displayName": "app-copilot-demo-003",
+  "displayName": "app-copilot-demo-002",
   "groupMembershipClaims": null,
-  "id": "f8801d72-df05-4533-a887-3b6efb6dee2b",
+  "id": "9fd689ca-e7dc-43f8-a710-e7f7df0b8d2f",
   "identifierUris": [
-    "api://67ef2f38-a5c1-44ec-b907-6b7e9576b4c0"
+    "api://ec0c2272-c9b3-4c30-9121-c7bd8b3576bc"
   ],
   "info": {
     "logoUrl": null,
@@ -83,7 +55,7 @@
   "isFallbackPublicClient": null,
   "keyCredentials": [],
   "nativeAuthenticationApisEnabled": null,
-  "notes": null,
+  "notes": "test2",
   "optionalClaims": null,
   "parentalControlSettings": {
     "countriesBlockedForMinors": [],
@@ -99,27 +71,11 @@
     {
       "resourceAccess": [
         {
-          "id": "c67b52c5-7c69-48b6-9d48-7b3af3ded914",
-          "type": "Scope"
-        },
-        {
-          "id": "c79f8feb-a9db-4090-85f9-90d820caa0eb",
-          "type": "Scope"
-        },
-        {
-          "id": "bdfbf15f-ee85-4955-8675-146e8e5296b5",
-          "type": "Scope"
-        },
-        {
           "id": "df85f4d6-205c-4ac5-a5ea-6bf408dba283",
           "type": "Scope"
         },
         {
           "id": "76bc735e-aecd-4a1d-8b4c-2b915deabb79",
-          "type": "Scope"
-        },
-        {
-          "id": "469cd065-729e-4dee-b1fa-d92e0fab6310",
           "type": "Scope"
         },
         {
@@ -150,10 +106,10 @@
   "samlMetadataUrl": null,
   "serviceManagementReference": null,
   "servicePrincipalLockConfiguration": null,
-  "signInAudience": "AzureADandPersonalMicrosoftAccount",
+  "signInAudience": "AzureADMyOrg",
   "spa": {
     "redirectUris": [
-      "https://app-copilot-demo-003.azurewebsites.net"
+      "https://app-copilot-demo-002.azurewebsites.net"
     ]
   },
   "tags": [],
@@ -167,8 +123,8 @@
   "web": {
     "homePageUrl": null,
     "implicitGrantSettings": {
-      "enableAccessTokenIssuance": false,
-      "enableIdTokenIssuance": false
+      "enableAccessTokenIssuance": true,
+      "enableIdTokenIssuance": true
     },
     "logoutUrl": null,
     "redirectUriSettings": [],
