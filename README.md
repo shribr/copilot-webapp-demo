@@ -425,6 +425,28 @@ The index.html file includes the following screens:
 
 <img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing.png">
 
+### Responsive Design for Touchscreen Devices
+
+Very careful considerations to this solution were made to ensure a smooth and seamless transition between traditional desktop and mobile devices. The UI is adapative and will render the layout accordingly based on the best user experience regardless of the device. Below are several screenshots of the mobile and touch experience.
+
+<div style="display:flex">
+   <div style=""><img width="400" alt="azure-ai-demo-mobile-chat" src="src/deployment/images/azure-ai-demo-mobile-chat.png"></div>
+   <div><img width="400" alt="azure-ai-demo-mobile-settings" src="src/deployment/images/azure-ai-demo-mobile-settings.png"></div>
+   <div><img width="400" alt="azure-ai-demo-mobile-user-profile" src="src/deployment/images/azure-ai-demo-mobile-user-profile.png"></div>
+   <div><img width="400" alt="azure-ai-demo-mobile-documents" src="src/deployment/images/azure-ai-demo-mobile-documents.png"></div>
+</div>
+
+<table style="padding: 4px; border: none !important">
+   <tr>
+      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-chat" src="src/deployment/images/azure-ai-demo-mobile-chat.png"></td>
+      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-settings" src="src/deployment/images/azure-ai-demo-mobile-settings.png"></td>
+   </tr>
+      <tr>
+      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-user-profile" src="src/deployment/images/azure-ai-demo-mobile-user-profile.png"></td>
+      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-documents" src="src/deployment/images/azure-ai-demo-mobile-documents.png"></td>
+   </tr>
+</table>
+
 ### Chat Workflow
 
 For a more in-depth understanding of the chat workflow click [here](./README_CHATWORKFLOW.md)
