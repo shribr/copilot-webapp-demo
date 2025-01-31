@@ -13,11 +13,11 @@
       "Name": "SearchService"
     }
   ],
-  "aiHubName": "hub-ai-copilot-demo-003",
-  "aiHubProjectName": "project-ai-copilot-demo-003",
-  "aiModelDeploymentName": "ai-deployment-copilot-demo-003",
+  "aiHubName": "hub-ai-copilot-demo-002",
+  "aiHubProjectName": "project-ai-copilot-demo-002",
+  "aiModelDeploymentName": "ai-deployment-copilot-demo-002",
   "aiModelFormat": "OpenAI",
-  "aiModelName": "ai-model-copilot-demo-003",
+  "aiModelName": "ai-model-copilot-demo-002",
   "aiModelSkuCapacity": 100,
   "aiModelSkuName": "Standard",
   "aiModelType": "gpt-4o",
@@ -48,15 +48,15 @@
       "Type": "text-embedding-3-large"
     }
   ],
-  "aiProjectName": "project-ai-copilot-demo-003",
+  "aiProjectName": "project-ai-copilot-demo-002",
   "aiServiceApiVersion": "2024-08-01-preview",
-  "aiServiceName": "ai-service-copilot-demo-003",
+  "aiServiceName": "ai-service-copilot-demo-002",
   "aiServiceProperties": {
     "ApiKey": "5c25eb463aa8431588b6d0f22f0ba417",
     "ApiVersion": "2024-08-01-preview",
-    "Endpoint": "https://ai-service-copilot-demo-003.cognitiveservices.azure.com/",
-    "Name": "ai-service-copilot-demo-003",
-    "ServiceName": "ai-service-copilot-demo-003",
+    "Endpoint": "https://ai-service-copilot-demo-002.cognitiveservices.azure.com/",
+    "Name": "ai-service-copilot-demo-002",
+    "ServiceName": "ai-service-copilot-demo-002",
     "Type": "azure_ai_services",
     "YamlFileName": "ai.connection.yaml"
   },
@@ -71,23 +71,27 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": ["text", "hybrid", "vector"],
+    "RetrievalModel": [
+      "text",
+      "hybrid",
+      "vector"
+    ],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
   },
   "apiManagementService": {
     "ApiId": "Standard",
-    "Display": "apim-copilot-demo-003",
+    "Display": "apim-copilot-demo-002",
     "Location": "east us",
-    "Name": "apim-copilot-demo-003",
+    "Name": "apim-copilot-demo-002",
     "Path": "/path",
     "PublisherEmail": "amschrei@microsoft.com",
     "PublisherName": "Ami Schreiber",
-    "ResourceGroup": "RG-COPILOT-DEMO-003",
+    "ResourceGroup": "RG-COPILOT-DEMO-002",
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
   },
-  "appRegistrationClientId": "67ef2f38-a5c1-44ec-b907-6b7e9576b4c0",
+  "appRegistrationClientId": "9fd689ca-e7dc-43f8-a710-e7f7df0b8d2f",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
@@ -101,7 +105,7 @@
       ]
     },
     {
-      "resourceAppId": "00000003-0000-0000-c000-000000000000",
+      "resourceAppId": "00000002-0000-0000-c000-000000000000",
       "resourceAccess": [
         {
           "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
@@ -137,34 +141,34 @@
     }
   ],
   "appDeploymentOnly": false,
-  "appInsightsName": "appi-copilot-demo-003",
-  "appServiceEnvironmentName": "ase-copilot-demo-003",
-  "appServicePlanName": "asp-copilot-demo-003",
+  "appInsightsName": "appi-copilot-demo-002",
+  "appServiceEnvironmentName": "ase-copilot-demo-002",
+  "appServicePlanName": "asp-copilot-demo-002",
   "appServicePlanSku": "I1V2",
   "appServices": [
     {
-      "AppServicePlan": "asp-copilot-demo-003",
+      "AppServicePlan": "asp-copilot-demo-002",
       "DeletePackageAfterDeploy": true,
       "DeployZipPackage": true,
       "Location": "east us",
-      "Name": "app-copilot-demo-003",
+      "Name": "app-copilot-demo-002",
       "Path": "app/frontend",
-      "ResourceGroup": "RG-COPILOT-DEMO-003",
+      "ResourceGroup": "RG-COPILOT-DEMO-002",
       "Runtime": "NODE:20LTS",
       "Type": "Web",
-      "Url": "https://app-copilot-demo-003.azurewebsites.net"
+      "Url": "https://app-copilot-demo-002.azurewebsites.net"
     },
     {
-      "AppServicePlan": "asp-copilot-demo-003",
+      "AppServicePlan": "asp-copilot-demo-002",
       "DeletePackageAfterDeploy": true,
       "DeployZipPackage": true,
       "Location": "east us",
-      "Name": "func-copilot-demo-003",
+      "Name": "func-copilot-demo-002",
       "Path": "app/functions/apikeys",
-      "ResourceGroup": "RG-COPILOT-DEMO-003",
+      "ResourceGroup": "RG-COPILOT-DEMO-002",
       "Runtime": "dotnet-isolated",
       "Type": "Function",
-      "Url": "https://func-copilot-demo-003.azurewebsites.net"
+      "Url": "https://func-copilot-demo-002.azurewebsites.net"
     }
   ],
   "appendUniqueSuffix": false,
@@ -176,7 +180,7 @@
     {
       "Description": "",
       "Location": "",
-      "Name": "crcopilotdemo003-copilot-demo-003",
+      "Name": "crcopilotdemo002-copilot-demo-002",
       "ReplicationLocations": {
         "Location1": "",
         "Location2": "",
@@ -189,14 +193,14 @@
       "YamlFileName": "container.registry.yaml"
     },
     {
-      "ApplicationInsightsName": "appi-copilot-demo-003",
-      "ContainerRegistryName": "crcopilotdemo003",
+      "ApplicationInsightsName": "appi-copilot-demo-002",
+      "ContainerRegistryName": "crcopilotdemo002",
       "Description": "This configuration specifies a project configuration with existing dependent resources",
       "DisplayName": "AI Hub Copilot Demo Project",
-      "KeyVaultName": "kv-copilot-demo-003",
+      "KeyVaultName": "kv-copilot-demo-002",
       "Location": "east us",
-      "Name": "project-ai-copilot-demo-003",
-      "StorageAccountName": "stcopilotdemo003",
+      "Name": "project-ai-copilot-demo-002",
+      "StorageAccountName": "stcopilotdemo002",
       "Tags": {
         "Purpose": ""
       },
@@ -206,9 +210,9 @@
     {
       "Api-Version": "2024-08-01-preview",
       "Description": "AIService",
-      "Endpoint": "https://srch-copilot-demo-003.cognitiveservices.azure.com/",
+      "Endpoint": "https://srch-copilot-demo-002.cognitiveservices.azure.com/",
       "Key": "xxx",
-      "Name": "ai-service-copilot-demo-003",
+      "Name": "ai-service-copilot-demo-002",
       "Type": "azure_ai_services",
       "YamlFileName": "ai.connection.yaml"
     },
@@ -217,13 +221,13 @@
       "ApiKey": "xxx",
       "ApiVersion": "2024-11-01-preview",
       "Description": "SearchService",
-      "Endpoint": "https://srch-copilot-demo-003.search.windows.net",
-      "Name": "srch-copilot-demo-003",
+      "Endpoint": "https://srch-copilot-demo-002.search.windows.net",
+      "Name": "srch-copilot-demo-002",
       "Type": "azure_ai_search",
       "YamlFileName": "search.connection.yaml"
     },
     {
-      "AccountName": "stcopilotdemo003",
+      "AccountName": "stcopilotdemo002",
       "ApiVersion": "2023-11-01",
       "ContainerName": "azureml",
       "Credentials": {
@@ -231,15 +235,15 @@
         "SasToken": "xxx"
       },
       "Description": "StorageService",
-      "Name": "stcopilotdemo003",
+      "Name": "stcopilotdemo002",
       "Type": "azure_blob",
-      "Url": "https://stcopilotdemo003.blob.core.windows.net/azureml",
+      "Url": "https://stcopilotdemo002.blob.core.windows.net/azureml",
       "YamlFileName": "storage.connection.yaml"
     }
   ],
-  "blobStorageAccountName": "blob-copilot-demo-003",
+  "blobStorageAccountName": "blob-copilot-demo-002",
   "blobStorageContainerName": "content",
-  "blobStrorageDatasourceName": "blob-datasource-copilot-demo-003",
+  "blobStrorageDatasourceName": "blob-datasource-copilot-demo-002",
   "chatPersonas": [
     {
       "Description": "You are a teenage girl who is very passionate about fashion and beauty. You love to share your thoughts and opinions on the latest trends and products. You are also very creative and love to express yourself through art and music.",
@@ -283,12 +287,12 @@
     }
   ],
   "cognitiveServiceApiVersion": "2024-10-01",
-  "cognitiveServiceName": "cog-copilot-demo-003",
-  "computerVisionName": "cv-copilot-demo-003",
+  "cognitiveServiceName": "cog-copilot-demo-002",
+  "computerVisionName": "cv-copilot-demo-002",
   "configFilePath": "app/frontend/config.json",
-  "containerAppName": "ca-copilot-demo-003",
-  "containerAppsEnvironmentName": "cae-copilot-demo-003",
-  "containerRegistryName": "crcopilotdemo003",
+  "containerAppName": "ca-copilot-demo-002",
+  "containerAppsEnvironmentName": "cae-copilot-demo-002",
+  "containerRegistryName": "crcopilotdemo002",
   "containerRegistryProperties": {
     "Description": "",
     "Location": "",
@@ -303,13 +307,13 @@
     },
     "YamlFileName": "container.registry.yaml"
   },
-  "cosmosDbAccountName": "cosmos-copilot-demo-003",
+  "cosmosDbAccountName": "cosmos-copilot-demo-002",
   "createResourceGroup": true,
   "deleteResourceGroup": false,
   "deployZipResources": true,
-  "documentIntelligenceName": "docintel-copilot-demo-003",
+  "documentIntelligenceName": "docintel-copilot-demo-002",
   "domainName": "azurewebsites.net",
-  "eventHubNamespaceName": "eh-copilot-demo-003",
+  "eventHubNamespaceName": "eh-copilot-demo-002",
   "exposeApiScopes": [
     {
       "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
@@ -327,34 +331,34 @@
     }
   ],
   "functionServiceProperties": {},
-  "keyVaultName": "kv-copilot-demo-003",
+  "keyVaultName": "kv-copilot-demo-002",
   "keyVaultApiVersion": "7.5",
   "location": "east us",
-  "logAnalyticsWorkspaceName": "log-copilot-demo-003",
+  "logAnalyticsWorkspaceName": "log-copilot-demo-002",
   "machineLearningProperties": {
-    "ApplicationInsightsName": "appi-copilot-demo-003",
-    "ContainerRegistryName": "crcopilotdemo003",
+    "ApplicationInsightsName": "appi-copilot-demo-002",
+    "ContainerRegistryName": "crcopilotdemo002",
     "Description": "This configuration specifies a project configuration with existing dependent resources",
     "DisplayName": "AI Hub Copilot Demo Project",
-    "KeyVaultName": "kv-copilot-demo-003",
+    "KeyVaultName": "kv-copilot-demo-002",
     "Location": "east us",
-    "Name": "ml-copilot-demo-003",
-    "StorageAccountName": "stcopilotdemo003",
+    "Name": "ml-copilot-demo-002",
+    "StorageAccountName": "stcopilotdemo002",
     "Tags": {
       "Purpose": ""
     },
     "YamlFileName": "ai.project.yaml"
   },
-  "machineLearningWorkspaceName": "ml-copilot-demo-003",
-  "managedIdentityName": "id-copilot-demo-003",
-  "openAIAccountName": "openai-copilot-demo-003",
+  "machineLearningWorkspaceName": "ml-copilot-demo-002",
+  "managedIdentityName": "id-copilot-demo-002",
+  "openAIAccountName": "openai-copilot-demo-002",
   "openAIApiVersion": "2024-08-01-preview",
   "openAIServiceProperties": {
     "ApiKey": "f622a933e72049049ac0af3dcfd90db1",
     "ApiVersion": "2024-08-01-preview",
-    "Endpoint": "https://ai-service-copilot-demo-003.openai.azure.com/",
-    "Name": "ai-service-copilot-demo-003_aoai",
-    "ServiceName": "ai-service-copilot-demo-003",
+    "Endpoint": "https://ai-service-copilot-demo-002.openai.azure.com/",
+    "Name": "ai-service-copilot-demo-002_aoai",
+    "ServiceName": "ai-service-copilot-demo-002",
     "Type": "azure_open_ai",
     "YamlFileName": "openai.connection.yaml"
   },
@@ -382,44 +386,44 @@
     },
     "Website": "https://www.contoso.com"
   },
-  "portalDashboardName": "portaldash-copilot-demo-003",
-  "previousResourceBaseName": "copilot-demo-004",
+  "portalDashboardName": "portaldash-copilot-demo-002",
+  "previousResourceBaseName": "copilot-demo-003",
   "privateEndpoints": [
     {
       "Location": "east us",
-      "Name": "pe-copilot-demo-003",
+      "Name": "pe-copilot-demo-002",
       "PrivateConnection": {
-        "Name": "pc-copilot-demo-003",
+        "Name": "pc-copilot-demo-002",
         "PrivateConnectionDescription": "Private connection to SQL Server",
-        "PrivateConnectionName": "pc-copilot-demo-003",
+        "PrivateConnectionName": "pc-copilot-demo-002",
         "PrivateConnectionStatus": "Approved",
         "PrivateConnectionType": "sql"
       },
-      "ResourceGroup": "RG-COPILOT-DEMO-003",
-      "Subnet": "subnet-copilot-demo-003"
+      "ResourceGroup": "RG-COPILOT-DEMO-002",
+      "Subnet": "subnet-copilot-demo-002"
     }
   ],
   "redeployResources": false,
-  "redisCacheName": "redis-copilot-demo-003",
-  "resourceBaseName": "copilot-demo-003",
-  "resourceGroupName": "RG-COPILOT-DEMO-003",
+  "redisCacheName": "redis-copilot-demo-002",
+  "resourceBaseName": "copilot-demo-002",
+  "resourceGroupName": "RG-COPILOT-DEMO-002",
   "resourceSuffix": 1,
   "restoreSoftDeletedResources": true,
   "searchApiVersion": "2024-11-01-preview",
   "searchAzureOpenAIModel": true,
-  "searchDataSourceName": "srch-datasource-copilot-demo-003",
+  "searchDataSourceName": "srch-datasource-copilot-demo-002",
   "searchDataSources": [
     {
-      "Name": "srch-datasource-blob-copilot-demo-003",
+      "Name": "srch-datasource-blob-copilot-demo-002",
       "ContainerName": "content",
       "Query": "*",
       "Schema": "search-datasource-blob-schema.json",
       "Type": "azureblob",
-      "Url": "https://stcopilotdemo003.blob.core.windows.net/content",
+      "Url": "https://stcopilotdemo002.blob.core.windows.net/content",
       "YamlFileName": "search.datasource.blob.yaml"
     },
     {
-      "Name": "srch-datasource-sharepoint-copilot-demo-003",
+      "Name": "srch-datasource-sharepoint-copilot-demo-002",
       "ContainerName": "defaultSiteLibrary",
       "Query": null,
       "Schema": "search-datasource-sharepoint-schema.json",
@@ -430,75 +434,79 @@
       "YamlFileName": "search.datasource.sharepoint.yaml"
     }
   ],
-  "searchEndpoint": "https://srch-copilot-demo-003.search.windows.net",
+  "searchEndpoint": "https://srch-copilot-demo-002.search.windows.net",
   "searchIndexFieldNames": "id,content,category,sourcepage,sourcefile,embedding",
-  "searchIndexName": "srch-index-copilot-demo-003",
-  "searchIndexerName": "srch-indexer-copilot-demo-003",
+  "searchIndexName": "srch-index-copilot-demo-002",
+  "searchIndexerName": "srch-indexer-copilot-demo-002",
   "searchIndexers": [
     {
-      "IndexName": "srch-index-copilot-demo-003",
-      "Name": "srch-indexer-copilot-demo-003",
+      "IndexName": "srch-index-copilot-demo-002",
+      "Name": "srch-indexer-copilot-demo-002",
       "Schema": "search-indexer-schema.json",
-      "SkillSetName": "srch-skillset-copilot-demo-003",
+      "SkillSetName": "srch-skillset-copilot-demo-002",
+      "DataSourceName": "srch-datasource-blob-copilot-demo-002",
       "Active": true
     },
     {
-      "IndexName": "vector-srch-index-copilot-demo-003",
-      "Name": "vector-srch-indexer-copilot-demo-003",
+      "IndexName": "vector-srch-index-copilot-demo-002",
+      "Name": "vector-srch-indexer-copilot-demo-002",
       "Schema": "vector-search-indexer-schema.json",
-      "SkillSetName": "vector-srch-skillset-copilot-demo-003",
+      "SkillSetName": "vector-srch-skillset-copilot-demo-002",
+      "DataSourceName": "srch-datasource-blob-copilot-demo-002",
       "Active": true
     },
     {
-      "IndexName": "embeddings-srch-index-copilot-demo-003",
-      "Name": "embeddings-srch-indexer-copilot-demo-003",
+      "IndexName": "embeddings-srch-index-copilot-demo-002",
+      "Name": "embeddings-srch-indexer-copilot-demo-002",
       "Schema": "embeddings-search-indexer-schema.json",
-      "SkillSetName": "embeddings-srch-skillset-copilot-demo-003",
+      "SkillSetName": "embeddings-srch-skillset-copilot-demo-002",
+      "DataSourceName": "srch-datasource-blob-copilot-demo-002",
       "Active": true
     },
     {
-      "IndexName": "sharepoint-srch-index-copilot-demo-003",
-      "Name": "sharepoint-srch-indexer-copilot-demo-003",
+      "IndexName": "sharepoint-srch-index-copilot-demo-002",
+      "Name": "sharepoint-srch-indexer-copilot-demo-002",
       "Schema": "sharepoint-search-indexer-schema.json",
       "SkillSetName": "",
+      "DataSourceName": "srch-datasource-sharepoint-copilot-demo-002",
       "Active": false
     }
   ],
   "searchIndexes": [
     {
       "Model": "gpt-4o",
-      "Name": "srch-index-copilot-demo-003",
+      "Name": "srch-index-copilot-demo-002",
       "Schema": "search-index-schema.json"
     },
     {
       "Model": "gpt-4o",
-      "Name": "vector-srch-index-copilot-demo-003",
+      "Name": "vector-srch-index-copilot-demo-002",
       "Schema": "vector-search-index-schema.json"
     },
     {
       "Model": "text-embedding-3-large",
-      "Name": "embeddings-srch-index-copilot-demo-003",
+      "Name": "embeddings-srch-index-copilot-demo-002",
       "Schema": "embeddings-search-index-schema.json"
     },
     {
       "Model": "gpt-4o",
-      "Name": "sharepoint-srch-index-copilot-demo-003",
+      "Name": "sharepoint-srch-index-copilot-demo-002",
       "Schema": "sharepoint-search-index-schema.json"
     }
   ],
   "searchPublicInternetResults": true,
   "searchServiceApiVersion": "2024-11-01-Preview",
-  "searchServiceName": "srch-copilot-demo-003",
+  "searchServiceName": "srch-copilot-demo-002",
   "searchServiceProperties": {
     "AIServicesResourceID": "",
     "ApiKey": "xxx",
     "ApiVersion": "2024-11-01-Preview",
-    "Endpoint": "https://srch-copilot-demo-003.search.windows.net",
-    "Name": "srch-copilot-demo-003",
+    "Endpoint": "https://srch-copilot-demo-002.search.windows.net",
+    "Name": "srch-copilot-demo-002",
     "Type": "azure_ai_search",
     "YamlFileName": "search.connection.yaml"
   },
-  "searchSkillSetName": "srch-skillset-copilot-demo-003",
+  "searchSkillSetName": "srch-skillset-copilot-demo-002",
   "searchSkillSetSchema": "search-skillset-copilot-demo.json",
   "searchSkillSets": [
     {
@@ -536,7 +544,7 @@
               ],
               "parentKeyFieldName": "text_parent_id",
               "sourceContext": "/document/pages/*",
-              "targetIndexName": "vector-srch-index-copilot-demo-003"
+              "targetIndexName": "vector-srch-index-copilot-demo-002"
             },
             {
               "mappings": [
@@ -555,11 +563,11 @@
               ],
               "parentKeyFieldName": "image_parent_id",
               "sourceContext": "/document/normalized_images/*",
-              "targetIndexName": "vector-srch-index-copilot-demo-003"
+              "targetIndexName": "vector-srch-index-copilot-demo-002"
             }
           ]
         },
-        "name": "srch-skillset-copilot-demo-003",
+        "name": "srch-skillset-copilot-demo-002",
         "skills": [
           {
             "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
@@ -713,7 +721,7 @@
               ],
               "parentKeyFieldName": "text_parent_id",
               "sourceContext": "/document/pages/*",
-              "targetIndexName": "vector-srch-index-copilot-demo-003"
+              "targetIndexName": "vector-srch-index-copilot-demo-002"
             },
             {
               "mappings": [
@@ -732,11 +740,11 @@
               ],
               "parentKeyFieldName": "image_parent_id",
               "sourceContext": "/document/normalized_images/*",
-              "targetIndexName": "vector-srch-index-copilot-demo-003"
+              "targetIndexName": "vector-srch-index-copilot-demo-002"
             }
           ]
         },
-        "name": "vector-srch-skillset-copilot-demo-003",
+        "name": "vector-srch-skillset-copilot-demo-002",
         "skills": [
           {
             "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
@@ -890,7 +898,7 @@
               ],
               "parentKeyFieldName": "text_parent_id",
               "sourceContext": "/document/pages/*",
-              "targetIndexName": "vector-srch-index-copilot-demo-003"
+              "targetIndexName": "vector-srch-index-copilot-demo-002"
             },
             {
               "mappings": [
@@ -909,11 +917,11 @@
               ],
               "parentKeyFieldName": "image_parent_id",
               "sourceContext": "/document/normalized_images/*",
-              "targetIndexName": "vector-srch-index-copilot-demo-003"
+              "targetIndexName": "vector-srch-index-copilot-demo-002"
             }
           ]
         },
-        "name": "embeddings-srch-skillset-copilot-demo-003",
+        "name": "embeddings-srch-skillset-copilot-demo-002",
         "skills": [
           {
             "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
@@ -1033,31 +1041,31 @@
       }
     }
   ],
-  "searchVectorIndexName": "vector-srch-index-copilot-demo-003",
-  "searchVectorIndexerName": "vector-srch-indexer-copilot-demo-003",
-  "serviceBusNamespaceName": "sb-copilot-demo-003",
-  "sharedDashboardName": "dash-copilot-demo-003",
+  "searchVectorIndexName": "vector-srch-index-copilot-demo-002",
+  "searchVectorIndexerName": "vector-srch-indexer-copilot-demo-002",
+  "serviceBusNamespaceName": "sb-copilot-demo-002",
+  "sharedDashboardName": "dash-copilot-demo-002",
   "siteLogo": "default",
-  "sqlServerName": "sql-copilot-demo-003",
-  "storageAccountName": "stcopilotdemo003",
+  "sqlServerName": "sql-copilot-demo-002",
+  "storageAccountName": "stcopilotdemo002",
   "storageApiVersion": "2025-01-05",
   "storageServiceProperties": {
-    "AccountName": "stcopilotdemo003",
+    "AccountName": "stcopilotdemo002",
     "ApiVersion": "2023-11-01",
     "ContainerName": "azureml",
     "Credentials": {
       "AccountKey": "xxx",
       "SasToken": "xxx"
     },
-    "Name": "stcopilotdemo003",
+    "Name": "stcopilotdemo002",
     "Type": "azure_blob",
-    "Url": "https://stcopilotdemo003.blob.core.windows.net/azureml",
+    "Url": "https://stcopilotdemo002.blob.core.windows.net/azureml",
     "YamlFileName": "storage.connection.yaml"
   },
   "subNet": [
     {
       "AddressPrefix": "10.0.1.0/24",
-      "Description": "subnet-copilot-demo-003",
+      "Description": "subnet-copilot-demo-002",
       "IPV4": [
         {
           "AddressRange": "",
@@ -1076,7 +1084,7 @@
         }
       ],
       "IPV6Enabled": false,
-      "Name": "subnet-copilot-demo-003",
+      "Name": "subnet-copilot-demo-002",
       "PrivateSubNet": true,
       "Security": [
         {
@@ -1095,16 +1103,16 @@
     }
   ],
   "subscriptionId": "00000000-0000-0000-0000-000000000000",
-  "userAssignedIdentityName": "id-copilot-demo-003",
+  "userAssignedIdentityName": "id-copilot-demo-002",
   "virtualNetwork": {
     "AddressPrefix": "",
     "AddressSpace": "",
     "Location": "east us",
-    "Name": "vnet-copilot-demo-003",
-    "ResourceGroup": "RG-COPILOT-DEMO-003",
+    "Name": "vnet-copilot-demo-002",
+    "ResourceGroup": "RG-COPILOT-DEMO-002",
     "Subnets": [
       {
-        "Name": "subnet-copilot-demo-003"
+        "Name": "subnet-copilot-demo-002"
       }
     ]
   }

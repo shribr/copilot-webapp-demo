@@ -1,7 +1,7 @@
 {
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "cognitiveServices": {
-    "key": "7bf1c14ea1184da1b8369a08ea509a2f",
+    "key": "3527527d080b4f53a54b106a7ff1bd25",
     "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
   },
   "description": "Skillset to chunk documents and generate embeddings",
@@ -31,7 +31,7 @@
         ],
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-004"
+        "targetIndexName": "vector-srch-index-copilot-demo-002"
       },
       {
         "mappings": [
@@ -50,11 +50,11 @@
         ],
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-004"
+        "targetIndexName": "vector-srch-index-copilot-demo-002"
       }
     ]
   },
-  "name": "embeddings-srch-skillset-copilot-demo-004",
+  "name": "embeddings-srch-skillset-copilot-demo-002",
   "skills": [
     {
       "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",

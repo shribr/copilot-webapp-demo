@@ -1373,13 +1373,21 @@ function New-ApiManagementService {
 
         }
         catch {
-            Write-Error "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create API Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            Write-Error "Failed to create Api Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Api Management service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
     }
     else {
-        Write-Host "API Management service '$apiManagementServiceName' already exists."
-        Write-Log -message "API Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
+        Write-Host "Api Management service '$apiManagementServiceName' already exists."
+        Write-Log -message "Api Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
+
+        $status = az apim show --resource-group $resourceGroupName --name $apiManagementServiceName --query "provisioningState" -o tsv
+
+        if ($status -eq "Activating") {
+            Write-Host "Api Management service '$apiManagementServiceName' is activating."
+            Write-Log -message "Api Management service '$apiManagementServiceName' is activating." -logFilePath $global:LogFilePath
+            return
+        }
 
         # Check if the API already exists
         $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy"
@@ -1395,12 +1403,12 @@ function New-ApiManagementService {
             az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
             az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
 
-            Write-Host "API 'KeyVaultProxy' and its operations created successfully."
-            Write-Log -message "API 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
+            Write-Host "Api 'KeyVaultProxy' and its operations created successfully."
+            Write-Log -message "Api 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
         }
         else {
-            Write-Host "API 'KeyVaultProxy' already exists."
-            Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
+            Write-Host "Api 'KeyVaultProxy' already exists."
+            Write-Log -message "Api 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
         }
     }
 }
@@ -1412,18 +1420,20 @@ function New-App-Registration {
         [string]$appServiceUrl,
         [string]$resourceGroupName,
         [string]$keyVaultName,
-        [array]$appRegRequiredResourceAccess,
-        [array]$exposeApiScopes,
         [string]$parametersFile
     )
 
     try {
         $ErrorActionPreference = 'Stop'
 
-        $appRegRequiredResourceAccessJson = $appRegRequiredResourceAccess | ConvertTo-Json -depth 4
+        $appRegRequiredResourceAccessJson = $appRegRequiredResourceAccess | ConvertTo-Json -Depth 4
+        $appRegRequiredResourceAccessObj = $appRegRequiredResourceAccessJson | ConvertFrom-Json
+
+        $exposeApiScopesJson = $exposeApiScopes | ConvertTo-Json -Depth 4
+        $exposeApiScopesObj = $exposeApiScopesJson | ConvertFrom-Json
 
         # Check if the app is already registered
-        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
+        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --query "[].id" --output tsv
 
         if ($existingApp) {
             Write-Host "App '$appServiceName' is already registered with App ID: $existingApp."
@@ -1431,17 +1441,13 @@ function New-App-Registration {
 
             $appId = $existingApp
             $objectId = az ad app show --id $appId --query "objectId" --output tsv
-
-            $global:appRegistrationClientId = $appId
         }
         else {
             # Register the app
-            $appRegistration = az ad app create --display-name $appServiceName --sign-in-audience "AzureADandPersonalMicrosoftAccount" --required-resource-access $appRegRequiredResourceAccessJson
+            $appRegistration = az ad app create --display-name $appServiceName --output tsv | ConvertFrom-Json
 
             $appId = $appRegistration.appId
             $objectId = $appRegistration.objectId
-
-            $global:appRegistrationClientId = $appId
 
             Write-Host "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
             Write-Log -message "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
@@ -1451,21 +1457,26 @@ function New-App-Registration {
         Update-ParametersFile-AppRegistration -parametersFile $parametersFile -appId $appId -appUri $appUri
 
         $permissions = "User.Read.All"
-
+        $apiPermissions = ""
+        
         # Check and set API permissions
         foreach ($permission in $appRegRequiredResourceAccess) {
-            $existingPermission = az ad app permission list --id $appId --query "[?resourceAppId=='$($permission.resourceAppId)'].{id:id, value:value}" --output tsv
+            $existingPermission = az ad app permission list --id $appId
             if (-not $existingPermission) {
 
                 try {
 
                     $permissionResourceAppId = $permission.resourceAppId
 
-                    $apiPermissions = "$($permission.resourceAccess.id)=$($permission.resourceAccess.type)"
+                    foreach ($access in $permission.resourceAccess) {
+                        $apiPermissions += "$($access.id)=$($access.type) "
+                        az ad app permission add --id $appId --api $permissionResourceAppId --api-permissions "$($access.id)=$($access.type)"
+                    }
+
                     Write-Host "API Permissions: $apiPermissions"
 
                     #For some reason using the variables is not working with the command below
-                    az ad app permission add --id $appId --api $permissionResourceAppId --api-permissions $apiPermissions
+                    #az ad app permission add --id $appId --api $permissionResourceAppId --api-permissions 
                     #az ad app permission add --id $appId --api $permission.resourceAppId --api-permissions $permissions=Scope
 
                     Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully."
@@ -1491,8 +1502,8 @@ function New-App-Registration {
 
         #az ad app permission grant --id $appId --api $permission.resourceAppId --scope $permissions
 
-        Write-Host "API permissions set for app '$appServiceName'."
-        Write-Log -message "API permissions set for app '$appServiceName'."
+        Write-Host "Api permissions set for app '$appServiceName'."
+        Write-Log -message "Api permissions set for app '$appServiceName'."
 
         try {
             # Check and expose the API
@@ -1534,6 +1545,7 @@ function New-App-Registration {
             
             az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
             az ad app update --id $appId --set "api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)"
+            az ad app update --id $appId --required-resource-accesses $appRegRequiredResourceAccessJson
             #az ad app update --id $appId --identifier-uris $identifierUris
 
             Write-Host "Scope for app '$appServiceName' added successfully."
@@ -2815,7 +2827,6 @@ function New-SearchIndex {
         [string]$searchServiceName,
         [string]$resourceGroupName,
         [string]$searchIndexName,
-        [string]$searchDatasourceName,
         [string]$searchIndexSchema
     )
 
@@ -3116,6 +3127,8 @@ function New-SearchService {
                         $indexerSchema = $indexer.Schema
                         $indexerSkillSetName = $indexer.SkillSetName
 
+                        $searchDataSourceName = $indexer.DataSourceName
+
                         $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
                         $searchIndexerExists = $searchIndexers -contains $indexerName
 
@@ -3279,6 +3292,8 @@ function New-SearchService {
                 $indexerName = $indexer.Name
                 $indexerSchema = $indexer.Schema
                 $indexerSkillSetName = $indexer.SkillSetName
+
+                $searchDataSourceName = $indexer.DataSourceName
 
                 $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
                 $searchIndexerExists = $searchIndexers -contains $indexerName
@@ -4209,7 +4224,7 @@ function Start-Deployment {
         }
             
         if ($appService.Name -ne $functionAppServiceName) {
-            New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
+            New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -parametersFile $global:parametersFile
             
             $appServiceName = $appService.Name
 
