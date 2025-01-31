@@ -1519,7 +1519,7 @@ function New-App-Registration {
             # Define the identifierUrisArray
             # $identifierUrisArray = @{"uri" = "https://app-$global:resourceBaseName.azurewebsites.net" }
             #$identifierUris = "https://app-$global:resourceBaseName.azurewebsites.net api://$global:appRegistrationClientId"
-            $identifierUris = "api://$global:appRegistrationClientId"
+            #$identifierUris = "api://$global:appRegistrationClientId"
 
             # Update the identifierUris and oauth2PermissionScopes properties
             #$app.identifierUris = $identifierUris
@@ -1628,6 +1628,9 @@ function New-AppService {
                     # Create a new web app
                     az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
                     #az webapp cors add --methods GET POST PUT --origins '*' --services b --account-name $appServiceName --account-key $storageAccessKey
+                    $userAssignedIdentity = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName
+
+                    az webapp identity assign --name $appServiceName --resource-group $resourceGroupName --identities $userAssignedIdentity.id --output tsv
                 }
             }
             else {
@@ -2720,6 +2723,16 @@ function New-SearchDataSource {
 
         $storageAccessKey = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName --query "[0].value" --output tsv
 
+        foreach ($appService in $global:appServices) {
+            $appServiceName = $appService.Name
+
+            if ($appService.Type -eq "Web") {
+                #$appId = az webapp show --name $appService.Name --resource-group $resourceGroupName --query "id" --output tsv
+                $appId = az ad app list --filter "displayName eq '$($appService.Name)'" --query "[].appId" --output tsv
+                Write-Host "App ID for $($appServiceName): $appId"
+            }
+        }
+
         switch ($searchDatasourceType) {
             "azureblob" {
                 $searchDatasourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
@@ -2737,45 +2750,27 @@ function New-SearchDataSource {
                 $searchDatasourceConnectionString = "Server=$mysqlServerName.mysql.database.azure.com;Database=$mysqlDatabaseName;Uid=$mysqlServerAdmin@$mysqlServerName;Pwd=$mysqlServerAdminPassword;SslMode=Preferred;"
             }
             "sharepoint" {
-                $searchDatasourceConnectionString = "SharePointOnlineEndpoint=$searchDataSource.Url;AppId=$appId;TenantId=$global:tenantId"
+                $searchDataSourceUrl = $searchDataSource.Url
+                $searchDatasourceConnectionString = "SharePointOnlineEndpoint=$searchDataSourceUrl;ApplicationId=$appId;TenantId=$global:tenantId"
             }
             "sql" {
                 $searchDatasourceConnectionString = "Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlServerAdmin;Password=$sqlServerAdminPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
             }
         }
 
-        $searchDatasourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
-
         $searchDatasourceUrl = "https://$searchServiceName.search.windows.net/datasources?api-version=$global:searchServiceAPiVersion"
 
         Write-Host "searchDatasourceUrl: $searchDatasourceUrl"
 
-        if ($searchDatasourceType -eq "sharepoint") {
-
-            $body = @{
-                name        = $searchDatasourceName
-                type        = $searchDatasourceType
-                "admin-key" = $searchServiceApiKey
-                credentials = @{
-                    connectionString = $searchDatasourceConnectionString
-                }
-                container   = @{
-                    name  = $searchDatasourceContainerName
-                    query = $searchDatasourceQuery
-                }
+        $body = @{
+            name        = $searchDatasourceName
+            type        = $searchDatasourceType
+            credentials = @{
+                connectionString = $searchDatasourceConnectionString
             }
-        }
-        else {
-            $body = @{
-                name        = $searchDatasourceName
-                type        = $searchDatasourceType
-                credentials = @{
-                    connectionString = $searchDatasourceConnectionString
-                }
-                container   = @{
-                    name  = $searchDatasourceContainerName
-                    query = $searchDatasourceQuery
-                }
+            container   = @{
+                name  = $searchDatasourceContainerName
+                query = $searchDatasourceQuery
             }
         }
 
@@ -2791,13 +2786,11 @@ function New-SearchDataSource {
         try {
             $ErrorActionPreference = 'Continue'
 
-            if ($searchDataSourceType -ne "sharepoint" || $appId -ne "") {
-                Invoke-RestMethod -Uri $searchDatasourceUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
+            Invoke-RestMethod -Uri $searchDatasourceUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
 
-                Write-Host "Datasource '$searchDatasourceName' created successfully."
-                Write-Log -message "Datasource '$searchDatasourceName' created successfully."
-            }
-
+            Write-Host "Datasource '$searchDatasourceName' created successfully."
+            Write-Log -message "Datasource '$searchDatasourceName' created successfully."
+                
             return true
         }
         catch {
@@ -2944,7 +2937,7 @@ function New-SearchIndexer {
         # Construct the REST API URL
         $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$global:searchServiceApiVersion"
 
-        # Create the index
+        # Create the indexer
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
             Write-Host "Search Indexer '$searchIndexerName' created successfully."
@@ -3053,12 +3046,21 @@ function New-SearchService {
             # Example for how to obtain the sharepoint siteid for use with the REST Api: https://fedairs.sharepoint.com/sites/MicrosoftCopilotDemo/_api/site
             $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
 
+            foreach ($appService in $global:appServices) {
+                if ($appService.Type -eq "Web") {
+                    $appServiceName = $appService.Name
+                    #$appId = az webapp show --name $appService.Name --resource-group $resourceGroupName --query "id" --output tsv
+                    $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
+                    Write-Host "App ID for $($appServiceName): $appId"
+                }
+            }
+
             foreach ($searchDataSource in $global:searchDataSources) {
                 $searchDataSourceName = $searchDataSource.Name
                 $dataSourceExists = $dataSources -contains $searchDataSourceName
 
                 if ($dataSourceExists -eq $false) {
-                    New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $storageAccountName
+                    New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $storageAccountName -appId $appId
                 }
                 else {
                     Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
@@ -3106,7 +3108,9 @@ function New-SearchService {
             try {
                 if ($dataSourceExists -eq "true" -and $searchIndexExists -eq $true) {
 
-                    foreach ($indexer in $global:searchIndexers) {
+                    $filteredSearchIndexers = $global:searchIndexers | Where-Object { $_.Active -eq $true }
+
+                    foreach ($indexer in $filteredSearchIndexers) {
                         $indexName = $indexer.IndexName
                         $indexerName = $indexer.Name
                         $indexerSchema = $indexer.Schema
@@ -3223,13 +3227,23 @@ function New-SearchService {
         #Start-Sleep -Seconds 15
         
         $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+        $userAssignedIdentity = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName
+
+        foreach ($appService in $global:appServices) {
+            $appServiceName = $appService.Name
+            if ($appService.Type -eq "Web") {
+                #$appId = az webapp show --name $appService.Name --resource-group $resourceGroupName --query "id" --output tsv
+                $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
+                Write-Host "App ID for $($appServiceName): $appId"
+            }
+        }
 
         foreach ($searchDataSource in $global:searchDataSources) {
             $searchDataSourceName = $searchDataSource.Name
             $dataSourceExists = $dataSources -contains $searchDataSourceName
 
             if ($dataSourceExists -eq $false) {
-                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $storageAccountName
+                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $storageAccountName -appId $appId
             }
             else {
                 Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
@@ -3258,7 +3272,9 @@ function New-SearchService {
 
         try {
 
-            foreach ($indexer in $global:searchIndexers) {
+            $filteredSearchIndexers = $global:searchIndexers | Where-Object { $_.Active -eq $true }
+
+            foreach ($indexer in $filteredSearchIndexers) {
                 $indexName = $indexer.IndexName
                 $indexerName = $indexer.Name
                 $indexerSchema = $indexer.Schema
@@ -4079,11 +4095,12 @@ function Start-Deployment {
 
     # Create new web app and function app services
     foreach ($appService in $appServices) {
+        $appServiceName = $appService.Name
         if ($existingResources -notcontains $appService.Name) {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -deployZipResources $false
 
             $appId = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "id" --output tsv
-            Write-Host "App ID for $appService.Name: $appId"
+            Write-Host "App ID for $($appServiceName): $appId"
         }
     }
 
@@ -4193,9 +4210,13 @@ function Start-Deployment {
             
         if ($appService.Name -ne $functionAppServiceName) {
             New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
-        
-            $appId = az webapp show --name $appService.Name --resource-group $resourceGroupName --query "id" --output tsv
-            Write-Host "App ID for $appService.Name: $appId"
+            
+            $appServiceName = $appService.Name
+
+            #$appId = az webapp show --name $appService.Name --resource-group $resourceGroupName --query "id" --output tsv
+            $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
+            
+            Write-Host "App ID for $($appServiceName): $appId"
 
             $dataSources = Get-DataSources -resourceGroupName $resourceGroupName -searchServiceName $searchServiceName
 

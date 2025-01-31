@@ -1,9 +1,9 @@
 {
-  "@odata.context": "https://srch-copilot-demo-003.search.windows.net/indexers?api-version=2024-11-01-preview",
+  "@odata.context": "https://srch-copilot-demo-003.search.windows.net/indexers?api-version=2024-11-01-Preview",
   "@odata.etag": "\"0x8DD102F99E2BC2D\"",
-  "name": "sharepoint-search-indexer-copilot-demo-003",
-  "dataSourceName": "sharepoint-datasource-copilot-demo-003",
-  "targetIndexName": "sharepoint-search-index-copilot-demo-003",
+  "name": "sharepoint-srch-indexer-copilot-demo-003",
+  "dataSourceName": "srch-datasource-sharepoint-copilot-demo-003",
+  "targetIndexName": "sharepoint-srch-index-copilot-demo-003",
   "parameters": {
     "batchSize": null,
     "maxFailedItems": null,

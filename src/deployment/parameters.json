@@ -439,25 +439,29 @@
       "IndexName": "srch-index-copilot-demo-003",
       "Name": "srch-indexer-copilot-demo-003",
       "Schema": "search-indexer-schema.json",
-      "SkillSetName": "srch-skillset-copilot-demo-003"
+      "SkillSetName": "srch-skillset-copilot-demo-003",
+      "Active": true
     },
     {
       "IndexName": "vector-srch-index-copilot-demo-003",
       "Name": "vector-srch-indexer-copilot-demo-003",
       "Schema": "vector-search-indexer-schema.json",
-      "SkillSetName": "vector-srch-skillset-copilot-demo-003"
+      "SkillSetName": "vector-srch-skillset-copilot-demo-003",
+      "Active": true
     },
     {
       "IndexName": "embeddings-srch-index-copilot-demo-003",
       "Name": "embeddings-srch-indexer-copilot-demo-003",
       "Schema": "embeddings-search-indexer-schema.json",
-      "SkillSetName": "embeddings-srch-skillset-copilot-demo-003"
+      "SkillSetName": "embeddings-srch-skillset-copilot-demo-003",
+      "Active": true
     },
     {
       "IndexName": "sharepoint-srch-index-copilot-demo-003",
       "Name": "sharepoint-srch-indexer-copilot-demo-003",
       "Schema": "sharepoint-search-indexer-schema.json",
-      "SkillSetName": ""
+      "SkillSetName": "",
+      "Active": false
     }
   ],
   "searchIndexes": [
