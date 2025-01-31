@@ -91,6 +91,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     var screen = getQueryParam('screen');
 
+    document.title = config.USE_CUSTOM_APP_TITLE ? config.CUSTOM_APP_TITLE : config.DEFAULT_APP_TITLE;
+
+    document.getElementById('main-header-title').innerText = config.USE_CUSTOM_APP_TITLE ? config.CUSTOM_APP_TITLE : config.DEFAULT_APP_TITLE;
+
     toggleDisplay(screen);
 
     var loginContainer = document.getElementById("login-container");

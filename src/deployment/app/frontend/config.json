@@ -1,4 +1,6 @@
 {
+  "CUSTOM_APP_TITLE": "GAO Chat using Microsoft Copilot",
+  "DEFAULT_APP_TITLE": "Chat with Microsoft Copilot",
   "AUTHENTICATION_MODE": "MSAL",
   "AZURE_OPENAI_SERVICE_API_KEY": "617fbecd68bb4835af175a0503bac785",
   "AZURE_OPENAI_SERVICE_SECRET_NAME": "OpenAIServiceApiKey",
@@ -26,7 +28,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-29T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tqfb&srt=co&sig=eTnQr%2BKgLsPSaU0uZi4F2t33t%2BCUVi0A3LrsiYSwiNc%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo002.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-01-29T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=ftqb&srt=co&sig=oOGIQdtOj4ZXeEc8XqmAEgccqJQ%2B/9D4/7p/me4xfZI%3D",
   "AZURE_STORAGE_KEY": "OOtQNuMEM39fvwTB0GSrEHV+3eAsErAs4z/aEwXuMeLSKCb5c1iVMeErAGB873MvexBoGNZsxkDS+AStICKgzA==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -89,13 +91,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "tqfb",
+    "SS": "ftqb",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-01-29T23:59:59Z",
     "ST": "2025-01-29T23:59:59Z",
     "SPR": "https",
-    "SIG": "eTnQr%2BKgLsPSaU0uZi4F2t33t%2BCUVi0A3LrsiYSwiNc%3D",
+    "SIG": "oOGIQdtOj4ZXeEc8XqmAEgccqJQ%2B/9D4/7p/me4xfZI%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -561,5 +563,6 @@
       "SVG": "<svg fill=\"currentColor\" class=\"icon-svg-nav sidenav link\" focusable=\"false\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M0 0h24v24H0z\" fill=\"none\"></path><path d=\"M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z\"></path></svg>",
       "URL": "?screen=chat"
     }
-  }
+  },
+  "USE_CUSTOM_APP_TITLE": true
 }

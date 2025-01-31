@@ -168,6 +168,7 @@
     }
   ],
   "appendUniqueSuffix": false,
+  "appTitle": "Chat with Microsoft Copilot",
   "azureManagement": {
     "ApiVersion": "2024-06-01-Preview",
     "Url": "https://management.azure.com"
