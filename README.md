@@ -432,11 +432,11 @@ Very careful considerations to this solution were made to ensure a smooth and se
 <table style="padding: 4px; border: none !important">
    <tr>
       <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-chat" src="src/deployment/images/azure-ai-demo-mobile-chat.png"></td>
-      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-settings" src="src/deployment/images/azure-ai-demo-mobile-settings.png"></td>
+      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-documents" src="src/deployment/images/azure-ai-demo-mobile-documents.png"></td>
    </tr>
       <tr>
       <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-user-profile" src="src/deployment/images/azure-ai-demo-mobile-user-profile.png"></td>
-      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-documents" src="src/deployment/images/azure-ai-demo-mobile-documents.png"></td>
+      <td style="border:none !important"><img width="400" alt="azure-ai-demo-mobile-settings" src="src/deployment/images/azure-ai-demo-mobile-settings.png"></td>
    </tr>
 </table>
 
