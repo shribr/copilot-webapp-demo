@@ -46,6 +46,18 @@
         "Name": "Standard"
       },
       "Type": "text-embedding-3-large"
+    },
+    {
+      "ApiKey": "xxx",
+      "ApiVersion": "2023-08-10",
+      "Format": "OpenAI",
+      "ModelVersion": "3.0",
+      "Name": "dall-e-3",
+      "Sku": {
+        "Capacity": 6,
+        "Name": "Standard"
+      },
+      "Type": "dall-e-3"
     }
   ],
   "aiProjectName": "project-ai-copilot-demo-004",

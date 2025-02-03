@@ -491,6 +491,15 @@ function addMessageToChatHistory(thread, message) {
     console.log(thread);
 }
 
+// Function to check if user is requesting an image be generated.
+async function checkIfImageQuestion(input) {
+    const creationTerms = ['create', 'make', 'generate', 'design', 'imagine'];
+
+    const createImage = input.indexOf(creationTerms);
+
+    return createImage;
+}
+
 // Function to check if user is logged in
 async function checkIfLoggedIn() {
 
@@ -606,6 +615,33 @@ function clearFileInput() {
     const selectedFilesDiv = document.getElementById('file-list');
     selectedFilesDiv.innerHTML = ''; // Clear the list of selected files
     updatePlaceholder(); // Update the placeholder text
+}
+
+// Function to collect chat results
+function collectChatResults(chatResultsId) {
+    const chatDisplay = document.getElementById(`${chatResultsId} `);
+    return chatDisplay.innerHTML;
+}
+
+// Function to count the number of occurrences of a string in another string
+function countOccurrences(mainString, searchString) {
+
+    //const count = countQuadrupleDollarSigns(mainString);
+
+    const regex = new RegExp(searchString.replace(/\$/g, '\\$'), 'g');
+    const matches = mainString.match(regex);
+    return matches ? matches.length : 0;
+}
+
+function countQuadrupleDollarSigns(str) {
+    const regex = /\$\$\$\$/g;
+    let count = 0;
+    let match;
+    while ((match = regex.exec(str)) !== null) {
+        count++;
+    }
+
+    return count;
 }
 
 // Function to create chat response content
@@ -781,33 +817,6 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         //answerResponseNumber++;
     }
 
-}
-
-// Function to collect chat results
-function collectChatResults(chatResultsId) {
-    const chatDisplay = document.getElementById(`${chatResultsId} `);
-    return chatDisplay.innerHTML;
-}
-
-// Function to count the number of occurrences of a string in another string
-function countOccurrences(mainString, searchString) {
-
-    //const count = countQuadrupleDollarSigns(mainString);
-
-    const regex = new RegExp(searchString.replace(/\$/g, '\\$'), 'g');
-    const matches = mainString.match(regex);
-    return matches ? matches.length : 0;
-}
-
-function countQuadrupleDollarSigns(str) {
-    const regex = /\$\$\$\$/g;
-    let count = 0;
-    let match;
-    while ((match = regex.exec(str)) !== null) {
-        count++;
-    }
-
-    return count;
 }
 
 //function to create side navigation links
@@ -1062,7 +1071,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     const deploymentName = aiModelName;
     const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const clientId = config.AZURE_APP_REG_CLIENT_APP_ID;
+
     const keyVaultEndPoint = "https://vault.azure.net/.default"
     const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
@@ -1097,6 +1106,15 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
         }
 
         searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+    }
+
+    const createImage = await checkIfImageQuestion(userInput);
+
+    if (createImage > -1) {
+
+        const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
+
+        return result;
     }
 
     if (dataSources.length > 0) {
@@ -1223,7 +1241,6 @@ async function getChatResponse(questionBubble) {
     const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const dataSources = config.DATA_SOURCES;
-    const keyVaultName = config.AZURE_KEY_VAULT_NAME;
 
     const responseTabList = Object.entries(config.RESPONSE_TABS);
     const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
@@ -1237,7 +1254,23 @@ async function getChatResponse(questionBubble) {
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
 
-    const aiModel = config.AI_MODELS[0];
+    const checkIfImageQuestion = await checkIfImageQuestion(chatInput);
+
+    const queryParam = getQueryParam('promptSuffix');
+
+    let aiModel = {};
+    let promptSuffix = !queryParam ? config.PROMPT_SUFFIX : queryParam;
+    let prompt = '';
+
+    if (checkIfImageQuestion > -1) {
+        prompt = chatInput;
+        aiModel = config.AI_MODELS.find(item => item.Name === "dall-e-3");
+    }
+    else {
+        prompt = chatInput + promptSuffix;
+        aiModel = config.AI_MODELS.find(item => item.Name === "gpt-4o");
+    }
+
     const aiModelName = aiModel.Name;
 
     // Construct the SAS token from the individual components
@@ -1257,16 +1290,8 @@ async function getChatResponse(questionBubble) {
     const loadingAnimation = document.querySelector('.loading-animation');
     loadingAnimation.style.display = 'flex';
 
-    // Temporarary attachment for testing
-    const attachment = "";
-
-    const queryParam = getQueryParam('promptSuffix');
-
-    let promptSuffix = !queryParam ? config.PROMPT_SUFFIX : queryParam;
-
     if (chatInput) {
 
-        const prompt = chatInput + promptSuffix;
         const message = { "role": "user", "content": prompt };
 
         addMessageToChatHistory(thread, message);
@@ -1411,6 +1436,11 @@ async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sa
     } catch (error) {
         console.error('Error fetching documents:', error);
     }
+}
+
+// Function to get answers for image related questions
+async function getImageAnswers(input) {
+
 }
 
 // Function to get SAS token from Azure Key Vault
@@ -1642,9 +1672,7 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
     let data = {};
     let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
-    const keyVaultName = config.AZURE_KEY_VAULT_NAME;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const clientId = config.AZURE_APP_REG_CLIENT_APP_ID;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
     const keyVaultEndPoint = "https://vault.azure.net/.default"
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
