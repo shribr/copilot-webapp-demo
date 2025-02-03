@@ -199,7 +199,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 <img id="ai_studio_project_add_models" width="600" alt="AI Studio Add AI Models" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-management.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 
-## Deployment Script Workflow and Functions List
+#### Script Workflow and Functions List
 
 1. **Initialization and Setup:**
 
