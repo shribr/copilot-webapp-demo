@@ -20,10 +20,6 @@ The index.html file includes the following screens:
 
 <img width="1879" alt="azure-ai-demo-settings" src="src/deployment/images/azure-ai-demo-settings.png">
 
-<img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/images/azure-ai-demo-selected-docs.png">
-
-<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing.png">
-
 ## Prerequisites
 
 ### Core Tools (Required)
@@ -533,6 +529,13 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 **API Management Service CORS**
 
 <img id="api_management_service_cors" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+**Document Screen - Selected Documents**
+
+<img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/images/azure-ai-demo-selected-docs.png">
+
+**Documents Screen - Existing Documents**
+<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing.png">
 
 ## Index
 
