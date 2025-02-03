@@ -6,7 +6,23 @@ This project is a web application that allows users to chat with Azure Copilot t
 
 The solution is fully configurable via a parameters.json file. It includes a simple HTML interface and a PowerShell script for deployment.
 
+## Web Application Screens
+
+The index.html file includes the following screens:
+
 <img width="1423" alt="azure-ai-demo-home" src="src/deployment/images/azure-ai-demo-home.png">
+
+<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/images/azure-ai-demo-documents-upload.png">
+
+<img width="1410" alt="azure-ai-demo-chat" src="src/deployment/images/azure-ai-demo-chat.png">
+
+<img width="1409" alt="azure-ai-demo-response" src="src/deployment/images/azure-ai-demo-response.png">
+
+<img width="1879" alt="azure-ai-demo-settings" src="src/deployment/images/azure-ai-demo-settings.png">
+
+<img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/images/azure-ai-demo-selected-docs.png">
+
+<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing.png">
 
 ## Prerequisites
 
@@ -449,24 +465,6 @@ This architecture ensures a robust, scalable, and maintainable web application l
 ├── settings.json
 
 ```
-
-## Web Application Screens
-
-The index.html file includes the following screens:
-
-<img width="1423" alt="azure-ai-demo-home" src="src/deployment/images/azure-ai-demo-home.png">
-
-<img width="1423" alt="azure-ai-demo-upload-docs" src="src/deployment/images/azure-ai-demo-documents-upload.png">
-
-<img width="1410" alt="azure-ai-demo-chat" src="src/deployment/images/azure-ai-demo-chat.png">
-
-<img width="1409" alt="azure-ai-demo-response" src="src/deployment/images/azure-ai-demo-response.png">
-
-<img width="1879" alt="azure-ai-demo-settings" src="src/deployment/images/azure-ai-demo-settings.png">
-
-<img width="1153" alt="azure-ai-demo-selected-docs" src="src/deployment/images/azure-ai-demo-selected-docs.png">
-
-<img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing.png">
 
 ## Responsive Design
 
