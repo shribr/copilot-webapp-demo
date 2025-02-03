@@ -56,7 +56,7 @@
       "ApiVersion": "2024-08-01-preview",
       "Type": "gpt-4o",
       "ModelVersion": null,
-      "Name": "gpt-4o",
+      "DeploymentName": "gpt-4o",
       "Sku": {
         "Name": "Standard",
         "Capacity": 100
@@ -70,7 +70,7 @@
       "ApiVersion": "2023-05-15",
       "Type": "text-embedding-3-large",
       "ModelVersion": null,
-      "Name": "text-embedding",
+      "DeploymentName": "text-embedding",
       "Sku": {
         "Name": "Standard",
         "Capacity": 100
@@ -84,7 +84,7 @@
       "ApiVersion": "2024-02-01",
       "Type": "dall-e-3",
       "ModelVersion": null,
-      "Name": "dall-e-3",
+      "DeploymentName": "dall-e-3",
       "Sku": {
         "Name": "Standard",
         "Capacity": 6

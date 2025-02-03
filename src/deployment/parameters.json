@@ -28,7 +28,7 @@
       "ApiVersion": "2024-08-01-preview",
       "Format": "OpenAI",
       "ModelVersion": "2024-08-06",
-      "Name": "gpt-4o",
+      "DeploymentName": "gpt-4o",
       "Sku": {
         "Capacity": 100,
         "Name": "Standard"
@@ -41,7 +41,7 @@
       "ApiVersion": "2023-05-15",
       "Format": "OpenAI",
       "ModelVersion": "1",
-      "Name": "text-embedding",
+      "DeploymentName": "text-embedding",
       "Sku": {
         "Capacity": 100,
         "Name": "Standard"
@@ -54,7 +54,7 @@
       "ApiVersion": "2024-02-01",
       "Format": "OpenAI",
       "ModelVersion": "3.0",
-      "Name": "dall-e-3",
+      "DeploymentName": "dall-e-3",
       "Sku": {
         "Capacity": 6,
         "Name": "Standard"

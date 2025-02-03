@@ -1099,7 +1099,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const apiVersion = aiModel.ApiVersion;
     const urlPath = aiModel.Path;
-    const deploymentName = aiModel.Name;
+    const deploymentName = aiModel.DeploymentName;
 
     const openAIRequestBody = isImageQuestion ? config.DALL_E_REQUEST_BODY : config.AZURE_OPENAI_REQUEST_BODY;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
@@ -1154,7 +1154,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
         let imageTableBody = document.createElement('tbody');
         imageTableBody.class = 'image-table-body';
 
-        const result = await invokeRESTAPI(jsonString, endpoint, aiModel, openAiTokenSecretName);
+        const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
 
         for (const image of result.data) {
 
@@ -1202,7 +1202,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
                 //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
                 //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
-                const result = await invokeRESTAPI(jsonString, endpoint, aiModel, openAiTokenSecretName);
+                const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
 
                 results.push(result);
             }
@@ -1225,7 +1225,7 @@ async function getAnswersFromPublicInternet(userInput) {
     const aiModels = config.AI_MODELS;
     //const aiGPTModel = aiModels.find(item => item.Name === "gpt-4o");
     const aiGPTModel = config.AI_MODELS[0];
-    const deploymentName = aiGPTModel.Name;
+    const deploymentName = aiGPTModel.DeploymentName;
     const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
@@ -1735,7 +1735,7 @@ function insertDollarSigns(str) {
 }
 
 // Function to call the rest API
-async function invokeRESTAPI(jsonString, endpoint, aiModel, apiTokenSecretName) {
+async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
 
     let data = {};
     let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;

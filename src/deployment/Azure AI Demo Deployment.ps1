@@ -243,18 +243,19 @@ function Deploy-AppService {
 }
 
 # Function to deploy an Azure AI model
-function Deploy-OpenAIModel {
+function Deploy-OpenAIModels {
     param (
-        [string]$resourceGroupName,
         [string]$aiServiceName,
-        [array]$aiModels
+        [array]$aiModels,
+        [string]$resourceGroupName,
+        [array]$existingResources
     )
 
     foreach ($aiModel in aiModels) {
         $aiModelName = $aiModel.Name
+        $aiModelDeploymentName = $aiModel.DeploymentName
         $aiModelType = $aiModel.Type
         $aiModelVersion = $aiModel.ModelVersion
-        $aiModelApiVersion = $aiModel.ApiVersion
         $aiServiceName = aiServiceName
         $aiModelFormat = $aiModel.Format
         $aiModelSkuName = $aiModel.Sku.Name
@@ -4181,8 +4182,7 @@ function Start-Deployment {
     Start-Sleep -Seconds 10
 
     # Deploy AI Models
-
-    Deploy-OpenAIModel -aiModelDeploymentName $aiModelName -aiServiceName $aiServiceName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiModelApiVersion $aiModelApiVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
+    Deploy-OpenAIModels -aiModels $aiModels -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # Add AI Service connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiServiceProperties
@@ -5006,7 +5006,7 @@ function Update-ConfigFile {
 
         # Loop through the AI models collection from global:aiModels
         foreach ($aiModel in $global:aiModels) {
-            $aiModelName = $aiModel.Name
+            $aiModelDeploymentName = $aiModel.DeploymentName
             $aiModelType = $aiModel.Type
             $aiModelVersion = $aiModel.Version
             $aiModelApiVersion = $aiModel.ApiVersion
@@ -5017,7 +5017,7 @@ function Update-ConfigFile {
             $aiModelKeyWordTriggers = $aiModel.KeyWordTriggers
 
             $config.AI_MODELS += @{
-                "Name"            = $aiModelName
+                "DeploymentName"  = $aiModelDeploymentName
                 "Type"            = $aiModelType
                 "ModelVersion"    = $aiModelVersion
                 "ApiKey"          = $apiKey
