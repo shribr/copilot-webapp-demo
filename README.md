@@ -268,8 +268,8 @@ There are several manual steps which need to be performed for a variety of reaso
 4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
 5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the `apiManagementService.SubscriptionKey` value in the parameters.json file which will then update the `AZURE_APIM_SUBSCRIPTION_KEY` value in the config.json value and used in the deployed app service. Of the 3 keys that are shown you need to copy the value from the last one titled "Built-in all-access subscription". <sup>[8](#api_management_service_subscription_key)</sup>
 
-   > [!NOTE]<br>
-   > Use of the API Management Service is only necessary if you plan on using the MSAL for authentication as opposed to just using API tokens.
+> [!NOTE]<br>
+> Use of the API Management Service is only necessary if you plan on using the MSAL for authentication as opposed to just using API tokens.
 
 6. **API Management CORS:** For each of the two API operations `Get OpenAI Service Api Key` and `Get Search Service Api Key`, you need to make sure you add the CORS policy to the Inbound Processing section and add the Url of your app service to the Allowed Origins section.
 7. **Azure AI Project / Machine Learning Workspace:**
