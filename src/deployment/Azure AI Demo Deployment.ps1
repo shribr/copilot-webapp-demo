@@ -251,7 +251,7 @@ function Deploy-OpenAIModels {
         [array]$existingResources
     )
 
-    foreach ($aiModel in aiModels) {
+    foreach ($aiModel in $aiModels) {
         $aiModelName = $aiModel.Name
         $aiModelDeploymentName = $aiModel.DeploymentName
         $aiModelType = $aiModel.Type
