@@ -503,35 +503,35 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 
 <img id="storage_service_cors" width="600" alt="Setting CORS" src="src/deployment/images/azure-ai-demo-storage-cors-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Service Index CORS
+**Search Service Index CORS**
 
 <img id="search_service_index_cors" width="600" alt="Search Index CORS Config" src="src/deployment/images/azure-ai-demo-search-index-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Service Index Vectorizer Api-Key Redacted
+**Search Service Index Vectorizer Api-Key Redacted**
 
 <img id="search_service_index_redacted_api_key" width="600" alt="Multi-Service Account" src="src/deployment/images/azure-ai-demo-search-index-apikey-redacted.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Service Managed Identity Remove
+**Search Service Managed Identity Remove**
 
 <img id="search_managed_identity_remove" width="600" alt="Removed and Re-Add Search Service Managed Idenity" src="src/deployment/images/azure-ai-demo-search-managed-identity-remove.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Service Datasource Managed Identity
+**Search Service Datasource Managed Identity**
 
 <img id="search_service_datasource_managed_identity" width="600" alt="Managed Identity" src="src/deployment/images/azure-ai-demo-search-datasource-managed-identity-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Service Skillset Connect to AI Service
+**Search Service Skillset Connect to AI Service**
 
 <img id="search_service_skillset_connect_ai_service" width="600" alt="Skillset Connect AI Service" src="src/deployment/images/azure-ai-demo-search-skillset-connect-ai-service.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### Search Service Index Vectorizer Multi-Service Account
+**Search Service Index Vectorizer Multi-Service Account**
 
 <img id="search_service_index_vectorizer_multi_service_account" width="600" alt="Multi-Service Account" src="src/deployment/images/azure-ai-demo-search-index-vectorizer-multi-service-account-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### API Management Service Subscription Key
+**API Management Service Subscription Key**
 
 <img id="api_management_service_subscription_key" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-subscription-key.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-### API Management Service CORS
+**API Management Service CORS**
 
 <img id="api_management_service_cors" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
