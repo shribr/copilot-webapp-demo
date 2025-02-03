@@ -308,7 +308,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 
 <img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project-create.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
-<img id="ai_studio_project_models_assets_menu" width="600" alt="AI Studio Model Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-asset-menu.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+<img id="ai_studio_project_models_assets_menu" width="300" alt="AI Studio Model Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-asset-menu.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 <img id="ai_studio_project_select_assets" width="600" alt="AI Studio Select Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-select.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
