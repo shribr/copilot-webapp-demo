@@ -14,6 +14,7 @@ let startTime;
 let isImageQuestion = false;
 
 let previousPersona = { "Type": "", "Prompt": "" };
+let creationTerms = [];
 
 let aiModel = {};
 
@@ -131,6 +132,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
     const editIcon = config.ICONS.EDIT.MONOTONE;
     const deleteIcon = config.ICONS.DELETE.MONOTONE;
+
+    creationTerms = config.DALL_E_CREATION_TERMS;
 
     const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
@@ -497,8 +500,6 @@ function addMessageToChatHistory(thread, message) {
 
 // Function to check if user is requesting an image be generated.
 function checkIfImageQuestion(input) {
-
-    const creationTerms = ['create', 'make', 'draw', 'generate', 'design', 'imagine'];
 
     const createImage = creationTerms.some(term => input.toLowerCase().includes(term));
 
@@ -1142,7 +1143,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
         let aiImage = '';
 
         openAIRequestBody.prompt = currentQuestion;
-        openAIRequestBody.n = 1;
+        openAIRequestBody.n = 4;
 
         jsonString = JSON.stringify(openAIRequestBody);
 

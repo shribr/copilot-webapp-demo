@@ -247,57 +247,61 @@ function Deploy-OpenAIModel {
     param (
         [string]$resourceGroupName,
         [string]$aiServiceName,
-        [string]$aiModelName,
-        [string]$aiModelType,
-        [string]$aiModelVersion,
-        [string]$aiModelApiVersion,
-        [string]$aiModelFormat,
-        [string]$aiModelSkuName,
-        [string]$aiModelSkuCapacity,
-        [string]$aiModelDeploymentName
+        [array]$aiModels
     )
 
-    try {
-        # Check if the deployment already exists
-        $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $aiServiceName --query "[?name=='$aiModelDeploymentName']" --output tsv
+    foreach ($aiModel in aiModels) {
+        $aiModelName = $aiModel.Name
+        $aiModelType = $aiModel.Type
+        $aiModelVersion = $aiModel.ModelVersion
+        $aiModelApiVersion = $aiModel.ApiVersion
+        $aiServiceName = aiServiceName
+        $aiModelFormat = $aiModel.Format
+        $aiModelSkuName = $aiModel.Sku.Name
+        $aiModelSkuCapacity = $aiModel.Sku.Capacity
+   
+        try {
+            # Check if the deployment already exists
+            $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $aiServiceName --query "[?name=='$aiModelDeploymentName']" --output tsv
 
-        if ($deploymentExists) {
-            Write-Host "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
-            Write-Log -message "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
-        }
-        else {
-            # Create the deployment if it does not exist
-            $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $aiServiceName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
+            if ($deploymentExists) {
+                Write-Host "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
+                Write-Log -message "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
+            }
+            else {
+                # Create the deployment if it does not exist
+                $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $aiServiceName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
 
-            # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+                # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
-            if ($jsonOutput -match "error") {
+                if ($jsonOutput -match "error") {
 
-                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+                    $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
-                $errorName = $errorInfo["Error"]
-                $errorCode = $errorInfo["Code"]
-                $errorDetails = $errorInfo["Message"]
+                    $errorName = $errorInfo["Error"]
+                    $errorCode = $errorInfo["Code"]
+                    $errorDetails = $errorInfo["Message"]
 
-                $errorMessage = "Failed to deploy Model '$aiModelName' for '$aiServiceName'. `
+                    $errorMessage = "Failed to deploy Model '$aiModelName' for '$aiServiceName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
 
-                Write-Host $errorMessage
-                Write-Log -message $errorMessage -logFilePath $global:LogFilePath
-            }
-            else {
-                Write-Host "Mdel '$aiModelDeploymentName' for '$aiServiceName' deployed successfully."
-                Write-Log -message "Model '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -logFilePath $global:LogFilePath
-            }
+                    Write-Host $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                }
+                else {
+                    Write-Host "Mdel '$aiModelDeploymentName' for '$aiServiceName' deployed successfully."
+                    Write-Log -message "Model '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -logFilePath $global:LogFilePath
+                }
 
 
+            }
         }
-    }
-    catch {
-        Write-Error "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        catch {
+            Write-Error "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
     }
 }
 
@@ -4178,18 +4182,7 @@ function Start-Deployment {
 
     # Deploy AI Models
 
-    foreach ($aiModel in $global:aiModels) {
-        $aiModelName = $aiModel.Name
-        $aiModelType = $aiModel.Type
-        $aiModelVersion = $aiModel.ModelVersion
-        $aiModelApiVersion = $aiModel.ApiVersion
-        $aiServiceName = $global:aiServiceName
-        $aiModelFormat = $aiModel.Format
-        $aiModelSkuName = $aiModel.Sku.Name
-        $aiModelSkuCapacity = $aiModel.Sku.Capacity
-
-        Deploy-OpenAIModel -aiModelDeploymentName $aiModelName -aiServiceName $aiServiceName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiModelApiVersion $aiModelApiVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
-    }
+    Deploy-OpenAIModel -aiModelDeploymentName $aiModelName -aiServiceName $aiServiceName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiModelApiVersion $aiModelApiVersion -resourceGroupName $resourceGroupName -aiModelFormat $aiModelFormat -aiModelSkuName $aiModelSkuName -aiModelSkuCapacity $aiModelSkuCapacity -existingResources $existingResources
 
     # Add AI Service connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiServiceProperties
@@ -5021,19 +5014,21 @@ function Update-ConfigFile {
             $aiModelSkuName = $aiModel.Sku.Name
             $aiModelSkuCapacity = $aiModel.Sku.Capacity
             $aiModelPath = $aiModel.Path
+            $aiModelKeyWordTriggers = $aiModel.KeyWordTriggers
 
             $config.AI_MODELS += @{
-                "Name"         = $aiModelName
-                "Type"         = $aiModelType
-                "ModelVersion" = $aiModelVersion
-                "ApiKey"       = $apiKey
-                "ApiVersion"   = $aiModelApiVersion
-                "Format"       = $aiModelFormat
-                "Sku"          = @{
+                "Name"            = $aiModelName
+                "Type"            = $aiModelType
+                "ModelVersion"    = $aiModelVersion
+                "ApiKey"          = $apiKey
+                "ApiVersion"      = $aiModelApiVersion
+                "Format"          = $aiModelFormat
+                "Sku"             = @{
                     "Name"     = $aiModelSkuName
                     "Capacity" = $aiModelSkuCapacity
                 }
-                "Path"         = $aiModelPath
+                "Path"            = $aiModelPath
+                "KeyWordTriggers" = $aiModelKeyWordTriggers
             }
         }
 
