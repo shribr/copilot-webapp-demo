@@ -103,7 +103,7 @@ The solution is fully configurable via a parameters.json file. It includes a sim
 
    ```
 
-## Deployment
+### Deployment
 
 The main PowerShell script [Azure AI Demo Deployment.ps1](./src/deployment/Azure%20AI%20Demo%20Deployment.ps1) automates the deployment of all the required Azure resources for this custom Copilot web application. There is a template titled [parameters.json](./src/deployment/parameters.json) which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
@@ -134,7 +134,7 @@ The image below shows a diagram of the deployed resources:
 
 <img width="1423" alt="azure-ai-demo-resource-visualizer" src="src/deployment/images/azure-ai-demo-resource-visualizer.png">
 
-### Manual Deployment Steps:
+#### Manual Deployment Steps
 
 There are several manual steps which need to be performed for a variety of reasons but mainly because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed fully. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing.
 
@@ -199,7 +199,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 <img id="ai_studio_project_add_models" width="600" alt="AI Studio Add AI Models" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-management.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 
-### Workflow of the Script
+## Deployment Script Workflow and Functions List
 
 1. **Initialization and Setup:**
 
@@ -301,7 +301,7 @@ The next few screenshots outline the manual steps you need to take in order to c
    - Creates various Azure resources by calling the respective functions.
    - Logs the total execution time and write it to the log file.
 
-### Project Structure
+## Project Structure
 
 - **Azure AI Demo Deployment.ps1**: Main deployment script.
 - **CognitiveServices.json**: Configuration file for Cognitive Services.
@@ -363,7 +363,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 - **server.js**: Local http server JavaScript file.
 - **settings.json**: Settings file.
 
-### Directory Structure
+## Directory Structure
 
 ```plaintext
 
@@ -429,7 +429,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 
 ```
 
-### Development Server
+## Development Server
 
 For testing you can use the built-in VS Code Live Server (uses port 5500 by default) or use the local Node server (uses port 3000 by default) by navigating to the `src/deployment` directory and running the following command:
 
@@ -488,7 +488,7 @@ Very careful considerations to this solution were made to ensure a smooth and se
 
 For a more in-depth understanding of the chat workflow click [here](./README_CHATWORKFLOW.md)
 
-### Additional Notes
+## Additional Notes
 
 **REST APIs**
 It is important to note that the technologies used by this solution are changing by the second. New versions of libraries and APIs are being released constantly and documentation is being updated on a near weekly basis. Since this solution leverages REST APIs, ensuring that you are using the most up-to-date API version for each service's API is absolutely critical. With each new API release, new capabilities are added (and sometimes existing ones removed). All the magic happens in the [Azure Open AI On Your Own Data API](https://learn.microsoft.com/en-us/azure/ai-services/openai/references/azure-search?tabs=rest).
@@ -496,27 +496,6 @@ It is important to note that the technologies used by this solution are changing
 A perfect example is the Azure [Search Service API](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). There is actually documentation for how to migrate to the newest version of the API located [here](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). In the documentation, it actually says "2023-07-01-preview was the first REST API for vector support. Do not use this API version. It's now deprecated and you should migrate to either stable or newer preview REST APIs immediately."
 
 Lucky for you this solution defines all of the API versions in the parameters.json file. When newer versions of a particular API are resleased, you just need to update that file and redeploy the web application. The PowerShell script regenerates the config.json file that is deployed as part of the web application zip package using the new values defined in the parameters.json file.
-
-### Chat Personas List
-
-- Attorney
-- Business Professional
-- CEO
-- Data Scientist
-- Doctor
-- Engineer
-- Financial Advisor
-- Fitness Enthusiast
-- Foodie
-- HR Manager
-- Journalist
-- Marketing Professional
-- Network Security Specialist
-- New Yorker
-- Teacher
-- Tech Enthusiast
-- Teenage Girl
-- Traveler
 
 ### Image Reference
 
@@ -555,6 +534,29 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 #### API Management Service CORS
 
 <img id="api_management_service_cors" width="600" alt="APIM Subscription Key" src="src/deployment/images/azure-ai-demo-apim-cors.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+## Index
+
+### Chat Personas List
+
+- Attorney
+- Business Professional
+- CEO
+- Data Scientist
+- Doctor
+- Engineer
+- Financial Advisor
+- Fitness Enthusiast
+- Foodie
+- HR Manager
+- Journalist
+- Marketing Professional
+- Network Security Specialist
+- New Yorker
+- Teacher
+- Tech Enthusiast
+- Teenage Girl
+- Traveler
 
 ### Contributing
 
