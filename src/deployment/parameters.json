@@ -102,6 +102,7 @@
     "ResourceGroup": "RG-COPILOT-DEMO-002",
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
   },
+  "appendUniqueSuffix": false,
   "appRegistrationClientId": "ec0c2272-c9b3-4c30-9121-c7bd8b3576bc",
   "appRegRequiredResourceAccess": [
     {
@@ -182,7 +183,6 @@
       "Url": "https://func-copilot-demo-002.azurewebsites.net"
     }
   ],
-  "appendUniqueSuffix": false,
   "appTitle": "Chat with Microsoft Copilot",
   "azureManagement": {
     "ApiVersion": "2024-06-01-Preview",
@@ -322,6 +322,7 @@
   "cosmosDbAccountName": "cosmos-copilot-demo-002",
   "createResourceGroup": true,
   "deleteResourceGroup": false,
+  "deployApiManagementService": false,
   "deployZipResources": true,
   "documentIntelligenceName": "docintel-copilot-demo-002",
   "domainName": "azurewebsites.net",

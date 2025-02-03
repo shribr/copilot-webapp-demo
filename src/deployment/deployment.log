@@ -1,0 +1,7 @@
+2025-02-03 14:31:14 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 02/03/2025 14:35:11 ***
+2025-02-03 14:36:33 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-02-03 14:37:52 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-02-03 14:41:56 - Config file updated successfully.
+2025-02-03 14:46:08 - Web app 'app-copilot-demo-002' deployed successfully.

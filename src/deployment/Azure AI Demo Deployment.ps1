@@ -843,6 +843,7 @@ function Initialize-Parameters {
     $global:cosmosDbAccountName = $parametersObject.cosmosDbAccountName
     $global:createResourceGroup = $parametersObject.createResourceGroup
     $global:deleteResourceGroup = $parametersObject.deleteResourceGroup
+    $global:deployApiManagementService = $parametersObject.deployApiManagementService
     $global:deployZipResources = $parametersObject.deployZipResources
     $global:documentIntelligenceName = $parametersObject.documentIntelligenceName
     $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
@@ -988,6 +989,7 @@ function Initialize-Parameters {
         cosmosDbAccountName          = $cosmosDbAccountName
         createResourceGroup          = $createResourceGroup
         deleteResourceGroup          = $deleteResourceGroup
+        deployApiManagementService   = $deployApiManagementService
         deployZipResources           = $deployZipResources
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
@@ -1314,6 +1316,10 @@ function New-ApiManagementService {
     #https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/read.png
 
     $apiManagementServiceName = $apiManagementService.Name
+
+    if ($global:DeployApiManagementService -eq $false) {
+        return
+    }
 
     if ($existingResources -notcontains $apiManagementServiceName) {
         try {
