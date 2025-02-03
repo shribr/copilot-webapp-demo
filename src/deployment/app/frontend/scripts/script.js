@@ -2,6 +2,7 @@ let iconStyle = "color";
 let blobs = [];
 let currentSortColumn = '';
 let currentSortDirection = 'asc';
+let currentQuestion = '';
 let answerResponseNumber = 1;
 let aiEnhancedAnswersArray = [];
 let originalDocumentCount = 0;
@@ -10,8 +11,11 @@ let filteredDocumentCount = 0;
 
 let timerInterval;
 let startTime;
+let isImageQuestion = false;
 
 let previousPersona = { "Type": "", "Prompt": "" };
+
+let aiModel = {};
 
 let msalInstance = {};
 let accessToken = '';
@@ -492,10 +496,11 @@ function addMessageToChatHistory(thread, message) {
 }
 
 // Function to check if user is requesting an image be generated.
-async function checkIfImageQuestion(input) {
-    const creationTerms = ['create', 'make', 'generate', 'design', 'imagine'];
+function checkIfImageQuestion(input) {
 
-    const createImage = input.indexOf(creationTerms);
+    const creationTerms = ['create', 'make', 'draw', 'generate', 'design', 'imagine'];
+
+    const createImage = creationTerms.some(term => input.toLowerCase().includes(term));
 
     return createImage;
 }
@@ -660,7 +665,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     let footNoteLinks = "";
     let followUpQuestions = "";
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error && azureOpenAIResults[0].choices) {
+    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error && azureOpenAIResults[0].choices && !isImageQuestion) {
 
         // Loop through the answers and create the response content   
         try {
@@ -761,14 +766,20 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
         let answerListHTML = '';
 
-        if (azureOpenAIResults[0].error && (azureOpenAIResults[0].error.code == 429 || azureOpenAIResults[0].error.code == 400)) {
-
-            answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
-            console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
+        if (isImageQuestion && azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
+            answerListHTML = `<div class="answer-results">${azureOpenAIResults[0]}</div>`;
         }
         else {
-            answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
-            console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
+
+            if (azureOpenAIResults[0].error && (azureOpenAIResults[0].error.code == 429 || azureOpenAIResults[0].error.code == 400)) {
+
+                answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
+                console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
+            }
+            else {
+                answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+                console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
+            }
         }
 
         answers += answerListHTML;
@@ -785,15 +796,33 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     openAIModelResultsId = `openai-model-results-${answerResponseNumber}`;
 
     if (answers.length > 0) {
-        answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><div class="ai-enhanced-answer-results">${answers}</div><br/></div>`;
-        answerContent.innerHTML += `<div id="followup-questions-container"><h6 class="followup-question">Suggested Follow Up Questions:</h6>${followUpQuestions}</div>`;
-        answerContent.innerHTML += `<div id="answer-sources-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div ></div> `;
+
+        if (isImageQuestion) {
+            answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><div class="ai-enhanced-answer-results"></div><br/></div>`;
+
+            chatResponse.appendChild(answerContent);
+
+            let enhancedAnswerResults = document.getElementById(`${openAIModelResultsId}`);
+
+            enhancedAnswerResults.getElementsByClassName('ai-enhanced-answer-results')[0].innerHTML = answers;
+
+            //enhancedAnswerResults.appendChild(answers);
+
+            //enhancedAnswerResults.innerHTML += answers;
+        }
+        else {
+            answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><div class="ai-enhanced-answer-results">${answers}</div><br/></div>`;
+            answerContent.innerHTML += `<div id="followup-questions-container"><h6 class="followup-question">Suggested Follow Up Questions:</h6>${followUpQuestions}</div>`;
+            answerContent.innerHTML += `<div id="answer-sources-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div ></div> `;
+
+            chatResponse.appendChild(answerContent);
+        }
     }
     else {
         answerContent.innerHTML += `<div id = "${openAIModelResultsId}"> No results found.</div>`;
-    }
 
-    chatResponse.appendChild(answerContent);
+        chatResponse.appendChild(answerContent);
+    }
 
     // Add download chat results button
     if (openAIModelResultsId != "" && openAIModelResultsId != undefined) {
@@ -1061,15 +1090,17 @@ function formatBytes(bytes) {
 }
 
 //Function to send chat message to Azure OpenAI model to either search the model directly or internal data sources
-async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSources) {
+async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSources) {
 
     if (!userInput) return;
 
     const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
-    const apiVersion = config.OPENAI_API_VERSION;
-    const deploymentName = aiModelName;
-    const openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
+    const apiVersion = aiModel.ApiVersion;
+    const urlPath = aiModel.Path;
+    const deploymentName = aiModel.Name;
+
+    const openAIRequestBody = isImageQuestion ? config.DALL_E_REQUEST_BODY : config.AZURE_OPENAI_REQUEST_BODY;
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
 
     const keyVaultEndPoint = "https://vault.azure.net/.default"
@@ -1079,14 +1110,12 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
 
     let searchApiKey = config.AZURE_SEARCH_API_KEY;
+    let jsonString = JSON.stringify(openAIRequestBody);
 
     const region = config.REGION;
-    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/${urlPath}?api-version=${apiVersion}`;
 
     var results = [];
-
-    openAIRequestBody.messages = [];
-    openAIRequestBody.messages = thread.messages;
 
     if (authMode === "MSAL") {
         const tokenRequest = {
@@ -1108,42 +1137,81 @@ async function getAnswersFromAzureOpenAI(userInput, aiModelName, persona, dataSo
         searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
     }
 
-    const createImage = await checkIfImageQuestion(userInput);
+    if (isImageQuestion) {
 
-    if (createImage > -1) {
+        let aiImage = '';
 
-        const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
+        openAIRequestBody.prompt = currentQuestion;
+        openAIRequestBody.n = 1;
 
-        return result;
-    }
+        jsonString = JSON.stringify(openAIRequestBody);
 
-    if (dataSources.length > 0) {
+        let imageTable = document.createElement('table');
+        imageTable.id = `image-table-${answerResponseNumber}`;
+        imageTable.className = 'image-table-class';
 
-        openAIRequestBody.data_sources.length = 0;
+        let imageTableBody = document.createElement('tbody');
+        imageTableBody.class = 'image-table-body';
 
-        for (const source of dataSources) {
-            source.parameters.role_information = persona.Prompt;
-            //If authMode is MSAL then we usw the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
-            //If the authMode is API_KEY then we just use the search API key directly from the config.json file.
-            source.parameters.authentication.key = searchApiKey;
-            //source.parameters.authentication.key = apiKey
-            openAIRequestBody.data_sources.push(source);
+        const result = await invokeRESTAPI(jsonString, endpoint, aiModel, openAiTokenSecretName);
 
-            const jsonString = JSON.stringify(openAIRequestBody);
+        for (const image of result.data) {
 
-            //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
-            //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
-            const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
+            let imageTableRow = document.createElement('tr');
+            imageTableRow.class = 'image-table-row';
 
-            results.push(result);
+            let imageTableCell = document.createElement('td');
+            imageTableCell.class = 'image-table-cell';
+
+            imageTableCell.innerHTML = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image">`;
+
+            imageTableRow.appendChild(imageTableCell);
+            imageTableBody.appendChild(imageTableRow);
+
+            aiImage = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image" style="width: 80%; height: auto;">`;
+
+            results.push(aiImage);
+
+            console.log('Image generation result URL: ' + image.url);
         }
+
+        imageTable.appendChild(imageTableBody);
+
+        //return imageTable;
+
+        return results
     }
     else {
-        delete openAIRequestBody.data_sources;
+        openAIRequestBody.messages = [];
+        openAIRequestBody.messages = thread.messages;
+
+        if (dataSources.length > 0) {
+
+            openAIRequestBody.data_sources.length = 0;
+
+            for (const source of dataSources) {
+                source.parameters.role_information = persona.Prompt;
+                //If authMode is MSAL then we usw the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
+                //If the authMode is API_KEY then we just use the search API key directly from the config.json file.
+                source.parameters.authentication.key = searchApiKey;
+                //source.parameters.authentication.key = apiKey
+                openAIRequestBody.data_sources.push(source);
+
+                jsonString = JSON.stringify(openAIRequestBody);
+
+                //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
+                //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
+                const result = await invokeRESTAPI(jsonString, endpoint, aiModel, openAiTokenSecretName);
+
+                results.push(result);
+            }
+        }
+        else {
+            delete openAIRequestBody.data_sources;
+        }
+
+        return results;
     }
-
-    return results;
-
 }
 
 //code to send chat message to Bing Search API (still under development)
@@ -1254,15 +1322,14 @@ async function getChatResponse(questionBubble) {
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
 
-    const checkIfImageQuestion = await checkIfImageQuestion(chatInput);
+    isImageQuestion = await checkIfImageQuestion(chatInput);
 
     const queryParam = getQueryParam('promptSuffix');
 
-    let aiModel = {};
     let promptSuffix = !queryParam ? config.PROMPT_SUFFIX : queryParam;
     let prompt = '';
 
-    if (checkIfImageQuestion > -1) {
+    if (isImageQuestion) {
         prompt = chatInput;
         aiModel = config.AI_MODELS.find(item => item.Name === "dall-e-3");
     }
@@ -1270,8 +1337,6 @@ async function getChatResponse(questionBubble) {
         prompt = chatInput + promptSuffix;
         aiModel = config.AI_MODELS.find(item => item.Name === "gpt-4o");
     }
-
-    const aiModelName = aiModel.Name;
 
     // Construct the SAS token from the individual components
     const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
@@ -1300,7 +1365,7 @@ async function getChatResponse(questionBubble) {
         chatExamplesContainer.style.display = 'none';
 
         // Get answers from Azure OpenAI model and datasources
-        const azureOpenAIResults = await getAnswersFromAzureOpenAI(thread, aiModelName, persona, dataSources);
+        const azureOpenAIResults = await getAnswersFromAzureOpenAI(thread, aiModel, persona, dataSources);
 
         // Create a new chat bubble element
         const chatResponse = document.createElement('div');
@@ -1333,14 +1398,16 @@ async function getChatResponse(questionBubble) {
             // Create tab contents for chat response content
             createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, storageUrl, sasToken, downloadChatResultsSVG);
 
-            // Create tab contents for thought process content
-            createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent);
+            if (isImageQuestion == false) {
+                // Create tab contents for thought process content
+                createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent);
 
-            // Create tab contents for supporting content
-            createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken);
+                // Create tab contents for supporting content
+                createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken);
 
-            chatResponse.appendChild(thoughtProcessContent);
-            chatResponse.appendChild(supportingContent);
+                chatResponse.appendChild(thoughtProcessContent);
+                chatResponse.appendChild(supportingContent);
+            }
 
             setEqualHeightForTabContents();
 
@@ -1667,14 +1734,14 @@ function insertDollarSigns(str) {
 }
 
 // Function to call the rest API
-async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
+async function invokeRESTAPI(jsonString, endpoint, aiModel, apiTokenSecretName) {
 
     let data = {};
     let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
 
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
-    const keyVaultEndPoint = "https://vault.azure.net/.default"
+
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
     const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
 
@@ -1702,10 +1769,12 @@ async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
             openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, accessToken);
         }
 
+        const contentType = isImageQuestion ? 'image/jpeg' : 'application/json';
+
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': `${contentType}`,
                 'api-key': `${openAiApiKey}`,
                 'http2': 'true'
             },
@@ -1767,6 +1836,8 @@ async function postQuestion() {
     if (chatInput.length > 0 && chatInput[0] !== chatInput[0].toUpperCase()) {
         chatInput = chatInput[0].toUpperCase() + chatInput.slice(1);
     }
+
+    currentQuestion = chatInput;
 
     // Create a new div for the chat bubble
     const questionBubble = document.createElement('div');

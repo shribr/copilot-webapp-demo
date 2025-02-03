@@ -5020,6 +5020,7 @@ function Update-ConfigFile {
             $aiModelFormat = $aiModel.Format
             $aiModelSkuName = $aiModel.Sku.Name
             $aiModelSkuCapacity = $aiModel.Sku.Capacity
+            $aiModelPath = $aiModel.Path
 
             $config.AI_MODELS += @{
                 "Name"         = $aiModelName
@@ -5032,6 +5033,7 @@ function Update-ConfigFile {
                     "Name"     = $aiModelSkuName
                     "Capacity" = $aiModelSkuCapacity
                 }
+                "Path"         = $aiModelPath
             }
         }
 
