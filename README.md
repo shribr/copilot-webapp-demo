@@ -499,7 +499,7 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 
 ## Image Reference
 
-### Storage Service CORS
+**Storage Service CORS**
 
 <img id="storage_service_cors" width="600" alt="Setting CORS" src="src/deployment/images/azure-ai-demo-storage-cors-config.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
@@ -558,10 +558,10 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 - Teenage Girl
 - Traveler
 
-### Contributing
+## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
 
-### License
+## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
