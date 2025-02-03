@@ -301,7 +301,29 @@ The next few screenshots outline the manual steps you need to take in order to c
    - Creates various Azure resources by calling the respective functions.
    - Logs the total execution time and write it to the log file.
 
-## Project Structure
+## Development Server
+
+For testing you can use the built-in VS Code Live Server (uses port 5500 by default) or use the local Node server (uses port 3000 by default) by navigating to the `src/deployment` directory and running the following command:
+
+```
+
+node server.js
+
+```
+
+## Solution Architecture
+
+The web application is structured to leverage various Azure services for a seamless and scalable deployment. The architecture includes:
+
+- **Frontend**: The frontend is built using HTML, CSS, and JavaScript, located in the frontend directory. It includes configuration files, stylesheets, images, and scripts necessary for the user interface.
+
+- **Backend**: None. This solution only leverages the built-in REST APIs for all of the required Azure resources.
+
+This architecture ensures a robust, scalable, and maintainable web application leveraging Azure's cloud capabilities.
+
+![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
+
+### Project Structure
 
 - **Azure AI Demo Deployment.ps1**: Main deployment script.
 - **CognitiveServices.json**: Configuration file for Cognitive Services.
@@ -363,7 +385,7 @@ The next few screenshots outline the manual steps you need to take in order to c
 - **server.js**: Local http server JavaScript file.
 - **settings.json**: Settings file.
 
-## Directory Structure
+### Directory Structure
 
 ```plaintext
 
@@ -428,28 +450,6 @@ The next few screenshots outline the manual steps you need to take in order to c
 ├── settings.json
 
 ```
-
-## Development Server
-
-For testing you can use the built-in VS Code Live Server (uses port 5500 by default) or use the local Node server (uses port 3000 by default) by navigating to the `src/deployment` directory and running the following command:
-
-```
-
-node server.js
-
-```
-
-## Solution Architecture
-
-The web application is structured to leverage various Azure services for a seamless and scalable deployment. The architecture includes:
-
-- **Frontend**: The frontend is built using HTML, CSS, and JavaScript, located in the frontend directory. It includes configuration files, stylesheets, images, and scripts necessary for the user interface.
-
-- **Backend**: None. This solution only leverages the built-in REST APIs for all of the required Azure resources.
-
-This architecture ensures a robust, scalable, and maintainable web application leveraging Azure's cloud capabilities.
-
-![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
 
 ## Web Application Screens
 
