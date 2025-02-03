@@ -2,28 +2,7 @@
 
 ## Overview
 
-This project is a web application that allows users to chat with Azure Copilot to query their own data. In addition to responses returned by Copilot, the application also provides the user with source references, suggested follow up questions AND a "Thought Process" tab which allows the user to understand how the AI arrived at it's answers. As an added bonus, a varity of AI personas are included which provide varying prompts based on their assigned descriptions. This allows the AI to focus on role specific aspects of the data being searched that would appear to be most important to a variety of different users. While searching the exact same dataset, the information which would be of interest to an IT professional would not be the same as what an attorney might be interested in.
-
-### Here are a list of included personas:
-
-- Attorney
-- Business Professional
-- CEO
-- Data Scientist
-- Doctor
-- Engineer
-- Financial Advisor
-- Fitness Enthusiast
-- Foodie
-- HR Manager
-- Journalist
-- Marketing Professional
-- Network Security Specialist
-- New Yorker
-- Teacher
-- Tech Enthusiast
-- Teenage Girl
-- Traveler
+This project is a web application that allows users to chat with Azure Copilot to query their own data. In addition to responses returned by Copilot, the application also provides the user with source references, suggested follow up questions AND a "Thought Process" tab which allows the user to understand how the AI arrived at it's answers. As an added bonus, a varity of AI personas are included which provide varying prompts based on their assigned descriptions. This allows the AI to focus on role specific aspects of the data being searched that would appear to be most important to a variety of different users. While searching the exact same dataset, the information which would be of interest to an IT professional would not be the same as what an attorney might be interested in. A list of all the included personas can be found [here](#chat-personas-list).
 
 The solution is fully configurable via a parameters.json file. It includes a simple HTML interface and a PowerShell script for deployment.
 
@@ -124,7 +103,7 @@ The solution is fully configurable via a parameters.json file. It includes a sim
 
    ```
 
-### Deployment
+## Deployment
 
 The main PowerShell script [Azure AI Demo Deployment.ps1](./src/deployment/Azure%20AI%20Demo%20Deployment.ps1) automates the deployment of all the required Azure resources for this custom Copilot web application. There is a template titled [parameters.json](./src/deployment/parameters.json) which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
@@ -154,6 +133,71 @@ Once the deployment script completes the following resources should have been cr
 The image below shows a diagram of the deployed resources:
 
 <img width="1423" alt="azure-ai-demo-resource-visualizer" src="src/deployment/images/azure-ai-demo-resource-visualizer.png">
+
+### Manual Deployment Steps:
+
+There are several manual steps which need to be performed for a variety of reasons but mainly because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed fully. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing.
+
+1. **Updating the parameters.json File:** You will need to update this file with whatever your preffered naming convention you plan to use. Once you've decided you will need to check and see what the name of the previous deployment was as the script needs to update a whole bunch of files related to things like search indexes, indexers, skillsets a whole bunch of yaml files containing connector information for the Azure AI service and a whole slew of other things. Part of this process is that the script will read the parameters.json file so it can know what to name all of your Azure resources. Once it has that info it will need to update all of the aforementioned files using the new resource names you provided. The way to figure this out is by looking at the **previousResourceBaseName** property. Each time you run the deployment script and use a different naming convention you will need to check and make sure that the value for this parameter is set to the previous deployment's base name so it can find and replace all of the old instances with the new ones. For example: If you use the resource base name of "copilot-demo-001" then the script will update all of the necessary resources with that new base name. Now, should you need to run the script again to deploy it to a new resource group and your new base name is "copilot-demo-002". The script needs to know what the old name was so it can find of all the old name instances and replace them with the new one. So all of the files that have "copilot-demo-001" will be updated to "copilot-demo-002". The parameter you need to set is apty named "previousResourceBaseName". In this example, all of your new resources would be "[resource-prefix]-copilot-demo-002" and the "previousResourceBasename" would be set to "copilot-demo-001". Make sense?
+2. **Storage Service CORS:** Make sure to set the CORS value for the Storage Service to "ALL". <sup>[1](#storage_service_cors)</sup>
+3. **Search Service:** There could be any number of reasons why the Search Service doesn't work properly. It seems to be very tempermental. I've come up with a few things to try to get it working but if none of these work you may just need to scrap your existing Resource Group and redeploy from scratch.
+   - **Search Service Index CORS:** Setting CORS to whatever your web app URL is for the Vector Search Index. It is not enough just to leave it open to "ALL". That will not work. Trust me. This was a nightmare to figure out and I learned a lot more about CORS than I ever really wanted to. In short, your web browser will enforce the SAME ORIGIN policy regardless of whether you want it to or not. So if your search service is **srch-copilot-demo-001.azurewebsites.net** and your app service is **app-copilot-demo-001.azurewebsites.net** then you will get a `Could not complete vectorization action. The vectorization endpoint returned status code '401' (Unauthorized).` error. You will NOT get this error when using a program like Postman because Postman is not a web browser so there is nothing to interfere with your http request. When the CORS setting is set to "All" then the Search Service basically doesn't send anything so your browser assumes that the two services communicating with one another are required to be of the same orgin (i.e. same FQDN). Now, to be fair, your web browser is kinda/sorta doing this for your own protection but it's still kind of annoying when you're trying to troubleshoot stuff. <sup>[2](#search_service_index_cors)</sup>
+   - **Search Service Index Redacted API Key:** Remove the apiKey `<redacted>` entry from the vector search index json if it exists. Don't just remove the value `<redacted>`. Remove the entire property. <sup>[3](#search_service_index_redacted_api_key)</sup>
+   - **Search Service Managed Identity:** You may need to remove and then re-add the search services managed identity user. <sup>[4](#search_managed_identity_remove)</sup>
+   - **Search Service Datasource Managed Identity:** Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed. You may need to remove and re-add the managed identity user to the Search service in order to run the indexer too. <sup>[5](#search_service_datasource_managed_identity)</sup>
+   - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[6](#search_service_skillset_connect_ai_service)</sup>
+   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. You also need to set the Authentication Type to "API Key". <sup>[7](#search_service_index_vectorizer_multi_service_account)</sup>
+4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
+5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the `apiManagementService.SubscriptionKey` value in the parameters.json file which will then update the `AZURE_APIM_SUBSCRIPTION_KEY` value in the config.json value and used in the deployed app service. Of the 3 keys that are shown you need to copy the value from the last one titled "Built-in all-access subscription". <sup>[8](#api_management_service_subscription_key)</sup>
+
+   <u>NOTE:</u> Use of the API Management Service is only necessary if you plan on using the MSAL for authentication as opposed to just using API tokens.
+
+6. **API Management CORS:** For each of the two API operations `Get OpenAI Service Api Key` and `Get Search Service Api Key`, you need to make sure you add the CORS policy to the Inbound Processing section and add the Url of your app service to the Allowed Origins section.
+7. **Azure AI Project / Machine Learning Workspace:**
+
+   <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
+
+```
+--name
+--description
+--display-name
+--resource-group
+--application-insights
+--location
+--key-vault
+--storage-account
+```
+
+The problem with this is that this solution needs to have an Azure AI project created and associated with the Azure Hub deployed in the resource group. Now, despite the official documentation stating that the parameters `kind` and `hub-id` do exist (albeit currently in preview mode) you cannot set either of those parameters using the Azure CLI. Here's where things get a little confusing. By not having the ability to specify values for those parameters, the "project" gets created as an **Azure Machine Learning Workspace** and it will only be available in **Azure Machine Learning Studio** as opposed to **Azure AI Studio** (recently renamed to **Azure AI Foundry**). Hence the reason why I titled this first item as **Azure AI Project / Machine Learning Workspace**. What this essentially means is that this resource can either be created in **Azure AI Foundary** or **Azure Machine Learning Studio** depending on where you ultimately decide to create it. Regardless of where the resource is created, it will display in your Resource Group. However, it will have different "purposes" and "structure" depending on where you provision it. Now, at this point you might be asking why you need to have either one in the first place. Well, the nice part about having a project/workspace is that it allows you to better organize your AI resources (i.e. models, endpoints, connected resources like Azure Blob Storage, OpenAI Services, Azure AI Services, Vision Services etc.) similar to how a resource group allows you to organize your cloud resources. In addition, you can invite people to your project/workspace without having to define explicit permissions for each and every resource.
+
+Even trying to pass in a yaml file instead of specifying the parameters directly in the command won't work if you include any other parameters than the ones listed above. So it's kind of annoying because this entire solution would literllay be "one-click" if not for the handful of aforementioned manual steps.
+
+Anyhow, once the project is created you need to make sure to set the quota to dynamic in order to actually make more than just a handful of REST API calls. This however can get pricey so make sure to check your budget before you go nuts.
+
+NOTE: Another issue with the whole Azure AI project is that because the script cannot create the correct instance of it due to the issues mentioned above, you will still to create one manually. Now, there is a pretty good chance that the script created one for you but...it was created in Azure ML Studio. So you will need to delete that project from your resource group and then be sure to also delete it from the "Recently Deleted" area too. In it's current state it has not been purged and if you try to create the correct project in Azure AI Studio (which you're about to do) it will fail saying the resource already exists. Anyhow...once you've purged the resource, you then create the "correct" project in Azure AI Studio. Make sure to select the correct Hub that the script created to house your previous Azure ML project that you just purged. If you don't then it won't be associated with your resource group or any of the other AI related resources and the solution will not work. Once you've created the project, create two AI models: gpt-4o and text-embedding-3-large. The names for both of these will be "gpt-4o" and "text-embedding".
+
+The next few screenshots outline the manual steps you need to take in order to configure the AI Project.
+
+1. Create new AI project and specify existing hub from your resource group. <sup>[9](#ai_studio_project_create)</sup>
+2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[10](#ai_studio_project_models_assets_menu)</sup>
+3. Select asset. <sup>[11](#ai_studio_project_select_assets)</sup>
+4. Select existing AI service from your resource group. <sup>[12](#ai_studio_project_select_ai_resource)</sup>
+5. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[13](#ai_studio_project_add_models)</sup>
+
+<img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project-create.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_models_assets_menu" width="600" alt="AI Studio Model Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-asset-menu.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_select_assets" width="600" alt="AI Studio Select Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-select.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_select_deployment_type" width="600" alt="AI Studio Select Deployment Type" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-deployment-type.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_select_ai_resource" width="600" alt="AI Studio Select AI Resource" src="src/deployment/images/azure-ai-demo-ai-studio-project-ai-resource.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
+<img id="ai_studio_project_add_models" width="600" alt="AI Studio Add AI Models" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-management.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
+
 
 ### Workflow of the Script
 
@@ -395,7 +439,7 @@ node server.js
 
 ```
 
-### Solution Architecture
+## Solution Architecture
 
 The web application is structured to leverage various Azure services for a seamless and scalable deployment. The architecture includes:
 
@@ -407,7 +451,7 @@ This architecture ensures a robust, scalable, and maintainable web application l
 
 ![image](https://github.com/user-attachments/assets/cf08f9d3-41dd-4f80-99cd-afbd4d9dca2c)
 
-### Web Application Screens
+## Web Application Screens
 
 The index.html file includes the following screens:
 
@@ -425,7 +469,7 @@ The index.html file includes the following screens:
 
 <img width="1164" alt="azure-ai-demo-existing-docs" src="src/deployment/images/azure-ai-demo-documents-existing.png">
 
-### Responsive Design for Touchscreen Devices
+## Responsive Design for Touchscreen Devices
 
 Very careful considerations to this solution were made to ensure a smooth and seamless transition between traditional desktop and mobile devices. The UI is adapative and will render the layout accordingly based on the best user experience regardless of the device. Below are several screenshots of the mobile and touch experience.
 
@@ -440,73 +484,9 @@ Very careful considerations to this solution were made to ensure a smooth and se
    </tr>
 </table>
 
-### Chat Workflow
+## Chat Workflow
 
 For a more in-depth understanding of the chat workflow click [here](./README_CHATWORKFLOW.md)
-
-### Manual Deployment Steps:
-
-There are several manual steps which need to be performed for a variety of reasons but mainly because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed fully. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing.
-
-1. **Updating the parameters.json File:** You will need to update this file with whatever your preffered naming convention you plan to use. Once you've decided you will need to check and see what the name of the previous deployment was as the script needs to update a whole bunch of files related to things like search indexes, indexers, skillsets a whole bunch of yaml files containing connector information for the Azure AI service and a whole slew of other things. Part of this process is that the script will read the parameters.json file so it can know what to name all of your Azure resources. Once it has that info it will need to update all of the aforementioned files using the new resource names you provided. The way to figure this out is by looking at the **previousResourceBaseName** property. Each time you run the deployment script and use a different naming convention you will need to check and make sure that the value for this parameter is set to the previous deployment's base name so it can find and replace all of the old instances with the new ones. For example: If you use the resource base name of "copilot-demo-001" then the script will update all of the necessary resources with that new base name. Now, should you need to run the script again to deploy it to a new resource group and your new base name is "copilot-demo-002". The script needs to know what the old name was so it can find of all the old name instances and replace them with the new one. So all of the files that have "copilot-demo-001" will be updated to "copilot-demo-002". The parameter you need to set is apty named "previousResourceBaseName". In this example, all of your new resources would be "[resource-prefix]-copilot-demo-002" and the "previousResourceBasename" would be set to "copilot-demo-001". Make sense?
-2. **Storage Service CORS:** Make sure to set the CORS value for the Storage Service to "ALL". <sup>[1](#storage_service_cors)</sup>
-3. **Search Service:** There could be any number of reasons why the Search Service doesn't work properly. It seems to be very tempermental. I've come up with a few things to try to get it working but if none of these work you may just need to scrap your existing Resource Group and redeploy from scratch.
-   - **Search Service Index CORS:** Setting CORS to whatever your web app URL is for the Vector Search Index. It is not enough just to leave it open to "ALL". That will not work. Trust me. This was a nightmare to figure out and I learned a lot more about CORS than I ever really wanted to. In short, your web browser will enforce the SAME ORIGIN policy regardless of whether you want it to or not. So if your search service is **srch-copilot-demo-001.azurewebsites.net** and your app service is **app-copilot-demo-001.azurewebsites.net** then you will get a `Could not complete vectorization action. The vectorization endpoint returned status code '401' (Unauthorized).` error. You will NOT get this error when using a program like Postman because Postman is not a web browser so there is nothing to interfere with your http request. When the CORS setting is set to "All" then the Search Service basically doesn't send anything so your browser assumes that the two services communicating with one another are required to be of the same orgin (i.e. same FQDN). Now, to be fair, your web browser is kinda/sorta doing this for your own protection but it's still kind of annoying when you're trying to troubleshoot stuff. <sup>[2](#search_service_index_cors)</sup>
-   - **Search Service Index Redacted API Key:** Remove the apiKey `<redacted>` entry from the vector search index json if it exists. Don't just remove the value `<redacted>`. Remove the entire property. <sup>[3](#search_service_index_redacted_api_key)</sup>
-   - **Search Service Managed Identity:** You may need to remove and then re-add the search services managed identity user. <sup>[4](#search_managed_identity_remove)</sup>
-   - **Search Service Datasource Managed Identity:** Setting managed identity type to "User-Assigned" for the Azure Search Service datasource. On the same screen you also need to set the blob container to "content". Note: At the time of this writing, there is a bug where the UI in the Azure Portal does not show that your settings have been changed. You may need to remove and re-add the managed identity user to the Search service in order to run the indexer too. <sup>[5](#search_service_datasource_managed_identity)</sup>
-   - **Search Skillset:** Click "Connect AI Service" from the Search Skillset to connect your AI service. <sup>[6](#search_service_skillset_connect_ai_service)</sup>
-   - **Multi-Service Account:** Setting the multi-service account The Azure Search Service indexer's vectorizer to the Azure AI Service multi-service account (i.e. the resource with the cog- prefix). You have to go to the Index settings for each search index to apply this change. Alternatively you can click "import and vectorize data" link at the top of the search screen in the Azure Portal. Select you storage account, blob name, select the managed identity, select AI Vision Vectorized for the "kind" field, select the multi-service account with the "cog-" prefix. You also need to set the Authentication Type to "API Key". <sup>[7](#search_service_index_vectorizer_multi_service_account)</sup>
-4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
-5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the `apiManagementService.SubscriptionKey` value in the parameters.json file which will then update the `AZURE_APIM_SUBSCRIPTION_KEY` value in the config.json value and used in the deployed app service. Of the 3 keys that are shown you need to copy the value from the last one titled "Built-in all-access subscription". <sup>[8](#api_management_service_subscription_key)</sup>
-
-   <u>NOTE:</u> Use of the API Management Service is only necessary if you plan on using the MSAL for authentication as opposed to just using API tokens.
-
-6. **API Management CORS:** For each of the two API operations `Get OpenAI Service Api Key` and `Get Search Service Api Key`, you need to make sure you add the CORS policy to the Inbound Processing section and add the Url of your app service to the Allowed Origins section.
-7. **Azure AI Project / Machine Learning Workspace:**
-
-   <img id="azure_ai_machine_learning_workspace" width="600" alt="Machine Learning Workspace" src="src/deployment/images/azure-ai-demo-manage-hubs-and-projects.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-
-Despite the official Microsoft [Azure Machine Learning Workspace schema](https://azuremlschemas.azureedge.net/latest/workspace.schema.json) documentation showing a whole list of parameters that are available, the `az ml workspace create` command will only accept the following parameters:
-
-```
---name
---description
---display-name
---resource-group
---application-insights
---location
---key-vault
---storage-account
-```
-
-The problem with this is that this solution needs to have an Azure AI project created and associated with the Azure Hub deployed in the resource group. Now, despite the official documentation stating that the parameters `kind` and `hub-id` do exist (albeit currently in preview mode) you cannot set either of those parameters using the Azure CLI. Here's where things get a little confusing. By not having the ability to specify values for those parameters, the "project" gets created as an **Azure Machine Learning Workspace** and it will only be available in **Azure Machine Learning Studio** as opposed to **Azure AI Studio** (recently renamed to **Azure AI Foundry**). Hence the reason why I titled this first item as **Azure AI Project / Machine Learning Workspace**. What this essentially means is that this resource can either be created in **Azure AI Foundary** or **Azure Machine Learning Studio** depending on where you ultimately decide to create it. Regardless of where the resource is created, it will display in your Resource Group. However, it will have different "purposes" and "structure" depending on where you provision it. Now, at this point you might be asking why you need to have either one in the first place. Well, the nice part about having a project/workspace is that it allows you to better organize your AI resources (i.e. models, endpoints, connected resources like Azure Blob Storage, OpenAI Services, Azure AI Services, Vision Services etc.) similar to how a resource group allows you to organize your cloud resources. In addition, you can invite people to your project/workspace without having to define explicit permissions for each and every resource.
-
-Even trying to pass in a yaml file instead of specifying the parameters directly in the command won't work if you include any other parameters than the ones listed above. So it's kind of annoying because this entire solution would literllay be "one-click" if not for the handful of aforementioned manual steps.
-
-Anyhow, once the project is created you need to make sure to set the quota to dynamic in order to actually make more than just a handful of REST API calls. This however can get pricey so make sure to check your budget before you go nuts.
-
-NOTE: Another issue with the whole Azure AI project is that because the script cannot create the correct instance of it due to the issues mentioned above, you will still to create one manually. Now, there is a pretty good chance that the script created one for you but...it was created in Azure ML Studio. So you will need to delete that project from your resource group and then be sure to also delete it from the "Recently Deleted" area too. In it's current state it has not been purged and if you try to create the correct project in Azure AI Studio (which you're about to do) it will fail saying the resource already exists. Anyhow...once you've purged the resource, you then create the "correct" project in Azure AI Studio. Make sure to select the correct Hub that the script created to house your previous Azure ML project that you just purged. If you don't then it won't be associated with your resource group or any of the other AI related resources and the solution will not work. Once you've created the project, create two AI models: gpt-4o and text-embedding-3-large. The names for both of these will be "gpt-4o" and "text-embedding".
-
-The next few screenshots outline the manual steps you need to take in order to configure the AI Project.
-
-1. Create new AI project and specify existing hub from your resource group. <sup>[9](#ai_studio_project_create)</sup>
-2. Select Models and Assets from the left navigation menu (towards the bottom). <sup>[10](#ai_studio_project_models_assets_menu)</sup>
-3. Select asset. <sup>[11](#ai_studio_project_select_assets)</sup>
-4. Select existing AI service from your resource group. <sup>[12](#ai_studio_project_select_ai_resource)</sup>
-5. Add two new models: GPT 4o (name the assets gpt-4o) and text-embedding-3-large (name the asset text-embedding). <sup>[13](#ai_studio_project_add_models)</sup>
-
-<img id="ai_studio_project_create" width="600" alt="AI Studio Project" src="src/deployment/images/azure-ai-demo-ai-studio-project-create.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-
-<img id="ai_studio_project_models_assets_menu" width="600" alt="AI Studio Model Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-asset-menu.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-
-<img id="ai_studio_project_select_assets" width="600" alt="AI Studio Select Assets" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-select.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-
-<img id="ai_studio_project_select_deployment_type" width="600" alt="AI Studio Select Deployment Type" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-deployment-type.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-
-<img id="ai_studio_project_select_ai_resource" width="600" alt="AI Studio Select AI Resource" src="src/deployment/images/azure-ai-demo-ai-studio-project-ai-resource.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
-
-<img id="ai_studio_project_add_models" width="600" alt="AI Studio Add AI Models" src="src/deployment/images/azure-ai-demo-ai-studio-project-model-management.png" style="box-shadow: 10px 10px 5px #888888; margin-top: 8px">
 
 ### Additional Notes
 
@@ -516,6 +496,27 @@ It is important to note that the technologies used by this solution are changing
 A perfect example is the Azure [Search Service API](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). There is actually documentation for how to migrate to the newest version of the API located [here](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). In the documentation, it actually says "2023-07-01-preview was the first REST API for vector support. Do not use this API version. It's now deprecated and you should migrate to either stable or newer preview REST APIs immediately."
 
 Lucky for you this solution defines all of the API versions in the parameters.json file. When newer versions of a particular API are resleased, you just need to update that file and redeploy the web application. The PowerShell script regenerates the config.json file that is deployed as part of the web application zip package using the new values defined in the parameters.json file.
+
+### Chat Personas List
+
+- Attorney
+- Business Professional
+- CEO
+- Data Scientist
+- Doctor
+- Engineer
+- Financial Advisor
+- Fitness Enthusiast
+- Foodie
+- HR Manager
+- Journalist
+- Marketing Professional
+- Network Security Specialist
+- New Yorker
+- Teacher
+- Tech Enthusiast
+- Teenage Girl
+- Traveler
 
 ### Image Reference
 
