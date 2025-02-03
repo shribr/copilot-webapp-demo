@@ -268,7 +268,7 @@ There are several manual steps which need to be performed for a variety of reaso
 4. **Setting Managed Identity for Cognitive Services:**. Set managed identity user for Cognitive Services resource in the Identity section of the resource with the cog- prefix (i.e. cog-copilot-demo-001).
 5. **API Management Service:** In order to leverage the REST APIs for the API Management Service (APIM) you need to obtain the subscription key. This is NOT the same thing as the subscriptionId for your Azure subscription. This key is stored in the API/Subscriptions section of the APIM resource. You will need to manually update the `apiManagementService.SubscriptionKey` value in the parameters.json file which will then update the `AZURE_APIM_SUBSCRIPTION_KEY` value in the config.json value and used in the deployed app service. Of the 3 keys that are shown you need to copy the value from the last one titled "Built-in all-access subscription". <sup>[8](#api_management_service_subscription_key)</sup>
 
-   > **Note**<br>
+   > [!NOTE]<br>
    > Use of the API Management Service is only necessary if you plan on using the MSAL for authentication as opposed to just using API tokens.
 
 6. **API Management CORS:** For each of the two API operations `Get OpenAI Service Api Key` and `Get Search Service Api Key`, you need to make sure you add the CORS policy to the Inbound Processing section and add the Url of your app service to the Allowed Origins section.
@@ -295,7 +295,7 @@ Even trying to pass in a yaml file instead of specifying the parameters directly
 
 Anyhow, once the project is created you need to make sure to set the quota to dynamic in order to actually make more than just a handful of REST API calls. This however can get pricey so make sure to check your budget before you go nuts.
 
-> **Note**<br>
+> [!NOTE]<br>
 > Another issue with the whole Azure AI project is that because the script cannot create the correct instance of it due to the issues mentioned above, you will still to create one manually. Now, there is a pretty good chance that the script created one for you but...it was created in Azure ML Studio. So you will need to delete that project from your resource group and then be sure to also delete it from the "Recently Deleted" area too. In it's current state it has not been purged and if you try to create the correct project in Azure AI Studio (which you're about to do) it will fail saying the resource already exists. Anyhow...once you've purged the resource, you then create the "correct" project in Azure AI Studio. Make sure to select the correct Hub that the script created to house your previous Azure ML project that you just purged. If you don't then it won't be associated with your resource group or any of the other AI related resources and the solution will not work. Once you've created the project, create two AI models: gpt-4o and text-embedding-3-large. The names for both of these will be "gpt-4o" and "text-embedding".
 
 The next few screenshots outline the manual steps you need to take in order to configure the AI Project.
