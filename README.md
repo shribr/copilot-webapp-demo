@@ -487,15 +487,6 @@ Very careful considerations to this solution were made to ensure a smooth and se
 
 For a more in-depth understanding of the chat workflow click [here](./README_CHATWORKFLOW.md)
 
-## Additional Notes
-
-**REST APIs**
-It is important to note that the technologies used by this solution are changing by the second. New versions of libraries and APIs are being released constantly and documentation is being updated on a near weekly basis. Since this solution leverages REST APIs, ensuring that you are using the most up-to-date API version for each service's API is absolutely critical. With each new API release, new capabilities are added (and sometimes existing ones removed). All the magic happens in the [Azure Open AI On Your Own Data API](https://learn.microsoft.com/en-us/azure/ai-services/openai/references/azure-search?tabs=rest).
-
-A perfect example is the Azure [Search Service API](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). There is actually documentation for how to migrate to the newest version of the API located [here](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). In the documentation, it actually says "2023-07-01-preview was the first REST API for vector support. Do not use this API version. It's now deprecated and you should migrate to either stable or newer preview REST APIs immediately."
-
-Lucky for you this solution defines all of the API versions in the parameters.json file. When newer versions of a particular API are resleased, you just need to update that file and redeploy the web application. The PowerShell script regenerates the config.json file that is deployed as part of the web application zip package using the new values defined in the parameters.json file.
-
 ## Image Reference
 
 **Storage Service CORS**
@@ -563,6 +554,20 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 - Tech Enthusiast
 - Teenage Girl
 - Traveler
+
+## Additional Notes
+
+**REST APIs**
+It is important to note that the technologies used by this solution are changing by the second. New versions of libraries and APIs are being released constantly and documentation is being updated on a near weekly basis. Since this solution leverages REST APIs, ensuring that you are using the most up-to-date API version for each service's API is absolutely critical. With each new API release, new capabilities are added (and sometimes existing ones removed). All the magic happens in the [Azure Open AI On Your Own Data API](https://learn.microsoft.com/en-us/azure/ai-services/openai/references/azure-search?tabs=rest).
+
+A perfect example is the Azure [Search Service API](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). There is actually documentation for how to migrate to the newest version of the API located [here](https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions). In the documentation, it actually says "2023-07-01-preview was the first REST API for vector support. Do not use this API version. It's now deprecated and you should migrate to either stable or newer preview REST APIs immediately."
+
+Lucky for you this solution defines all of the API versions in the parameters.json file. When newer versions of a particular API are resleased, you just need to update that file and redeploy the web application. The PowerShell script regenerates the config.json file that is deployed as part of the web application zip package using the new values defined in the parameters.json file.
+
+**VS Code Collapse/Fold**
+This has nothing to do with the current solution but it's something I found out to be very useful. Sometimes the VS Code collapse/fold feature gets a little wonky and doesn't detect start and end of functions. To fix this, have the file(s) that are having issues open in the editor. Then open VS Settings, search for "Editor Folding" and uncheck the box. Then switch over the the files you're having issues with and then go back to Settings and check the box again to reset the feature and hopefull fix the issue.
+
+<img width="1153" alt="VS Code Editor Folding" src="src/deployment/images/vs-code-editor-folding.png">
 
 ## Contributing
 

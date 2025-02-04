@@ -501,7 +501,8 @@ function addMessageToChatHistory(thread, message) {
 // Function to check if user is requesting an image be generated.
 function checkIfImageQuestion(input) {
 
-    const createImage = creationTerms.some(term => input.toLowerCase().includes(term));
+    const firstWord = input.trim().split(' ')[0].toLowerCase();
+    createImage = creationTerms.includes(firstWord);
 
     return createImage;
 }
@@ -1332,11 +1333,11 @@ async function getChatResponse(questionBubble) {
 
     if (isImageQuestion) {
         prompt = chatInput;
-        aiModel = config.AI_MODELS.find(item => item.Name === "dall-e-3");
+        aiModel = config.AI_MODELS.find(item => item.DeploymentName === "dall-e-3");
     }
     else {
         prompt = chatInput + promptSuffix;
-        aiModel = config.AI_MODELS.find(item => item.Name === "gpt-4o");
+        aiModel = config.AI_MODELS.find(item => item.DeploymentName === "gpt-4o");
     }
 
     // Construct the SAS token from the individual components

@@ -92,7 +92,9 @@
 
 # Set the default parameters file
 param (
-    [string]$parametersFile = "parameters.json"
+    [string]$parametersFile = "parameters.json",
+    [string]$deploymentType = "Existing",
+    [string]$resourceBaseName = "copilot-demo"
 )
 
 $global:parametersFile = "parameters.json"
@@ -255,7 +257,6 @@ function Deploy-OpenAIModels {
     )
 
     foreach ($aiModel in $aiModels) {
-        $aiModelName = $aiModel.Name
         $aiModelDeploymentName = $aiModel.DeploymentName
         $aiModelType = $aiModel.Type
         $aiModelVersion = $aiModel.ModelVersion
@@ -285,7 +286,7 @@ function Deploy-OpenAIModels {
                     $errorCode = $errorInfo["Code"]
                     $errorDetails = $errorInfo["Message"]
 
-                    $errorMessage = "Failed to deploy Model '$aiModelName' for '$aiServiceName'. `
+                    $errorMessage = "Failed to deploy Model '$aiModelDeploymentName' for '$aiModelDeploymentName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
@@ -302,8 +303,8 @@ function Deploy-OpenAIModels {
             }
         }
         catch {
-            Write-Error "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Model deployment '$deploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Error "Failed to create Model deployment '$aiModelDeploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Model deployment '$aiModelDeploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
 }
@@ -559,8 +560,8 @@ function Get-ResourceStatus {
     try {
         $resource = az resource show --name $resourceName --resource-group $resourceGroupName --resource-type $resourceType --output json | ConvertFrom-Json
         if ($resource.properties.provisioningState -eq "Succeeded") {
-            Write-Host "Resource '$resourceName' is provisioned successfully."
-            Write-Log -message "Resource '$resourceName' is provisioned successfully."
+            Write-Host "Resource '$resourceName' provisioned successfully."
+            Write-Log -message "Resource '$resourceName' provisioned successfully."
         }
         else {
             Write-Host "Resource '$resourceName' is in state: $($resource.properties.provisioningState)"
@@ -754,6 +755,22 @@ function Get-ValidServiceName {
     return $serviceName
 }
 
+# Function to increment a formatted number
+function Increment-FormattedNumber {
+    param (
+        [string]$formattedNumber,
+        [int]$width = 3
+    )
+    # Convert the formatted number to an integer
+    $number = [int]$formattedNumber
+
+    # Increment the number
+    $number++
+
+    # Convert the number back to the formatted string with leading zeros
+    return $number.ToString("D$width")
+}
+
 # Function to install Visual Studio Code extensions
 function Install-Extensions {
     # Define the path to the text file
@@ -764,7 +781,24 @@ function Install-Extensions {
 
     # Loop through each extension and install it using the `code` command
     foreach ($extension in $extensions) {
-        code --install-extension $extension
+        
+        # check if the extension is already installed
+        $isInstalled = code --list-extensions | Where-Object { $_ -eq $extension }
+
+        if ($isInstalled) {
+            Write-Host "Extension '$extension' is already installed."
+            continue
+        }
+        else {
+
+            try {
+                code --install-extension $extension
+                Write-Host "Installed extension '$extension' successfully."
+            }
+            catch {
+                Write-Error "Failed to install extension '$extension': $_"
+            }
+        }
     }
 }
 
@@ -803,11 +837,21 @@ function Initialize-Parameters {
         [string]$parametersFile = "parameters.json"
     )
 
+    $global:newResourceBaseName = "copilot-demo"
+
     # Navigate to the project directory
     Set-DirectoryPath -targetDirectory $global:deploymentPath
 
     # Load parameters from the JSON file
     $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+
+    $global:deploymentType = $parametersObject.deploymentType
+
+    if ($global:deploymentType -eq "New") {
+        Update-ResourceBaseName -newResourceBaseName $global:newResourceBaseName
+
+        $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+    }
 
     # Initialize global variables for each item in the parameters.json file
     $global:aiHubName = $parametersObject.aiHubName
@@ -851,6 +895,7 @@ function Initialize-Parameters {
     $global:eventHubNamespaceName = $parametersObject.eventHubNamespaceName
     $global:exposeApiScopes = $parametersObject.exposeApiScopes
     $global:keyVaultName = $parametersObject.keyVaultName
+    $global:keyVaultPermissionModel = $parametersObject.keyVaultPermissionModel
     $global:keyVaultApiVersion = $parametersObject.keyVaultApiVersion
     $global:location = $parametersObject.location
     $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
@@ -869,6 +914,7 @@ function Initialize-Parameters {
     $global:resourceBaseName = $parametersObject.resourceBaseName
     $global:resourceGroupName = $parametersObject.resourceGroupName
     $global:resourceSuffix = $parametersObject.resourceSuffix
+    $global:resourceSuffixCounter = $parametersObject.resourceSuffixCounter
     $global:restoreSoftDeletedResource = $parametersObject.restoreSoftDeletedResource
     $global:searchDataSourceName = $parametersObject.searchDataSourceName
     $global:searchDataSources = $parametersObject.searchDataSources
@@ -938,23 +984,6 @@ function Initialize-Parameters {
     $parametersObject | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
     $parametersObject | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
 
-    Write-Host "Doc Intelligence: $documentIntelligenceName"
-    Write-Host "Search Service Name: $searchServiceName"
-
-    # Debugging output
-    Write-Host "searchIndexName from parametersObject: $($parametersObject.searchIndexName)"
-    Write-Host "searchIndexName from global: $($global:searchIndexName)"
-
-    Write-Host "searchSkillSetName from parametersObject: $($parametersObject.searchSkillSetName)"
-    Write-Host "searchSkillSetName from global: $($global:searchSkillSetName)"
-
-    Write-Host "virtualNetworkName from parametersObject: $($parametersObject.virtualNetwork.Name)"
-    Write-Host "virtualNetworkName from global: $($global:virtualNetwork.Name)"
-
-    Write-Host "appServiceEnvironmentName from parametersObject: $($parametersObject.appServiceEnvironmentName)"
-    Write-Host "appServiceEnvironmentName from global: $($global:appServiceEnvironmentName)"
-
-
     $resources = @(
         @{ Name = $aiServiceName; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $apiManagementService.Name; Type = "API Management"; Status = "Pending" }
@@ -985,6 +1014,11 @@ function Initialize-Parameters {
         $global:ResourceList += [PSCustomObject]@{ Name = $resource.Name; Type = $resource.Type; Status = $resource.Status }
     }
     
+    Write-Host "Parameters initialized.`n"
+    Write-Host  $global:ResourceList
+
+    Write-Log -message "Parameters initialized."
+
     return @{
         aiDeploymentName             = $aiDeploymentName
         aiHubName                    = $aiHubName
@@ -1023,11 +1057,13 @@ function Initialize-Parameters {
         createResourceGroup          = $createResourceGroup
         deleteResourceGroup          = $deleteResourceGroup
         deployApiManagementService   = $deployApiManagementService
+        deploymentType               = $deploymentType
         deployZipResources           = $deployZipResources
         documentIntelligenceName     = $documentIntelligenceName
         eventHubNamespaceName        = $eventHubNamespaceName
         exposeApiScopes              = $exposeApiScopes
         keyVaultName                 = $keyVaultName
+        keyVaultPermissionModel      = $keyVaultPermissionModel
         keyVaultApiVersion           = $keyVaultApiVersion
         location                     = $location
         logAnalyticsWorkspaceName    = $logAnalyticsWorkspaceName
@@ -1049,6 +1085,7 @@ function Initialize-Parameters {
         resourceGroupName            = $resourceGroupName
         resourceGuid                 = $resourceGuid
         resourceSuffix               = $resourceSuffix
+        resourceSuffixCounter        = $resourceSuffixCounter
         restoreSoftDeletedResource   = $restoreSoftDeletedResource
         result                       = $result
         searchDataSourceName         = $searchDataSourceName
@@ -2951,12 +2988,12 @@ function New-SearchIndexer {
 
     try {
 
-        $resourceBaseName = $global:resourceBaseName
+        $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
 
         $content = Get-Content -Path $searchIndexerSchema
 
         # Replace the placeholder with the actual resource base name
-        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
+        $updatedContent = $content -replace $previousResourceBaseName, $fullResourceBaseName
 
         Set-Content -Path $searchIndexerSchema -Value $updatedContent
 
@@ -4013,6 +4050,7 @@ function Start-Deployment {
 
     # Log the current sequence number
     $logMessage = "*** LOG SEQUENCE: $sequenceNumber ***"
+
     Write-Host $logMessage
     Add-Content -Path $logFilePath -Value $logMessage
 
@@ -4059,7 +4097,7 @@ function Start-Deployment {
 
         # Update configuration file for web frontend
         Update-ConfigFile - configFilePath "app/frontend/config.json" `
-            -resourceBaseName $resourceBaseName `
+            -resourceBaseName $global:resourceBaseName `
             -resourceGroupName $resourceGroupName `
             -storageAccountName $storageAccountName `
             -searchServiceName $searchServiceName `
@@ -4134,7 +4172,12 @@ function Start-Deployment {
         }
     }
 
-    $useRBAC = $false
+    if ($global:keyVaultPermissionModel -eq "RoleBased") {
+        $useRBAC = $true
+    }
+    else {
+        $useRBAC = $false
+    }
 
     #**********************************************************************************************************************
     # Create Key Vault
@@ -4755,10 +4798,53 @@ function Update-ParameterFileApiVersions {
 
 }
 
+# Function to udpate the configuration file with new resource base name.
+function Update-ResourceBaseName() {
+    param (
+        [string]$newResourceBaseName = "copilot-demo"
+    )
+
+    # Read the parameters.json file
+    $parametersFileContent = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
+
+    # Get the currentResourceBaseName from the parameters file
+    $currentResourceBaseName = $parametersFileContent.resourceBaseName
+    $fullResourceBaseName = $parametersFileContent.fullResourceBaseName
+    $previousFullResourceBaseName = $parametersFileContent.previousFullResourceBaseName
+    $resourceSuffixCounter = $parametersFileContent.resourceSuffixCounter
+
+    $newResourceSuffixCounter = Increment-FormattedNumber -formattedNumber $resourceSuffixCounter
+    $newFullResourceBaseName = "$newResourceBaseName-$newResourceSuffixCounter"
+
+    $parametersFileContent.resourceSuffixCounter = $newResourceSuffixCounter
+    $parametersFileContent.fullResourceBaseName = $newFullResourceBaseName
+
+    # Update the previousResourceBaseName in the parameters file with the value stored in currentResourceBaseName
+    $parametersFileContent.resourceBaseName = $newResourceBaseName
+    $parametersFileContent.previousResourceBaseName = $currentResourceBaseName
+    $parametersFileContent.previousFullResourceBaseName = $fullResourceBaseName
+   
+    $parametersFileContent.resourceGroupName = $parametersFileContent.resourceGroupName.ToUpper()
+
+    # Save the updated parameters back to the parameters.json file
+    $parametersFileContent | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
+
+    $newFullResourceBaseNameNoHyphen = $newFullResourceBaseName -replace "-", ""
+    $previousFullResourceBaseNameNoHyphen = $previousFullResourceBaseName -replace "-", ""
+
+    # Replace all instances of currentResourceBaseName with the value stored in $resourceBaseName parameter
+    $fileContent = Get-Content -Path $parametersFile
+
+    $fileContent = $fileContent -replace $previousFullResourceBaseNameNoHyphen, $newFullResourceBaseNameNoHyphen
+    $fileContent = $fileContent -replace $previousFullResourceBaseName, $newFullResourceBaseName
+
+    Set-Content -Path $parametersFile -Value $fileContent
+}
+
 # Function to update search index files (not currently used)
 function Update-SearchIndexFiles {
 
-    $resourceBaseName = $global:resourceBaseName
+    $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
 
     $searchIndexFiles = @("search-index-schema-template.json,search-indexer-schema-template.json,vector-search-index-schema-template.json,vector-search-indexer-schema-template.json,embeddings-search-index-schema-template.json,embeddings-search-indexer-schema-template.json,sharepoint-search-index-schema-template.json,sharepoint-search-indexer-schema-template.json" )
 
@@ -4767,7 +4853,7 @@ function Update-SearchIndexFiles {
 
         $content = Get-Content -Path $fileName
 
-        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
+        $updatedContent = $content -replace $previousResourceBaseName, $fullResourceBaseName
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
     }
@@ -4775,13 +4861,13 @@ function Update-SearchIndexFiles {
 
 # Function to update search skill set files
 function Update-SearchSkillSetFiles {
-    $resourceBaseName = $global:resourceBaseName
+    $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
 
     foreach ($searchSkillSet in $searchSkillSets) {
 
         $content = Get-Content -Path $searchSkillSet.File
 
-        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
+        $updatedContent = $content -replace $previousResourceBaseName, $fullResourceBaseName
 
         Set-Content -Path $searchSkillSet.File -Value $updatedContent
     }
@@ -4791,7 +4877,6 @@ function Update-SearchSkillSetFiles {
 function Update-ConfigFile {
     param (
         [string]$configFilePath,
-        [string]$resourceBaseName,
         [string]$resourceGroupName,
         [string]$storageAccountName,
         [string]$searchServiceName,
@@ -4808,8 +4893,10 @@ function Update-ConfigFile {
 
     try {
 
-        $appServiceName = "app-$global:resourceBaseName"
-        $functionAppName = "func-$global:resourceBaseName"
+        $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
+
+        $appServiceName = "app-$fullResourceBaseName"
+        $functionAppName = "func-$fullResourceBaseName"
 
         $storageKey = az storage account keys list --resource-group  $global:resourceGroupName --account-name $global:storageAccountName --query "[0].value" --output tsv
         $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
@@ -4908,7 +4995,7 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
         $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
         $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
-        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$resourceBaseName-semantic-configuration" -join ""
+        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$fullResourceBaseName-semantic-configuration" -join ""
         $config.AZURE_SEARCH_SERVICE_NAME = $global:searchServiceName
         $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
         $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
@@ -5083,6 +5170,9 @@ function Write-Log {
 
 $ErrorActionPreference = 'Stop'
 
+# Need to install VS Code extensions before executing main deployment script
+# Install-Extensions
+
 #$global:subscriptionId = az account show --query "{Id:id}" --output tsv
 
 # Initialize the deployment path
@@ -5100,8 +5190,6 @@ $global:resourceCounter = 0
 
 # Initialize parameters
 $initParams = Initialize-Parameters -parametersFile $parametersFile
-#Write-Host "Parameters initialized."
-#Write-Log -message "Parameters initialized."
 
 # Alphabetize the parameters object
 $parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
