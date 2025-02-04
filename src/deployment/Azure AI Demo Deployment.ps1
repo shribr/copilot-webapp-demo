@@ -118,6 +118,9 @@ $global:ResourceTypes = @(
     "microsoft.insights/actiongroups"
 )
 
+# List of all resources pending creation
+$global:ResourceList = @()
+
 # Mapping of global AI Hub connected resources
 $global:AIHubConnectedResources = @()
 
@@ -256,7 +259,6 @@ function Deploy-OpenAIModels {
         $aiModelDeploymentName = $aiModel.DeploymentName
         $aiModelType = $aiModel.Type
         $aiModelVersion = $aiModel.ModelVersion
-        $aiServiceName = aiServiceName
         $aiModelFormat = $aiModel.Format
         $aiModelSkuName = $aiModel.Sku.Name
         $aiModelSkuCapacity = $aiModel.Sku.Capacity
@@ -659,23 +661,23 @@ function Get-UniqueSuffix {
     $appResourceExists = $true
 
     do {
-        $storageAccountName = "$($parameters.storageAccountName)$resourceGuid$resourceSuffix"
-        $appServicePlanName = "$($parameters.appServicePlanName)-$resourceGuid-$resourceSuffix"
-        $searchServiceName = "$($parameters.searchServiceName)-$resourceGuid-$resourceSuffix"
-        $logAnalyticsWorkspaceName = "$($parameters.logAnalyticsWorkspaceName)-$resourceGuid-$resourceSuffix"
-        $cognitiveServiceName = "$($parameters.cognitiveServiceName)-$resourceGuid-$resourceSuffix"
-        $keyVaultName = "$($parameters.keyVaultName)-$resourceGuid-$resourceSuffix"
-        $appInsightsName = "$($parameters.appInsightsName)-$resourceGuid-$resourceSuffix"
-        $portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
-        $managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
-        $userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
-        $openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
-        $documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
-        $aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
-        $aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
-        $aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:storageAccountName = "$($parameters.storageAccountName)$resourceGuid$resourceSuffix"
+        $global:appServicePlanName = "$($parameters.appServicePlanName)-$resourceGuid-$resourceSuffix"
+        $global:searchServiceName = "$($parameters.searchServiceName)-$resourceGuid-$resourceSuffix"
+        $global:logAnalyticsWorkspaceName = "$($parameters.logAnalyticsWorkspaceName)-$resourceGuid-$resourceSuffix"
+        $global:cognitiveServiceName = "$($parameters.cognitiveServiceName)-$resourceGuid-$resourceSuffix"
+        $global:keyVaultName = "$($parameters.keyVaultName)-$resourceGuid-$resourceSuffix"
+        $global:appInsightsName = "$($parameters.appInsightsName)-$resourceGuid-$resourceSuffix"
+        $global:portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
+        $global:managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
+        $global:userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
+        $global:openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
+        $global:documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
+        $global:aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
 
-        foreach ($appService in $appServices) {
+        foreach ($appService in $global:appServices) {
             $appService.Name = "$($appService.Name)-$($resourceGuid)-$($resourceSuffix)"
         }
 
@@ -692,7 +694,7 @@ function Get-UniqueSuffix {
         Test-ResourceExists $openAIName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists $documentIntelligenceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName
 
-        foreach ($appService in $appServices) {
+        foreach ($appService in $global:appServices) {
             $appResourceExists = Test-ResourceExists $appServiceName $appService.Name -resourceGroupName $resourceGroupName -or $resourceExists
             if ($appResourceExists) {
                 $resourceExists = $true
@@ -952,6 +954,39 @@ function Initialize-Parameters {
     Write-Host "appServiceEnvironmentName from parametersObject: $($parametersObject.appServiceEnvironmentName)"
     Write-Host "appServiceEnvironmentName from global: $($global:appServiceEnvironmentName)"
 
+
+    $resources = @(
+        @{ Name = $aiHubName; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $aiProjectName; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $aiServiceName; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $apiManagementService.Name; Type = "API Management"; Status = "Pending" }
+        @{ Name = $appInsightsName; Type = "Application Insights"; Status = "Pending" }
+        @{ Name = $appServiceEnvironmentName; Type = "App Service Environment"; Status = "Pending" }
+        @{ Name = $appServicePlanName; Type = "App Service Plan"; Status = "Pending" }
+        @{ Name = $blobStorageAccountName; Type = "Storage Account"; Status = "Pending" }
+        @{ Name = $cognitiveServiceName; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $computerVisionName; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $containerAppName; Type = "Container App"; Status = "Pending" }
+        @{ Name = $containerAppsEnvironmentName; Type = "Container Apps Environment"; Status = "Pending" }
+        @{ Name = $containerRegistryName; Type = "Container Registry"; Status = "Pending" }
+        @{ Name = $cosmosDbAccountName; Type = "Cosmos DB"; Status = "Pending" }
+        @{ Name = $documentIntelligenceName; Type = "Document Intelligence"; Status = "Pending" }
+        @{ Name = $keyVaultName; Type = "Key Vault"; Status = "Pending" }
+        @{ Name = $logAnalyticsWorkspaceName; Type = "Log Analytics Workspace"; Status = "Pending" }
+        @{ Name = $machineLearningWorkspace; Type = "Machine Learning Workspace"; Status = "Pending" }
+        @{ Name = $managedIdentityName; Type = "Managed Identity"; Status = "Pending" }
+        @{ Name = $openAIAccountName; Type = "OpenAI"; Status = "Pending" }
+        @{ Name = $resourceGroupName; Type = "Resource Group"; Status = "Pending" }
+        @{ Name = $searchServiceName; Type = "Search Service"; Status = "Pending" }
+        @{ Name = $storageAccountName; Type = "Storage Account"; Status = "Pending" }
+        @{ Name = $userAssignedIdentityName; Type = "User Assigned Identity"; Status = "Pending" }
+        @{ Name = $virtualNetwork.Name; Type = "Virtual Network"; Status = "Pending" }
+    )
+
+    foreach ($resource in $resources) {
+        $global:ResourceList += [PSCustomObject]@{ Name = $resource.Name; Type = $resource.Type; Status = $resource.Status }
+    }
+    
     return @{
         aiDeploymentName             = $aiDeploymentName
         aiHubName                    = $aiHubName
@@ -3943,7 +3978,7 @@ function Split-Guid {
     $newGuid = [guid]::NewGuid().ToString()
     $newGuid = $newGuid -replace "-", ""
 
-    $newGuid = $newGuid.Substring(0, 8)
+    $newGuid = $newGuid.Substring(0, 5)
 
     return $newGuid
 }
@@ -3992,6 +4027,10 @@ function Start-Deployment {
     $resourceGroupName = $global:resourceGroupName
 
     if ($appendUniqueSuffix -eq $true) {
+
+        # Find a unique suffix
+        $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
+
         $resourceGroupName = "$resourceGroupName$resourceSuffix"
     }
 
@@ -4057,69 +4096,34 @@ function Start-Deployment {
         Write-Host "Identity '$userAssignedIdentityName' already exists."
         Write-Log -message "Identity '$userAssignedIdentityName' already exists."
     }
-
-    if ($appendUniqueSuffix -eq $true) {
-
-        # Find a unique suffix
-        $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
-
-        New-Resources -aiProjectName $aiProjectName `
-            -appInsightsName $appInsightsName `
-            -appServiceEnvironmentName $appServiceEnvironmentName `
-            -appServicePlanName $appServicePlanName `
-            -appServicePlanSku $appServicePlanSku `
-            -blobStorageContainerName $blobStorageContainerName `
-            -cognitiveServiceName $cognitiveServiceName `
-            -computerVisionName $computerVisionName `
-            -containerRegistryName $containerRegistryName `
-            -documentIntelligenceName $documentIntelligenceName `
-            -existingResources $existingResources `
-            -keyVaultName $keyVaultName `
-            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
-            -managedEnvironmentName $managedEnvironmentName `
-            -openAIAccountName $openAIAccountName `
-            -portalDashboardName $portalDashboardName `
-            -searchDatasourceName $searchDatasourceName `
-            `searchIndexName $searchIndexName `
-            `searchIndexerName $searchIndexerName `
-            -searchServiceName $searchServiceName `
-            -searchSkillSets $searchSkillSets `
-            -storageAccountName $storageAccountName `
-            -subNet $subNet `
-            -userAssignedIdentityName $userAssignedIdentityName `
-            -userPrincipalName $userPrincipalName `
-            -virtualNetwork $virtualNetwork
-    }
-    else {
-
-        New-Resources -aiProjectName $aiProjectName `
-            -apiManagementService $apiManagementService `
-            -appInsightsName $appInsightsName `
-            -appServiceEnvironmentName $appServiceEnvironmentName `
-            -appServicePlanName $appServicePlanName `
-            -appServicePlanSku $appServicePlanSku `
-            -blobStorageContainerName $blobStorageContainerName `
-            -cognitiveServiceName $cognitiveServiceName `
-            -computerVisionName $computerVisionName `
-            -containerRegistryName $containerRegistryName `
-            -documentIntelligenceName $documentIntelligenceName `
-            -existingResources $existingResources `
-            -keyVaultName $keyVaultName `
-            -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
-            -managedEnvironmentName $managedEnvironmentName `
-            -openAIAccountName $openAIAccountName `
-            -portalDashboardName $portalDashboardName `
-            -searchDatasourceName $searchDatasourceName `
-            `searchIndexName $searchIndexName `
-            `searchIndexerName $searchIndexerName `
-            -searchServiceName $searchServiceName `
-            -searchSkillSets $searchSkillSets `
-            -storageAccountName $storageAccountName `
-            -subNet $subNet `
-            -userAssignedIdentityName $userAssignedIdentityName `
-            -userPrincipalName $userPrincipalName `
-            -virtualNetwork $virtualNetwork
-    }
+   
+    New-Resources -aiProjectName $aiProjectName `
+        -apiManagementService $apiManagementService `
+        -appInsightsName $appInsightsName `
+        -appServiceEnvironmentName $appServiceEnvironmentName `
+        -appServicePlanName $appServicePlanName `
+        -appServicePlanSku $appServicePlanSku `
+        -blobStorageContainerName $blobStorageContainerName `
+        -cognitiveServiceName $cognitiveServiceName `
+        -computerVisionName $computerVisionName `
+        -containerRegistryName $containerRegistryName `
+        -documentIntelligenceName $documentIntelligenceName `
+        -existingResources $existingResources `
+        -keyVaultName $keyVaultName `
+        -logAnalyticsWorkspaceName $logAnalyticsWorkspaceName `
+        -managedEnvironmentName $managedEnvironmentName `
+        -openAIAccountName $openAIAccountName `
+        -portalDashboardName $portalDashboardName `
+        -searchDatasourceName $searchDatasourceName `
+        `searchIndexName $searchIndexName `
+        `searchIndexerName $searchIndexerName `
+        -searchServiceName $searchServiceName `
+        -searchSkillSets $searchSkillSets `
+        -storageAccountName $storageAccountName `
+        -subNet $subNet `
+        -userAssignedIdentityName $userAssignedIdentityName `
+        -userPrincipalName $userPrincipalName `
+        -virtualNetwork $virtualNetwork
 
     # Create new web app and function app services
     foreach ($appService in $appServices) {

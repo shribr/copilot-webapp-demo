@@ -322,7 +322,7 @@
   "cosmosDbAccountName": "cosmos-copilot-demo-002",
   "createResourceGroup": true,
   "deleteResourceGroup": false,
-  "deployApiManagementService": false,
+  "deployApiManagementService": true,
   "deployZipResources": true,
   "documentIntelligenceName": "docintel-copilot-demo-002",
   "domainName": "azurewebsites.net",
