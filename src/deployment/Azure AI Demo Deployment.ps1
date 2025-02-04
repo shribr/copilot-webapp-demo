@@ -956,8 +956,6 @@ function Initialize-Parameters {
 
 
     $resources = @(
-        @{ Name = $aiHubName; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $aiProjectName; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $aiServiceName; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $apiManagementService.Name; Type = "API Management"; Status = "Pending" }
         @{ Name = $appInsightsName; Type = "Application Insights"; Status = "Pending" }
@@ -965,21 +963,21 @@ function Initialize-Parameters {
         @{ Name = $appServicePlanName; Type = "App Service Plan"; Status = "Pending" }
         @{ Name = $blobStorageAccountName; Type = "Storage Account"; Status = "Pending" }
         @{ Name = $cognitiveServiceName; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $computerVisionName; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $containerAppName; Type = "Container App"; Status = "Pending" }
+        @{ Name = $computerVisionName; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $containerAppsEnvironmentName; Type = "Container Apps Environment"; Status = "Pending" }
         @{ Name = $containerRegistryName; Type = "Container Registry"; Status = "Pending" }
         @{ Name = $cosmosDbAccountName; Type = "Cosmos DB"; Status = "Pending" }
         @{ Name = $documentIntelligenceName; Type = "Document Intelligence"; Status = "Pending" }
+        @{ Name = $aiHubName; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $userAssignedIdentityName; Type = "User Assigned Identity"; Status = "Pending" }
         @{ Name = $keyVaultName; Type = "Key Vault"; Status = "Pending" }
         @{ Name = $logAnalyticsWorkspaceName; Type = "Log Analytics Workspace"; Status = "Pending" }
-        @{ Name = $machineLearningWorkspace; Type = "Machine Learning Workspace"; Status = "Pending" }
-        @{ Name = $managedIdentityName; Type = "Managed Identity"; Status = "Pending" }
         @{ Name = $openAIAccountName; Type = "OpenAI"; Status = "Pending" }
+        @{ Name = $aiProjectName; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $resourceGroupName; Type = "Resource Group"; Status = "Pending" }
         @{ Name = $searchServiceName; Type = "Search Service"; Status = "Pending" }
         @{ Name = $storageAccountName; Type = "Storage Account"; Status = "Pending" }
-        @{ Name = $userAssignedIdentityName; Type = "User Assigned Identity"; Status = "Pending" }
         @{ Name = $virtualNetwork.Name; Type = "Virtual Network"; Status = "Pending" }
     )
 

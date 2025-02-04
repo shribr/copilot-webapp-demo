@@ -1,37 +1,38 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 02/03/2025 20:01:59 ***
-2025-02-03 20:02:01 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
-2025-02-03 20:03:19 - Resource 'srch-copilot-demo-002' is provisioned successfully.
-2025-02-03 20:03:19 - Identity 'id-copilot-demo-002' already exists.
-2025-02-03 20:03:23 - Storage account 'stcopilotdemo002' already exists.
-2025-02-03 20:04:44 - Subnet 'subnet-copilot-demo-002' already exists.
-2025-02-03 20:04:44 - App Service Plan 'asp-copilot-demo-002' already exists.
-2025-02-03 20:04:44 - Cognitive Service 'cog-copilot-demo-002' already exists.
-2025-02-03 20:04:46 - Search Service 'srch-copilot-demo-002' already exists.
-2025-02-03 20:04:51 - Search Index 'srch-index-copilot-demo-002' already exists.
-2025-02-03 20:04:52 - Search Index 'vector-srch-index-copilot-demo-002' already exists.
-2025-02-03 20:06:08 - Search Index 'embeddings-srch-index-copilot-demo-002' already exists.
-2025-02-03 20:06:10 - Search Index 'sharepoint-srch-index-copilot-demo-002' already exists.
-2025-02-03 20:57:15 - Search Service Data Source 'srch-datasource-blob-copilot-demo-002' already exists.
-2025-02-03 20:57:15 - Search Service Data Source 'srch-datasource-sharepoint-copilot-demo-002' already exists.
-2025-02-03 20:57:26 - Search Skill Set 'srch-skillset-copilot-demo-002' already exists.
-2025-02-03 20:57:30 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
-2025-02-03 20:57:34 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-002' already exists.
-2025-02-03 20:58:37 - Search Indexer 'srch-indexer-copilot-demo-002' already exists.
-2025-02-03 21:02:34 - Search Indexer 'vector-srch-indexer-copilot-demo-002' already exists.
-2025-02-03 21:02:38 - Search Indexer 'embeddings-srch-indexer-copilot-demo-002' already exists.
-2025-02-03 21:02:38 - Log Analytics workspace 'log-copilot-demo-002' already exists.
-2025-02-03 21:02:38 - Application Insights 'appi-copilot-demo-002' already exists.
-2025-02-03 21:02:38 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
-2025-02-03 21:02:38 - Container Registry 'crcopilotdemo002' already exists.
-2025-02-03 21:02:38 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
-2025-02-03 21:02:38 - Computer Vision Service 'cv-copilot-demo-002' already exists.
-2025-02-03 21:02:38 - Api Management service 'apim-copilot-demo-002' already exists.
-2025-02-03 21:14:41 - Api 'KeyVaultProxy' already exists.
-2025-02-03 21:14:41 - Key Vault 'kv-copilot-demo-002' already exists.
-2025-02-03 21:14:41 - AI Hub 'hub-ai-copilot-demo-002' already exists.
-2025-02-03 21:14:43 - AI Service 'ai-service-copilot-demo-002' already exists.
-2025-02-03 21:14:50 - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
-2025-02-03 21:14:54 - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
-2025-02-03 21:14:58 - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
-2025-02-03 21:14:59 - Machine Learning Workspace 'project-ai-copilot-demo-002' already exists.
+*** SCRIPT START TIME: 02/03/2025 22:44:21 ***
+2025-02-03 22:44:25 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-02-03 22:45:43 - Resource 'srch-copilot-demo-002' is provisioned successfully.
+2025-02-03 22:45:43 - Identity 'id-copilot-demo-002' already exists.
+2025-02-03 22:45:47 - Storage account 'stcopilotdemo002' already exists.
+2025-02-03 22:47:07 - Subnet 'subnet-copilot-demo-002' already exists.
+2025-02-03 22:47:07 - App Service Plan 'asp-copilot-demo-002' already exists.
+2025-02-03 22:47:07 - Cognitive Service 'cog-copilot-demo-002' already exists.
+2025-02-03 22:48:23 - Search Service 'srch-copilot-demo-002' already exists.
+2025-02-03 22:49:44 - Search Index 'srch-index-copilot-demo-002' already exists.
+2025-02-03 22:49:47 - Search Index 'vector-srch-index-copilot-demo-002' already exists.
+2025-02-03 22:49:48 - Search Index 'embeddings-srch-index-copilot-demo-002' already exists.
+2025-02-03 22:49:50 - Search Index 'sharepoint-srch-index-copilot-demo-002' already exists.
+2025-02-03 22:52:24 - Search Service Data Source 'srch-datasource-blob-copilot-demo-002' already exists.
+2025-02-03 22:52:24 - Search Service Data Source 'srch-datasource-sharepoint-copilot-demo-002' already exists.
+2025-02-03 22:52:26 - Search Skill Set 'srch-skillset-copilot-demo-002' already exists.
+2025-02-03 22:52:28 - Search Skill Set 'vector-srch-skillset-copilot-demo-002' already exists.
+2025-02-03 22:52:30 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-002' already exists.
+2025-02-03 22:52:32 - Search Indexer 'srch-indexer-copilot-demo-002' already exists.
+2025-02-03 22:52:34 - Search Indexer 'vector-srch-indexer-copilot-demo-002' already exists.
+2025-02-03 22:52:36 - Search Indexer 'embeddings-srch-indexer-copilot-demo-002' already exists.
+2025-02-03 22:52:36 - Log Analytics workspace 'log-copilot-demo-002' already exists.
+2025-02-03 22:52:36 - Application Insights 'appi-copilot-demo-002' already exists.
+2025-02-03 22:52:36 - Azure OpenAI service 'openai-copilot-demo-002' already exists.
+2025-02-03 22:52:36 - Container Registry 'crcopilotdemo002' already exists.
+2025-02-03 22:52:36 - Document Intelligence Service 'docintel-copilot-demo-002' already exists.
+2025-02-03 22:52:36 - Computer Vision Service 'cv-copilot-demo-002' already exists.
+2025-02-03 22:52:36 - Api Management service 'apim-copilot-demo-002' already exists.
+2025-02-03 22:52:40 - Api 'KeyVaultProxy' already exists.
+2025-02-03 22:52:40 - Key Vault 'kv-copilot-demo-002' already exists.
+2025-02-03 22:52:40 - AI Hub 'hub-ai-copilot-demo-002' already exists.
+2025-02-03 22:53:56 - AI Service 'ai-service-copilot-demo-002' already exists.
+2025-02-03 22:54:01 - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
+2025-02-03 22:54:02 - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
+2025-02-03 22:54:03 - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-002'.
+2025-02-03 22:54:03 - Machine Learning Workspace 'project-ai-copilot-demo-002' already exists.
+2025-02-03 22:54:14 - Model deployment 'gpt-4o' for 'ai-service-copilot-demo-002' already exists.
