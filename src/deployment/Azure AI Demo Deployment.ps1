@@ -846,6 +846,7 @@ function Initialize-Parameters {
     $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
     $global:deploymentType = $parametersObject.deploymentType
+    $global:previousFullResourceBaseName = $parametersObject.previousFullResourceBaseName
 
     if ($global:deploymentType -eq "New") {
         Update-ResourceBaseName -newResourceBaseName $global:newResourceBaseName
@@ -1077,6 +1078,7 @@ function Initialize-Parameters {
         openAIServiceProperties      = $openAIServiceProperties
         parameters                   = $parametersObject
         portalDashboardName          = $portalDashboardName
+        previousFullResourceBaseName = $previousFullResourceBaseName
         previousResourceBaseName     = $previousResourceBaseName
         privateEndPointName          = $privateEndPointName
         redeployResources            = $redeployResources
@@ -4296,6 +4298,16 @@ function Start-Deployment {
         }
     }
 
+    # Set $previousFullResourceBaseName to the $currentResourceBaseName
+    $previousFullResourceBaseName = $global:currentFullResourceBaseName
+
+    $parametersFileContent = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
+
+    $parametersFileContent.previousFullResourceBaseName = $previousFullResourceBaseName
+
+    # Save the updated parameters back to the parameters.json file
+    $parametersFileContent | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
+
     # End the timer
     $endTime = Get-Date
     $executionTime = $endTime - $startTime
@@ -4808,9 +4820,12 @@ function Update-ResourceBaseName() {
     $parametersFileContent = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
 
     # Get the currentResourceBaseName from the parameters file
-    $currentResourceBaseName = $parametersFileContent.resourceBaseName
+    $currentFullResourceBaseName = $parametersFileContent.currentFullResourceBaseName
+
+    $global:currentFullResourceBaseName = $currentFullResourceBaseName
+
     $fullResourceBaseName = $parametersFileContent.fullResourceBaseName
-    $previousFullResourceBaseName = $parametersFileContent.previousFullResourceBaseName
+    
     $resourceSuffixCounter = $parametersFileContent.resourceSuffixCounter
 
     $newResourceSuffixCounter = Increment-FormattedNumber -formattedNumber $resourceSuffixCounter
@@ -4821,30 +4836,35 @@ function Update-ResourceBaseName() {
 
     # Update the previousResourceBaseName in the parameters file with the value stored in currentResourceBaseName
     $parametersFileContent.resourceBaseName = $newResourceBaseName
-    $parametersFileContent.previousResourceBaseName = $currentResourceBaseName
-    $parametersFileContent.previousFullResourceBaseName = $fullResourceBaseName
-   
-    $parametersFileContent.resourceGroupName = $parametersFileContent.resourceGroupName.ToUpper()
+
+    $newFullResourceBaseNameUpperCase = $newFullResourceBaseName.ToUpper()
+    $parametersFileContent.resourceGroupName = "RG-$newFullResourceBaseNameUpperCase"
+
+    $parametersFileContent | ForEach-Object {
+        $_.PSObject.Properties | ForEach-Object {
+            if ($_.Value -is [string]) {
+                $_.Value = $_.Value -replace [regex]::Escape($fullResourceBaseName), $newFullResourceBaseName
+            }
+        }
+    }
 
     # Save the updated parameters back to the parameters.json file
     $parametersFileContent | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
 
     $newFullResourceBaseNameNoHyphen = $newFullResourceBaseName -replace "-", ""
-    $previousFullResourceBaseNameNoHyphen = $previousFullResourceBaseName -replace "-", ""
+    $currentFullResourceBaseNameNoHyphen = $fullResourceBaseName -replace "-", ""
 
     # Replace all instances of currentResourceBaseName with the value stored in $resourceBaseName parameter
     $fileContent = Get-Content -Path $parametersFile
 
-    $fileContent = $fileContent -replace $previousFullResourceBaseNameNoHyphen, $newFullResourceBaseNameNoHyphen
-    $fileContent = $fileContent -replace $previousFullResourceBaseName, $newFullResourceBaseName
+    $fileContent = $fileContent -replace $currentFullResourceBaseNameNoHyphen, $newFullResourceBaseNameNoHyphen
+    $fileContent = $fileContent -replace $currentFullResourceBaseName, $newFullResourceBaseName
 
     Set-Content -Path $parametersFile -Value $fileContent
 }
 
 # Function to update search index files (not currently used)
 function Update-SearchIndexFiles {
-
-    $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
 
     $searchIndexFiles = @("search-index-schema-template.json,search-indexer-schema-template.json,vector-search-index-schema-template.json,vector-search-indexer-schema-template.json,embeddings-search-index-schema-template.json,embeddings-search-indexer-schema-template.json,sharepoint-search-index-schema-template.json,sharepoint-search-indexer-schema-template.json" )
 
@@ -4853,7 +4873,7 @@ function Update-SearchIndexFiles {
 
         $content = Get-Content -Path $fileName
 
-        $updatedContent = $content -replace $previousResourceBaseName, $fullResourceBaseName
+        $updatedContent = $content -replace $global:previousFullResourceBaseName, $global:fullResourceBaseName
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
     }
@@ -4861,13 +4881,11 @@ function Update-SearchIndexFiles {
 
 # Function to update search skill set files
 function Update-SearchSkillSetFiles {
-    $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
-
     foreach ($searchSkillSet in $searchSkillSets) {
 
         $content = Get-Content -Path $searchSkillSet.File
 
-        $updatedContent = $content -replace $previousResourceBaseName, $fullResourceBaseName
+        $updatedContent = $content -replace $global:previousFullResourceBaseName, $global:fullResourceBaseName
 
         Set-Content -Path $searchSkillSet.File -Value $updatedContent
     }
@@ -4893,7 +4911,7 @@ function Update-ConfigFile {
 
     try {
 
-        $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
+        $fullResourceBaseName = $global:fullResourceBaseName
 
         $appServiceName = "app-$fullResourceBaseName"
         $functionAppName = "func-$fullResourceBaseName"
