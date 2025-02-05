@@ -24,6 +24,7 @@ The index.html file includes the following screens:
 
 ### Core Tools (Required)
 
+- [Visual Studio Code](https://code.visualstudio.com/download)
 - [Node.js](https://nodejs.org/) (version 20 or higher recommended)
 - [npm](https://www.npmjs.com/) (package management)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for deploying to Azure)
@@ -88,6 +89,13 @@ The index.html file includes the following screens:
 
 ### Installation
 
+All of the steps below must be performed in the terminal within VS Code. 
+
+Also, you must have an active Azure subscription and be signed into that account in VS Code.
+
+<img width="600" alt="VS Code Accounts" src="src/deployment/images/azure-ai-demo-vscode-accounts.png">
+
+
 1. Clone the repository:
 
    ```
@@ -97,23 +105,10 @@ The index.html file includes the following screens:
 
    ```
 
-2. Install [Node](https://nodejs.org/) and then install the required VS Code extensions ([extensions.txt](./src/deployment/extensions.txt)) using the following script (make sure you are in the `src/deployment directory`):
+2. Navigate to the `src/deployment` directory and open the `Azure AI Demo Deployment.ps1` file in the main editor window and just click the play button in the debugger. All of the required extensions listed in ([extensions.txt](./src/deployment/extensions.txt)) will be installed via this script prior to the deployment process.
 
-   ```
-   function Install-Extensions {
-    # Define the path to the text file
-    $filePath = "extensions.txt"
-
-    # Read all lines from the file
-    $extensions = Get-Content -Path $filePath
-
-    # Loop through each extension and install it using the `code` command
-    foreach ($extension in $extensions) {
-        code --install-extension $extension
-    }
-   }
-
-   ```
+> [!NOTE]
+> You must navigate to the `src/deployment` directory within the solution before executing the PowerShell script.
 
 ### Deployment
 
@@ -121,7 +116,7 @@ The main PowerShell script [Azure AI Demo Deployment.ps1](./src/deployment/Azure
 
 Once the deployment script completes the following resources should have been created in the resource group:
 
-- Api Management Service (optional)
+- Api Management Service (required if using MSAL for authentication in web app but optional if you only plan on using api keys)
 - App Service
 - App Service Plan
 - Application Insights
