@@ -1487,10 +1487,6 @@ function New-App-Registration {
         $ErrorActionPreference = 'Stop'
 
         $appRegRequiredResourceAccessJson = $appRegRequiredResourceAccess | ConvertTo-Json -Depth 4
-        $appRegRequiredResourceAccessObj = $appRegRequiredResourceAccessJson | ConvertFrom-Json
-
-        $exposeApiScopesJson = $exposeApiScopes | ConvertTo-Json -Depth 4
-        $exposeApiScopesObj = $exposeApiScopesJson | ConvertFrom-Json
 
         # Check if the app is already registered
         $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
@@ -1504,7 +1500,7 @@ function New-App-Registration {
         }
         else {
             # Register the app
-            $appRegistration = az ad app create --display-name $appServiceName --sign-in-audience AzureADandPersonalMicrosoftAccount --output tsv | ConvertFrom-Json
+            $appRegistration = az ad app create --display-name $appServiceName --sign-in-audience AzureADandPersonalMicrosoftAccount | ConvertFrom-Json
 
             $appId = $appRegistration.appId
             $objectId = $appRegistration.objectId
@@ -2454,7 +2450,7 @@ function New-MachineLearningWorkspace {
                 $global:resourceCounter += 1
 
                 Write-Host "Machine Learning Workspace '$aiProjectName' created successfully. [$global:resourceCounter]"
-                Write-Log -message "Machine Learning Workspace '$aiProjectName' created successfullt. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+                Write-Log -message "Machine Learning Workspace '$aiProjectName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
 
                 return $jsonOutput
             }
@@ -3128,15 +3124,13 @@ function New-SearchService {
                 }
 
                 # Convert the body hashtable to JSON
-            
-                $jsonBody = $body | ConvertTo-Json -Depth 10
 
-                $accessToken = (az account get-access-token --query accessToken -o tsv)
+                # $accessToken = (az account get-access-token --query accessToken -o tsv)
 
-                $headers = @{
-                    "api-key"       = $searchServiceApiKey
-                    "Authorization" = "Bearer $accessToken"  # Add the authorization header
-                }
+                # $headers = @{
+                #    "api-key"       = $searchServiceApiKey
+                #    "Authorization" = "Bearer $accessToken"  # Add the authorization header
+                #}
 
                 #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
                 #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
@@ -3333,7 +3327,7 @@ function New-SearchService {
         #Start-Sleep -Seconds 15
         
         $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
-        $userAssignedIdentity = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName
+        #$userAssignedIdentity = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName
 
         foreach ($appService in $global:appServices) {
             $appServiceName = $appService.Name
@@ -4229,7 +4223,7 @@ function Start-Deployment {
         Write-Log -message "Key Vault '$keyVaultName' already exists."
     }
 
-    #Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
+    Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName
 
     # Filter appService nodes with type equal to 'function'
     $functionAppServices = $appServices | Where-Object { $_.type -eq 'Function' }
@@ -5075,7 +5069,6 @@ function Update-ConfigFile {
         # Clear existing values in SEARCH_INDEXES
         $config.SEARCH_INDEXES = @()
 
-        $vectorSearchIndex = $null
         $vectorSearchIndexName = $null
 
         # Loop through the search indexes collection from global:searchIndexes
@@ -5083,7 +5076,6 @@ function Update-ConfigFile {
             $config.SEARCH_INDEXES += $searchIndex
 
             if ($searchIndex.Name -match "vector") {
-                $vectorSearchIndex = $searchIndex
                 $vectorSearchIndexName = $searchIndex.Name
             }
         }
