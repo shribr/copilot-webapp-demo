@@ -1,0 +1,15 @@
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 02/05/2025 11:10:13 ***
+2025-02-05 11:15:21 - Resource group 'RG-COPILOT-DEMO-006' created successfully. [1]
+2025-02-05 11:16:42 - User Assigned Identity 'id-copilot-demo-006' created successfully. [2]
+2025-02-05 11:22:00 - Service principal created for identity 'id-copilot-demo-006'.
+2025-02-05 11:23:34 - User 'id-copilot-demo-006' assigned to role: 'Contributor'.
+2025-02-05 11:23:39 - User 'id-copilot-demo-006' assigned to role: 'Cognitive Services OpenAI User'.
+2025-02-05 11:26:12 - User 'id-copilot-demo-006' assigned to role: 'Search Index Data Reader'.
+2025-02-05 11:30:01 - User 'id-copilot-demo-006' assigned to role: 'Storage Blob Data Reader'.
+2025-02-05 11:32:56 - Storage account 'stcopilotdemo006' created successfully. [3]
+2025-02-05 11:34:50 - Virtual Network 'vnet-copilot-demo-006' created successfully. [4]
+2025-02-05 11:37:36 - Subnet 'subnet-copilot-demo-006' created successfully.
+2025-02-05 11:39:05 - App Service Plan 'asp-copilot-demo-006' created successfully. [5]
+2025-02-05 11:40:25 - Cognitive Services account 'cog-copilot-demo-006' created successfully. [6]
+2025-02-05 11:41:43 - Managed identity 'id-copilot-demo-006' assigned to Cognitive Services account 'cog-copilot-demo-006'.

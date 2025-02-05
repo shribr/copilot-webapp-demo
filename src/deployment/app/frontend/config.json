@@ -68,7 +68,7 @@
     },
     {
       "KeyWordTriggers": null,
-      "Path": "images/generations",
+      "Path": "text-embedding/embeddings",
       "ApiVersion": "2023-05-15",
       "Sku": {
         "Name": "Standard",

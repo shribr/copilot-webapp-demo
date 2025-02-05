@@ -1361,7 +1361,6 @@ function New-ApiManagementService {
         [array]$existingResources
     )
 
-    #https://eastus.api.cognitive.microsoft.com/documentintelligence/documentModels/prebuilt-read:analyze?api-version=2024-07-31-preview&api-key=94a688bb516141839048e01dc680192d
     #https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/read.png
 
     $apiManagementServiceName = $apiManagementService.Name
