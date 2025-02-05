@@ -1,5 +1,5 @@
 {
-  "name": "vector-srch-index-copilot-demo-005",
+  "name": "vector-srch-index-copilot-demo-007",
   "fields": [
     {
       "name": "content",
@@ -118,7 +118,9 @@
   ],
   "scoringProfiles": [],
   "corsOptions": {
-    "allowedOrigins": ["*"],
+    "allowedOrigins": [
+      "*"
+    ],
     "maxAgeInSeconds": 300
   },
   "suggesters": [],

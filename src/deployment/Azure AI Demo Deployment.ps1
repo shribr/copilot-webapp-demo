@@ -549,30 +549,6 @@ function Get-RandomInt {
     return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 }
 
-# Function to check the status of a resource
-function Get-ResourceStatus {
-    param (
-        [string]$resourceName,
-        [string]$resourceGroupName,
-        [string]$resourceType = "Microsoft.Search/searchServices"
-    )
-
-    try {
-        $resource = az resource show --name $resourceName --resource-group $resourceGroupName --resource-type $resourceType --output json | ConvertFrom-Json
-        if ($resource.properties.provisioningState -eq "Succeeded") {
-            Write-Host "Resource '$resourceName' provisioned successfully."
-            Write-Log -message "Resource '$resourceName' provisioned successfully."
-        }
-        else {
-            Write-Host "Resource '$resourceName' is in state: $($resource.properties.provisioningState)"
-            Write-Log -message "Resource '$resourceName' is in state: $($resource.properties.provisioningState)"
-        }
-    }
-    catch {
-        Write-Error "Failed to get status for resource '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to get status for resource '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-}
 
 # Function to check if a search index exists
 function Get-SearchIndexes {
@@ -853,6 +829,9 @@ function Initialize-Parameters {
 
         $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
     }
+    else {
+        $global:newFullResourceBaseName = $parametersObject.resourceBaseName
+    }
 
     # Initialize global variables for each item in the parameters.json file
     $global:aiHubName = $parametersObject.aiHubName
@@ -951,7 +930,7 @@ function Initialize-Parameters {
 
     # Make sure the previousResourceBaseName parameter in the parameters.json file is different than the resourceBaseName parameter.
     # What this code does is determine whether or not you are attempting to redeploy the same resources with the same base name or if you are trying to provision an entirely new deployment with a new resource group name etc.
-    if ($parametersObject.previousResourceBaseName -eq $parametersObject.resourceBaseName -and $redeployResources -eq $false) {
+    if ($parametersObject.previousFullResourceBaseName -eq $global:newFullResourceBaseName -and $redeployResources -eq $false) {
         Write-Host "The previousResourceBaseName parameter is the same as the resourceBaseName parameter. Please change the previousResourceBaseName parameter to a different value."
         exit
     }
@@ -1017,8 +996,6 @@ function Initialize-Parameters {
     
     Write-Host "Parameters initialized.`n"
     Write-Host  $global:ResourceList
-
-    Write-Log -message "Parameters initialized."
 
     return @{
         aiDeploymentName             = $aiDeploymentName
@@ -1542,6 +1519,21 @@ function New-App-Registration {
         $permissions = "User.Read.All"
         $apiPermissions = ""
         
+        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+
+        foreach ($searchDataSource in $global:searchDataSources) {
+            $searchDataSourceName = $searchDataSource.Name
+            $dataSourceExists = $dataSources -contains $searchDataSourceName
+
+            if ($dataSourceExists -eq $false) {
+                New-SearchDataSource -searchServiceName $global:searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageAccountName $global:storageAccountName -appId $appId
+            }
+            else {
+                Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+            }
+        }
+
         # Check and set API permissions
         foreach ($permission in $appRegRequiredResourceAccess) {
             $existingPermission = az ad app permission list --id $appId
@@ -2704,15 +2696,15 @@ function New-Resources {
     )
 
     # Debug statements to print variable values
-    Write-Host "subscriptionId: $subscriptionId"
-    Write-Host "resourceGroupName: $resourceGroupName"
-    Write-Host "storageAccountName: $storageAccountName"
-    Write-Host "appServicePlanName: $appServicePlanName"
-    Write-Host "location: $location"
-    Write-Host "userPrincipalName: $userPrincipalName"
-    Write-Host "searchIndexName: $searchIndexName"
-    Write-Host "searchIndexerName: $searchIndexerName"
-    Write-Host "searchSkillSetName: $searchSkillSetName"
+    #Write-Host "subscriptionId: $subscriptionId"
+    #Write-Host "resourceGroupName: $resourceGroupName"
+    #Write-Host "storageAccountName: $storageAccountName"
+    #Write-Host "appServicePlanName: $appServicePlanName"
+    #Write-Host "location: $location"
+    #Write-Host "userPrincipalName: $userPrincipalName"
+    #Write-Host "searchIndexName: $searchIndexName"
+    #Write-Host "searchIndexerName: $searchIndexerName"
+    #Write-Host "searchSkillSetName: $searchSkillSetName"
 
     # **********************************************************************************************************************
     # Create Storage Account
@@ -2826,8 +2818,24 @@ function New-SearchDataSource {
             if ($appService.Type -eq "Web") {
                 #$appId = az webapp show --name $appService.Name --resource-group $resourceGroupName --query "id" --output tsv
                 $appId = az ad app list --filter "displayName eq '$($appService.Name)'" --query "[].appId" --output tsv
-                Write-Host "App ID for $($appServiceName): $appId"
+                
+                if ($appId -eq "") {
+                    Write-Error "Failed to retrieve App ID for App Service."
+                    Write-Log -message "Failed to retrieve App ID for App Service."
+
+                    return
+                }
+                else {
+                    Write-Host "App ID for $($appServiceName): $appId"
+                }
             }
+        }
+
+        if ($appId -eq "") {
+            Write-Error "Failed to retrieve App ID for App Service."
+            Write-Log -message "Failed to retrieve App ID for App Service."
+
+            return
         }
 
         switch ($searchDatasourceType) {
@@ -3131,7 +3139,7 @@ function New-SearchService {
                 }
 
                 #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-                Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+                #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
 
             }
             catch {
@@ -3140,7 +3148,7 @@ function New-SearchService {
             }
 
             # Example for how to obtain the sharepoint siteid for use with the REST Api: https://fedairs.sharepoint.com/sites/MicrosoftCopilotDemo/_api/site
-            $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+            $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 
             foreach ($appService in $global:appServices) {
                 if ($appService.Type -eq "Web") {
@@ -4009,6 +4017,35 @@ function Set-RBACRoles {
     }
 }
 
+# Function to show existing resource deployment status
+function Show-ExistingResourceProvisioningStatus {
+
+    $jsonOutput = az resource list --resource-group $resourceGroupName  --output json
+
+    $existingResources = $jsonOutput | ConvertFrom-Json
+
+    foreach ($resource in $existingResources) {
+
+        $resourceName = $resource.Name
+        $resourceProvisioningState = $resource.provisioningState
+
+        try {
+            if ($resourceProvisioningState -eq "Succeeded") {
+                Write-Host "Resource '$resourceName' provisioned successfully."
+                Write-Log -message "Resource '$resourceName' provisioned successfully."
+            }
+            else {
+                Write-Host "Resource '$resourceName' is in state: $resourceProvisioningState"
+                Write-Log -message "Resource '$resourceName' is in state: $resourceProvisioningState"
+            }
+        }
+        catch {
+            Write-Error "Failed to get status for resource '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to get status for resource '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+}
+
 # Function to split a GUID and return the first 8 characters
 function Split-Guid {
 
@@ -4093,8 +4130,8 @@ function Start-Deployment {
 
     $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
 
-    Get-ResourceStatus -resourceGroupName $resourceGroupName -resourceName $searchServiceName -resourceType "Microsoft.Search/searchServices"
-
+    Show-ExistingResourceProvisioningStatus
+    
     if ($global:appDeploymentOnly -eq $true) {
 
         # Update configuration file for web frontend
@@ -4829,7 +4866,7 @@ function Update-ResourceBaseName() {
     $resourceSuffixCounter = $parametersFileContent.resourceSuffixCounter
 
     $newResourceSuffixCounter = Increment-FormattedNumber -formattedNumber $resourceSuffixCounter
-    $newFullResourceBaseName = "$newResourceBaseName-$newResourceSuffixCounter"
+    $global:newFullResourceBaseName = "$newResourceBaseName-$newResourceSuffixCounter"
 
     $parametersFileContent.resourceSuffixCounter = $newResourceSuffixCounter
     $parametersFileContent.fullResourceBaseName = $newFullResourceBaseName

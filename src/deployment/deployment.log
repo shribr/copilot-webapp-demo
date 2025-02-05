@@ -1,0 +1,20 @@
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 02/04/2025 19:52:14 ***
+2025-02-04 19:52:15 - Resource Group 'RG-COPILOT-DEMO-007' already exists.
+2025-02-04 19:53:36 - Resource 'id-copilot-demo-007' provisioned successfully.
+2025-02-04 19:53:36 - Resource 'stcopilotdemo007' provisioned successfully.
+2025-02-04 19:53:36 - Resource 'vnet-copilot-demo-007' provisioned successfully.
+2025-02-04 19:53:36 - Resource 'asp-copilot-demo-007' provisioned successfully.
+2025-02-04 19:53:36 - Resource 'cog-copilot-demo-007' provisioned successfully.
+2025-02-04 19:53:36 - Resource 'srch-copilot-demo-007' provisioned successfully.
+2025-02-04 19:54:49 - Identity 'id-copilot-demo-007' already exists.
+2025-02-04 19:54:54 - Storage account 'stcopilotdemo007' already exists.
+2025-02-04 19:54:59 - Subnet 'subnet-copilot-demo-007' already exists.
+2025-02-04 19:54:59 - App Service Plan 'asp-copilot-demo-007' already exists.
+2025-02-04 19:54:59 - Cognitive Service 'cog-copilot-demo-007' already exists.
+2025-02-04 19:55:00 - Search Service 'srch-copilot-demo-007' already exists.
+2025-02-04 19:57:34 - Search Index 'srch-index-copilot-demo-007' already exists.
+2025-02-04 19:57:36 - Search Index 'vector-srch-index-copilot-demo-007' already exists.
+2025-02-04 19:57:37 - Search Index 'embeddings-srch-index-copilot-demo-007' already exists.
+2025-02-04 19:57:38 - Search Index 'sharepoint-srch-index-copilot-demo-007' already exists.
+2025-02-04 19:58:56 - Search Service Data Source 'srch-datasource-blob-copilot-demo-007' already exists.

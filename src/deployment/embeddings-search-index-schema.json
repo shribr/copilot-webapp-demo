@@ -1,5 +1,5 @@
 {
-  "name": "embeddings-srch-index-copilot-demo-005",
+  "name": "embeddings-srch-index-copilot-demo-007",
   "fields": [
     {
       "name": "id",
@@ -79,7 +79,9 @@
   ],
   "scoringProfiles": [],
   "corsOptions": {
-    "allowedOrigins": ["*"],
+    "allowedOrigins": [
+      "*"
+    ],
     "maxAgeInSeconds": 300
   },
   "suggesters": [],
