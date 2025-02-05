@@ -749,30 +749,37 @@ function Increment-FormattedNumber {
 
 # Function to install Visual Studio Code extensions
 function Install-Extensions {
-    # Define the path to the text file
-    $filePath = "extensions.txt"
+    # Define the path to the extensions.json file
+    $filePath = "extensions.json"
+
+    # Load parameters from the JSON file
+    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
     # Read all lines from the file
-    $extensions = Get-Content -Path $filePath
+    $extensions = Get-Content -Path $filePath | ConvertFrom-Json
+
+    if ($parametersObject.installRequiredExtensionsOnly -eq $true) {
+        $extensions = $extensions | Where-Object { $_.required -eq $true }
+    }
 
     # Loop through each extension and install it using the `code` command
     foreach ($extension in $extensions) {
         
         # check if the extension is already installed
-        $isInstalled = code --list-extensions | Where-Object { $_ -eq $extension }
+        $isInstalled = code --list-extensions | Where-Object { $_ -eq $extension.name }
 
         if ($isInstalled) {
-            Write-Host "Extension '$extension' is already installed."
+            Write-Host "Extension '$extension.name' is already installed."
             continue
         }
         else {
 
             try {
-                code --install-extension $extension
-                Write-Host "Installed extension '$extension' successfully."
+                code --install-extension $extension.name
+                Write-Host "Installed extension '$extension.name' successfully."
             }
             catch {
-                Write-Error "Failed to install extension '$extension': $_"
+                Write-Error "Failed to install extension '$extension.name': $_"
             }
         }
     }

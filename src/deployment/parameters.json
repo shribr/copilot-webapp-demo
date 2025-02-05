@@ -89,11 +89,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -357,6 +353,7 @@
   "keyVaultName": "kv-copilot-demo-006",
   "keyVaultApiVersion": "7.5",
   "keyVaultPermissionModel": "VaultAccessPolicy",
+  "installRequiredExtensionsOnly": true,
   "location": "east us",
   "logAnalyticsWorkspaceName": "log-copilot-demo-006",
   "machineLearningProperties": {
