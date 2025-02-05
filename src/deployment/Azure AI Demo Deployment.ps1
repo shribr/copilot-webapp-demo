@@ -5217,7 +5217,7 @@ function Write-Log {
 $ErrorActionPreference = 'Stop'
 
 # Need to install VS Code extensions before executing main deployment script
-# Install-Extensions
+Install-Extensions
 
 #$global:subscriptionId = az account show --query "{Id:id}" --output tsv
 
