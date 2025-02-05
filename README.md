@@ -557,6 +557,9 @@ For a more in-depth understanding of the chat workflow click [here](./README_CHA
 
 ## Additional Notes
 
+**Search Indexing**
+Before you can chat you need to actually upload documents to Azure Storage using the form on the Documents screen. When you upload documents the search indexer should automatically run. It might take a few minutes to complete so you may not see info from your newly uploaded documents right away. If you'd like to see the progress of the indexing, go to the search service in the Azure portal and find the indexer with the "vector-srch-indexer-copilot-demo" prefix. Check the time stamp to make sure it executed recently.
+
 **REST APIs**
 It is important to note that the technologies used by this solution are changing by the second. New versions of libraries and APIs are being released constantly and documentation is being updated on a near weekly basis. Since this solution leverages REST APIs, ensuring that you are using the most up-to-date API version for each service's API is absolutely critical. With each new API release, new capabilities are added (and sometimes existing ones removed). All the magic happens in the [Azure Open AI On Your Own Data API](https://learn.microsoft.com/en-us/azure/ai-services/openai/references/azure-search?tabs=rest).
 
