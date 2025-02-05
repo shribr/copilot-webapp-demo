@@ -2,9 +2,9 @@
   "CUSTOM_APP_TITLE": "GAO Chat using Microsoft Copilot",
   "DEFAULT_APP_TITLE": "Chat with Microsoft Copilot",
   "AUTHENTICATION_MODE": "API_KEY",
-  "AZURE_OPENAI_SERVICE_API_KEY": "cbabda8cf7ba4122b7cacce67165e581",
+  "AZURE_OPENAI_SERVICE_API_KEY": "296db575172244698b5896eebd08f4f4",
   "AZURE_OPENAI_SERVICE_SECRET_NAME": "OpenAIServiceApiKey",
-  "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-007",
+  "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-004",
   "AZURE_APIM_SUBSCRIPTION_KEY": "4da6fa1779a347f88e1b37f6cf0c1295",
   "AZURE_APP_SERVICE_NAME": "app-copilot-demo",
   "AZURE_APP_REG_CLIENT_APP_ID": null,
@@ -12,24 +12,24 @@
   "AZURE_FUNCTION_APP_NAME": "func-",
   "AZURE_FUNCTION_APP_URL": "https://",
   "AZURE_FUNCTION_NAME": "Chat",
-  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-007",
+  "AZURE_KEY_VAULT_NAME": "kv-copilot-demo-004",
   "AZURE_KEY_VAULT_API_VERSION": "7.5",
   "AZURE_RESOURCE_BASE_NAME": "copilot-demo",
-  "AZURE_SEARCH_API_KEY": "dBW4sd1HTDvdXcx1fGunWBDJtwz163SUQ47UXOgRtmAzSeABTYyd",
+  "AZURE_SEARCH_API_KEY": "P5fn6ed7Wy0rsLwfde6w83VZ8E2JZ6vpxFZie3O9oFAzSeCqcYAh",
   "AZURE_SEARCH_API_VERSION": "2024-11-01-Preview",
   "AZURE_SEARCH_INDEX_NAME": "configFilePath",
   "AZURE_SEARCH_INDEXER_NAME": "app/frontend/config.json",
   "AZURE_SEARCH_SEMANTIC_CONFIG": "vector-profile-srch-index--semantic-configuration",
-  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-007",
+  "AZURE_SEARCH_SERVICE_NAME": "srch-copilot-demo-004",
   "AZURE_SEARCH_SERVICE_SECRET_NAME": "SearchServiceApiKey",
   "AZURE_SEARCH_VECTOR_INDEX_NAME": "",
   "AZURE_SEARCH_VECTOR_INDEXER_NAME": "",
-  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo007",
+  "AZURE_STORAGE_ACCOUNT_NAME": "stcopilotdemo004",
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-02T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bftq&srt=co&sig=lCP24DMV3pYJVkxfQ4zaYjIFd7dow2tVDMx2Ge2fAhQ%3D",
-  "AZURE_STORAGE_KEY": "JfajHIY9zGUHl2JFZ8tRcYsxbDbwux53DrOfJrkzwVhEMN9Qs0jtrr3efM9/gHxpLHn9fgo3YOkr+AStzUHsig==",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo004.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-03T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tfbq&srt=co&sig=sHWdGLTnzU0fWyMjMiM3K6kgE7dY4spwqTzKjrRFb64%3D",
+  "AZURE_STORAGE_KEY": "QGRXdmIzBa/Il4cDnK4sV6PUyDlJiwxgiFwG1VKxE7WUQAm1L1M4+G1YLlPPcFVWUK4eIVvnBWEw+AStZKgM6g==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
   "AZURE_TENANT_ID": "e362c86f-e64a-4e58-b26a-c8bf314b1093",
@@ -43,8 +43,8 @@
   ],
   "DEPLOYMENT_ID": "ai",
   "ICON_COLOR": "false",
-  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-007",
-  "OPENAI_API_KEY": "7c8162a2654f4e61a037b1332e16c151",
+  "OPENAI_ACCOUNT_NAME": "openai-copilot-demo-004",
+  "OPENAI_API_KEY": "197fa086db2742aaab6d708e8ee88a97",
   "OPENAI_API_VERSION": "2024-08-01-preview",
   "PROMPT_SUFFIX": " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set of followup questions surrounded by <ol id='followup-questions-list'> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.",
   "REGION": "eastus",
@@ -53,46 +53,46 @@
   "SITE_LOGO": "default",
   "AI_MODELS": [
     {
-      "Format": "OpenAI",
-      "Type": "gpt-4o",
+      "KeyWordTriggers": null,
+      "Path": "chat/completions",
       "ApiVersion": "2024-08-01-preview",
+      "Sku": {
+        "Name": "Standard",
+        "Capacity": 100
+      },
       "DeploymentName": "gpt-4o",
-      "ApiKey": "cbabda8cf7ba4122b7cacce67165e581",
-      "Sku": {
-        "Capacity": 100,
-        "Name": "Standard"
-      },
-      "KeyWordTriggers": null,
+      "Type": "gpt-4o",
+      "ApiKey": "296db575172244698b5896eebd08f4f4",
       "ModelVersion": null,
-      "Path": "chat/completions"
+      "Format": "OpenAI"
     },
     {
-      "Format": "OpenAI",
-      "Type": "text-embedding-3-large",
+      "KeyWordTriggers": null,
+      "Path": "images/generations",
       "ApiVersion": "2023-05-15",
-      "DeploymentName": "text-embedding",
-      "ApiKey": "cbabda8cf7ba4122b7cacce67165e581",
       "Sku": {
-        "Capacity": 100,
-        "Name": "Standard"
+        "Name": "Standard",
+        "Capacity": 100
       },
-      "KeyWordTriggers": null,
+      "DeploymentName": "text-embedding",
+      "Type": "text-embedding-3-large",
+      "ApiKey": "296db575172244698b5896eebd08f4f4",
       "ModelVersion": null,
-      "Path": "images/generations"
+      "Format": "OpenAI"
     },
     {
-      "Format": "OpenAI",
-      "Type": "dall-e-3",
-      "ApiVersion": "2024-02-01",
-      "DeploymentName": "dall-e-3",
-      "ApiKey": "cbabda8cf7ba4122b7cacce67165e581",
-      "Sku": {
-        "Capacity": 6,
-        "Name": "Standard"
-      },
       "KeyWordTriggers": null,
+      "Path": "images/generations",
+      "ApiVersion": "2024-02-01",
+      "Sku": {
+        "Name": "Standard",
+        "Capacity": 2
+      },
+      "DeploymentName": "dall-e-3",
+      "Type": "dall-e-3",
+      "ApiKey": "296db575172244698b5896eebd08f4f4",
       "ModelVersion": null,
-      "Path": "images/generations"
+      "Format": "OpenAI"
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -117,49 +117,49 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "bftq",
+    "SS": "tfbq",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-02-02T23:59:59Z",
-    "ST": "2025-02-02T23:59:59Z",
+    "SE": "2026-02-03T23:59:59Z",
+    "ST": "2025-02-03T23:59:59Z",
     "SPR": "https",
-    "SIG": "lCP24DMV3pYJVkxfQ4zaYjIFd7dow2tVDMx2Ge2fAhQ%3D",
+    "SIG": "sHWdGLTnzU0fWyMjMiM3K6kgE7dY4spwqTzKjrRFb64%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
-    "stop": null,
-    "top_p": 0.95,
-    "data_sources": [
-      {
-        "type": "azure_search",
-        "parameters": {
-          "authentication": {
-            "type": "api_key",
-            "key": "dBW4sd1HTDvdXcx1fGunWBDJtwz163SUQ47UXOgRtmAzSeABTYyd"
-          },
-          "endpoint": "https://srch-copilot-demo-007.search.windows.net",
-          "index_name": "vector-srch-index-copilot-demo-007"
-        }
-      }
-    ],
     "presence_penalty": 0,
-    "temperature": 0.7,
+    "stream": false,
     "messages": [
       {
+        "role": "system",
         "content": "",
-        "role_information": "You are a helpful assistant",
-        "role": "system"
+        "role_information": "You are a helpful assistant"
       },
       {
-        "content": "",
-        "role": "user"
+        "role": "user",
+        "content": ""
       }
     ],
-    "max_tokens": 800,
-    "stream": false,
-    "frequency_penalty": 0
+    "data_sources": [
+      {
+        "parameters": {
+          "index_name": "vector-srch-index-copilot-demo-004",
+          "authentication": {
+            "key": "P5fn6ed7Wy0rsLwfde6w83VZ8E2JZ6vpxFZie3O9oFAzSeCqcYAh",
+            "type": "api_key"
+          },
+          "endpoint": "https://srch-copilot-demo-004.search.windows.net"
+        },
+        "type": "azure_search"
+      }
+    ],
+    "frequency_penalty": 0,
+    "top_p": 0.95,
+    "stop": null,
+    "temperature": 0.7,
+    "max_tokens": 800
   },
   "CHAT_PERSONAS": [
     {
@@ -284,16 +284,16 @@
   },
   "DATA_SOURCES": [
     {
-      "type": "azure_search",
       "parameters": {
+        "index_name": "vector-srch-index-copilot-demo-004",
         "authentication": {
-          "type": "api_key",
-          "key": "dBW4sd1HTDvdXcx1fGunWBDJtwz163SUQ47UXOgRtmAzSeABTYyd"
+          "key": "P5fn6ed7Wy0rsLwfde6w83VZ8E2JZ6vpxFZie3O9oFAzSeCqcYAh",
+          "type": "api_key"
         },
-        "endpoint": "https://srch-copilot-demo-007.search.windows.net",
-        "index_name": "vector-srch-index-copilot-demo-007",
+        "endpoint": "https://srch-copilot-demo-004.search.windows.net",
         "role_information": ""
-      }
+      },
+      "type": "azure_search"
     }
   ],
   "FILE_TYPES": {
@@ -386,17 +386,17 @@
       "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" fill=\"#000000\" class=\"icon-svg\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <title>1227</title> <defs> </defs> <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"> <path d=\"M12.566,8 L15.611,4.956 C16.031,4.535 16.031,3.853 15.611,3.434 L12.566,0.389 C12.146,-0.031 11.464,-0.031 11.043,0.389 L7.999,3.433 L4.955,0.389 C4.534,-0.031 3.852,-0.031 3.432,0.389 L0.388,3.434 C-0.034,3.854 -0.034,4.536 0.387,4.956 L3.431,8 L0.387,11.044 C-0.034,11.465 -0.034,12.147 0.388,12.567 L3.432,15.611 C3.852,16.032 4.534,16.032 4.955,15.611 L7.999,12.567 L11.043,15.611 C11.464,16.032 12.146,16.032 12.566,15.611 L15.611,12.567 C16.031,12.146 16.031,11.464 15.611,11.044 L12.566,8 L12.566,8 Z\" fill=\"#434343\" class=\"si-glyph-fill\"> </path> </g> </g></svg>"
     },
     "EDIT": {
-      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-svg edit-icon\"></g><g> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300706,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>",
-      "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.007,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
+      "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-svg edit-icon\"></g><g> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300406,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>",
+      "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.004,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
       "COLOR2": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"icon-svg edit-icon\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <polygon style=\"fill:#E21B1B;\" points=\"404.176,0 256,148.176 107.824,0 0,107.824 148.176,256 0,404.176 107.824,512 256,363.824 404.176,512 512,404.176 363.824,256 512,107.824 \"></polygon> </g></svg>",
-      "COLOR4": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.007,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
-      "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-svg edit-icon\"></g><g> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300706,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>"
+      "COLOR4": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.004,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
+      "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-svg edit-icon\"></g><g> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300406,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>"
     },
     "HAMBURGER_MENU": {
       "MONOTONE": "<svg width=\"42\" height=\"42\" viewBox=\"0 0 42 42\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\"><path d=\"M3 6H21V8H3V6Z\" fill=\"currentColor\" /><path d=\"M3 11H21V13H3V11Z\" fill=\"currentColor\" /><path d=\"M3 16H21V18H3V16Z\" fill=\"currentColor\" /></svg>"
     },
     "USER_PROFILE": {
-      "MONOTONE": "<svg id=\"user-profile-icon\" class=\"icon-svg\" focusable=\"false\" viewBox=\"0 0 24 24\" width=\"24\" aria-hidden=\"true\"><!--!--><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g><g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill-rule=\"evenodd\"> <g transform=\"translate(-140.000000, -2159.000000)\"> <g id=\"icons\" transform=\"translate(56.000000, 160.000000)\"> <path d=\"M100.562548,2016.99998 L87.4381713,2016.99998 C86.7317804,2016.99998 86.2101535,2016.30298 86.4765813,2015.66198 C87.7127655,2012.69798 90.6169306,2010.99998 93.9998492,2010.99998 C97.3837885,2010.99998 100.287954,2012.69798 101.524138,2015.66198 C101.790566,2016.30298 101.268939,2016.99998 100.562548,2016.99998 M89.9166645,2004.99998 C89.9166645,2002.79398 91.7489936,2000.99998 93.9998492,2000.99998 C96.2517256,2000.99998 98.0830339,2002.79398 98.0830339,2004.99998 C98.0830339,2007.20598 96.2517256,2008.99998 93.9998492,2008.99998 C91.7489936,2008.99998 89.9166645,2007.20598 89.9166645,2004.99998 M103.955674,2016.63598 C103.213556,2013.27698 100.892265,2010.79798 97.837022,2009.67298 C99.4560048,2008.39598 100.400241,2006.33098 100.053171,2004.06998 C99.6509769,2001.44698 97.4235996,1999.34798 94.7348224,1999.04198 C91.0232075,1998.61898 87.8750721,2001.44898 87.8750721,2004.99998 C87.8750721,2006.88998 88.7692896,2008.57398 90.1636971,2009.67298 C87.1074334,2010.79798 84.7871636,2013.27698 84.044024,2016.63598 C83.7745338,2017.85698 84.7789973,2018.99998 86.0539717,2018.99998 L101.945727,2018.99998 C103.221722,2018.99998 104.226185,2017.85698 103.955674,2016.63598\" id=\"user-profile-svg\"> </path> </g> </g> </g> </g></svg>"
+      "MONOTONE": "<svg id=\"user-profile-icon\" class=\"icon-svg\" focusable=\"false\" viewBox=\"0 0 24 24\" width=\"24\" aria-hidden=\"true\"><!--!--><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g><g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill-rule=\"evenodd\"> <g transform=\"translate(-140.000000, -2159.000000)\"> <g id=\"icons\" transform=\"translate(56.000000, 160.000000)\"> <path d=\"M100.562548,2016.99998 L87.4381713,2016.99998 C86.7317804,2016.99998 86.2101535,2016.30298 86.4765813,2015.66198 C87.7127655,2012.69798 90.6169306,2010.99998 93.9998492,2010.99998 C97.3837885,2010.99998 100.287954,2012.69798 101.524138,2015.66198 C101.790566,2016.30298 101.268939,2016.99998 100.562548,2016.99998 M89.9166645,2004.99998 C89.9166645,2002.79398 91.7489936,2000.99998 93.9998492,2000.99998 C96.2517256,2000.99998 98.0830339,2002.79398 98.0830339,2004.99998 C98.0830339,2004.20598 96.2517256,2008.99998 93.9998492,2008.99998 C91.7489936,2008.99998 89.9166645,2004.20598 89.9166645,2004.99998 M103.955674,2016.63598 C103.213556,2013.27698 100.892265,2010.79798 97.837022,2009.67298 C99.4560048,2008.39598 100.400241,2006.33098 100.053171,2004.06998 C99.6509769,2001.44698 97.4235996,1999.34798 94.7348224,1999.04198 C91.0232075,1998.61898 87.8750721,2001.44898 87.8750721,2004.99998 C87.8750721,2006.88998 88.7692896,2008.57398 90.1636971,2009.67298 C87.1074334,2010.79798 84.7871636,2013.27698 84.044024,2016.63598 C83.7745338,2017.85698 84.7789973,2018.99998 86.0539717,2018.99998 L101.945727,2018.99998 C103.221722,2018.99998 104.226185,2017.85698 103.955674,2016.63598\" id=\"user-profile-svg\"> </path> </g> </g> </g> </g></svg>"
     },
     "SETTINGS": {
       "MONOTONE": "<svg id=\"settings-icon\" class=\"icon-svg\" focusable=\"false\" viewBox=\"0 0 24 24\" width=\"24\" aria-hidden=\"true\"><!--!--><g><path d=\"M0,0h24v24H0V0z\" fill=\"none\"></path><path d=\"M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z\"></path></g></svg>"
@@ -524,57 +524,57 @@
   },
   "SEARCH_INDEXERS": [
     {
-      "IndexName": "srch-index-copilot-demo-007",
-      "Name": "srch-indexer-copilot-demo-007",
+      "IndexName": "srch-index-copilot-demo-004",
+      "Name": "srch-indexer-copilot-demo-004",
       "Schema": "search-indexer-schema.json",
-      "SkillSetName": "srch-skillset-copilot-demo-007",
-      "DataSourceName": "srch-datasource-blob-copilot-demo-007",
+      "SkillSetName": "srch-skillset-copilot-demo-004",
+      "DataSourceName": "srch-datasource-blob-copilot-demo-004",
       "Active": true
     },
     {
-      "IndexName": "vector-srch-index-copilot-demo-007",
-      "Name": "vector-srch-indexer-copilot-demo-007",
+      "IndexName": "vector-srch-index-copilot-demo-004",
+      "Name": "vector-srch-indexer-copilot-demo-004",
       "Schema": "vector-search-indexer-schema.json",
-      "SkillSetName": "vector-srch-skillset-copilot-demo-007",
-      "DataSourceName": "srch-datasource-blob-copilot-demo-007",
+      "SkillSetName": "vector-srch-skillset-copilot-demo-004",
+      "DataSourceName": "srch-datasource-blob-copilot-demo-004",
       "Active": true
     },
     {
-      "IndexName": "embeddings-srch-index-copilot-demo-007",
-      "Name": "embeddings-srch-indexer-copilot-demo-007",
+      "IndexName": "embeddings-srch-index-copilot-demo-004",
+      "Name": "embeddings-srch-indexer-copilot-demo-004",
       "Schema": "embeddings-search-indexer-schema.json",
-      "SkillSetName": "embeddings-srch-skillset-copilot-demo-007",
-      "DataSourceName": "srch-datasource-blob-copilot-demo-007",
+      "SkillSetName": "embeddings-srch-skillset-copilot-demo-004",
+      "DataSourceName": "srch-datasource-blob-copilot-demo-004",
       "Active": true
     },
     {
-      "IndexName": "sharepoint-srch-index-copilot-demo-007",
-      "Name": "sharepoint-srch-indexer-copilot-demo-007",
+      "IndexName": "sharepoint-srch-index-copilot-demo-004",
+      "Name": "sharepoint-srch-indexer-copilot-demo-004",
       "Schema": "sharepoint-search-indexer-schema.json",
       "SkillSetName": "",
-      "DataSourceName": "srch-datasource-sharepoint-copilot-demo-007",
+      "DataSourceName": "srch-datasource-sharepoint-copilot-demo-004",
       "Active": false
     }
   ],
   "SEARCH_INDEXES": [
     {
       "Model": "gpt-4o",
-      "Name": "srch-index-copilot-demo-007",
+      "Name": "srch-index-copilot-demo-004",
       "Schema": "search-index-schema.json"
     },
     {
       "Model": "gpt-4o",
-      "Name": "vector-srch-index-copilot-demo-007",
+      "Name": "vector-srch-index-copilot-demo-004",
       "Schema": "vector-search-index-schema.json"
     },
     {
       "Model": "text-embedding-3-large",
-      "Name": "embeddings-srch-index-copilot-demo-007",
+      "Name": "embeddings-srch-index-copilot-demo-004",
       "Schema": "embeddings-search-index-schema.json"
     },
     {
       "Model": "gpt-4o",
-      "Name": "sharepoint-srch-index-copilot-demo-007",
+      "Name": "sharepoint-srch-index-copilot-demo-004",
       "Schema": "sharepoint-search-index-schema.json"
     }
   ],

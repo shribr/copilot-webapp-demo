@@ -502,7 +502,7 @@ function addMessageToChatHistory(thread, message) {
 function checkIfImageQuestion(input) {
 
     const firstWord = input.trim().split(' ')[0].toLowerCase();
-    createImage = creationTerms.includes(firstWord);
+    const createImage = creationTerms.includes(firstWord);
 
     return createImage;
 }
@@ -1144,7 +1144,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
         let aiImage = '';
 
         openAIRequestBody.prompt = currentQuestion;
-        openAIRequestBody.n = 4;
+        //openAIRequestBody.n = 4;
 
         jsonString = JSON.stringify(openAIRequestBody);
 

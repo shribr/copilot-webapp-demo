@@ -27,7 +27,7 @@
       "ApiKey": "xxx",
       "ApiVersion": "2024-08-01-preview",
       "Format": "OpenAI",
-      "ModelVersion": "2024-08-06",
+      "ModelVersion": "2024-11-20",
       "DeploymentName": "gpt-4o",
       "Location": "east us",
       "Sku": {
@@ -106,7 +106,7 @@
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
   },
   "appendUniqueSuffix": false,
-  "appRegistrationClientId": "0631d9ec-59c5-42a0-852f-14c77381bb34",
+  "appRegistrationClientId": "0fe52d7b-b008-41c5-8e7e-53ac5098a495",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
