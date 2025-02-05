@@ -2,7 +2,10 @@
 
 ## Overview
 
-This project is a web application that allows users to chat with Azure Copilot to query their own data. In addition to responses returned by Copilot, the application also provides the user with source references, suggested follow up questions AND a "Thought Process" tab which allows the user to understand how the AI arrived at it's answers. As an added bonus, a varity of AI personas are included which provide varying prompts based on their assigned descriptions. This allows the AI to focus on role specific aspects of the data being searched that would appear to be most important to a variety of different users. While searching the exact same dataset, the information which would be of interest to an IT professional would not be the same as what an attorney might be interested in. A list of all the included personas can be found [here](#chat-personas-list).
+This project is a web application that allows users to chat with Azure Copilot to query their own data. In addition to responses returned by Copilot, the application also provides the user with source references, suggested "Follow up Questions", "Supporting Content" and a "Thought Process" tab which allows the user to understand how the AI arrived at it's answers. 
+
+>[!NOTE]
+> As an added bonus, a varity of AI personas are included which provide varying prompts based on their assigned descriptions. This allows the AI to focus on role specific aspects of the data being searched that would logically be most important to the selected persona. So, while searching the exact same dataset, the information which would be of interest to an IT professional would not be the same as what an attorney might be interested in. A list of all the included personas can be found [here](#chat-personas-list).
 
 The solution is fully configurable via a parameters.json file. It includes a simple HTML interface and a PowerShell script for deployment.
 
