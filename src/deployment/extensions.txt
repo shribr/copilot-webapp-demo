@@ -37,7 +37,6 @@ ms-vscode.remote-repositories
 ms-vscode.remote-server
 ms-vscode.vscode-github-issue-notebooks
 ms-vscode.vscode-node-azure-pack
-ms-vscode.vscode-speech
 ms-vsliveshare.vsliveshare
 msazurermtools.azurerm-vscode-tools
 redhat.vscode-yaml
