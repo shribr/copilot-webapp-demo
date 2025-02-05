@@ -1,12 +1,12 @@
 {
-  "@odata.context": "https://srch-copilot-demo-005.search.windows.net/$metadata#datasources/$entity",
+  "@odata.context": "https://srch-copilot-demo-000.search.windows.net/$metadata#datasources/$entity",
   "@odata.etag": "\"0x8DD3A46039DD4A3\"",
-  "name": "srch-datasource-copilot-demo-005",
+  "name": "srch-datasource-copilot-demo-000",
   "description": null,
   "type": "azureblob",
   "subtype": null,
   "credentials": {
-    "connectionString": "ResourceId=/subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-005/providers/Microsoft.Storage/storageAccounts/stcopilotdemo005;"
+    "connectionString": "ResourceId=/subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-copilot-demo-000/providers/Microsoft.Storage/storageAccounts/stcopilotdemo005;"
   },
   "container": {
     "name": "content",
@@ -17,6 +17,6 @@
   "encryptionKey": null,
   "identity": {
     "@odata.type": "#Microsoft.Azure.Search.DataUserAssignedIdentity",
-    "userAssignedIdentity": "/subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourcegroups/RG-COPILOT-DEMO-005/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-copilot-demo-005"
+    "userAssignedIdentity": "/subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourcegroups/RG-copilot-demo-000/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-copilot-demo-000"
   }
 }
