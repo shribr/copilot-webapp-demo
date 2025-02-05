@@ -59,7 +59,7 @@
       "DeploymentName": "dall-e-3",
       "Location": "east us",
       "Sku": {
-        "Capacity": 6,
+        "Capacity": 2,
         "Name": "Standard"
       },
       "Type": "dall-e-3",

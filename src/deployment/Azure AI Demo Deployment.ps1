@@ -286,7 +286,7 @@ function Deploy-OpenAIModels {
                     $errorCode = $errorInfo["Code"]
                     $errorDetails = $errorInfo["Message"]
 
-                    $errorMessage = "Failed to deploy Model '$aiModelDeploymentName' for '$aiModelDeploymentName'. `
+                    $errorMessage = "Failed to deploy Model '$aiModelDeploymentName' for '$aiServiceName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
