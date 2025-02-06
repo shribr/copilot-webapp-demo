@@ -134,7 +134,7 @@ $global:KeyVaultSecrets = [PSCustomObject]@{
 }
 
 # Function to check if user is logged in to Azure
-function Check-AzureLogin {
+function Check-Azure-Login {
     try {
         $account = az account show --output json
 
