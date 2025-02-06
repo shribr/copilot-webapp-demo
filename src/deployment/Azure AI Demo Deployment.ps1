@@ -516,6 +516,23 @@ function Get-LatestDotNetRuntime {
     return $latestRuntime
 }
 
+# Function to detect the operating system
+function Get-OperatingSystem {
+    $os = $PSVersionTable.OS
+    if ($os -match "Windows") {
+        return "Windows"
+    }
+    elseif ($os -match "Linux") {
+        return "Linux"
+    }
+    elseif ($os -match "Darwin") {
+        return "macOS"
+    }
+    else {
+        return "Unknown"
+    }
+}
+
 # Function to alphabetize the parameters object
 function Get-Parameters-Sorted {
     param (
@@ -745,6 +762,45 @@ function Increment-FormattedNumber {
 
     # Convert the number back to the formatted string with leading zeros
     return $number.ToString("D$width")
+}
+
+# Function to install Azure CLI
+function Install-AzureCLI {
+    Write-Host "Verifying Azure CLI installation..."
+
+    # Check if the Azure CLI is already installed
+    $isInstalled = az --version
+
+    if ($isInstalled) {
+        Write-Host "Azure CLI is already installed."
+        return
+    }
+    else {
+        try {
+            $ProgressPreference = 'SilentlyContinue'
+            $os = Get-OperatingSystem
+            if ($os -eq "Windows") {
+                Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+                Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+                Remove-Item .\AzureCLI.msi
+            }
+            elseif ($os -eq "macOS") {
+                brew update && brew install azure-cli
+            }
+            elseif ($os -eq "Linux") {
+                curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            }
+            else {
+                Write-Error "Unsupported operating system: $os"
+                return
+            }
+
+            Write-Host "Azure CLI installed successfully."
+        }
+        catch {
+            Write-Error "Failed to install Azure CLI: $_"
+        }
+    }
 }
 
 # Function to install Visual Studio Code extensions
@@ -1108,6 +1164,21 @@ function Initialize-Parameters {
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
         virtualNetwork               = $virtualNetwork
+    }
+}
+
+# Function to login to Azure account
+function Initialize-Azure-Login {
+
+    Write-Host "Logging in to Azure..."
+
+    $ErrorActionPreference = 'Stop'
+
+    try {
+        az login
+    }
+    catch {
+        Write-Error "Failed to login to Azure: $_"
     }
 }
 
@@ -5226,7 +5297,12 @@ $ErrorActionPreference = 'Stop'
 # Need to install VS Code extensions before executing main deployment script
 Install-Extensions
 
-#$global:subscriptionId = az account show --query "{Id:id}" --output tsv
+# Install Azure CLI
+Install-AzureCLI
+
+# Login to Azure
+Initialize-Azure-Login
+
 
 # Initialize the deployment path
 $global:deploymentPath = Reset-DeploymentPath
