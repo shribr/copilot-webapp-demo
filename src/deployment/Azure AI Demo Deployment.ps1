@@ -133,6 +133,26 @@ $global:KeyVaultSecrets = [PSCustomObject]@{
     OpenAIServiceApiKey  = ""
 }
 
+# Function to check if user is logged in to Azure
+function Check-AzureLogin {
+    try {
+        $account = az account show --output json
+
+        if ($account) {
+            Write-Host "User is logged in to Azure"
+            return true
+        }
+        else {
+            Write-Host "User is not logged in to Azure"
+            return false
+        }
+    }
+    catch {
+        Write-Host "User is not logged in to Azure"
+        return false
+    }
+}
+
 # Function to convert string to proper case
 function ConvertTo-ProperCase {
     param (
@@ -841,35 +861,6 @@ function Install-Extensions {
     }
 }
 
-# Function to invoke an Azure REST API method
-function Invoke-AzureRestMethod {
-    param (
-        [string]$method,
-        [string]$url,
-        [string]$jsonBody = $null
-    )
-
-    # Get the access token
-    $token = az account get-access-token --query accessToken --output tsv
-
-    $body = $jsonBody | ConvertFrom-Json
-
-    $token = az account get-access-token --query accessToken --output tsv
-    $headers = @{
-        "Authorization" = "Bearer $token"
-        "Content-Type"  = "application/json"
-    }
-
-    try {
-        $response = Invoke-RestMethod -Method $method -Uri $url -Headers $headers -Body ($body | ConvertTo-Json -Depth 10)
-        return $response
-    }
-    catch {
-        Write-Host "Error: $_"
-        throw $_
-    }
-}
-
 # Initialize the parameters
 function Initialize-Parameters {
     param (
@@ -1170,15 +1161,51 @@ function Initialize-Parameters {
 # Function to login to Azure account
 function Initialize-Azure-Login {
 
-    Write-Host "Logging in to Azure..."
+    $isLoggedIn = Check-AzureLogin
 
-    $ErrorActionPreference = 'Stop'
+    if ($isLoggedIn) {
+        Write-Host "Already logged in to Azure."
+    }
+    else {
+        Write-Host "Logging in to Azure..."
+
+        $ErrorActionPreference = 'Stop'
+
+        try {
+            az login
+        }
+        catch {
+            Write-Error "Failed to login to Azure: $_"
+        }
+    }
+}
+
+# Function to invoke an Azure REST API method
+function Invoke-AzureRestMethod {
+    param (
+        [string]$method,
+        [string]$url,
+        [string]$jsonBody = $null
+    )
+
+    # Get the access token
+    $token = az account get-access-token --query accessToken --output tsv
+
+    $body = $jsonBody | ConvertFrom-Json
+
+    $token = az account get-access-token --query accessToken --output tsv
+    $headers = @{
+        "Authorization" = "Bearer $token"
+        "Content-Type"  = "application/json"
+    }
 
     try {
-        az login
+        $response = Invoke-RestMethod -Method $method -Uri $url -Headers $headers -Body ($body | ConvertTo-Json -Depth 10)
+        return $response
     }
     catch {
-        Write-Error "Failed to login to Azure: $_"
+        Write-Host "Error: $_"
+        throw $_
     }
 }
 
