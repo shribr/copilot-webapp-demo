@@ -1,0 +1,10 @@
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 02/06/2025 19:17:50 ***
+*** LOG SEQUENCE: 2 ***
+*** SCRIPT START TIME: 02/06/2025 22:27:08 ***
+*** LOG SEQUENCE: 3 ***
+*** SCRIPT START TIME: 02/06/2025 22:39:18 ***
+2025-02-06 22:39:25 - Resource group 'RG-COPILOT-DEMO-006' created successfully. [1]
+2025-02-06 22:42:02 - User Assigned Identity 'id-copilot-demo-006' created successfully. [2]
+2025-02-06 22:42:29 - Service principal created for identity 'id-copilot-demo-006'.
+2025-02-06 22:42:49 - User 'id-copilot-demo-006' assigned to role: 'Contributor'.

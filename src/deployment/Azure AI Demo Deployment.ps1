@@ -139,17 +139,17 @@ function Check-Azure-Login {
         $account = az account show --output json
 
         if ($account) {
-            Write-Host "User is logged in to Azure"
-            return true
+            Write-Host "User is already logged in to Azure"
+            return $true
         }
         else {
             Write-Host "User is not logged in to Azure"
-            return false
+            return $false
         }
     }
     catch {
         Write-Host "User is not logged in to Azure"
-        return false
+        return $false
     }
 }
 
@@ -411,6 +411,60 @@ function Format-CustomErrorInfo {
     return $properties
 }
 
+# Function to get a list of Azure tenants
+function Get-Azure-Tenants() {
+    $tenantId = ""
+    $optionSelected = 0
+
+    az config set extension.dynamic_install_allow_preview=true
+
+    $tenants = az account tenant list | ConvertFrom-Json
+
+    $optionValue = 1
+    foreach ($tenant in $tenants) {
+        $tenant | Add-Member -MemberType NoteProperty -Name "option" -Value $optionValue
+        $optionValue++
+    }
+    
+    Write-Host "Available Azure tenants:"
+    Write-Host $tenants
+
+    if ($tenants.Count -eq 1) {
+        $tenantId = $tenants[0].tenantId
+        az account set --tenant $tenantId
+    }
+    else {
+        $optionSelected = Read-Host "Select the Azure tenant ID:"
+
+        $tenantId = $tenants[$optionSelected - 1].tenantId
+    }
+    $setAsDefaultTenant = Read-Host "Set the selected tenant as the default tenant? (Y/N)"
+
+    if ($setAsDefaultTenant -eq "Y") {
+        az account set --tenant $tenantId
+    }
+
+    # Prompt user to select a subscription
+    $subscriptions = az account list --query "[].{Name:name, Id:id}" | ConvertFrom-Json
+    $subscriptionOptions = @()
+    $optionValue = 1
+    foreach ($subscription in $subscriptions) {
+        $subscriptionOptions += "$optionValue. $($subscription.Name) ($($subscription.Id))"
+        $subscription | Add-Member -MemberType NoteProperty -Name "option" -Value $optionValue
+        $optionValue++
+    }
+
+    Write-Host "Available subscriptions:"
+    $subscriptionOptions | ForEach-Object { Write-Host $_ }
+
+    $subscriptionSelected = Read-Host "Select the Azure subscription ID (enter the number)..."
+    $selectedSubscription = $subscriptions[$subscriptionSelected - 1].Id
+
+    az account set --subscription $selectedSubscription
+
+    return $tenantId
+}
+
 # Function to get Cognitive Services API key
 function Get-CognitiveServicesApiKey {
     param (
@@ -586,7 +640,6 @@ function Get-RandomInt {
     return [math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $max
 }
 
-
 # Function to check if a search index exists
 function Get-SearchIndexes {
     param (
@@ -668,7 +721,6 @@ function Get-SearchSkillSets {
 # Function to find a unique suffix and create resources
 function Get-UniqueSuffix {
     param (
-        [int]$resourceSuffix,
         [string]$resourceGroupName
     )
 
@@ -680,36 +732,50 @@ function Get-UniqueSuffix {
         $global:searchServiceName = "$($parameters.searchServiceName)-$resourceGuid-$resourceSuffix"
         $global:logAnalyticsWorkspaceName = "$($parameters.logAnalyticsWorkspaceName)-$resourceGuid-$resourceSuffix"
         $global:cognitiveServiceName = "$($parameters.cognitiveServiceName)-$resourceGuid-$resourceSuffix"
+        $global:containerRegistryName = "$($parameters.containerRegistryName)-$resourceGuid-$resourceSuffix"
         $global:keyVaultName = "$($parameters.keyVaultName)-$resourceGuid-$resourceSuffix"
         $global:appInsightsName = "$($parameters.appInsightsName)-$resourceGuid-$resourceSuffix"
-        $global:portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
-        $global:managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
+        #$global:portalDashboardName = "$($parameters.portalDashboardName)-$resourceGuid-$resourceSuffix"
+        #$global:managedEnvironmentName = "$($parameters.managedEnvironmentName)-$resourceGuid-$resourceSuffix"
         $global:userAssignedIdentityName = "$($parameters.userAssignedIdentityName)-$resourceGuid-$resourceSuffix"
-        $global:openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
+        #$global:openAIName = "$($parameters.openAIName)-$resourceGuid-$resourceSuffix"
         $global:documentIntelligenceName = "$($parameters.documentIntelligenceName)-$resourceGuid-$resourceSuffix"
         $global:aiHubName = "$($aiHubName)-$($resourceGuid)-$($resourceSuffix)"
         $global:aiModelName = "$($aiModelName)-$($resourceGuid)-$($resourceSuffix)"
         $global:aiServiceName = "$($aiServiceName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:computerVisionName = "$($computerVisionName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:openAIAccountName = "$($openAIAccountName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:virtualNetworkName = "$($virtualNetworkName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:subnetName = "$($subnetName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:apiManagementServiceName = "$($apiManagementServiceName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:aiProjectName = "$($aiProjectName)-$($resourceGuid)-$($resourceSuffix)"
+        $global:virtualNetworkName = "$($virtualNetworkName)-$($resourceGuid)-$($resourceSuffix)"
 
         foreach ($appService in $global:appServices) {
             $appService.Name = "$($appService.Name)-$($resourceGuid)-$($resourceSuffix)"
         }
 
-        $resourceExists = Test-ResourceExists $storageAccountName "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $appServicePlanName "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $searchServiceName "Microsoft.Search/searchServices" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $logAnalyticsWorkspaceName "Microsoft.OperationalInsights/workspaces" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $cognitiveServiceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $keyVaultName "Microsoft.KeyVault/vaults" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $appInsightsName "Microsoft.Insights/components" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $portalDashboardName "Microsoft.Portal/dashboards" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $managedEnvironmentName "Microsoft.App/managedEnvironments" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $userAssignedIdentityName "Microsoft.ManagedIdentity/userAssignedIdentities" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $openAIName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists $documentIntelligenceName "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName
+        $resourceExists = Test-ResourceExists -resourceName $storageAccountName -resourceType "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $appServicePlanName -resourceType "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $searchServiceName -resourceType "Microsoft.Search/searchServices" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $logAnalyticsWorkspaceName -resourceType "Microsoft.OperationalInsights/workspaces" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $cognitiveServiceName -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $keyVaultName -resourceType "Microsoft.KeyVault/vaults" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $appInsightsName -resourceType "Microsoft.Insights/components" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $apiManagementServiceName -resourceType "Microsoft.Portal/ApiManagement/service" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $openAIAccountName -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $aiServiceName -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $computerVisionName -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $userAssignedIdentityName -resourceType "Microsoft.ManagedIdentity/userAssignedIdentities" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $openAIAccountName -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $virtualNetworkName -resourceType "Microsoft.Network/virtualNetworks" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $documentIntelligenceName -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $aiHubName -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $aiProjectName -resourceType "Microsoft.App/MachineLearningServices/workspaces" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $containerRegistryName -resourceType "Microsoft.App/MachineLearningServices/registries" -resourceGroupName $resourceGroupName
 
         foreach ($appService in $global:appServices) {
-            $appResourceExists = Test-ResourceExists $appServiceName $appService.Name -resourceGroupName $resourceGroupName -or $resourceExists
+            $appResourceExists = Test-ResourceExists resourceName $appService.Name -resourceType "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or $resourceExists
             if ($appResourceExists) {
                 $resourceExists = $true
                 break
@@ -717,7 +783,7 @@ function Get-UniqueSuffix {
         }
 
         if ($resourceExists) {
-            $resourceSuffix++
+            $global:resourceSuffix++
         }
     } while ($resourceExists)
 
@@ -745,7 +811,7 @@ function Get-UniqueSuffix {
         New-AIHubAndModel -aiHubName $aiHubName -aiModelName $aiModelName -aiModelType $aiModelType -aiModelVersion $aiModelVersion -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location
     :Enter a comment or description}
     #>
-    return $resourceSuffix
+    return $global:resourceSuffix
 }
 
 # Ensure the service name is valid
@@ -828,6 +894,8 @@ function Install-Extensions {
     # Define the path to the extensions.json file
     $filePath = "extensions.json"
 
+    Write-Host "Installing Visual Studio Code extensions..."
+
     # Load parameters from the JSON file
     $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
@@ -841,21 +909,22 @@ function Install-Extensions {
     # Loop through each extension and install it using the `code` command
     foreach ($extension in $extensions) {
         
+        $extensionName = $extension.name
         # check if the extension is already installed
-        $isInstalled = code --list-extensions | Where-Object { $_ -eq $extension.name }
+        $isInstalled = code --list-extensions | Where-Object { $_ -eq $extensionName }
 
         if ($isInstalled) {
-            Write-Host "Extension '$extension.name' is already installed."
+            Write-Host "Extension '$extensionName' is already installed."
             continue
         }
         else {
 
             try {
-                code --install-extension $extension.name
-                Write-Host "Installed extension '$extension.name' successfully."
+                code --install-extension $extensionName
+                Write-Host "Installed extension '$extensionName' successfully."
             }
             catch {
-                Write-Error "Failed to install extension '$extension.name': $_"
+                Write-Error "Failed to install extension '$extensionName': $_"
             }
         }
     }
@@ -901,6 +970,7 @@ function Initialize-Parameters {
     $global:aiServiceName = $parametersObject.aiServiceName
     $global:aiServiceProperties = $parametersObject.aiServiceProperties
     $global:apiManagementService = $parametersObject.apiManagementService
+    $global:apiManagementServiceName = $parametersObject.apiManagementServiceName
     $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
     $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appInsightsName = $parametersObject.appInsightsName
@@ -981,6 +1051,7 @@ function Initialize-Parameters {
     $global:subNetName = $parametersObject.subNetName
     $global:userAssignedIdentityName = $parametersObject.userAssignedIdentityName
     $global:virtualNetwork = $parametersObject.virtualNetwork
+    $global:virtualNetworkName = $parametersObject.virtualNetworkName
 
     # Make sure the previousResourceBaseName parameter in the parameters.json file is different than the resourceBaseName parameter.
     # What this code does is determine whether or not you are attempting to redeploy the same resources with the same base name or if you are trying to provision an entirely new deployment with a new resource group name etc.
@@ -1041,15 +1112,18 @@ function Initialize-Parameters {
         @{ Name = $resourceGroupName; Type = "Resource Group"; Status = "Pending" }
         @{ Name = $searchServiceName; Type = "Search Service"; Status = "Pending" }
         @{ Name = $storageAccountName; Type = "Storage Account"; Status = "Pending" }
-        @{ Name = $virtualNetwork.Name; Type = "Virtual Network"; Status = "Pending" }
+        @{ Name = $virtualNetworkName; Type = "Virtual Network"; Status = "Pending" }
     )
+
+    $jsonOutput = $resources | ConvertTo-Json
+    $resourceTable = $jsonOutput | ConvertFrom-Json
 
     foreach ($resource in $resources) {
         $global:ResourceList += [PSCustomObject]@{ Name = $resource.Name; Type = $resource.Type; Status = $resource.Status }
     }
     
     Write-Host "Parameters initialized.`n"
-    Write-Host  $global:ResourceList
+    $resourceTable | Format-Table -AutoSize
 
     return @{
         aiDeploymentName             = $aiDeploymentName
@@ -1066,6 +1140,7 @@ function Initialize-Parameters {
         aiServiceName                = $aiServiceName
         aiServiceProperties          = $aiServiceProperties
         apiManagementService         = $apiManagementService
+        apiManagementServiceName     = $apiManagementServiceName
         appRegRequiredResourceAccess = $appRegRequiredResourceAccess
         appDeploymentOnly            = $appDeploymentOnly
         appendUniqueSuffix           = $appendUniqueSuffix
@@ -1155,24 +1230,25 @@ function Initialize-Parameters {
         userAssignedIdentityName     = $userAssignedIdentityName
         userPrincipalName            = $userPrincipalName
         virtualNetwork               = $virtualNetwork
+        virtualNetworkName           = $virtualNetworkName
     }
 }
 
 # Function to login to Azure account
 function Initialize-Azure-Login {
+    param(
+        [string]$tenantId
+    )
 
-    $isLoggedIn = Check-AzureLogin
+    $isLoggedIn = Check-Azure-Login
 
-    if ($isLoggedIn) {
-        Write-Host "Already logged in to Azure."
-    }
-    else {
+    if (!$isLoggedIn) {
         Write-Host "Logging in to Azure..."
 
         $ErrorActionPreference = 'Stop'
 
         try {
-            az login
+            az login --use-device-code
         }
         catch {
             Write-Error "Failed to login to Azure: $_"
@@ -4202,9 +4278,9 @@ function Start-Deployment {
     if ($appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
-        $resourceSuffix = Get-UniqueSuffix -resourceSuffix $resourceSuffix -resourceGroupName $resourceGroupName
+        Get-UniqueSuffix -resourceGroupName $resourceGroupName
 
-        $resourceGroupName = "$resourceGroupName$resourceSuffix"
+        $resourceGroupName = "$resourceGroupName-$global:resourceSuffix"
     }
 
     $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -location $location
@@ -4572,20 +4648,23 @@ function Test-ResourceExists {
             "Microsoft.CognitiveServices/accounts" {
                 $result = az cognitiveservices account list --query "[?name=='$resourceName'].name" --output tsv
             }
-            "Microsoft.ApiManagement/" {
+            "Microsoft.ApiManagement/service" {
                 $result = az apim api list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
             }
             "Microsoft.ContainerRegistry/" {
                 $result = az container list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
             }
+            "Microsoft.Networks/virtualNetwork" {
+                $result = az network vnet list --resource-group $resourceGroupName --query "[?name=='$resourceName'].name" --output tsv
+            }
         }
 
         if (-not [string]::IsNullOrEmpty($result)) {
-            Write-Host "$resourceName exists."
+            Write-Host "A resource named '$resourceName' already exists. Incrementing counter by 1 and trying again."
             return $true
         }
         else {
-            Write-Host "$resourceName does not exist."
+            Write-Host "A resource named '$resourceName' does not exist and is available for use."
             return $false
         }
     }
@@ -4593,11 +4672,11 @@ function Test-ResourceExists {
         # Check within the subscription
         $result = az resource list --name $resourceName --resource-type $resourceType --query "[].name" --output tsv
         if (-not [string]::IsNullOrEmpty($result)) {
-            Write-Host "$resourceName exists."
+            Write-Host "A resource named '$resourceName' already exists. Incrementing counter by 1 and trying again."
             return $true
         }
         else {
-            Write-Host "$resourceName does not exist."
+            Write-Host  "A resource named '$resourceName' does not exist and is available for use."
             return $false
         }
     }
@@ -5343,6 +5422,7 @@ Set-Location -Path $global:deploymentPath
 $global:existingResources = @()
 
 $global:resourceCounter = 0
+$global:resourceSuffix = 1
 
 # Initialize parameters
 $initParams = Initialize-Parameters -parametersFile $parametersFile
