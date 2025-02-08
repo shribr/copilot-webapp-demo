@@ -6,24 +6,24 @@
     "knownClientApplications": [],
     "oauth2PermissionScopes": [
       {
-        "isEnabled": true,
         "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "adminConsentDisplayName": "Access API as user",
         "type": "User",
+        "isEnabled": true,
+        "id": "90e20d5a-6bc3-4b23-8d86-b64e1c854297",
         "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "adminConsentDisplayName": "Access API as user",
         "value": "access_as_user",
-        "userConsentDisplayName": "Access API as user",
-        "id": "c514f2a5-9e9c-495b-809b-f2dfdc5b4473"
+        "userConsentDisplayName": "Access API as user"
       },
       {
-        "isEnabled": true,
         "adminConsentDescription": "Allow the application to read data from the API.",
-        "adminConsentDisplayName": "Read data from API",
         "type": "User",
+        "isEnabled": true,
+        "id": "e18aea64-6068-49d0-a448-dac5e300066f",
         "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "adminConsentDisplayName": "Read data from API",
         "value": "read_data",
-        "userConsentDisplayName": "Read data from API",
-        "id": "cd1d4578-8768-40d2-8971-dc7b3df78a7f"
+        "userConsentDisplayName": "Read data from API"
       }
     ],
     "preAuthorizedApplications": [],
@@ -38,7 +38,7 @@
   "deletedDateTime": null,
   "description": null,
   "disabledByMicrosoftStatus": null,
-  "displayName": "app-copilot-demo-000",
+  "displayName": "app-copilot-demo-007",
   "groupMembershipClaims": null,
   "id": "22d29916-8d56-4180-8add-bacc6ebd1351",
   "identifierUris": [],

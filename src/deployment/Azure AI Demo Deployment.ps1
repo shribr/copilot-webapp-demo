@@ -953,7 +953,7 @@ function Initialize-Parameters {
         $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
     }
     else {
-        $global:newFullResourceBaseName = $parametersObject.resourceBaseName
+        $global:newFullResourceBaseName = $parametersObject.fullResourceBaseName
     }
 
     # Initialize global variables for each item in the parameters.json file
@@ -1534,6 +1534,57 @@ function New-AIService {
     }
 }
 
+
+function New-ApiManagementApi {
+    param (
+        [string]$resourceGroupName,
+        [string]$apiManagementServiceName
+    )
+
+    # Check if the API already exists
+    $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+    if (-not $apiExists) {
+        try {
+            # Create the API
+            az apim api create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --display-name "KeyVault Proxy" --path keyvault --service-url "https://$global:KeyVaultName.vault.azure.net/" --protocols https
+ 
+        }
+        catch {
+            Write-Error "Failed to create API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath               
+        }
+
+        try {
+            # Add operations
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
+    
+        }
+        catch {
+            Write-Error "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        }
+                
+        try {
+            # Add CORS policy to operations
+            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+    
+        }
+        catch {
+            Write-Error "Failed to add CORS policy to operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to add CORS policy to operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        }
+
+        Write-Host "API 'KeyVaultProxy' and its operations created successfully."
+        Write-Log -message "API 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
+    }
+    else {
+        Write-Host "API 'KeyVaultProxy' already exists."
+        Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
+    }
+}
+
 # Function to create and deploy Api Management service
 function New-ApiManagementService {
     param (
@@ -1571,7 +1622,7 @@ function New-ApiManagementService {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorCode -match "FlagMustBeSetForRestore" && $global:restoreSoftDeletedResource) {
+                if (($errorCode -match "FlagMustBeSetForRestore" || $errorCode -match "ServiceAlreadyExistsInSoftDeletedState" ) && $global:restoreSoftDeletedResource) {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     Restore-SoftDeletedResource -resourceName $apiManagementServiceName -resourceType "ApiManagementService" -location $location -resourceGroupName $resourceGroupName
                 }
@@ -1589,27 +1640,8 @@ function New-ApiManagementService {
                 Write-Host "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]"
                 Write-Log -message "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
-            # Check if the API already exists
-            $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
-            if (-not $apiExists) {
-                # Create the API
-                az apim api create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --display-name "KeyVault Proxy" --path keyvault --service-url "https://$global:KeyVaultName.vault.azure.net/" --protocols https
 
-                # Add operations
-                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
-                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
-
-                # Add CORS policy to operations
-                az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
-                az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
-
-                Write-Host "API 'KeyVaultProxy' and its operations created successfully."
-                Write-Log -message "API 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
-            }
-            else {
-                Write-Host "API 'KeyVaultProxy' already exists."
-                Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
-            }
+            New-ApiManagementApi -resourceGroupName $resourceGroupName -apiManagementServiceName $apiManagementServiceName
 
         }
         catch {
@@ -1629,27 +1661,7 @@ function New-ApiManagementService {
             return
         }
 
-        # Check if the API already exists
-        $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy"
-        if (-not $apiExists) {
-            # Create the API
-            az apim api create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --display-name "KeyVault Proxy" --path keyvault --service-url "https://$global:KeyVaultName.vault.azure.net/" --protocols https
-
-            # Add operations
-            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
-            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
-
-            # Add CORS policy to operations
-            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
-            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id "KeyVaultProxy" --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
-
-            Write-Host "Api 'KeyVaultProxy' and its operations created successfully."
-            Write-Log -message "Api 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
-        }
-        else {
-            Write-Host "Api 'KeyVaultProxy' already exists."
-            Write-Log -message "Api 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
-        }
+        New-ApiManagementApi -resourceGroupName $resourceGroupName -apiManagementServiceName $apiManagementServiceName
     }
 }
 
@@ -2898,7 +2910,7 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create Subnet
 
-    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName -existingResources $existingResources
+    New-SubNet -subNet $subNet -vnetName $virtualNetworkName -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create App Service Environment
@@ -3104,7 +3116,7 @@ function New-SearchIndex {
         $content = Get-Content -Path $searchIndexSchema
 
         # Replace the placeholder with the actual resource base name
-        $updatedContent = $content -replace $previousResourceBaseName, $resourceBaseName
+        $updatedContent = $content -replace $previousFullResourceBaseName, $newFullResourceBaseName
 
         Set-Content -Path $searchIndexSchema -Value $updatedContent
 
@@ -3174,12 +3186,10 @@ function New-SearchIndexer {
 
     try {
 
-        $fullResourceBaseName = "${$global:resourceBaseName}-${$global:resourceSuffixCounter}"
-
         $content = Get-Content -Path $searchIndexerSchema
 
         # Replace the placeholder with the actual resource base name
-        $updatedContent = $content -replace $previousResourceBaseName, $fullResourceBaseName
+        $updatedContent = $content -replace $previousFullResourceBaseName, $newFullResourceBaseName
 
         Set-Content -Path $searchIndexerSchema -Value $updatedContent
 
@@ -3713,7 +3723,7 @@ function New-SubNet {
     param (
         [string]$resourceGroupName,
         [string]$vnetName,
-        [array]$subnet,
+        [psobject]$subnet,
         [array]$existingResources
     )
 
@@ -3742,7 +3752,7 @@ function New-SubNet {
 # Function to create a new virtual network
 function New-VirtualNetwork {
     param (
-        [array]$virtualNetwork,
+        [psobject]$virtualNetwork,
         [array]$existingResources
     )
 
@@ -3919,6 +3929,8 @@ function Restore-SoftDeletedResource {
             # Code to restore Cognitive Service
             try {
                 Write-Output "Restoring API Management Service: $resourceName"
+                az resource update --ids $(az apim show --name $resourceName --resource-group $resourceGroupName --query 'id' --output tsv) --set properties.deletionRecoveryLevel="Recoverable"
+
                 az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
 
                 $global:resourceCounter += 1
@@ -4280,7 +4292,9 @@ function Start-Deployment {
         # Find a unique suffix
         Get-UniqueSuffix -resourceGroupName $resourceGroupName
 
-        $resourceGroupName = "$resourceGroupName-$global:resourceSuffix"
+        $global:resourceSuffix = 1
+
+        $resourceGroupName = "$resourceGroupName-$global:resourceGuid-$global:resourceSuffix"
     }
 
     $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName -location $location
@@ -5125,7 +5139,7 @@ function Update-ConfigFile {
 
     try {
 
-        $fullResourceBaseName = $global:fullResourceBaseName
+        $fullResourceBaseName = $global:newFullResourceBaseName
 
         $appServiceName = "app-$fullResourceBaseName"
         $functionAppName = "func-$fullResourceBaseName"
@@ -5365,12 +5379,12 @@ function Update-ConfigFile {
         # Write the updated JSON back to the file
         $updatedConfig | Set-Content -Path $configFilePath
 
-        Write-Host "Config file updated successfully."
-        Write-Log -message "Config file updated successfully."
+        Write-Host "Config.json file updated successfully."
+        Write-Log -message "Config.json file updated successfully."
     }
     catch {
-        Write-Host "Failed to update the config file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to update the config file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Host "Failed to update the Config.json file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to update the Config.json file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
@@ -5408,7 +5422,6 @@ Install-AzureCLI
 
 # Login to Azure
 Initialize-Azure-Login
-
 
 # Initialize the deployment path
 $global:deploymentPath = Reset-DeploymentPath
