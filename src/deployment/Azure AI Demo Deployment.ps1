@@ -1841,6 +1841,14 @@ function New-App-Registration {
             # Update the identifierUris and oauth2PermissionScopes properties
             #$app.identifierUris = $identifierUris
             $app.api.oauth2PermissionScopes += $apiScopes
+
+            # The issue with the below code is that the entries made for the API access permissions are using AD Graph and not MS Graph. The AD graph does not have "name" or "description" properties.
+            # So even though the original code I had set in the parameters file was correct, the code below is not working as expected so I removed those two properties from the parameters.json file.
+            # It was then that I realized that it was using the wrong Graph API because instead of the name of the permission being showm it was the GUID instead.
+            # It would appear that the manifest file will not allow me to add the permissions from the MS Graph API only the AD Graph API. 
+            # Even though the manifest files for the AD and MS Graph APIs are the same, unless I add the permissions using the GUI in the web portal the values will be saved as AD Graph and not MS Graph.
+            # I still need to figure out how to add the permissions from the MS Graph API instead of the AD Graph API.
+
             $app.requiredResourceAccess = $appRegRequiredResourceAccess
             #$app.spa.redirectUris = $appServiceUrl
 
