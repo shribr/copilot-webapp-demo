@@ -4524,6 +4524,15 @@ function Start-Deployment {
 
     Set-KeyVaultSecrets -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName
 
+    # The CLI needs to be updated to allow Azure AI Studio projects to be created correctly.
+    # This code will create a new workspace in ML Studio but not in AI Studio.
+    # I am still having this code execute so that the rest of the script doesn't error out.
+    # Once the enture script completes the code will delete the ML workspace.
+    # This is admittedly a hack but it is the only way to get the script to work for now.
+
+    # 2025-02-09 ADS: THE ABOVE COMMENT IS NO LONGER VALID. THE CLI HAS BEEN UPDATED TO ALLOW FOR AI STUDIO PROJECTS TO BE CREATED CORRECTLY.
+    # I AM KEEPING THE COMMENT ABOVE FOR POSTERITY.
+
     # Create AI Studio AI Project / ML Studio Workspace
 
     New-MachineLearningWorkspace -resourceGroupName $resourceGroupName `
