@@ -3,7 +3,7 @@
   "appDeploymentOnly": false,
   "deploymentType": "Existing",
   "fullResourceBaseName": "copilot-demo-007",
-  "previousFullResourceBaseName": "copilot-demo-006",
+  "previousFullResourceBaseName": null,
   "previousResourceBaseName": "copilot-demo",
   "resourceSuffix": 1,
   "resourceSuffixCounter": "007",
@@ -36,7 +36,7 @@
       "ApiKey": "xxx",
       "ApiVersion": "2024-08-01-preview",
       "Format": "OpenAI",
-      "ModelVersion": "2024-11-20",
+      "ModelVersion": "2024-08-06",
       "DeploymentName": "gpt-4o",
       "Location": "east us",
       "Sku": {
@@ -122,8 +122,6 @@
       "resourceAccess": [
         {
           "id": "f53da476-18e3-4152-8e01-aec403e6edc0",
-          "name": "user_impersonation",
-          "description": "Have full access to the Azure Key Vault service",
           "type": "Scope"
         }
       ]
@@ -133,32 +131,22 @@
       "resourceAccess": [
         {
           "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-          "name": "User.Read",
-          "description": "Sign you in and read your profile",
           "type": "Scope"
         },
         {
           "id": "df85f4d6-205c-4ac5-a5ea-6bf408dba283",
-          "name": "Files.Read.All",
-          "description": "Read all files that you have access to",
           "type": "Scope"
         },
         {
           "id": "76bc735e-aecd-4a1d-8b4c-2b915deabb79",
-          "name": "Presence.Read",
-          "description": "Reader your presence",
           "type": "Scope"
         },
         {
           "id": "205e70e5-aba6-4c52-a976-6d2d46c48043",
-          "name": "Sites.Read.All",
-          "description": "Read items in all site collections",
           "type": "Scope"
         },
         {
           "id": "f89c84ef-20d0-4b54-87e9-02e856d66d53",
-          "name": "Sites.Selected",
-          "description": "Access selected Sites, on behalf of the signed-in user",
           "type": "Scope"
         }
       ]

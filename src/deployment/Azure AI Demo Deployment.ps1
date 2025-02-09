@@ -1841,13 +1841,14 @@ function New-App-Registration {
             # Update the identifierUris and oauth2PermissionScopes properties
             #$app.identifierUris = $identifierUris
             $app.api.oauth2PermissionScopes += $apiScopes
-    
+            $app.requiredResourceAccess = $appRegRequiredResourceAccess
+
             # Convert the updated manifest back to JSON
             $appJson = $app | ConvertTo-Json -Depth 10
     
             # Update the application with the modified manifest
             $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-            #az ad app update --id $appId --set appManifest.json
+            az ad app update --id $appId --set appManifest.json
             
             az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
             az ad app update --id $appId --set api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)
@@ -2638,7 +2639,7 @@ function New-MachineLearningWorkspace {
             $jsonOutput = az ml workspace create --resource-group $resourceGroupName `
                 --application-insights $appInsightsName `
                 --description "This configuration specifies a workspace configuration with existing dependent resources" `
-                --display-name "AI Studio Project / Machine Learning Workspace" `
+                --display-name $aiProjectName `
                 --hub-id $aiHubName `
                 --kind project `
                 --location $location `
@@ -4521,12 +4522,6 @@ function Start-Deployment {
     New-AIService -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     Set-KeyVaultSecrets -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName
-
-    # The CLI needs to be updated to allow Azure AI Studio projects to be created correctly.
-    # This code will create a new workspace in ML Studio but not in AI Studio.
-    # I am still having this code execute so that the rest of the script doesn't error out.
-    # Once the enture script completes the code will delete the ML workspace.
-    # This is admittedly a hack but it is the only way to get the script to work for now.
 
     # Create AI Studio AI Project / ML Studio Workspace
 
