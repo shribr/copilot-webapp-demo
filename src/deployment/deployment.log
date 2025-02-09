@@ -105,3 +105,80 @@
 2025-02-09 02:56:30 - Config.json file updated successfully.
 2025-02-09 02:57:33 - Web app 'app-copilot-demo-007' deployed successfully.
 2025-02-09 03:00:53 - Function app 'func-copilot-demo-007' deployed successfully.
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 02/09/2025 03:39:29 ***
+2025-02-09 03:39:38 - Resource Group 'RG-COPILOT-DEMO-007' already exists.
+2025-02-09 03:39:48 - Resource 'id-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'stcopilotdemo007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'vnet-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'asp-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'cog-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'srch-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'log-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'appi-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'openai-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'crcopilotdemo007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'docintel-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'cv-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'app-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'Failure Anomalies - appi-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'func-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'kv-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'hub-ai-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'ai-service-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'apim-copilot-demo-007' provisioned successfully.
+2025-02-09 03:39:48 - Resource 'project-ai-copilot-demo-007' provisioned successfully.
+2025-02-09 03:40:33 - Config.json file updated successfully.
+2025-02-09 03:41:28 - Web app 'app-copilot-demo-007' deployed successfully.
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 02/09/2025 03:42:59 ***
+2025-02-09 03:43:08 - Resource Group 'RG-COPILOT-DEMO-007' already exists.
+2025-02-09 03:43:10 - Resource 'id-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'stcopilotdemo007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'vnet-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'asp-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'cog-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'srch-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'log-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'appi-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'openai-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'crcopilotdemo007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'docintel-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'cv-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'app-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'Failure Anomalies - appi-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'func-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'kv-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'hub-ai-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'ai-service-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'apim-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:10 - Resource 'project-ai-copilot-demo-007' provisioned successfully.
+2025-02-09 03:43:55 - Config.json file updated successfully.
+2025-02-09 03:44:35 - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-09 03:47:06 - Function app 'func-copilot-demo-007' deployed successfully.
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 02/09/2025 12:29:24 ***
+2025-02-09 12:29:25 - Resource Group 'RG-COPILOT-DEMO-007' already exists.
+2025-02-09 12:29:28 - Resource 'id-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'stcopilotdemo007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'vnet-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'asp-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'cog-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'srch-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'log-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'appi-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'openai-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'crcopilotdemo007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'docintel-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'cv-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'app-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'Failure Anomalies - appi-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'func-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'kv-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'hub-ai-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'ai-service-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'apim-copilot-demo-007' provisioned successfully.
+2025-02-09 12:29:28 - Resource 'project-ai-copilot-demo-007' provisioned successfully.
+2025-02-09 12:35:58 - Config.json file updated successfully.
+2025-02-09 12:43:58 - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-09 12:59:37 - Function app 'func-copilot-demo-007' deployed successfully.

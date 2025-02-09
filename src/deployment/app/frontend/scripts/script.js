@@ -158,6 +158,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('clear-button').style.display = 'none';
     }
 
+    let searchIndexers = config.SEARCH_INDEXERS;
+
+    let searchIndexStatusMessage = `If files were recently uploaded it will take some time for the search indexer to complete executing so that the new documents are included in the search results. `;
+    searchIndexStatusMessage += `The time will vary depending on the number of documents that were uploaded. `;
+    searchIndexStatusMessage += `If you feel that enough time has passed and still aren't seeing the new results you can try to manually re-run the indexer by clicking the refresh button.`;
+
+    let searchIndexerStatus = await getSearchIndexerStatus(searchIndexers);
+
+    document.getElementById('search-indexer-status-text').innerHTML = "";
+    document.getElementById('search-indexer-status-refresh').innerHTML = `<a href="#" id="run-search-indexer-link">${config.ICONS.REFRESH.SVG}</a>`;
+    document.getElementById('search-indexer-status-refresh').title = searchIndexStatusMessage;
+
+    document.getElementById('run-search-indexer-link').addEventListener('click', function (event) {
+        event.preventDefault();
+        runSearchIndexer(searchIndexers);
+    });
+
     document.getElementById('send-button').addEventListener('click', postQuestion);
     document.getElementById('clear-button').addEventListener('click', clearChatDisplay);
     document.getElementById('login-button').addEventListener('click', login);
@@ -757,7 +774,8 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
             }
         } catch (error) {
-            const answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+
+            let answerListHTML = `<div class="answer-results no-results">${persona.NoResults}</div>`;
 
             answers += answerListHTML;
             console.error(error);
@@ -1531,6 +1549,78 @@ async function getSasToken() {
     }
 
     return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+}
+
+// Function to get the search indexer status
+async function getSearchIndexerStatus(searchIndexers) {
+    // Retrieve configuration which should include your Azure Search service name and API key
+    let searchApiKey = config.AZURE_SEARCH_API_KEY;
+    const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
+    const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
+    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
+    const keyVaultEndPoint = "https://vault.azure.net/.default"
+    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
+    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
+    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+
+    let searchIndexerStatusArray = [];
+
+    if (authMode === 'MSAL') {
+
+        const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
+
+        const tokenRequest = {
+            scopes: [`${keyVaultEndPoint}`],
+            account: activeAccount
+        };
+
+        let tokenResponse;
+
+        try {
+            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+            console.log("Token acquired silently");
+        } catch (silentError) {
+            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+            console.log("Token acquired via popup");
+        }
+
+        const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+
+        // Insert a delay of 5 seconds
+        await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+
+    // Iterate over the search indexers and run each one
+    for (const searchIndexer of searchIndexers) {
+        var searchIndexerName = searchIndexer.Name;
+        //var searchIndexName = searchIndexer.IndexName;
+        //var searchIndexerSchema = searchIndexer.Schema;
+
+        var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/status?api-version=${searchServiceApiVersion}`;
+
+        var headers = {
+            'api-key': searchApiKey,
+            'Content-Type': 'application/json'
+        };
+
+        // Invoke the REST method to run the search indexer
+        try {
+            const response = await fetch(searchIndexerUrl, {
+                method: 'GET',
+                headers: headers
+            });
+            //No need to return anything from the search indexer
+            const data = await response.json();
+            console.log('Indexer status:', data.lastResult.status);
+
+            searchIndexerStatusArray.push({ "name": searchIndexerName, "status": data.lastResult.status });
+        } catch (error) {
+            console.error(`Error getting search indexer status`, error.message);
+        }
+    }
+
+    return searchIndexerStatusArray;
 }
 
 // Function to get user presence
@@ -2511,7 +2601,6 @@ async function uploadFilesToAzure(files) {
             if (response.ok) {
                 showToastNotification(`Upload successful for ${file.name}.`, true);
                 console.log(`Upload successful for ${file.name}.`);
-                getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
             } else {
                 const errorText = await response.text();
                 showToastNotification(`Error uploading file ${file.name} to Azure Storage: ${errorText}`, false);
@@ -2523,6 +2612,8 @@ async function uploadFilesToAzure(files) {
     }
     // Clear the file input after successful upload
     clearFileInput();
+
+    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
 
     //The isn't working yet because of permissions issues
     await runSearchIndexer(searchIndexers);

@@ -1768,6 +1768,46 @@ code {
   padding: 12px;
 }
 
+#run-search-indexer-link {
+  color: #0078d4;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.6rem;
+  font-style: italic;
+}
+
+#search-indexer-status {
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+#search-indexer-status-container {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  /* margin-top: 10px; */
+  font-size: 0.8rem;
+  height: 80%;
+  padding-bottom: 4px;
+}
+
+#search-indexer-status-refresh {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  outline: none;
+}
+
+#search-indexer-status-label {
+  margin-top: 4px;
+}
+
+#search-indexer-status-refresh svg {
+  width: 16px;
+  height: 16px; /* Change color as needed */
+}
+
 #selected-file-list-container {
   width: 100%;
   max-width: 100%;
