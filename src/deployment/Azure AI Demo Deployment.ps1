@@ -1842,6 +1842,7 @@ function New-App-Registration {
             #$app.identifierUris = $identifierUris
             $app.api.oauth2PermissionScopes += $apiScopes
             $app.requiredResourceAccess = $appRegRequiredResourceAccess
+            #$app.spa.redirectUris = $appServiceUrl
 
             # Convert the updated manifest back to JSON
             $appJson = $app | ConvertTo-Json -Depth 10
@@ -4959,6 +4960,275 @@ function Update-AzureServiceProperties {
 
 }
 
+# Function to update the config file
+function Update-ConfigFile {
+    param (
+        [string]$configFilePath,
+        [string]$resourceGroupName,
+        [string]$storageAccountName,
+        [string]$searchServiceName,
+        [string]$searchIndexName,
+        [string]$searchIndexerName,
+        [string]$searchVectorIndexName,
+        [string]$searchVectorIndexerName,
+        [string]$openAIAccountName,
+        [string]$aiServiceName,
+        [psobject]$apiManagementService,
+        [string]$functionAppName,
+        [string]$siteLogo
+    )
+
+    try {
+
+        $fullResourceBaseName = $global:newFullResourceBaseName
+
+        $appServiceName = "app-$fullResourceBaseName"
+        $functionAppName = "func-$fullResourceBaseName"
+
+        $storageKey = az storage account keys list --resource-group  $global:resourceGroupName --account-name $global:storageAccountName --query "[0].value" --output tsv
+        $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $searchApiKey = az search admin-key show --resource-group $global:resourceGroupName --service-name $global:searchServiceName --query "primaryKey" --output tsv
+        $openAIApiKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $global:openAIAccountName --query "key1" --output tsv
+        $aiServiceKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $aiServiceName --query "key1" --output tsv
+        $functionApiKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
+        $functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        
+        #$apimSubscriptionKey = az apim api list --resource-group $resourceGroupName --service-name $global:apiManagementService.Name --query "SubscriptionKey" --output tsv
+        #$global:applicationManagementService.SubscriptionKey = $apimSubscriptionKey
+
+        $appRegistrationClientId = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
+
+        # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
+        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services btfq --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
+        #Write-Output "Generated SAS Token: $storageSAS"
+
+        # URL-decode the SAS token
+        #$decodedSAS = [System.Web.HttpUtility]::UrlDecode($storageSAS)
+        #Write-Output "Decoded SAS Token: $decodedSAS"
+
+        # Extract and decode 'se' and 'st' parameters
+        if ($storageSAS -match "se=([^&]+)") {
+            $encodedSe = $matches[1]
+            $decodedSe = [System.Web.HttpUtility]::UrlDecode($encodedSe)
+            $storageSAS = $storageSAS -replace "se=$encodedSe", "se=$decodedSe"
+        }
+        if ($storageSAS -match "st=([^&]+)") {
+            $encodedSt = $matches[1]
+            $decodedSt = [System.Web.HttpUtility]::UrlDecode($encodedSt)
+            $storageSAS = $storageSAS -replace "st=$encodedSt", "st=$decodedSt"
+        }
+
+        #Write-Output "Modified SAS Token: $storageSAS"
+
+        $storageUrl = "https://$storageAccountName.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
+
+        # Extract the 'sig' parameter value from the SAS token
+        if ($storageSAS -match "sig=([^&]+)") {
+            $storageSASKey = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'sig' parameter from SAS token."
+            return
+        }
+
+        if ($storageSAS -match "ss=([^&]+)") {
+            $storageSS = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'ss' parameter from SAS token."
+            return
+        }
+
+        if ($storageSAS -match "sp=([^&]+)") {
+            $storageSP = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'ss' parameter from SAS token."
+            return
+        }
+
+        if ($storageSAS -match "srt=([^&]+)") {
+            $storageSRT = $matches[1]
+        }
+        else {
+            Write-Error "Failed to extract 'ss' parameter from SAS token."
+            return
+        }
+
+        $configFilePath = "app/frontend/config.json"
+
+        # Read the config file
+        $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
+
+        # Update the config with the new key-value pair
+        # Update the config with the new key-value pair
+        $config.AZURE_OPENAI_SERVICE_API_KEY = $aiServiceKey
+        $config.AZURE_FUNCTION_API_KEY = $functionApiKey
+        $config.AZURE_FUNCTION_APP_NAME = $functionAppName
+        $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
+        $config.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
+
+        if ($global:apiManagementService.SubscriptionKey) {
+            $config.AZURE_APIM_SUBSCRIPTION_KEY = $global:apiManagementService.SubscriptionKey
+        }
+
+        $config.AZURE_APP_REG_CLIENT_APP_ID = $appRegistrationClientId
+        $config.AZURE_APP_SERVICE_NAME = $appServiceName
+        $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
+        $config.AZURE_KEY_VAULT_API_VERSION = $global:keyVaultApiVersion
+        $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
+        $config.AZURE_SEARCH_API_KEY = $searchApiKey
+        $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
+        $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
+        $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
+        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$fullResourceBaseName-semantic-configuration" -join ""
+        $config.AZURE_SEARCH_SERVICE_NAME = $global:searchServiceName
+        $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
+        $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
+        $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageAccountName
+        $config.AZURE_STORAGE_API_VERSION = $global:storageApiVersion
+        $config.AZURE_STORAGE_FULL_URL = $storageUrl
+        $config.AZURE_STORAGE_KEY = $storageKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
+        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
+        $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
+        $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
+        $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
+        $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
+        $config.OPENAI_ACCOUNT_NAME = $global:openAIAccountName
+        $config.OPENAI_API_KEY = $openAIApiKey
+        $config.OPENAI_API_VERSION = $global:openAIApiVersion
+        $config.SEARCH_AZURE_OPENAI_MODEL = $global:searchAzureOpenAIModel
+        $config.SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
+        $config.SITE_LOGO = $global:siteLogo
+
+        # Clear existing values in SEARCH_INDEXES
+        $config.SEARCH_INDEXES = @()
+
+        $vectorSearchIndexName = $null
+
+        # Loop through the search indexes collection from global:searchIndexes
+        foreach ($searchIndex in $global:searchIndexes) {
+            $config.SEARCH_INDEXES += $searchIndex
+
+            if ($searchIndex.Name -match "vector") {
+                $vectorSearchIndexName = $searchIndex.Name
+            }
+        }
+
+        # Clear existing values in SEARCH_INDEXERS
+        $config.SEARCH_INDEXERS = @()
+
+        # Loop through the search indexes collection from global:searchIndexes
+        foreach ($searchIndexer in $global:searchIndexers) {
+            $config.SEARCH_INDEXERS += $searchIndexer
+        }
+
+        $config.DATA_SOURCES = @(
+            @{
+                "type"       = "azure_search"
+                "parameters" = @{
+                    "endpoint"         = "https://$global:searchServiceName.search.windows.net"
+                    "index_name"       = "$vectorSearchIndexName"
+                    "role_information" = ""
+                    "authentication"   = @{
+                        "type" = "api_key"
+                        "key"  = "$searchApiKey"
+                    }
+                }
+            }
+        )
+            
+        # Define the AZURE_OPENAI_REQUEST_BODY
+        #region AZURE_OPENAI_REQUEST_BODY
+        $config.AZURE_OPENAI_REQUEST_BODY = @{
+            "stop"              = $null
+            "messages"          = @(
+                @{
+                    "role"             = "system"
+                    "role_information" = "You are a helpful assistant"
+                    "content"          = ""
+                }
+                @{
+                    "role"    = "user"
+                    "content" = ""
+                }
+            )
+            "presence_penalty"  = 0
+            "top_p"             = 0.95
+            "temperature"       = 0.7
+            "frequency_penalty" = 0
+            "data_sources"      = @(
+                @{
+                    "type"       = "azure_search"
+                    "parameters" = @{
+                        "endpoint"       = "https://$global:searchServiceName.search.windows.net"
+                        "index_name"     = "$vectorSearchIndexName"
+                        "authentication" = @{
+                            "type" = "api_key"
+                            "key"  = "$searchApiKey"
+                        }
+                    }
+                }
+            )
+            "stream"            = $false
+            "max_tokens"        = 800
+        }
+        #endregion
+
+        # Clear existing values in AI_MODELS
+        $config.AI_MODELS = @()
+
+        #$aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+        $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
+
+        # Loop through the AI models collection from global:aiModels
+        foreach ($aiModel in $global:aiModels) {
+            $aiModelDeploymentName = $aiModel.DeploymentName
+            $aiModelType = $aiModel.Type
+            $aiModelVersion = $aiModel.Version
+            $aiModelApiVersion = $aiModel.ApiVersion
+            $aiModelFormat = $aiModel.Format
+            $aiModelSkuName = $aiModel.Sku.Name
+            $aiModelSkuCapacity = $aiModel.Sku.Capacity
+            $aiModelPath = $aiModel.Path
+            $aiModelKeyWordTriggers = $aiModel.KeyWordTriggers
+
+            $config.AI_MODELS += @{
+                "DeploymentName"  = $aiModelDeploymentName
+                "Type"            = $aiModelType
+                "ModelVersion"    = $aiModelVersion
+                "ApiKey"          = $apiKey
+                "ApiVersion"      = $aiModelApiVersion
+                "Format"          = $aiModelFormat
+                "Sku"             = @{
+                    "Name"     = $aiModelSkuName
+                    "Capacity" = $aiModelSkuCapacity
+                }
+                "Path"            = $aiModelPath
+                "KeyWordTriggers" = $aiModelKeyWordTriggers
+            }
+        }
+
+        #$config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+
+        # Convert the updated object back to JSON format
+        $updatedConfig = $config | ConvertTo-Json -Depth 10
+
+        # Write the updated JSON back to the file
+        $updatedConfig | Set-Content -Path $configFilePath
+
+        Write-Host "Config.json file updated successfully."
+        Write-Log -message "Config.json file updated successfully."
+    }
+    catch {
+        Write-Host "Failed to update the Config.json file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to update the Config.json file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
 # Function to update ML workspace connection file
 function Update-ContainerRegistryFile {
     param (
@@ -5197,275 +5467,6 @@ function Update-SearchSkillSetFiles {
         $updatedContent = $content -replace $global:previousFullResourceBaseName, $global:fullResourceBaseName
 
         Set-Content -Path $searchSkillSet.File -Value $updatedContent
-    }
-}
-
-# Function to update the config file
-function Update-ConfigFile {
-    param (
-        [string]$configFilePath,
-        [string]$resourceGroupName,
-        [string]$storageAccountName,
-        [string]$searchServiceName,
-        [string]$searchIndexName,
-        [string]$searchIndexerName,
-        [string]$searchVectorIndexName,
-        [string]$searchVectorIndexerName,
-        [string]$openAIAccountName,
-        [string]$aiServiceName,
-        [psobject]$apiManagementService,
-        [string]$functionAppName,
-        [string]$siteLogo
-    )
-
-    try {
-
-        $fullResourceBaseName = $global:newFullResourceBaseName
-
-        $appServiceName = "app-$fullResourceBaseName"
-        $functionAppName = "func-$fullResourceBaseName"
-
-        $storageKey = az storage account keys list --resource-group  $global:resourceGroupName --account-name $global:storageAccountName --query "[0].value" --output tsv
-        $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
-        $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
-        $searchApiKey = az search admin-key show --resource-group $global:resourceGroupName --service-name $global:searchServiceName --query "primaryKey" --output tsv
-        $openAIApiKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $global:openAIAccountName --query "key1" --output tsv
-        $aiServiceKey = az cognitiveservices account keys list --resource-group  $global:resourceGroupName --name $aiServiceName --query "key1" --output tsv
-        $functionApiKey = az functionapp keys list --resource-group  $global:resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
-        $functionAppUrl = az functionapp show -g  $global:resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
-        
-        #$apimSubscriptionKey = az apim api list --resource-group $resourceGroupName --service-name $global:apiManagementService.Name --query "SubscriptionKey" --output tsv
-        #$global:applicationManagementService.SubscriptionKey = $apimSubscriptionKey
-
-        $appRegistrationClientId = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
-
-        # https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli
-        $storageSAS = az storage account generate-sas --account-name $storageAccountName --account-key $storageKey --resource-types co --services btfq --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
-        #Write-Output "Generated SAS Token: $storageSAS"
-
-        # URL-decode the SAS token
-        #$decodedSAS = [System.Web.HttpUtility]::UrlDecode($storageSAS)
-        #Write-Output "Decoded SAS Token: $decodedSAS"
-
-        # Extract and decode 'se' and 'st' parameters
-        if ($storageSAS -match "se=([^&]+)") {
-            $encodedSe = $matches[1]
-            $decodedSe = [System.Web.HttpUtility]::UrlDecode($encodedSe)
-            $storageSAS = $storageSAS -replace "se=$encodedSe", "se=$decodedSe"
-        }
-        if ($storageSAS -match "st=([^&]+)") {
-            $encodedSt = $matches[1]
-            $decodedSt = [System.Web.HttpUtility]::UrlDecode($encodedSt)
-            $storageSAS = $storageSAS -replace "st=$encodedSt", "st=$decodedSt"
-        }
-
-        #Write-Output "Modified SAS Token: $storageSAS"
-
-        $storageUrl = "https://$storageAccountName.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
-
-        # Extract the 'sig' parameter value from the SAS token
-        if ($storageSAS -match "sig=([^&]+)") {
-            $storageSASKey = $matches[1]
-        }
-        else {
-            Write-Error "Failed to extract 'sig' parameter from SAS token."
-            return
-        }
-
-        if ($storageSAS -match "ss=([^&]+)") {
-            $storageSS = $matches[1]
-        }
-        else {
-            Write-Error "Failed to extract 'ss' parameter from SAS token."
-            return
-        }
-
-        if ($storageSAS -match "sp=([^&]+)") {
-            $storageSP = $matches[1]
-        }
-        else {
-            Write-Error "Failed to extract 'ss' parameter from SAS token."
-            return
-        }
-
-        if ($storageSAS -match "srt=([^&]+)") {
-            $storageSRT = $matches[1]
-        }
-        else {
-            Write-Error "Failed to extract 'ss' parameter from SAS token."
-            return
-        }
-
-        $configFilePath = "app/frontend/config.json"
-
-        # Read the config file
-        $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
-
-        # Update the config with the new key-value pair
-        # Update the config with the new key-value pair
-        $config.AZURE_OPENAI_SERVICE_API_KEY = $aiServiceKey
-        $config.AZURE_FUNCTION_API_KEY = $functionApiKey
-        $config.AZURE_FUNCTION_APP_NAME = $functionAppName
-        $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
-        $config.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
-
-        if ($global:apiManagementService.SubscriptionKey) {
-            $config.AZURE_APIM_SUBSCRIPTION_KEY = $global:apiManagementService.SubscriptionKey
-        }
-
-        $config.AZURE_APP_REG_CLIENT_APP_ID = $appRegistrationClientId
-        $config.AZURE_APP_SERVICE_NAME = "app-$global:resourceBaseName"
-        $config.AZURE_KEY_VAULT_NAME = $global:keyVaultName
-        $config.AZURE_KEY_VAULT_API_VERSION = $global:keyVaultApiVersion
-        $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
-        $config.AZURE_SEARCH_API_KEY = $searchApiKey
-        $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
-        $config.AZURE_SEARCH_INDEX_NAME = $searchIndexName
-        $config.AZURE_SEARCH_INDEXER_NAME = $searchIndexerName
-        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$fullResourceBaseName-semantic-configuration" -join ""
-        $config.AZURE_SEARCH_SERVICE_NAME = $global:searchServiceName
-        $config.AZURE_SEARCH_VECTOR_INDEX_NAME = $searchVectorIndexName
-        $config.AZURE_SEARCH_VECTOR_INDEXER_NAME = $searchVectorIndexerName
-        $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageAccountName
-        $config.AZURE_STORAGE_API_VERSION = $global:storageApiVersion
-        $config.AZURE_STORAGE_FULL_URL = $storageUrl
-        $config.AZURE_STORAGE_KEY = $storageKey
-        $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
-        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
-        $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
-        $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
-        $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
-        $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
-        $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
-        $config.OPENAI_ACCOUNT_NAME = $global:openAIAccountName
-        $config.OPENAI_API_KEY = $openAIApiKey
-        $config.OPENAI_API_VERSION = $global:openAIApiVersion
-        $config.SEARCH_AZURE_OPENAI_MODEL = $global:searchAzureOpenAIModel
-        $config.SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
-        $config.SITE_LOGO = $global:siteLogo
-
-        # Clear existing values in SEARCH_INDEXES
-        $config.SEARCH_INDEXES = @()
-
-        $vectorSearchIndexName = $null
-
-        # Loop through the search indexes collection from global:searchIndexes
-        foreach ($searchIndex in $global:searchIndexes) {
-            $config.SEARCH_INDEXES += $searchIndex
-
-            if ($searchIndex.Name -match "vector") {
-                $vectorSearchIndexName = $searchIndex.Name
-            }
-        }
-
-        # Clear existing values in SEARCH_INDEXERS
-        $config.SEARCH_INDEXERS = @()
-
-        # Loop through the search indexes collection from global:searchIndexes
-        foreach ($searchIndexer in $global:searchIndexers) {
-            $config.SEARCH_INDEXERS += $searchIndexer
-        }
-
-        $config.DATA_SOURCES = @(
-            @{
-                "type"       = "azure_search"
-                "parameters" = @{
-                    "endpoint"         = "https://$global:searchServiceName.search.windows.net"
-                    "index_name"       = "$vectorSearchIndexName"
-                    "role_information" = ""
-                    "authentication"   = @{
-                        "type" = "api_key"
-                        "key"  = "$searchApiKey"
-                    }
-                }
-            }
-        )
-            
-        # Define the AZURE_OPENAI_REQUEST_BODY
-        #region AZURE_OPENAI_REQUEST_BODY
-        $config.AZURE_OPENAI_REQUEST_BODY = @{
-            "stop"              = $null
-            "messages"          = @(
-                @{
-                    "role"             = "system"
-                    "role_information" = "You are a helpful assistant"
-                    "content"          = ""
-                }
-                @{
-                    "role"    = "user"
-                    "content" = ""
-                }
-            )
-            "presence_penalty"  = 0
-            "top_p"             = 0.95
-            "temperature"       = 0.7
-            "frequency_penalty" = 0
-            "data_sources"      = @(
-                @{
-                    "type"       = "azure_search"
-                    "parameters" = @{
-                        "endpoint"       = "https://$global:searchServiceName.search.windows.net"
-                        "index_name"     = "$vectorSearchIndexName"
-                        "authentication" = @{
-                            "type" = "api_key"
-                            "key"  = "$searchApiKey"
-                        }
-                    }
-                }
-            )
-            "stream"            = $false
-            "max_tokens"        = 800
-        }
-        #endregion
-
-        # Clear existing values in AI_MODELS
-        $config.AI_MODELS = @()
-
-        #$aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
-        $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
-
-        # Loop through the AI models collection from global:aiModels
-        foreach ($aiModel in $global:aiModels) {
-            $aiModelDeploymentName = $aiModel.DeploymentName
-            $aiModelType = $aiModel.Type
-            $aiModelVersion = $aiModel.Version
-            $aiModelApiVersion = $aiModel.ApiVersion
-            $aiModelFormat = $aiModel.Format
-            $aiModelSkuName = $aiModel.Sku.Name
-            $aiModelSkuCapacity = $aiModel.Sku.Capacity
-            $aiModelPath = $aiModel.Path
-            $aiModelKeyWordTriggers = $aiModel.KeyWordTriggers
-
-            $config.AI_MODELS += @{
-                "DeploymentName"  = $aiModelDeploymentName
-                "Type"            = $aiModelType
-                "ModelVersion"    = $aiModelVersion
-                "ApiKey"          = $apiKey
-                "ApiVersion"      = $aiModelApiVersion
-                "Format"          = $aiModelFormat
-                "Sku"             = @{
-                    "Name"     = $aiModelSkuName
-                    "Capacity" = $aiModelSkuCapacity
-                }
-                "Path"            = $aiModelPath
-                "KeyWordTriggers" = $aiModelKeyWordTriggers
-            }
-        }
-
-        #$config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
-
-        # Convert the updated object back to JSON format
-        $updatedConfig = $config | ConvertTo-Json -Depth 10
-
-        # Write the updated JSON back to the file
-        $updatedConfig | Set-Content -Path $configFilePath
-
-        Write-Host "Config.json file updated successfully."
-        Write-Log -message "Config.json file updated successfully."
-    }
-    catch {
-        Write-Host "Failed to update the Config.json file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to update the Config.json file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 
