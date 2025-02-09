@@ -4413,7 +4413,7 @@ function Start-Deployment {
 
     $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
 
-    Show-ExistingResourceProvisioningStatus
+    # Show-ExistingResourceProvisioningStatus
     
     if ($global:appDeploymentOnly -eq $true) {
 

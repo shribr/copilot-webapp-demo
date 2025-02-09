@@ -182,3 +182,38 @@
 2025-02-09 12:35:58 - Config.json file updated successfully.
 2025-02-09 12:43:58 - Web app 'app-copilot-demo-007' deployed successfully.
 2025-02-09 12:59:37 - Function app 'func-copilot-demo-007' deployed successfully.
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 02/09/2025 15:30:05 ***
+2025-02-09 15:30:06 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-02-09 15:30:09 - Resource 'id-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'stcopilotdemo002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'vnet-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'asp-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'cog-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'srch-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'log-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'appi-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'openai-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'crcopilotdemo002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'docintel-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'cv-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'apim-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'app-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'func-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'Failure Anomalies - appi-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'kv-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'hub-ai-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'ai-service-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'project-ai-copilot-demo-002' provisioned successfully.
+2025-02-09 15:30:09 - Resource 'bing-ai-copilot-demo-002' provisioned successfully.
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 02/09/2025 15:33:52 ***
+2025-02-09 15:33:53 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+*** LOG SEQUENCE: 10 ***
+*** SCRIPT START TIME: 02/09/2025 15:41:22 ***
+2025-02-09 15:42:38 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+*** LOG SEQUENCE: 11 ***
+*** SCRIPT START TIME: 02/09/2025 16:22:40 ***
+2025-02-09 16:22:41 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
+2025-02-09 16:30:28 - Config.json file updated successfully.
+2025-02-09 16:37:32 - Web app 'app-copilot-demo-002' deployed successfully.
