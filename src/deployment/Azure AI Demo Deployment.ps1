@@ -5188,7 +5188,7 @@ function Update-ConfigFile {
         foreach ($aiModel in $global:aiModels) {
             $aiModelDeploymentName = $aiModel.DeploymentName
             $aiModelType = $aiModel.Type
-            $aiModelVersion = $aiModel.Version
+            $aiModelVersion = $aiModel.ModelVersion
             $aiModelApiVersion = $aiModel.ApiVersion
             $aiModelFormat = $aiModel.Format
             $aiModelSkuName = $aiModel.Sku.Name
