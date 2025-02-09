@@ -270,6 +270,7 @@ function Deploy-AppService {
 # Function to deploy an Azure AI model
 function Deploy-OpenAIModels {
     param (
+        [string]$aiProjectName,
         [string]$aiServiceName,
         [array]$aiModels,
         [string]$resourceGroupName,
@@ -325,6 +326,8 @@ function Deploy-OpenAIModels {
         catch {
             Write-Error "Failed to create Model deployment '$aiModelDeploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create Model deployment '$aiModelDeploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+            #Remove-MachineLearningWorkspace -resourceGroupName $resourceGroupName -aiProjectName $aiProjectName
         }
     }
 }
@@ -926,6 +929,24 @@ function Install-Extensions {
             catch {
                 Write-Error "Failed to install extension '$extensionName': $_"
             }
+        }
+    }
+
+    # Check for Azure Machine Learning Extension
+    $azMLExists = az extension list --query "[?name=='azure-cli-ml']" | ConvertFrom-Json
+
+    if ($azMLExists) {
+        Write-Host "Uninstalling legacy 'azure=cli-ml' Azure Machine Learning extension."
+
+        az extension remove -n azure-cli-ml
+    }
+    else {
+        try {
+            az extension add --name ml
+            Write-Host "Azure Machine Learning extension installed successfully."
+        }
+        catch {
+            Write-Error "Failed to install Azure Machine Learning extension: $_"
         }
     }
 }
@@ -1534,7 +1555,7 @@ function New-AIService {
     }
 }
 
-
+# Function to create a new AI Service connection
 function New-ApiManagementApi {
     param (
         [string]$resourceGroupName,
@@ -1566,9 +1587,9 @@ function New-ApiManagementApi {
         }
                 
         try {
-            # Add CORS policy to operations
-            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
-            az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+            # Add CORS policy to operations [THIS DOES NOT WORK]
+            #az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+            #az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
     
         }
         catch {
@@ -1582,6 +1603,28 @@ function New-ApiManagementApi {
     else {
         Write-Host "API 'KeyVaultProxy' already exists."
         Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
+
+        try {
+            # Add operations
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
+    
+        }
+        catch {
+            Write-Error "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        }
+                
+        try {
+            # Add CORS policy to operations [THIS DOES NOT WORK]
+            #az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+            #az apim api operation policy set --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+    
+        }
+        catch {
+            Write-Error "Failed to add CORS policy to operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to add CORS policy to operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+        }
     }
 }
 
@@ -2563,6 +2606,7 @@ function New-MachineLearningWorkspace {
     $keyVaultName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
     $appInsightsName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.insights/components/$appInsightsName"
     $userAssignedIdentityName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$global:userAssignedIdentityName"
+    $aiHubName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.MachineLearningServices/workspaces/$aiHubName"
 
     if ($existingResources -notcontains $aiProjectName) {
 
@@ -2572,36 +2616,39 @@ function New-MachineLearningWorkspace {
             # https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-openai?view=azureml-api-2
             # "While the az ml connection commands can be used to manage both Azure Machine Learning and Azure AI Studio connections, the OpenAI connection is specific to Azure AI Studio."
 
-            <#
-            # {            $mlWorkspaceFile = Update-MLWorkspaceFile `
-                            -aiProjectName $aiProjectName `
-                            -resourceGroupName $resourceGroupName `
-                            -appInsightsName $appInsightsName `
-                            -keyVaultName $keyVaultName `
-                            -location $location `
-                            -subscriptionId $subscriptionId `
-                            -storageAccountName $storageAccountName `
-                            -containerRegistryName $containerRegistryName `
-                            -userAssignedIdentityName $userAssignedIdentityName 2>&1:Enter a comment or description}
-            #>
+            $mlWorkspaceFile = Update-MLWorkspaceFile `
+                -aiProjectName $aiProjectName `
+                -aiHubName $aiHubName `
+                -resourceGroupName $resourceGroupName `
+                -appInsightsName $appInsightsName `
+                -keyVaultName $keyVaultName `
+                -location $location `
+                -subscriptionId $subscriptionId `
+                -storageAccountName $storageAccountName `
+                -containerRegistryName $containerRegistryName `
+                -userAssignedIdentityName $userAssignedIdentityName 2>&1
 
             #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
 
             #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
 
-            #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroupName --output none 2>&1
+            #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --resource-group $resourceGroupName --output none 2>&1
             #$jsonOutput = az ml workspace create --file $mlWorkspaceFile -g $resourceGroupName --primary-user-assigned-identity $userAssignedIdentityName --kind project --hub-id $aiHubName --output none 2>&1
+            
             $jsonOutput = az ml workspace create --resource-group $resourceGroupName `
                 --application-insights $appInsightsName `
                 --description "This configuration specifies a workspace configuration with existing dependent resources" `
                 --display-name "AI Studio Project / Machine Learning Workspace" `
+                --hub-id $aiHubName `
+                --kind project `
                 --location $location `
                 --name $aiProjectName `
-                --key-vault $keyVaultName `
-                --storage-account $storageAccountName `
-                --tags "Purpose: Azure AI Hub Project or Machine Learning Workspace"`
-                --update-dependent-resources `
                 --output none 2>&1
+            #--key-vault $keyVaultName `
+            #--storage-account $storageAccountName `
+            #--tags "Purpose: Azure AI Hub Project or Machine Learning Workspace"`
+            #--update-dependent-resources `
+            #--output none 2>&1
 
             if ($jsonOutput -match "error") {
 
@@ -4246,6 +4293,44 @@ function Split-Guid {
 # Function to start the deployment
 function Start-Deployment {
 
+    $ErrorActionPreference = 'Stop'
+
+    # Initialize the deployment path
+    $global:deploymentPath = Reset-DeploymentPath
+
+    $global:LogFilePath = "$global:deploymentPath/deployment.log"
+
+    Set-Location -Path $global:deploymentPath
+
+    # Initialize the existing resources array
+    $global:existingResources = @()
+
+    $global:resourceCounter = 0
+    $global:resourceSuffix = 1
+
+    # Initialize parameters
+    $initParams = Initialize-Parameters -parametersFile $parametersFile
+
+    if ($global:appDeploymentOnly -eq $false) {
+    
+        # Need to install VS Code extensions before executing main deployment script
+        Install-Extensions
+
+        # Install Azure CLI
+        Install-AzureCLI
+
+        # Login to Azure
+        Initialize-Azure-Login
+
+    }
+    
+    # Alphabetize the parameters object
+    $parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
+
+    # Set the user-assigned identity name
+    $global:userPrincipalName = $parameters.userPrincipalName
+
+    Set-DirectoryPath -targetDirectory $global:deploymentPath
     az config set extension.use_dynamic_install=yes_without_prompt
 
     $logFilePath = "deployment.log"
@@ -4460,7 +4545,7 @@ function Start-Deployment {
     Start-Sleep -Seconds 10
 
     # Deploy AI Models
-    Deploy-OpenAIModels -aiModels $aiModels -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -existingResources $existingResources
+    Deploy-OpenAIModels -aiProjectName $aiProjectName -aiModels $aiModels -aiServiceName $aiServiceName -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # Add AI Service connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $aiProjectName -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiServiceProperties
@@ -4928,6 +5013,7 @@ function Update-MLWorkspaceFile {
         [string]$resourceGroupName,
         [string]$containerRegistryName,
         [string]$aiProjectName,
+        [string]$aiHubName,
         [string]$location,
         [string]$subscriptionId,
         [string]$storageAccountName,
@@ -4957,7 +5043,7 @@ storage_account: $storageAccountName
 container_registry: $containerRegistryName
 key_vault: $keyVaultName
 application_insights: $appInsightsName
-#workspace_hub: $aiHubName
+workspace_hub: $aiHubName
 identity:
   type: user_assigned
   tenant_id: $global:tenantId
@@ -5412,41 +5498,6 @@ function Write-Log {
 # Main script
 #**********************************************************************************************************************
 
-$ErrorActionPreference = 'Stop'
-
-# Need to install VS Code extensions before executing main deployment script
-Install-Extensions
-
-# Install Azure CLI
-Install-AzureCLI
-
-# Login to Azure
-Initialize-Azure-Login
-
-# Initialize the deployment path
-$global:deploymentPath = Reset-DeploymentPath
-
-$global:LogFilePath = "$global:deploymentPath/deployment.log"
-$global:ConfigFilePath = "$global:deploymentPath/app/frontend/config.json"
-
-Set-Location -Path $global:deploymentPath
-
-# Initialize the existing resources array
-$global:existingResources = @()
-
-$global:resourceCounter = 0
-$global:resourceSuffix = 1
-
-# Initialize parameters
-$initParams = Initialize-Parameters -parametersFile $parametersFile
-
-# Alphabetize the parameters object
-$parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
-
-# Set the user-assigned identity name
-$global:userPrincipalName = $parameters.userPrincipalName
-
-Set-DirectoryPath -targetDirectory $global:deploymentPath
 
 # Start the deployment
 Start-Deployment

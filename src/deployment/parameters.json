@@ -41,7 +41,7 @@
       "Location": "east us",
       "Sku": {
         "Capacity": 100,
-        "Name": "Global Standard"
+        "Name": "Standard"
       },
       "Type": "gpt-4o",
       "Path": "chat/completions"
@@ -98,11 +98,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
