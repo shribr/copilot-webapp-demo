@@ -1563,6 +1563,8 @@ async function getSearchIndexerStatus(searchIndexers) {
     const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
     const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
 
+    //https://learn.microsoft.com/en-us/rest/api/searchservice/indexers/get-status?view=rest-searchservice-2024-07-01&tabs=HTTP#indexerexecutionstatus
+
     let searchIndexerStatusArray = [];
 
     if (authMode === 'MSAL') {
