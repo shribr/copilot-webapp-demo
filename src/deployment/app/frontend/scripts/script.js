@@ -1594,7 +1594,7 @@ async function getSearchIndexerStatus(searchIndexers) {
         await new Promise(resolve => setTimeout(resolve, 5000));
     }
 
-    // Iterate over the search indexers and run each one
+    // Iterate over the search indexers to get their current statuses
     for (const searchIndexer of searchIndexers) {
         var searchIndexerName = searchIndexer.Name;
         //var searchIndexName = searchIndexer.IndexName;
@@ -1607,13 +1607,13 @@ async function getSearchIndexerStatus(searchIndexers) {
             'Content-Type': 'application/json'
         };
 
-        // Invoke the REST method to run the search indexer
+        // Invoke the REST method to get the search indexer status
         try {
             const response = await fetch(searchIndexerUrl, {
                 method: 'GET',
                 headers: headers
             });
-            //No need to return anything from the search indexer
+
             const data = await response.json();
             console.log('Indexer status:', data.lastResult.status);
 
