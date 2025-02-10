@@ -53,46 +53,46 @@
   "SITE_LOGO": "default",
   "AI_MODELS": [
     {
-      "ApiVersion": "2024-08-01-preview",
-      "KeyWordTriggers": null,
-      "ApiKey": "617fbecd68bb4835af175a0503bac785",
-      "Format": "OpenAI",
-      "Type": "gpt-4o",
       "Sku": {
-        "Name": "Standard",
-        "Capacity": 100
+        "Capacity": 100,
+        "Name": "Standard"
       },
       "Path": "chat/completions",
-      "DeploymentName": "gpt-4o",
-      "ModelVersion": "2024-08-06"
+      "KeyWordTriggers": null,
+      "Format": "OpenAI",
+      "ApiVersion": "2024-08-01-preview",
+      "Type": "gpt-4o",
+      "ApiKey": "617fbecd68bb4835af175a0503bac785",
+      "ModelVersion": "2024-08-06",
+      "DeploymentName": "gpt-4o"
     },
     {
+      "Sku": {
+        "Capacity": 100,
+        "Name": "Standard"
+      },
+      "Path": "images/generations",
+      "KeyWordTriggers": null,
+      "Format": "OpenAI",
       "ApiVersion": "2023-05-15",
-      "KeyWordTriggers": null,
-      "ApiKey": "617fbecd68bb4835af175a0503bac785",
-      "Format": "OpenAI",
       "Type": "text-embedding-3-large",
-      "Sku": {
-        "Name": "Standard",
-        "Capacity": 100
-      },
-      "Path": "images/generations",
-      "DeploymentName": "text-embedding",
-      "ModelVersion": "1"
+      "ApiKey": "617fbecd68bb4835af175a0503bac785",
+      "ModelVersion": "1",
+      "DeploymentName": "text-embedding"
     },
     {
-      "ApiVersion": "2024-02-01",
-      "KeyWordTriggers": null,
-      "ApiKey": "617fbecd68bb4835af175a0503bac785",
-      "Format": "OpenAI",
-      "Type": "dall-e-3",
       "Sku": {
-        "Name": "Standard",
-        "Capacity": 2
+        "Capacity": 2,
+        "Name": "Standard"
       },
       "Path": "images/generations",
-      "DeploymentName": "dall-e-3",
-      "ModelVersion": "3.0"
+      "KeyWordTriggers": null,
+      "Format": "OpenAI",
+      "ApiVersion": "2024-02-01",
+      "Type": "dall-e-3",
+      "ApiKey": "617fbecd68bb4835af175a0503bac785",
+      "ModelVersion": "3.0",
+      "DeploymentName": "dall-e-3"
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -129,37 +129,37 @@
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
+    "presence_penalty": 0,
+    "messages": [
+      {
+        "role_information": "You are a helpful assistant",
+        "role": "system",
+        "content": ""
+      },
+      {
+        "content": "",
+        "role": "user"
+      }
+    ],
     "top_p": 0.95,
     "data_sources": [
       {
         "type": "azure_search",
         "parameters": {
-          "index_name": "vector-srch-index-copilot-demo-002",
           "authentication": {
             "type": "api_key",
             "key": "laQLNdsPNpHacLi2sLMEtDFTPrTaHXqAMNdvHZJGYGAzSeAhAqB5"
           },
+          "index_name": "vector-srch-index-copilot-demo-002",
           "endpoint": "https://srch-copilot-demo-002.search.windows.net"
         }
       }
     ],
-    "temperature": 0.7,
-    "messages": [
-      {
-        "content": "",
-        "role_information": "You are a helpful assistant",
-        "role": "system"
-      },
-      {
-        "role": "user",
-        "content": ""
-      }
-    ],
-    "stream": false,
-    "presence_penalty": 0,
     "max_tokens": 800,
+    "stream": false,
     "stop": null,
-    "frequency_penalty": 0
+    "frequency_penalty": 0,
+    "temperature": 0.7
   },
   "CHAT_PERSONAS": [
     {
@@ -286,13 +286,13 @@
     {
       "type": "azure_search",
       "parameters": {
-        "index_name": "vector-srch-index-copilot-demo-002",
         "authentication": {
           "type": "api_key",
           "key": "laQLNdsPNpHacLi2sLMEtDFTPrTaHXqAMNdvHZJGYGAzSeAhAqB5"
         },
-        "endpoint": "https://srch-copilot-demo-002.search.windows.net",
-        "role_information": ""
+        "index_name": "vector-srch-index-copilot-demo-002",
+        "role_information": "",
+        "endpoint": "https://srch-copilot-demo-002.search.windows.net"
       }
     }
   ],

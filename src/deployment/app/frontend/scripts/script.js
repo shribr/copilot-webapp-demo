@@ -734,6 +734,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                 const citations = context.citations;
 
+                // NOTE: At the time of this writing if model version 2024-08-06 is not used, the title value from the citations object is not returned in the response
                 if (citations) {
 
                     console.log(citations);
