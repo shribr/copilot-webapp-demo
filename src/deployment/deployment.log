@@ -1,6 +1,0 @@
-*** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 02/09/2025 16:42:17 ***
-2025-02-09 16:42:19 - Resource Group 'RG-COPILOT-DEMO-002' already exists.
-2025-02-09 16:51:25 - Config.json file updated successfully.
-2025-02-09 16:56:57 - Web app 'app-copilot-demo-002' deployed successfully.
-2025-02-09 19:47:15 - Function app 'func-copilot-demo-002' deployed successfully.
