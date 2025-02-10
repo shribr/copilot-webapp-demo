@@ -571,7 +571,7 @@ Lucky for you this solution defines all of the API versions in the parameters.js
 
 **Azure AI Model Versions**
 
-At the time of this writing (2/9/2025) you **MUST** select gpt-4o model `version 2024-08-06` Standard/Global Standard. If you select any other version then the citation title property is null and the JavaScript code used to add footnotes will break.
+At the time of this writing (2/9/2025) you **MUST** select gpt-4o model version `2024-08-06` standard/global standard. If you select any version other than `2024-08-06` then the citation title property returned from the chat completion REST API call will be null and the JavaScript code used to add footnotes to the response will fail.
 
 **VS Code Collapse/Fold**
 
