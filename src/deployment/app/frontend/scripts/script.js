@@ -164,7 +164,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     searchIndexStatusMessage += `The time will vary depending on the number of documents that were uploaded. `;
     searchIndexStatusMessage += `If you feel that enough time has passed and still aren't seeing the new results you can try to manually re-run the indexer by clicking the refresh button.`;
 
-    let searchIndexerStatus = await getSearchIndexerStatus(searchIndexers);
+    // If this executes with a breakpoint then it works. If it doesn't then it doesn't work.
+    //let searchIndexerStatus = await getSearchIndexerStatus(searchIndexers);
 
     document.getElementById('search-indexer-status-text').innerHTML = "";
     document.getElementById('search-indexer-status-refresh').innerHTML = `<a href="#" id="run-search-indexer-link">${config.ICONS.REFRESH.SVG}</a>`;
