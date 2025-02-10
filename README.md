@@ -569,6 +569,10 @@ A perfect example is the Azure [Search Service API](https://learn.microsoft.com/
 
 Lucky for you this solution defines all of the API versions in the parameters.json file. When newer versions of a particular API are resleased, you just need to update that file and redeploy the web application. The PowerShell script regenerates the config.json file that is deployed as part of the web application zip package using the new values defined in the parameters.json file.
 
+**Azure AI Model Versions**
+
+At the time of this writing (2/9/2025) you **MUST** select gpt-4o model `version 2024-08-06` Standard/Global Standard. If you select any other version then the citation title property is null and the JavaScript code used to add footnotes will break.
+
 **VS Code Collapse/Fold**
 
 This has nothing to do with the current solution but it's something I found out to be very useful. Sometimes the VS Code collapse/fold feature gets a little wonky and doesn't detect start and end of functions. To fix this, have the file(s) that are having issues open in the editor. Then open VS Settings, search for "Editor Folding" and uncheck the box. Then switch over the the files you're having issues with and then go back to Settings and check the box again to reset the feature and hopefull fix the issue.
