@@ -107,6 +107,9 @@ $global:AIHubConnectedResources = @()
 
 # Function to check if user is logged in to Azure
 function Check-Azure-Login {
+
+    Write-Host "Executing Check-Azure-Login function..." -ForegroundColor Magenta
+
     try {
         $account = az account show --output json
 
@@ -123,6 +126,7 @@ function Check-Azure-Login {
         Write-Host "User is not logged in to Azure"
         return $false
     }
+
 }
 
 # Function to convert string to proper case
@@ -130,6 +134,8 @@ function ConvertTo-ProperCase {
     param (
         [string]$inputString
     )
+
+    Write-Host "Executing ConvertTo_ProperCase function..." -ForegroundColor Magenta
 
     # Split the input string into words
     $words = $inputString -split "\s+"
@@ -154,6 +160,8 @@ function Deploy-AppService {
         [bool]$deployZipResources,
         [array]$existingResources
     )
+
+    Write-Host "Executing Deploy-AppService function..." -ForegroundColor Magenta
 
     $appExists = @()
 
@@ -248,6 +256,8 @@ function Deploy-OpenAIModels {
         [array]$existingResources
     )
 
+    Write-Host "ExecutingDeploy-OpenAIModels function..." -ForegroundColor Magenta
+
     foreach ($aiModel in $aiModels) {
         $aiModelDeploymentName = $aiModel.DeploymentName
         $aiModelType = $aiModel.Type
@@ -309,6 +319,8 @@ function Find-AppRoot {
         [string]$currentDirectory
     )
 
+    Write-Host "Executing Find-AppRoot function..." -ForegroundColor Magenta
+
     # Get the directory info
     $directoryInfo = Get-Item -Path $currentDirectory
 
@@ -332,6 +344,8 @@ function Format-ErrorInfo {
         [string]$message,
         [string]$objectType
     )
+
+    #Write-Host "Executing Format-ErrorInfo function..." -ForegroundColor Magenta
 
     # Split the message into lines
     $lines = $message -split "`n"
@@ -363,6 +377,8 @@ function Format-CustomErrorInfo {
     param([array]$jsonOutput
     )
 
+    #Write-Host "Executing Format-CustomErrorInfo function..." -ForegroundColor Magenta
+
     $properties = @{}
 
     # Process each line
@@ -387,6 +403,9 @@ function Format-CustomErrorInfo {
 
 # Function to get a list of Azure tenants
 function Get-Azure-Tenants() {
+    
+    Write-Host "Executing Get-Azure-Tenants function..." -ForegroundColor Magenta
+
     $tenantId = ""
     $optionSelected = 0
 
@@ -446,6 +465,8 @@ function Get-CognitiveServicesApiKey {
         [string]$cognitiveServiceName
     )
 
+    Write-Host "Executing Get-CognitiveServicesApiKey function..." -ForegroundColor Magenta
+
     try {
         # Run the Azure CLI command and capture the output
         $apiKeysJson = az cognitiveservices account keys list --resource-group $resourceGroup.Name --name $cognitiveServiceName
@@ -476,6 +497,8 @@ function Get-DataSources {
         [string]$searchServiceName
     )
 
+    Write-Host "Executing Get-DataSources function..." -ForegroundColor Magenta
+
     # Get the admin key for the search service
     #
     $apiKey = az search admin-key show --resource-group $resourceGroup.Name --service-name $searchServiceName --query primaryKey --output tsv
@@ -501,6 +524,8 @@ function Get-KeyVaultSecret {
         [string]$secretName
     )
 
+    Write-Host "Executing Get-KeyVaultSecret function..." -ForegroundColor Magenta
+
     try {
         $secret = az keyvault secret show --vault-name $keyVaultName --name $secretName --query "value" --output tsv
         Write-Host "Secret: '$secretName' already exista."
@@ -521,6 +546,8 @@ function Get-LatestApiVersion {
         [string]$resourceType
     )
 
+    Write-Host "Executing Get-LatestApiVersion function..." -ForegroundColor Magenta
+
     $apiVersions = az provider show --namespace $resourceProviderNamespace --query "resourceTypes[?resourceType=='$resourceType'].apiVersions[]" --output json | ConvertFrom-Json
     $latestApiVersion = ($apiVersions | Sort-Object -Descending)[0]
     return $latestApiVersion
@@ -533,6 +560,8 @@ function Get-LatestDotNetRuntime {
         [string]$os,
         [string]$version
     )
+
+    Write-Host "Executing Get-LatestDotNetRuntime function..." -ForegroundColor Magenta
 
     if ($resourceType -eq "functionapp") {
         $functionRuntimes = az functionapp list-runtimes --output json | ConvertFrom-Json
@@ -566,6 +595,7 @@ function Get-LatestDotNetRuntime {
 
 # Function to detect the operating system
 function Get-OperatingSystem {
+    
     $os = $PSVersionTable.OS
     if ($os -match "Windows") {
         return "Windows"
@@ -587,6 +617,8 @@ function Get-Parameters-Sorted {
         [Parameter(Mandatory = $true)]
         [psobject]$Parameters
     )
+
+    #Write-Host "Executing Get-Parameters-Sorted function..." -ForegroundColor Magenta
 
     # Convert properties to an array and sort them by name
     $sortedProperties = $Parameters.PSObject.Properties | Sort-Object Name
@@ -622,6 +654,8 @@ function Get-SearchIndexes {
         [string]$subscriptionId
     )
 
+    Write-Host "Executing Get-SearchIndexes function..." -ForegroundColor Magenta
+
     $subscriptionId = $global:subscriptionId
     $resourceGroup.Name = $resourceGroup.Name
 
@@ -646,6 +680,8 @@ function Get-SearchIndexers {
         [string]$searchServiceName,
         [string]$resourceGroupName
     )
+
+    Write-Host "Executing Get-SearchIndexers function..." -ForegroundColor Magenta
 
     $subscriptionId = $global:subscriptionId
 
@@ -672,6 +708,8 @@ function Get-SearchSkillSets {
         [string]$subscriptionId
     )
 
+    Write-Host "Executing Get-SearchSkillSets function..." -ForegroundColor Magenta
+
     $subscriptionId = $global:subscriptionId
     $resourceGroup.Name = $resourceGroup.Name
 
@@ -696,6 +734,8 @@ function Get-UniqueSuffix {
     (
         [psobject]$resourceGroup
     )
+
+    Write-Host "Executing Get-UniqueSuffix function..." -ForegroundColor Magenta
 
     $resourceGroupName = $resourceGroup.Name
 
@@ -778,6 +818,9 @@ function Get-ValidServiceName {
     param (
         [string]$serviceName
     )
+
+    Write-Host "Executing Get-ValidServiceName function..." -ForegroundColor Magenta
+
     # Convert to lowercase
     $serviceName = $serviceName.ToLower()
 
@@ -811,6 +854,7 @@ function Increment-FormattedNumber {
 
 # Function to install Azure CLI
 function Install-AzureCLI {
+
     Write-Host "Verifying Azure CLI installation..."
 
     # Check if the Azure CLI is already installed
@@ -913,6 +957,8 @@ function Initialize-Parameters {
         [string]$parametersFile = "parameters.json"
     )
 
+    Write-Host "Executing Initialize-Parameters function..." -ForegroundColor Magenta
+
     # Navigate to the project directory
     Set-DirectoryPath -targetDirectory $global:deploymentPath
 
@@ -943,16 +989,16 @@ function Initialize-Parameters {
     $global:aiService = $parametersObject.aiService
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appInsightsService = $parametersObject.appInsightsService   
-    $global:appServiceEnvironmentName = $parametersObject.appServiceEnvironmentName
+    $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
     $global:appServicePlan = $parametersObject.AppServicePlan
     $global:cognitiveService = $parametersObject.cognitiveService       
     $global:computerVisionService = $parametersObject.computerVisionService  
     $global:containerRegistry = $parametersObject.containerRegistry      
     $global:documentIntelligenceService = $parametersObject.documentIntelligenceService  
     $global:keyVault = $parametersObject.keyVault               
-    $global:logAnalyticsWorkspaceName = $parametersObject.logAnalyticsWorkspaceName
+    $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
     $global:openAIService = $parametersObject.openAIService          
-    $resourceGroup.Name = $parametersObject.resourceGroupName
+    $global:resourceGroup = $parametersObject.resourceGroup
     $global:searchService = $parametersObject.searchService          
     $global:storageService = $parametersObject.storageService
     $global:userAssignedIdentity = $parametersObject.userAssignedIdentity         
@@ -997,7 +1043,7 @@ function Initialize-Parameters {
         @{ Name = $global:aiService.Name; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $global:apiManagementService.Name; Type = "API Management"; Status = "Pending" }
         @{ Name = $global:appInsightsService.Name; Type = "Application Insights"; Status = "Pending" }
-        @{ Name = $global:appServiceEnvironmentName; Type = "App Service Environment"; Status = "Pending" }
+        @{ Name = $global:appServiceEnvironment.Name; Type = "App Service Environment"; Status = "Pending" }
         @{ Name = $global:appServicePlan.Name; Type = "App Service Plan"; Status = "Pending" }
         @{ Name = $global:cognitiveService.Name; Type = "Cognitive Services"; Status = "Pending" }
         @{ Name = $global:computerVisionService.Name; Type = "Cognitive Services"; Status = "Pending" }
@@ -1009,7 +1055,7 @@ function Initialize-Parameters {
         @{ Name = $global:logAnalyticsWorkspaceName; Type = "Log Analytics Workspace"; Status = "Pending" }
         @{ Name = $global:openAIService.Name; Type = "OpenAI"; Status = "Pending" }
         @{ Name = $global:aiProject.Name; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $resourceGroup.Name; Type = "Resource Group"; Status = "Pending" }
+        @{ Name = $global:resourceGroup.Name; Type = "Resource Group"; Status = "Pending" }
         @{ Name = $global:searchService.Name; Type = "Search Service"; Status = "Pending" }
         @{ Name = $global:storageService.Name; Type = "Storage Account"; Status = "Pending" }
         @{ Name = $global:userAssignedIdentity.Name; Type = "User Assigned Identity"; Status = "Pending" }
@@ -1055,7 +1101,7 @@ function Initialize-Parameters {
         keyVault                     = $global:keyVault
         keyVaultSecrets              = $global:KeyVaultSecrets
         location                     = $parametersObject.location
-        logAnalyticsWorkspaceName    = $global:logAnalyticsWorkspaceName
+        logAnalyticsWorkspace        = $global:logAnalyticsWorkspace
         machineLearningService       = $parametersObject.machineLearningService
         managedIdentityName          = $parametersObject.managedIdentityName
         newResourceBaseName          = $global:newResourceBaseName
@@ -1067,7 +1113,7 @@ function Initialize-Parameters {
         redeployResources            = $parametersObject.redeployResources
         redisCacheName               = $parametersObject.redisCacheName
         resourceBaseName             = $parametersObject.resourceBaseName
-        resourceGroupName            = $resourceGroup.Name
+        resourceGroup                = $global:resourceGroup
         resourceGuid                 = $global:resourceGuid
         resourceSuffix               = $parametersObject.resourceSuffix
         resourceSuffixCounter        = $parametersObject.resourceSuffixCounter
@@ -1099,6 +1145,8 @@ function Initialize-Azure-Login {
         [string]$tenantId
     )
 
+    Write-Host "Executing Initialize-Azure-Login function..." -ForegroundColor Magenta
+
     $isLoggedIn = Check-Azure-Login
 
     if (!$isLoggedIn) {
@@ -1122,6 +1170,8 @@ function Invoke-AzureRestMethod {
         [string]$url,
         [string]$jsonBody = $null
     )
+
+    Write-Host "Executing Invoke-AzureRestMethod function..." -ForegroundColor Magenta
 
     # Get the access token
     $token = az account get-access-token --query accessToken --output tsv
@@ -1148,7 +1198,7 @@ function Invoke-AzureRestMethod {
 function New-AIHub {
     param (
         [psobject]$aiHub,
-        
+        [string]$resourceGroupName,
         [array]$existingResources
     )
 
@@ -1158,16 +1208,18 @@ function New-AIHub {
     $aiHubName = $aiHub.Name
     $location = $aiHub.Location
 
+    Write-Host "Executing New-AIHub ('$aiHubName') function..." -ForegroundColor Magenta
+
     Set-DirectoryPath -targetDirectory $global:deploymentPath
 
     # Create AI Hub
     if ($existingResources -notcontains $aiHubName) {
         try {
             $ErrorActionPreference = 'Stop'
-            $storageAccountId = az storage account show --resource-group $resourceGroup.Name --name $storageServiceName --query 'id' --output tsv
-            $keyVaultId = az keyvault show --resource-group $resourceGroup.Name --name $keyVaultName --query 'id' --output tsv
+            $storageAccountId = az storage account show --resource-group $resourceGroupName --name $storageServiceName --query 'id' --output tsv
+            $keyVaultId = az keyvault show --resource-group $resourceGroupName --name $keyVaultName --query 'id' --output tsv
 
-            az ml workspace create --kind hub --resource-group $resourceGroup.Name --name $aiHubName --storage-account $storageAccountId --key-vault $keyVaultId
+            az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName --storage-account $storageAccountId --key-vault $keyVaultId
 
             $global:resourceCounter += 1
             Write-Host "AI Hub: '$aiHubName' created successfully. ($global:resourceCounter)"
@@ -1177,7 +1229,7 @@ function New-AIHub {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
                 try {
-                    Restore-SoftDeletedResource -resourceGroupName $resourceGroup.Name -resourceName $aiHubName -location $location -resourceType "AIHub"
+                    Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -location $location -resourceType "AIHub"
                 }
                 catch {
                     Write-Error "Failed to restore AI Hub '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1207,6 +1259,8 @@ function New-AIHubConnection {
         [string]$serviceProperties,
         [array]$existingResources
     )
+
+    Write-Host "Executing New-AIHubConnection ('$serviceName') function..." -ForegroundColor Magenta
 
     #https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-blob?view=azureml-api-2
 
@@ -1248,6 +1302,8 @@ function New-AIProject {
     $aiHubName = $global:aiHub.Name
     $aiProjectName = $aiProject.Name
     $location = $aiProject.Location
+
+    Write-Host "Executing New-AIProject ('$aiProjectName') function..." -ForegroundColor Magenta
 
     $subscriptionId = $global:subscriptionId
 
@@ -1310,6 +1366,8 @@ function New-AIService {
 
     $aiServiceName = $aiService.Name
     $location = $aiService.Location
+
+    Write-Host "Executing New-AIService ('$aiServiceName') function..." -ForegroundColor Magenta
 
     # Create AI Service
     if ($existingResources -notcontains $aiServiceName) {
@@ -1396,18 +1454,20 @@ function New-AIService {
 # Function to create a new AI Service connection
 function New-ApiManagementApi {
     param (
-        
+        [string]$resourceGroupName,
         [psobject]$apiManagementService
     )
 
     $apiManagementServiceName = $apiManagementService.Name
 
+    Write-Host "Executing New-ApiManagement ('$apiManagementServiceName') function..." -ForegroundColor Magenta
+
     # Check if the API already exists
-    $apiExists = az apim api show --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy
+    $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
     if (-not $apiExists) {
         try {
             # Create the API
-            az apim api create --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --display-name "KeyVault Proxy" --path keyvault --service-url "https://$global:KeyVaultName.vault.azure.net/" --protocols https
+            az apim api create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --display-name "KeyVault Proxy" --path keyvault --service-url "https://$global:KeyVaultName.vault.azure.net/" --protocols https
  
         }
         catch {
@@ -1417,8 +1477,8 @@ function New-ApiManagementApi {
 
         try {
             # Add operations
-            az apim api operation create --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
-            az apim api operation create --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
     
         }
         catch {
@@ -1446,8 +1506,8 @@ function New-ApiManagementApi {
 
         try {
             # Add operations
-            az apim api operation create --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
-            az apim api operation create --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
+            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
     
         }
         catch {
@@ -1476,9 +1536,11 @@ function New-ApiManagementService {
         [array]$existingResources
     )
 
-    #https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/read.png
-
     $apiManagementServiceName = $apiManagementService.Name
+
+    Write-Host "Executing New-ApiManagementService ('$apiManagementServiceName') function..." -ForegroundColor Magenta
+
+    #https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/read.png
 
     if ($global:DeployApiManagementService -eq $false) {
         return
@@ -1549,7 +1611,7 @@ function New-ApiManagementService {
 }
 
 # Function to register an app, set API permissions, expose the API, and set Key Vault access policies
-function New-App-Registration {
+function New-AppRegistration {
     param (
         [string]$appServiceName,
         [string]$appServiceUrl,
@@ -1557,6 +1619,8 @@ function New-App-Registration {
         [string]$keyVaultName,
         [string]$parametersFile
     )
+
+    Write-Host "Executing New-AppRegistration ('$appServiceName') function..." -ForegroundColor Magenta
 
     try {
         $ErrorActionPreference = 'Stop'
@@ -1737,9 +1801,11 @@ function New-ApplicationInsights {
     param (
         [string]$appInsightsName,
         [string]$location,
-        
+        [string]$resourceGroupName,
         [array]$existingResources
     )
+
+    Write-Host "Executing New-ApplicationInsights ('$appInsightsName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $appInsightsName) {
 
@@ -1749,7 +1815,7 @@ function New-ApplicationInsights {
         # Try to create an Application Insights component
         try {
             $ErrorActionPreference = 'Stop'
-            az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroup.Name --application-type web --output none
+            az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
 
             $global:resourceCounter += 1
             Write-Host "Application Insights component '$appInsightsName' created successfully. [$global:resourceCounter]"
@@ -1776,16 +1842,18 @@ function New-AppService {
         [array]$existingResources
     )
 
+    $appServiceType = $appService.Type
+    $appServiceName = $appService.Name
+    $deployZipPackage = $appService.DeployZipPackage
+
+    Write-Host "Executing New-AppService ('$appServiceName') function..." -ForegroundColor Magenta
+
     $appExists = @()
 
     $ErrorActionPreference = 'Stop'
 
     # Making sure we are in the correct folder depending on the app type
     Set-DirectoryPath -targetDirectory $appService.Path
-
-    $appServiceType = $appService.Type
-    $appServiceName = $appService.Name
-    $deployZipPackage = $appService.DeployZipPackage
 
     try {
         try {
@@ -1854,6 +1922,7 @@ function New-AppServiceEnvironment {
 
     $appServiceEnvironmentName = $appServiceEnvironment.Name
 
+    Write-Host "Executing New-AppServiceEnvironment ('$appServiceEnvironmentName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $appServicePlanName) {
         try {
@@ -1904,6 +1973,8 @@ function New-AppServicePlan {
     $appServicePlanLocation = $appServicePlan.Location
     $appServicePlanSku = $appServicePlan.Sku
 
+    Write-Host "Executing New-AppServicePlan ('$appServicePlanName') function..." -ForegroundColor Magenta
+
     if ($existingResources -notcontains $appServicePlanName) {
         try {
             $ErrorActionPreference = 'Stop'
@@ -1936,6 +2007,10 @@ function New-AppServicePlanInASE {
 
     $appServicePlanName = $appServicePlan.Name
 
+    Write-Host "Executing New-AppServicePlanInASE ('$appServicePlanName') in ('$appServiceEnvironmentName') function..." -ForegroundColor Magenta
+
+    $appServicePlanName = $appServicePlan.Name
+
     try {
         $ErrorActionPreference = 'Stop'
         az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --sku $sku --output none
@@ -1959,6 +2034,8 @@ function New-CognitiveService {
     )
 
     $cognitiveServiceName = $cognitiveService.Name
+
+    Write-Host "Executing New-CognitiveService ('$cognitiveServiceName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $cognitiveServiceName) {
         try {
@@ -2036,6 +2113,8 @@ function New-ComputerVisionService {
     )
 
     $computerVisionName = $computerVisionService.Name
+
+    Write-Host "Executing New-ComputerVisionService ('$computerVisionServiceName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $computerVisionName) {
         $computerVisionName = Get-ValidServiceName -serviceName $computerVisionName
@@ -2119,6 +2198,8 @@ function New-ContainerRegistry {
 
     $containerRegistryName = $containerRegistry.Name
 
+    Write-Host "Executing New-ContainerRegistry ('$containerRegistryName') function..." -ForegroundColor Magenta
+
     if ($existingResources -notcontains $containerRegistryName) {
         $containerRegistryFile = Update-ContainerRegistryFile -resourceGroupName $resourceGroupName -containerRegistry $containerRegistry
 
@@ -2178,6 +2259,8 @@ function New-DocumentIntelligenceService {
 
     $documentIntelligenceName = $documentIntelligenceService.Name
     $location = $documentIntelligenceService.Location
+
+    Write-Host "Executing New-DocumentIntelligenceService ('$documentIntelligenceServiceName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $documentIntelligenceName) {
 
@@ -2268,6 +2351,8 @@ function New-KeyVault {
     $userAssignedIdentityName = $global:userAssignedIdentity.Name
     $userPrincipalName = $global:userPrincipalName
     $useRBAC = $keyVault.UseRBAC
+   
+    Write-Host "Executing New-KeyVault ('$keyVaultName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $keyVaultName) {
 
@@ -2357,6 +2442,8 @@ function New-LogAnalyticsWorkspace {
     $logAnalyticsWorkspaceName = $logAnalyticsWorkspace.Name
     $location = $logAnalyticsWorkspace.Location
 
+    Write-Host "Executing New-LogAnalyticsWorkspace ('$logAnalyticsWorkspaceName') function..." -ForegroundColor Magenta
+
     $logAnalyticsWorkspaceName = Get-ValidServiceName -serviceName $logAnalyticsWorkspaceName
 
     if ($existingResources -notcontains $logAnalyticsWorkspaceName) {
@@ -2390,6 +2477,8 @@ function New-ManagedIdentity {
 
     $userAssignedIdentityName = $userAssignedIdentity.Name
     $location = $userAssignedIdentity.Location
+
+    Write-Host "Executing New-ManagedIdentity ('$userAssignedIdentityName') function..." -ForegroundColor Magenta
 
     $subscriptionId = $global:subscriptionId
 
@@ -2461,6 +2550,8 @@ function New-MachineLearningWorkspace {
     $userAssignedIdentityName = $global:userAssignedIdentity.Name
     $storageServiceName = $global:storageService.Name
     $keyVaultName = $global:keyVault.Name
+
+    Write-Host "Executing New-MachineLearningWorkspace ('$aiProjectName') function..." -ForegroundColor Magenta
 
     $subscriptionId = $global:subscriptionId
 
@@ -2561,6 +2652,8 @@ function New-OpenAIService {
     $openAIServiceName = $openAIService.Name
     $location = $openAIService.Location
 
+    Write-Host "Executing New-OpenAIService ('$openAIServiceName') function..." -ForegroundColor Magenta
+
     if ($existingResources -notcontains $openAIAccountName) {
 
         try {
@@ -2646,6 +2739,8 @@ function New-PrivateEndPoint {
         [array]$existingResources
     )
 
+    Write-Host "Executing New-PrivateEndPoint ('$privateEndPointName') function..." -ForegroundColor Magenta
+
     try {
         az network private-endpoint create --name $privateEndpointName --resource-group $resourceGroupName --vnet-name $virtualNetworkName --subnet $subnetId --private-connection-resource-id $privateLinkServiceId --group-id "sqlServer" --connection-name $privateLinkServiceName --location $location --output none
         Write-Host "Private endpoint '$privateEndpointName' created successfully."
@@ -2705,6 +2800,8 @@ function New-ResourceGroup {
 
     $resourceGroupName = $resourceGroup.Name
 
+    Write-Host "Executing New-ResourceGroup ('$resourceGroupName') function..." -ForegroundColor Magenta
+
     do {
         $resourceGroupExists = Test-ResourceGroupExists -resourceGroup $resourceGroup
 
@@ -2755,6 +2852,8 @@ function New-Resources {
         [psobject]$apiManagementService,
         [array]$existingResources
     )
+
+    Write-Host "Executing New-Resources function..." -ForegroundColor Magenta
 
     # **********************************************************************************************************************
     # Create Storage Service
@@ -2843,19 +2942,21 @@ function New-SearchDataSource {
 
     # https://learn.microsoft.com/en-us/azure/search/search-howto-index-sharepoint-online
 
+    $storageServiceName = $storageService.Name
+
+    $searchDataSourceName = $searchDataSource.Name
+    $searchDataSourceType = $searchDataSource.Type
+    $searchDataSourceQuery = $searchDataSource.Query
+    $searchDataSourceUrl = $searchDataSource.Url
+    $searchDataSourceContainerName = $searchDataSource.ContainerName
+    $searchDataSourceConnectionString = ""
+
+    Write-Host "Executing New-SearchDataSource ('$searchDataSourceName') function..." -ForegroundColor Magenta
+
     $resourceGroupName = $resourceGroup.Name
 
     try {
         $ErrorActionPreference = 'Continue'
-
-        $storageServiceName = $storageService.Name
-
-        $searchDataSourceName = $searchDataSource.Name
-        $searchDataSourceType = $searchDataSource.Type
-        $searchDataSourceQuery = $searchDataSource.Query
-        $searchDataSourceUrl = $searchDataSource.Url
-        $searchDataSourceContainerName = $searchDataSource.ContainerName
-        $searchDataSourceConnectionString = ""
 
         $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchService.Name --query "primaryKey" --output tsv
 
@@ -2970,6 +3071,8 @@ function New-SearchIndex {
     $searchServiceName = $searchService.Name
     $searchServiceApiVersion = $searchService.ApiVersion
 
+    Write-Host "Executing New-SearchIndex ('$searchIndexName') function..." -ForegroundColor Magenta
+
     try {
 
         $content = Get-Content -Path $searchIndexSchema
@@ -3046,6 +3149,8 @@ function New-SearchIndexer {
     $searchServiceApiVersion = $searchService.ApiVersion
     $searchIndexerName = $searchIndexer.Name
     $searchIndexerSchema = $searchIndexer.Schema
+
+    Write-Host "Executing New-SearchIndexer ('$searchIndexerName') function..." -ForegroundColor Magenta
 
     try {
 
@@ -3129,6 +3234,8 @@ function New-SearchService {
     $userAssignedIdentityName = $userAssignedIdentity.Name
     $resourceGroupName = $resourceGroup.Name
     $location = $searchService.Location
+
+    Write-Host "Executing New-SearchService ('$searchServiceName') function..." -ForegroundColor Magenta
 
     az provider show --namespace Microsoft.Search --query "resourceTypes[?resourceType=='searchServices'].apiVersions"
 
@@ -3477,6 +3584,8 @@ function New-SearchSkillSet {
         [string]$cognitiveServiceName
     )
 
+    Write-Host "Executing New-SearchSkillSet function..." -ForegroundColor Magenta
+
     $searchServiceName = $searchService.Name
     $searchServiceApiVersion = $searchService.ApiVersion
 
@@ -3553,6 +3662,8 @@ function New-StorageService {
     $storageKind = $storageService.Kind
     $storageSku = $storageService.Sku
 
+    Write-Host "Executing New-StorageService ('$storageServiceName') function..." -ForegroundColor Magenta
+
     if ($existingResources -notcontains $storageServiceName) {
 
         try {
@@ -3605,6 +3716,8 @@ function New-SubNet {
         [array]$existingResources
     )
 
+    Write-Host "Executing New-SubNet function..." -ForegroundColor Magenta
+
     $subnetName = $subnet.Name
     $subnetAddressPrefix = $subnet.AddressPrefix
 
@@ -3636,6 +3749,8 @@ function New-VirtualNetwork {
         [array]$existingResources
     )
 
+    Write-Host "Executing New-VirtualNetwork function..." -ForegroundColor Magenta
+
     $vnetName = $virtualNetwork.Name
 
     if ($existingResources -notcontains $vnetName) {
@@ -3659,6 +3774,8 @@ function Remove-ResourceGroup {
     params(
         [psobject]$resourceGroup
     )
+
+    Write-Host "Executing Remove-ResourceGroup function..." -ForegroundColor Magenta
 
     $resourceGroupName = $resourceGroup.Name
 
@@ -3687,6 +3804,8 @@ function Remove-MachineLearningWorkspace {
         [string]$resourceGroupName,
         [string]$aiProjectName
     )
+
+    Write-Host "Executing Remove-MachineLearningWorkspace function..." -ForegroundColor Magenta
 
     try {
         az ml workspace delete --name $aiProjectName --resource-group $resourceGroupName --yes --output none
@@ -3763,6 +3882,8 @@ function Restore-SoftDeletedResource {
         [string]$useRBAC,
         [string]$userAssignedIdentityName
     )
+
+    Write-Host "Executing Restore-SoftDeletedResource ('$resourceName') function..." -ForegroundColor Magenta
 
     switch ($resourceType) {
         "KeyVault" {
@@ -3994,6 +4115,8 @@ function Set-KeyVaultAccessPolicies {
         [string]$keyVaultName
     )
 
+    Write-Host "Executing Set-KeyVaultAccessPolicies function..." -ForegroundColor Magenta
+
     $userPrincipalName = $global:userPrincipalName
 
     try {
@@ -4020,6 +4143,8 @@ function Set-KeyVaultRoles {
         [string]$location
     )
 
+    Write-Host "Executing Set-KeyVaultRoles function..." -ForegroundColor Magenta
+
     # Set policy for the application
     try {
         $ErrorActionPreference = 'Stop'
@@ -4038,6 +4163,9 @@ function Set-KeyVaultSecrets {
     param (
         [string]$keyVaultName
     )
+
+    Write-Host "Executing Set-KeyVaultSecrets function..." -ForegroundColor Magenta
+
     # Loop through the array of secrets and store each one in the Key Vault
     foreach ($property in $global:keyVaultSecrets.PSObject.Properties) {
         # Generate a random value for the secret
@@ -4067,6 +4195,9 @@ function Set-RBACRoles {
         [string]$userPrincipalName,
         [bool]$useRBAC
     )
+
+    Write-Host "Executing Set-RBACRoles function..." -ForegroundColor Magenta
+
     try {
         $ErrorActionPreference = 'Stop'
         $scope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
@@ -4130,6 +4261,8 @@ function Split-Guid {
 
 # Function to start the deployment
 function Start-Deployment {
+
+    Write-Host "Executing Start-Deployment function..." -ForegroundColor Magenta
 
     $ErrorActionPreference = 'Stop'
 
@@ -4363,7 +4496,7 @@ function Start-Deployment {
         }
             
         if ($appService.Name -ne $functionAppServiceName) {
-            New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVault.Name -appServiceUrl $appService.Url -parametersFile $global:parametersFile
+            New-AppRegistration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVault.Name -appServiceUrl $appService.Url -parametersFile $global:parametersFile
             
             $appServiceName = $appService.Name
 
@@ -4427,6 +4560,8 @@ function Start-SearchIndexer {
         [string]$searchIndexerName
     )
 
+    Write-Host "Executing Start-Deployment function..." -ForegroundColor Magenta
+
     # try {
     #     $ErrorActionPreference = 'Stop'
 
@@ -4451,6 +4586,8 @@ function Test-DirectoryExists {
         [string]$directoryPath
     )
 
+    Write-Host "Executing Test-DirectoryExists function..." -ForegroundColor Magenta
+
     if (-not (Test-Path -Path $directoryPath -PathType Container)) {
         New-Item -ItemType Directory -Path $directoryPath
     }
@@ -4461,6 +4598,8 @@ function Test-ResourceGroupExists {
     param (
         [string]$resourceGroupName
     )
+
+    Write-Host "Executing Test-ResourceGroupExists function..." -ForegroundColor Magenta
 
     $resourceGroupExists = az group exists --resource-group $resourceGroup.Name --output tsv
 
@@ -4479,6 +4618,8 @@ function Test-ResourceExists {
         [string]$resourceGroupName,
         [string]$resourceType
     )
+
+    Write-Host "Executing Test-ResourceExists function..." -ForegroundColor Magenta
 
     if ($global:resourceTypes -contains $resourceType) {
         switch ($resourceType) {
@@ -4563,6 +4704,8 @@ function Test-SubnetExists {
         [string]$subnetName
     )
 
+    Write-Host "Executing Test-SubNetExists function..." -ForegroundColor Magenta
+
     try {
         $subnet = az network vnet subnet show --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --query "name" --output tsv
         if ($subnet) {
@@ -4585,6 +4728,8 @@ function Update-AIConnectionFile {
         [string]$serviceName,
         [string]$serviceProperties
     )
+
+    Write-Host "Executing Update-AIConnectionFile ('$serviceName') function..." -ForegroundColor Magenta
 
     $rootPath = Get-Item -Path (Get-Location).Path
 
@@ -4691,6 +4836,8 @@ function Update-AIProjectFile {
         [string]$storageServiceName
     )
 
+    Write-Host "Executing Update-AIProjectFile function..." -ForegroundColor Magenta
+
     $rootPath = Get-Item -Path (Get-Location).Path
 
     $filePath = "$rootPath/ai.project.yaml"
@@ -4732,6 +4879,8 @@ function Update-ConfigFile {
     param (
         [string]$configFilePath
     )
+
+    Write-Host "Executing Update-ConfigFile function..." -ForegroundColor Magenta
 
     try {
 
@@ -4985,6 +5134,8 @@ function Update-ContainerRegistryFile {
         [psobject]$containerRegistry
     )
 
+    Write-Host "Executing Update-ContainerRegistryFile function..." -ForegroundColor Magenta
+
     $containerRegistryName = $containerRegistry.Name
     $location = $containerRegistry.Location
 
@@ -5038,6 +5189,8 @@ function Update-MLWorkspaceFile {
         [string]$userAssignedIdentityName
     )
 
+    Write-Host "Executing Update-MLWorkspaceFile function..." -ForegroundColor Magenta
+
     $rootPath = Get-Item -Path (Get-Location).Path
 
     $filePath = "${rootPath}/ml.workspace.yaml"
@@ -5090,6 +5243,8 @@ function Update-ParametersFile-AppRegistration {
         [string]$appUri
     )
 
+    Write-Host "Executing Update-ParametersFile-AppRegistration function..." -ForegroundColor Magenta
+
     try {
         $ErrorActionPreference = 'Stop'
 
@@ -5116,6 +5271,8 @@ function Update-ParametersFile-AppRegistration {
 
 # Function to update the parameters.json file with the latest API versions. NOTE: This function is not currently used.
 function Update-ParameterFileApiVersions {
+
+    Write-Host "Executing Update-ParameterFileApiVersions function..." -ForegroundColor Magenta
 
     # NOTE: Code below seems to get older API versions for some reason. This function will not be used until I can investigate further.
 
@@ -5145,6 +5302,8 @@ function Update-ResourceBaseName() {
     param (
         [string]$newResourceBaseName = "copilot-demo"
     )
+
+    Write-Host "Executing Update-ResourceBaseName ('$newResourceBaseName') function..." -ForegroundColor Magenta
 
     # Read the parameters.json file
     $parametersFileContent = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
@@ -5196,6 +5355,8 @@ function Update-ResourceBaseName() {
 # Function to update search index files (not currently used)
 function Update-SearchIndexFiles {
 
+    Write-Host "Executing Update-SearchIndexFiles function..." -ForegroundColor Magenta
+
     $searchIndexFiles = @("search-index-schema-template.json,search-indexer-schema-template.json,vector-search-index-schema-template.json,vector-search-indexer-schema-template.json,embeddings-search-index-schema-template.json,embeddings-search-indexer-schema-template.json,sharepoint-search-index-schema-template.json,sharepoint-search-indexer-schema-template.json" )
 
     foreach ($fileName in $searchIndexFiles) {
@@ -5211,6 +5372,9 @@ function Update-SearchIndexFiles {
 
 # Function to update search skill set files
 function Update-SearchSkillSetFiles {
+
+    Write-Host "Executing SearchSkillSetFiles function..." -ForegroundColor Magenta
+
     foreach ($searchSkillSet in $searchSkillSets) {
 
         $content = Get-Content -Path $searchSkillSet.File
