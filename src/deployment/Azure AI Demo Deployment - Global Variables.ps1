@@ -105,6 +105,50 @@ $global:ResourceList = @()
 # Mapping of global AI Hub connected resources
 $global:AIHubConnectedResources = @()
 
+# Function to Generate visual map of all resources
+function Build-ResourceList {
+    params(
+        [psobject]$parametersObject
+    )
+
+    Write-Host "Executing Build-ResourceList function..." -ForegroundColor Magenta
+
+    # Build the list of resources using the new schema
+    $resources = @(
+        @{ Name = $global:aiService.Name; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $global:apiManagementService.Name; Type = "API Management"; Status = "Pending" }
+        @{ Name = $global:appInsightsService.Name; Type = "Application Insights"; Status = "Pending" }
+        @{ Name = $global:appServiceEnvironment.Name; Type = "App Service Environment"; Status = "Pending" }
+        @{ Name = $global:appServicePlan.Name; Type = "App Service Plan"; Status = "Pending" }
+        @{ Name = $global:cognitiveService.Name; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $global:computerVisionService.Name; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $global:containerRegistry.Name; Type = "Container Registry"; Status = "Pending" }
+        @{ Name = $global:documentIntelligenceService.Name; Type = "Document Intelligence"; Status = "Pending" }
+        @{ Name = $global:aiHub.Name; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $global:userAssignedIdentityName; Type = "User Assigned Identity"; Status = "Pending" }
+        @{ Name = $global:keyVault.Name; Type = "Key Vault"; Status = "Pending" }
+        @{ Name = $global:logAnalyticsWorkspaceName; Type = "Log Analytics Workspace"; Status = "Pending" }
+        @{ Name = $global:openAIService.Name; Type = "OpenAI"; Status = "Pending" }
+        @{ Name = $global:aiProject.Name; Type = "Cognitive Services"; Status = "Pending" }
+        @{ Name = $global:resourceGroup.Name; Type = "Resource Group"; Status = "Pending" }
+        @{ Name = $global:searchService.Name; Type = "Search Service"; Status = "Pending" }
+        @{ Name = $global:storageService.Name; Type = "Storage Account"; Status = "Pending" }
+        @{ Name = $global:userAssignedIdentity.Name; Type = "User Assigned Identity"; Status = "Pending" }
+        @{ Name = $global:virtualNetwork.Name; Type = "Virtual Network"; Status = "Pending" }
+    )
+
+    $jsonOutput = $resources | ConvertTo-Json
+    $resourceTable = $jsonOutput | ConvertFrom-Json
+
+    #foreach ($resource in $resources) {
+    #    $global:ResourceList += [PSCustomObject]@{ Name = $resource.Name; Type = $resource.Type; Status = $resource.Status }
+    #}
+    
+    Write-Host "Parameters initialized.`n"
+
+    $resourceTable | Format-Table -AutoSize
+}
+
 # Function to check if user is logged in to Azure
 function Check-Azure-Login {
 
@@ -1017,20 +1061,23 @@ function Initialize-Parameters {
         exit
     }
 
+    # 2025-02-11 ADS: Commenting out objectId related code because it seems to be slowing the script down significantly. 
+    # I can't recall what it's for but I guess I'll find out soon enough with stuff starts breaking.
+
     # Retrieve subscription, tenant, object and user details
     $global:subscriptionId = az account show --query "id" --output tsv
     $global:tenantId = az account show --query "tenantId" --output tsv
-    $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
+    #$global:objectId = az ad signed-in-user show --query "objectId" --output tsv
     $global:userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
     $global:resourceGuid = Split-Guid
 
-    if ($parametersObject.PSObject.Properties.Name.Contains("objectId")) {
-        $global:objectId = $parametersObject.objectId
-    }
-    else {
-        $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
-        $parametersObject | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
-    }
+    #if ($parametersObject.PSObject.Properties.Name.Contains("objectId")) {
+    #    $global:objectId = $parametersObject.objectId
+    #}
+    #else {
+    #    $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
+    #    $parametersObject | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
+    #}
 
     # Add new authentication and resource properties to parameters object
     #$parametersObject | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
@@ -1038,39 +1085,7 @@ function Initialize-Parameters {
     $parametersObject | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
     $parametersObject | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
 
-    # Build the list of resources using the new schema
-    $resources = @(
-        @{ Name = $global:aiService.Name; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $global:apiManagementService.Name; Type = "API Management"; Status = "Pending" }
-        @{ Name = $global:appInsightsService.Name; Type = "Application Insights"; Status = "Pending" }
-        @{ Name = $global:appServiceEnvironment.Name; Type = "App Service Environment"; Status = "Pending" }
-        @{ Name = $global:appServicePlan.Name; Type = "App Service Plan"; Status = "Pending" }
-        @{ Name = $global:cognitiveService.Name; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $global:computerVisionService.Name; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $global:containerRegistry.Name; Type = "Container Registry"; Status = "Pending" }
-        @{ Name = $global:documentIntelligenceService.Name; Type = "Document Intelligence"; Status = "Pending" }
-        @{ Name = $global:aiHub.Name; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $global:userAssignedIdentityName; Type = "User Assigned Identity"; Status = "Pending" }
-        @{ Name = $global:keyVault.Name; Type = "Key Vault"; Status = "Pending" }
-        @{ Name = $global:logAnalyticsWorkspaceName; Type = "Log Analytics Workspace"; Status = "Pending" }
-        @{ Name = $global:openAIService.Name; Type = "OpenAI"; Status = "Pending" }
-        @{ Name = $global:aiProject.Name; Type = "Cognitive Services"; Status = "Pending" }
-        @{ Name = $global:resourceGroup.Name; Type = "Resource Group"; Status = "Pending" }
-        @{ Name = $global:searchService.Name; Type = "Search Service"; Status = "Pending" }
-        @{ Name = $global:storageService.Name; Type = "Storage Account"; Status = "Pending" }
-        @{ Name = $global:userAssignedIdentity.Name; Type = "User Assigned Identity"; Status = "Pending" }
-        @{ Name = $global:virtualNetwork.Name; Type = "Virtual Network"; Status = "Pending" }
-    )
-
-    $jsonOutput = $resources | ConvertTo-Json
-    $resourceTable = $jsonOutput | ConvertFrom-Json
-
-    foreach ($resource in $resources) {
-        $global:ResourceList += [PSCustomObject]@{ Name = $resource.Name; Type = $resource.Type; Status = $resource.Status }
-    }
-    
-    Write-Host "Parameters initialized.`n"
-    $resourceTable | Format-Table -AutoSize
+    # Build-ResourceList -parametersObject $parametersObject
 
     return @{
         aiHub                        = $global:aiHub
@@ -1083,7 +1098,7 @@ function Initialize-Parameters {
         appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
         appDeploymentOnly            = $parametersObject.appDeploymentOnly
         appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
-        appServiceEnvironmentName    = $global:appServiceEnvironmentName
+        appServiceEnvironment        = $global:appServiceEnvironment
         appServicePlan               = $global:appServicePlan
         azureManagement              = $parametersObject.azureManagement
         cognitiveService             = $global:cognitiveService
@@ -1106,8 +1121,9 @@ function Initialize-Parameters {
         managedIdentityName          = $parametersObject.managedIdentityName
         newResourceBaseName          = $global:newResourceBaseName
         newFullResourceBaseName      = $global:newFullResourceBaseName
-        objectId                     = $global:objectId
+        #objectId                     = $global:objectId
         openAIService                = $global:openAIService
+        parameters                   = $parametersObject
         previousFullResourceBaseName = $global:previousFullResourceBaseName
         previousResourceBaseName     = $parametersObject.previousResourceBaseName
         redeployResources            = $parametersObject.redeployResources
@@ -2794,16 +2810,16 @@ function New-RandomPassword {
 function New-ResourceGroup {
     param (
         [bool]$resourceGroupExists,
-        [psobject]$resourceGroup,
-        [string]$location
+        [psobject]$resourceGroup
     )
 
     $resourceGroupName = $resourceGroup.Name
+    $resourceGroupLocation = $resourceGroup.Location
 
     Write-Host "Executing New-ResourceGroup ('$resourceGroupName') function..." -ForegroundColor Magenta
 
     do {
-        $resourceGroupExists = Test-ResourceGroupExists -resourceGroup $resourceGroup
+        $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName
 
         if ($resourceGroupExists -eq $true) {
             Write-Host "Resource group '$resourceGroupName' already exists. Trying a new name."
@@ -2816,7 +2832,7 @@ function New-ResourceGroup {
     } while ($resourceGroupExists -eq $true)
 
     try {
-        az group create --name $resourceGroup.Name --location $resourceGroup.Location --output none
+        az group create --name $resourceGroupName --location $resourceGroupLocation --output none
 
         $global:resourceCounter += 1
 
@@ -3772,14 +3788,12 @@ function New-VirtualNetwork {
 # Function to delete Azure resource groups
 function Remove-ResourceGroup {
     params(
-        [psobject]$resourceGroup
+        [string]$resourceGroupName
     )
 
     Write-Host "Executing Remove-ResourceGroup function..." -ForegroundColor Magenta
 
-    $resourceGroupName = $resourceGroup.Name
-
-    $resourceGroupExists = Test-ResourceGroupExists -resourceGroup $resourceGroup
+    $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName
 
     if ($resourceGroupExists -eq "true") {
         try {
@@ -4341,23 +4355,34 @@ function Start-Deployment {
     $startTimeMessage = "*** SCRIPT START TIME: $startTime ***"
     Add-Content -Path $logFilePath -Value $startTimeMessage
 
+    Write-Host "Getting initial value '$($global:resourceGroup.Name)' for global variable 'resourceGroup.Name' and setting local 'resourceGroupName' variable with that value." -ForegroundColor Cyan
+
     $resourceGroupName = $global:resourceGroup.Name
 
     if ($appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
-        Get-UniqueSuffix -resourceGroup $global:resourceGroup
+        Get-UniqueSuffix -resourceGroupName $resourceGroupName
 
         $global:resourceSuffix = 1
 
-        $resourceGroup.Name = "$resourceGroupName-$global:resourceGuid-$global:resourceSuffix"
+        $newUniqueResourceGroupName = "$resourceGroupName-$global:resourceSuffix"
+
+        Write-Host "Setting newly generated globally unique value '$newUniqueResourceGroupName' to global variable 'resourceGroup.Name' and setting local 'resourceGroupName' variable to that value." -ForegroundColor Cyan
+
+        $global:resourceGroup.Name = $newUniqueResourceGroupName
+
+        Write-Host "Setting local 'resourceGroupName' variable to '$newUniqueResourceGroupName'." -ForegroundColor Cyan
+
+        $resourceGroupName = $global:resourceGroup.Name
+
     }
 
-    $resourceGroupExists = Test-ResourceGroupExists -resourceGroup $global:resourceGroup
+    $resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName
 
     if ($deleteResourceGroup -eq $true) {
         # Delete existing resource groups with the same name
-        Remove-ResourceGroup -resourceGroup $global:resourceGroup
+        Remove-ResourceGroup -resourceGroupName $resourceGroupName
 
         $resourceGroupExists = $false
     }
@@ -4393,7 +4418,7 @@ function Start-Deployment {
 
     Reset-DeploymentPath
 
-    $userPrincipalName = "$($parameters.userPrincipalName)"
+    $userPrincipalName = $global:userPrincipalName
 
     #**********************************************************************************************************************
     # Create User Assigned Identity
@@ -4599,9 +4624,9 @@ function Test-ResourceGroupExists {
         [string]$resourceGroupName
     )
 
-    Write-Host "Executing Test-ResourceGroupExists function..." -ForegroundColor Magenta
+    Write-Host "Executing Test-ResourceGroupExists ('$resourceGroupName') function..." -ForegroundColor Magenta
 
-    $resourceGroupExists = az group exists --resource-group $resourceGroup.Name --output tsv
+    $resourceGroupExists = az group exists --resource-group $resourceGroupName --output tsv
 
     if ($resourceGroupExists -eq $true) {
         return $true

@@ -1081,7 +1081,8 @@
   ],
   "subscriptionId": "00000000-0000-0000-0000-000000000000",
   "userAssignedIdentity": {
-    "Name": "id-copilot-demo-008"
+    "Name": "id-copilot-demo-008",
+    "Location": "east us"
   },
   "virtualNetwork": {
     "AddressPrefix": "",
