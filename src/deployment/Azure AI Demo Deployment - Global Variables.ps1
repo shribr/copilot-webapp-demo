@@ -1888,6 +1888,7 @@ function New-AppService {
         [string]$appInsightsName,
         [string]$resourceGroupName,        
         [string]$storageServiceName,
+        [string]$userAssignedIdentityName,
         [bool]$deployZipResources,
         [array]$existingResources
     )
@@ -1916,7 +1917,7 @@ function New-AppService {
                     # Create a new web app
                     az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appService.AppServicePlan --runtime $appService.Runtime --deployment-source-url $appService.Url
                     #az webapp cors add --methods GET POST PUT --origins '*' --services b --account-name $appServiceName --account-key $storageAccessKey
-                    $userAssignedIdentity = az identity show --resource-group $resourceGroup.Name --name $global:userAssignedIdentityName
+                    $userAssignedIdentity = az identity show --resource-group $resourceGroup.Name --name $userAssignedIdentityName
 
                     az webapp identity assign --name $appServiceName --resource-group $resourceGroup.Name --identities $userAssignedIdentity.id --output tsv
                 }
@@ -2593,16 +2594,16 @@ function New-MachineLearningWorkspace {
     param(
         [psobject]$aiProject,
         [string]$resourceGroupName,
+        [string]$aiHubName,
+        [string]$appInsightsName,
+        [string]$containerRegistryName,
+        [string]$userAssignedIdentityName,
+        [string]$storageServiceName,
+        [string]$keyVaultName,
         [array]$existingResources
     )
 
     $aiProjectName = $aiProject.Name
-    $aiHubName = $global:aiHub.Name
-    $appInsightsName = $global:appInsights.Name
-    $containerRegistryName = $global:containerRegistry.Name
-    $userAssignedIdentityName = $global:userAssignedIdentity.Name
-    $storageServiceName = $global:storageService.Name
-    $keyVaultName = $global:keyVault.Name
 
     Write-Host "Executing New-MachineLearningWorkspace ('$aiProjectName') function..." -ForegroundColor Magenta
 
@@ -4228,7 +4229,8 @@ function Set-KeyVaultRoles {
 # Function to create secrets in Key Vault
 function Set-KeyVaultSecrets {
     param (
-        [string]$keyVaultName
+        [string]$keyVaultName,
+        [string]$resourceGroupName
     )
 
     Write-Host "Executing Set-KeyVaultSecrets function..." -ForegroundColor Magenta
@@ -4522,7 +4524,7 @@ function Start-Deployment {
     foreach ($appService in $appServices) {
         $appServiceName = $appService.Name
         if ($existingResources -notcontains $appService.Name) {
-            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageServiceName $global:storageService.Name -appInsightsName $global:appInsightsService.Name -deployZipResources $false
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -userAssignedIdentityName $global:userAssignedIdentity.Name -storageServiceName $global:storageService.Name -appInsightsName $global:appInsightsService.Name -deployZipResources $false
 
             $appId = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "id" --output tsv
             Write-Host "App ID for $($appServiceName): $appId"
@@ -4571,7 +4573,15 @@ function Start-Deployment {
 
     # Create AI Studio AI Project / ML Studio Workspace
 
-    New-MachineLearningWorkspace -aiProject $global:aiProject -resourceGroupName $resourceGroupName -existingResources $global:existingResources
+    New-MachineLearningWorkspace -aiProject $global:aiProject `
+        -aiHubName $global:aiHub.Name `
+        -appInsightsName $global:appInsightsService.Name `
+        -containerRegistryName $global:containerRegistry.Name `
+        -userAssignedIdentityName $global:userAssignedIdentity.Name `
+        -storageServiceName $global:storageService.Name `
+        -keyVaultName $global:keyVault.Name `
+        -resourceGroupName $resourceGroupName `
+        -existingResources $global:existingResources
 
     Start-Sleep -Seconds 10
 
@@ -4599,7 +4609,7 @@ function Start-Deployment {
     # Deploy web app and function app services
     foreach ($appService in $appServices) {
         if ($existingResources -notcontains $appService.Name) {
-            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageServiceName $global:storageService.Name -appInsightsName $global:appInsightsService.Name -deployZipResources $true
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -userAssignedIdentityName $global:userAssignedIdentity.Name -storageServiceName $global:storageService.Name -appInsightsName $global:appInsightsService.Name -deployZipResources $true
         }
             
         if ($appService.Name -ne $functionAppServiceName) {
@@ -4955,7 +4965,7 @@ function Update-AIProjectFile {
 
     $filePath = "$rootPath/ai.project.yaml"
 
-    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName --query 'principalId' --output tsv
+    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
 
     $content = @"
 `$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
@@ -5311,7 +5321,7 @@ function Update-MLWorkspaceFile {
 
     #$userAssignedIdentityName = $global:userAssignedIdentityName
 
-    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentityName --query 'principalId' --output tsv
+    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
 
     #`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
 
