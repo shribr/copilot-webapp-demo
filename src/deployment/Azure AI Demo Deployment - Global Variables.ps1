@@ -2997,30 +2997,33 @@ function New-SearchDataSource {
 
         $storageAccessKey = az storage account keys list --account-name $storageServiceName --resource-group $resourceGroupName --query "[0].value" --output tsv
 
-        foreach ($appService in $global:appServices) {
-            $appServiceName = $appService.Name
+        # appId code is only relevant for SharePoint Online data source
+        if ($searchDataSourceType -eq "sharepoint") {
+            foreach ($appService in $global:appServices) {
+                $appServiceName = $appService.Name
 
-            if ($appService.Type -eq "Web") {
-                #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
-                $appId = az ad app list --filter "displayName eq '$($appService.Name)'" --query "[].appId" --output tsv
+                if ($appService.Type -eq "Web") {
+                    #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
+                    $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
                 
-                if ($appId -eq "") {
-                    Write-Error "Failed to retrieve App ID for App Service."
-                    Write-Log -message "Failed to retrieve App ID for App Service."
+                    if ($appId -eq "") {
+                        Write-Error "Failed to retrieve App ID for App Service '$appServiceName' for SharePoint datasource connection."
+                        Write-Log -message "Failed to retrieve App ID for App Service '$appServiceName' for SharePoint datasource connection." -logFilePath $global:LogFilePath
 
-                    return
-                }
-                else {
-                    Write-Host "App ID for $($appServiceName): $appId"
+                        return
+                    }
+                    else {
+                        Write-Host "App ID for $($appServiceName): $appId for SharePoint datasource connection."
+                    }
                 }
             }
-        }
 
-        if ($appId -eq "") {
-            Write-Error "Failed to retrieve App ID for App Service."
-            Write-Log -message "Failed to retrieve App ID for App Service."
+            if ($appId -eq "") {
+                Write-Error "Failed to retrieve App ID for App Service."
+                Write-Log -message "Failed to retrieve App ID for App Service." -logFilePath $global:LogFilePath
 
-            return
+                return
+            }
         }
 
         switch ($searchDataSourceType) {
@@ -3233,7 +3236,7 @@ function New-SearchIndexer {
         # Create the indexer
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-            Write-Host "Search Indexer '$searchIndexerName' created successfully."
+            Write-Host "Search Indexer '$searchIndexerName' created successfully." -ForegroundColor Green
             Write-Log -message "Search Indexer '$searchIndexerName' created successfully."
 
             return true
@@ -3536,6 +3539,7 @@ function New-SearchService {
                 #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
                 $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
                 Write-Host "App ID for $($appServiceName): $appId"
+                break
             }
         }
 
@@ -4594,6 +4598,7 @@ function Start-Deployment {
             
             Write-Host "App ID for $($appServiceName): $appId"
 
+            # Executing this function again because now that the app service has been created, the app ID is available and therefore the SharePoint datasource can be created.
             $dataSources = Get-DataSources -resourceGroupName $resourceGroupName -searchServiceName $global:searchService.Name
 
             foreach ($searchDataSource in $global:searchDataSources) {
@@ -4601,7 +4606,7 @@ function Start-Deployment {
                 $dataSourceExists = $dataSources -contains $searchDataSourceName
 
                 if ($dataSourceExists -eq $false) {
-                    New-SearchDataSource -searchServiceName $global:searchService.Name -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $global:storageService.Name -appId $appId
+                    New-SearchDataSource -searchService $global:searchService -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageService $global:storageService -appId $appId
                 }
                 else {
                     Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue

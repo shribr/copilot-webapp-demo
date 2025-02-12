@@ -311,7 +311,8 @@
   ],
   "location": "east us",
   "logAnalyticsWorkspace": {
-    "Name": "log-copilot-demo-008"
+    "Name": "log-copilot-demo-008",
+    "Location": "east us"
   },
   "machineLearningService": {
     "ApplicationInsightsName": "appi-copilot-demo-008",
