@@ -2230,6 +2230,7 @@ function New-ContainerRegistry {
     )
 
     $containerRegistryName = $containerRegistry.Name
+    $containerRegistryLocation = $containerRegistry.Location
 
     Write-Host "Executing New-ContainerRegistry ('$containerRegistryName') function..." -ForegroundColor Magenta
 
@@ -2257,7 +2258,7 @@ function New-ContainerRegistry {
                 # Check if the error is due to soft deletion
                 if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $containerRegistryName -resourceType "ContainerRegistry" -location $containerRegistry.Location -resourceGroupName $resourceGroupName
+                    Restore-SoftDeletedResource -resourceName $containerRegistryName -resourceType "ContainerRegistry" -location $containerRegistryLocation -resourceGroupName $resourceGroupName
                 }
                 else {
                     Write-Error $errorMessage
@@ -2946,7 +2947,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create Container Registry
 
-    New-ContainerRegistry -containerRegistryName $containerRegistryName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
+    New-ContainerRegistry -containerRegistry $containerRegistry -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Document Intelligence service
@@ -3007,8 +3008,8 @@ function New-SearchDataSource {
                     $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
                 
                     if ($appId -eq "") {
-                        Write-Error "Failed to retrieve App ID for App Service '$appServiceName' for SharePoint datasource connection."
-                        Write-Log -message "Failed to retrieve App ID for App Service '$appServiceName' for SharePoint datasource connection." -logFilePath $global:LogFilePath
+                        #Write-Error "Failed to retrieve App ID for App Service '$appServiceName' for SharePoint datasource connection."
+                        #Write-Log -message "Failed to retrieve App ID for App Service '$appServiceName' for SharePoint datasource connection." -logFilePath $global:LogFilePath
 
                         return
                     }
@@ -3016,13 +3017,6 @@ function New-SearchDataSource {
                         Write-Host "App ID for $($appServiceName): $appId for SharePoint datasource connection."
                     }
                 }
-            }
-
-            if ($appId -eq "") {
-                Write-Error "Failed to retrieve App ID for App Service."
-                Write-Log -message "Failed to retrieve App ID for App Service." -logFilePath $global:LogFilePath
-
-                return
             }
         }
 
@@ -3399,7 +3393,7 @@ function New-SearchService {
 
                 if ($searchSkillSetExists -eq $false) {
 
-                    Start-Sleep -Seconds 30
+                    Start-Sleep -Seconds 10
                     New-SearchSkillSet -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
                 }
                 else {
@@ -3508,112 +3502,111 @@ function New-SearchService {
         #     Write-Error "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         #     Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         # }
-    }
-
-    try {
-        $ErrorActionPreference = 'Continue'
-
-        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
-        $dataSourceExists = $dataSources -contains $searchDataSourceName
-
-        foreach ($index in $global:searchIndexes) {
-            $indexName = $index.Name
-
-            $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
-            $searchIndexExists = $searchIndexes -contains $indexName
-
-            if ($searchIndexExists -eq $false) {
-                New-SearchIndex -searchService $searchService -resourceGroupName $resourceGroupName -searchIndex $index
-            }
-            else {
-                Write-Host "Search Index '$indexName' already exists." -ForegroundColor Blue
-                Write-Log -message "Search Index '$indexName' already exists."
-            }
-        }
-
-        #Start-Sleep -Seconds 15
-
-        foreach ($appService in $global:appServices) {
-            $appServiceName = $appService.Name
-            if ($appService.Type -eq "Web") {
-                #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
-                $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
-                Write-Host "App ID for $($appServiceName): $appId"
-                break
-            }
-        }
-
-        foreach ($searchDataSource in $global:searchDataSources) {
-            $searchDataSourceName = $searchDataSource.Name
-            $dataSourceExists = $dataSources -contains $searchDataSourceName
-
-            if ($dataSourceExists -eq $false) {
-                New-SearchDataSource -searchService $searchService -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageService $storageService -appId $appId
-            }
-            else {
-                Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
-                Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
-            }
-        }
-
-        foreach ($searchSkillSet in $searchSkillSets) {
-
-            $searchSkillSetName = $searchSkillSet.Schema.Name
-
-            $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
-
-            $searchSkillSetExists = $existingSearchSkillSets -contains $searchSkillSetName
-
-            if ($searchSkillSetExists -eq $false) {
-
-                Start-Sleep -Seconds 10
-                New-SearchSkillSet -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
-            }
-            else {
-                Write-Host "Search Skill Set '$searchSkillSetName' already exists." -ForegroundColor Blue
-                Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
-            }
-        }
 
         try {
+            $ErrorActionPreference = 'Continue'
 
-            $filteredSearchIndexers = $global:searchIndexers | Where-Object { $_.Active -eq $true }
+            $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+            $dataSourceExists = $dataSources -contains $searchDataSourceName
 
-            foreach ($indexer in $filteredSearchIndexers) {
-                $indexName = $indexer.IndexName
-                $indexerName = $indexer.Name
+            foreach ($index in $global:searchIndexes) {
+                $indexName = $index.Name
 
-                $searchDataSourceName = $indexer.DataSourceName
+                $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+                $searchIndexExists = $searchIndexes -contains $indexName
 
-                $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
-                $searchIndexerExists = $searchIndexers -contains $indexerName
-
-                if ($searchIndexerExists -eq $false) {
-                    New-SearchIndexer -searchService $searchService `
-                        -resourceGroupName $resourceGroupName `
-                        -searchDatasourceName $searchDataSourceName `
-                        -searchSkillSetName $searchSkillSetName `
-                        -searchIndexName $indexName `
-                        -searchIndexer $indexer
+                if ($searchIndexExists -eq $false) {
+                    New-SearchIndex -searchService $searchService -resourceGroupName $resourceGroupName -searchIndex $index
                 }
                 else {
-                    Write-Host "Search Indexer '$indexerName' already exists." -ForegroundColor Blue
-                    Write-Log -message "Search Indexer '$indexerName' already exists."
+                    Write-Host "Search Index '$indexName' already exists." -ForegroundColor Blue
+                    Write-Log -message "Search Index '$indexName' already exists."
                 }
-
-                Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
-
             }
 
+            foreach ($appService in $global:appServices) {
+                $appServiceName = $appService.Name
+                if ($appService.Type -eq "Web") {
+                    #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
+                    $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
+                    Write-Host "App ID for $($appServiceName): $appId"
+                    break
+                }
+            }
+
+            foreach ($searchDataSource in $global:searchDataSources) {
+                $searchDataSourceName = $searchDataSource.Name
+                $dataSourceExists = $dataSources -contains $searchDataSourceName
+
+                if ($dataSourceExists -eq $false) {
+                    New-SearchDataSource -searchService $searchService -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageService $storageService -appId $appId
+                }
+                else {
+                    Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
+                    Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+                }
+            }
+
+            foreach ($searchSkillSet in $searchSkillSets) {
+
+                $searchSkillSetName = $searchSkillSet.Schema.Name
+
+                $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
+
+                $searchSkillSetExists = $existingSearchSkillSets -contains $searchSkillSetName
+
+                if ($searchSkillSetExists -eq $false) {
+
+                    Start-Sleep -Seconds 10
+                    New-SearchSkillSet -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
+                }
+                else {
+                    Write-Host "Search Skill Set '$searchSkillSetName' already exists." -ForegroundColor Blue
+                    Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
+                }
+            }
+
+            try {
+
+                $filteredSearchIndexers = $global:searchIndexers | Where-Object { $_.Active -eq $true }
+
+                foreach ($indexer in $filteredSearchIndexers) {
+                    $indexName = $indexer.IndexName
+                    $indexerName = $indexer.Name
+
+                    $searchDataSourceName = $indexer.DataSourceName
+
+                    $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+                    $searchIndexerExists = $searchIndexers -contains $indexerName
+
+                    if ($searchIndexerExists -eq $false) {
+                        New-SearchIndexer -searchService $searchService `
+                            -resourceGroupName $resourceGroupName `
+                            -searchDatasourceName $searchDataSourceName `
+                            -searchSkillSetName $searchSkillSetName `
+                            -searchIndexName $indexName `
+                            -searchIndexer $indexer
+                    }
+                    else {
+                        Write-Host "Search Indexer '$indexerName' already exists." -ForegroundColor Blue
+                        Write-Log -message "Search Indexer '$indexerName' already exists."
+                    }
+
+                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+
+                }
+
+            }
+            catch {
+                Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
         catch {
-            Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Error "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
-    }
-    catch {
-        Write-Error "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create Search Service Index '$searchServiceIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    
     }
 }
 

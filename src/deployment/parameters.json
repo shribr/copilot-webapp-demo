@@ -252,8 +252,8 @@
   "configFilePath": "app/frontend/config.json",
   "containerRegistry": {
     "Description": "",
-    "Location": "",
-    "Name": "",
+    "Location": "east us",
+    "Name": "crcopilotdemo008",
     "ReplicationLocations": {
       "Location1": "",
       "Location2": "",
@@ -335,7 +335,8 @@
     "ApiKey": "f622a933e72049049ac0af3dcfd90db1",
     "ApiVersion": "2024-08-01-preview",
     "Endpoint": "https://ai-service-copilot-demo-008.openai.azure.com/",
-    "Name": "ai-service-copilot-demo-008_aoai",
+    "Location": "east us",
+    "Name": "ai-service-copilot-demo-008",
     "ServiceName": "ai-service-copilot-demo-008",
     "Type": "azure_open_ai",
     "YamlFileName": "openai.connection.yaml"
