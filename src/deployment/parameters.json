@@ -337,10 +337,10 @@
   "openAIService": {
     "ApiKey": "f622a933e72049049ac0af3dcfd90db1",
     "ApiVersion": "2024-08-01-preview",
-    "Endpoint": "https://ai-service-copilot-demo-008.openai.azure.com/",
+    "Endpoint": "https://openai-service-copilot-demo-008.openai.azure.com/",
     "Location": "east us",
-    "Name": "ai-service-copilot-demo-008",
-    "ServiceName": "ai-service-copilot-demo-008",
+    "Name": "openai-service-copilot-demo-008",
+    "ServiceName": "openai-service-copilot-demo-008",
     "Type": "azure_open_ai",
     "YamlFileName": "openai.connection.yaml"
   },
