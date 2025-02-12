@@ -530,7 +530,7 @@ function Get-CognitiveServicesApiKey {
 function Get-DataSources {
     param(
         [string]$dataSourceName,
-        
+        [string]$resourceGroupName,
         [string]$searchServiceName
     )
 
@@ -538,7 +538,7 @@ function Get-DataSources {
 
     # Get the admin key for the search service
     #
-    $apiKey = az search admin-key show --resource-group $resourceGroup.Name --service-name $searchServiceName --query primaryKey --output tsv
+    $apiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
 
     $uri = "https://$searchServiceName.search.windows.net/datasources?api-version=2024-07-01"
 
@@ -1019,7 +1019,7 @@ function Initialize-Parameters {
 
     #$global:keyVaultSecrets = $parametersObject.KeyVaultSecrets
     $global:resourceTypes = $parametersObject.resourceTypes
-
+    $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
     $global:newResourceBaseName = $parametersObject.newResourceBaseName
     $global:previousFullResourceBaseName = $parametersObject.previousFullResourceBaseName
 
@@ -1048,7 +1048,8 @@ function Initialize-Parameters {
     $global:documentIntelligenceService = $parametersObject.documentIntelligenceService  
     $global:keyVault = $parametersObject.keyVault               
     $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
-    $global:openAIService = $parametersObject.openAIService          
+    $global:openAIService = $parametersObject.openAIService
+    $global:previousResourceBaseName = $parametersObject.previousResourceBaseName          
     $global:resourceGroup = $parametersObject.resourceGroup
     $global:searchIndexers = $parametersObject.searchIndexers
     $global:searchIndexes = $parametersObject.searchIndexes
@@ -1137,7 +1138,7 @@ function Initialize-Parameters {
         openAIService                = $global:openAIService
         parameters                   = $parametersObject
         previousFullResourceBaseName = $global:previousFullResourceBaseName
-        previousResourceBaseName     = $parametersObject.previousResourceBaseName
+        previousResourceBaseName     = $global:previousResourceBaseName
         redeployResources            = $parametersObject.redeployResources
         redisCacheName               = $parametersObject.redisCacheName
         resourceBaseName             = $parametersObject.resourceBaseName
@@ -1682,20 +1683,22 @@ function New-AppRegistration {
         $permissions = "User.Read.All"
         $apiPermissions = ""
         
-        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
+        <#
+        # {        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
 
-        foreach ($searchDataSource in $global:searchDataSources) {
-            $searchDataSourceName = $searchDataSource.Name
-            $dataSourceExists = $dataSources -contains $searchDataSourceName
+                foreach ($searchDataSource in $global:searchDataSources) {
+                    $searchDataSourceName = $searchDataSource.Name
+                    $dataSourceExists = $dataSources -contains $searchDataSourceName
 
-            if ($dataSourceExists -eq $false) {
-                New-SearchDataSource -searchServiceName $global:searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $global:storageServiceName -appId $appId
-            }
-            else {
-                Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
-                Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
-            }
-        }
+                    if ($dataSourceExists -eq $false) {
+                        New-SearchDataSource -searchServiceName $global:searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $global:storageServiceName -appId $appId
+                    }
+                    else {
+                        Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
+                        Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
+                    }
+                }:Enter a comment or description}
+        #>
 
         # Check and set API permissions
         foreach ($permission in $appRegRequiredResourceAccess) {
@@ -2923,7 +2926,7 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create Search Service
 
-    New-SearchService -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSets $searchSkillSets -existingResources $existingResources
+    New-SearchService -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSets $searchSkillSets -storageService $storageService -cognitiveService $cognitiveService -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Log Analytics Workspace
@@ -2933,7 +2936,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create Application Insights component
 
-    New-ApplicationInsights -appInsightsName $appInsightsService -resourceGroupName $resourceGroupName -existingResources $existingResources
+    New-ApplicationInsights -appInsightsService $appInsightsService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create OpenAI service
@@ -3181,7 +3184,7 @@ function New-SearchIndexer {
     $searchServiceApiVersion = $searchService.ApiVersion
     $searchIndexerName = $searchIndexer.Name
     $searchIndexerSchema = $searchIndexer.Schema
-    $searchIndexerSchedule
+    $searchIndexerSchedule = $searchIndexer.Schedule
 
     Write-Host "Executing New-SearchIndexer ('$searchIndexerName') function..." -ForegroundColor Magenta
 
@@ -3256,6 +3259,7 @@ function New-SearchService {
     param(
         [psobject]$searchService,
         [psobject]$storageService,
+        [psobject]$cognitiveService,
         [string]$resourceGroupName,
         [psobject]$userAssignedIdentity,
         [psobject]$searchSkillSets,
@@ -3264,6 +3268,7 @@ function New-SearchService {
 
     $searchServiceName = $searchService.Name
     $storageServiceName = $storageService.Name
+    $cognitiveServiceName = $cognitiveService.Name
     $userAssignedIdentityName = $userAssignedIdentity.Name
     $location = $searchService.Location
 
@@ -3273,7 +3278,7 @@ function New-SearchService {
 
     if ($existingResources -notcontains $searchServiceName) {
         $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
-        #$searchServiceSku = "basic"
+        #$searchServiceSku = $searchService.Sku
 
         try {
             $ErrorActionPreference = 'Stop'
@@ -3418,6 +3423,8 @@ function New-SearchService {
                         if ($searchIndexerExists -eq $false) {
                             New-SearchIndexer -searchService $searchService `
                                 -resourceGroupName $resourceGroupName `
+                                -searchDatasourceName $searchDataSourceName `
+                                -searchSkillSetName $searchSkillSetName `
                                 -searchIndexName $indexName `
                                 -searchIndexer $indexer
                         }
@@ -3504,13 +3511,13 @@ function New-SearchService {
     try {
         $ErrorActionPreference = 'Continue'
 
-        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -dataSourceName $searchDataSourceName
+        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
         $dataSourceExists = $dataSources -contains $searchDataSourceName
 
         foreach ($index in $global:searchIndexes) {
             $indexName = $index.Name
 
-            $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name
+            $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
             $searchIndexExists = $searchIndexes -contains $indexName
 
             if ($searchIndexExists -eq $false) {
@@ -3523,9 +3530,6 @@ function New-SearchService {
         }
 
         #Start-Sleep -Seconds 15
-        
-        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
-        #$userAssignedIdentity = az identity show --resource-group $resourceGroup.Name --name $global:userAssignedIdentityName
 
         foreach ($appService in $global:appServices) {
             $appServiceName = $appService.Name
@@ -3541,7 +3545,7 @@ function New-SearchService {
             $dataSourceExists = $dataSources -contains $searchDataSourceName
 
             if ($dataSourceExists -eq $false) {
-                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchDataSource $searchDataSource -storageServiceName $storageServiceName -appId $appId
+                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $storageServiceName -appId $appId
             }
             else {
                 Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
@@ -3553,14 +3557,14 @@ function New-SearchService {
 
             $searchSkillSetName = $searchSkillSet.Schema.Name
 
-            $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchSkillSetName $searchSkillSetName
+            $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
 
             $searchSkillSetExists = $existingSearchSkillSets -contains $searchSkillSetName
 
             if ($searchSkillSetExists -eq $false) {
 
-                Start-Sleep -Seconds 30
-                New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
+                Start-Sleep -Seconds 10
+                New-SearchSkillSet -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
             }
             else {
                 Write-Host "Search Skill Set '$searchSkillSetName' already exists." -ForegroundColor Blue
@@ -3582,8 +3586,10 @@ function New-SearchService {
                 $searchIndexerExists = $searchIndexers -contains $indexerName
 
                 if ($searchIndexerExists -eq $false) {
-                    New-SearchIndexer -searchServiceName $searchServiceName `
+                    New-SearchIndexer -searchService $searchService `
                         -resourceGroupName $resourceGroupName `
+                        -searchDatasourceName $searchDataSourceName `
+                        -searchSkillSetName $searchSkillSetName `
                         -searchIndexName $indexName `
                         -searchIndexer $indexer
                 }
@@ -4813,7 +4819,7 @@ function Update-AIConnectionFile {
         [string]$serviceProperties
     )
 
-    Write-Host "Executing Update-AIConnectionFile ('$serviceName') function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-AIConnectionFile ('$serviceName') function..." -ForegroundColor Yellow
 
     $rootPath = Get-Item -Path (Get-Location).Path
 
@@ -4920,7 +4926,7 @@ function Update-AIProjectFile {
         [string]$storageServiceName
     )
 
-    Write-Host "Executing Update-AIProjectFile function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-AIProjectFile function..." -ForegroundColor Yellow
 
     $rootPath = Get-Item -Path (Get-Location).Path
 
@@ -4964,7 +4970,7 @@ function Update-ConfigFile {
         [string]$configFilePath
     )
 
-    Write-Host "Executing Update-ConfigFile function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-ConfigFile function..." -ForegroundColor Yellow
 
     try {
 
@@ -5218,7 +5224,7 @@ function Update-ContainerRegistryFile {
         [psobject]$containerRegistry
     )
 
-    Write-Host "Executing Update-ContainerRegistryFile function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-ContainerRegistryFile function..." -ForegroundColor Yellow
 
     $containerRegistryName = $containerRegistry.Name
     $location = $containerRegistry.Location
@@ -5273,7 +5279,7 @@ function Update-MLWorkspaceFile {
         [string]$userAssignedIdentityName
     )
 
-    Write-Host "Executing Update-MLWorkspaceFile function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-MLWorkspaceFile function..." -ForegroundColor Yellow
 
     $rootPath = Get-Item -Path (Get-Location).Path
 
@@ -5327,7 +5333,7 @@ function Update-ParametersFile-AppRegistration {
         [string]$appUri
     )
 
-    Write-Host "Executing Update-ParametersFile-AppRegistration function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-ParametersFile-AppRegistration function..." -ForegroundColor Yellow
 
     try {
         $ErrorActionPreference = 'Stop'
@@ -5356,7 +5362,7 @@ function Update-ParametersFile-AppRegistration {
 # Function to update the parameters.json file with the latest API versions. NOTE: This function is not currently used.
 function Update-ParameterFileApiVersions {
 
-    Write-Host "Executing Update-ParameterFileApiVersions function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-ParameterFileApiVersions function..." -ForegroundColor Yellow
 
     # NOTE: Code below seems to get older API versions for some reason. This function will not be used until I can investigate further.
 
@@ -5387,7 +5393,7 @@ function Update-ResourceBaseName() {
         [string]$newResourceBaseName = "copilot-demo"
     )
 
-    Write-Host "Executing Update-ResourceBaseName ('$newResourceBaseName') function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-ResourceBaseName ('$newResourceBaseName') function..." -ForegroundColor Yellow
 
     # Read the parameters.json file
     $parametersFileContent = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
@@ -5439,7 +5445,7 @@ function Update-ResourceBaseName() {
 # Function to update search index files (not currently used)
 function Update-SearchIndexFiles {
 
-    Write-Host "Executing Update-SearchIndexFiles function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-SearchIndexFiles function..." -ForegroundColor Yellow
 
     $searchIndexFiles = @("search-index-schema-template.json,search-indexer-schema-template.json,vector-search-index-schema-template.json,vector-search-indexer-schema-template.json,embeddings-search-index-schema-template.json,embeddings-search-indexer-schema-template.json,sharepoint-search-index-schema-template.json,sharepoint-search-indexer-schema-template.json" )
 
@@ -5457,7 +5463,7 @@ function Update-SearchIndexFiles {
 # Function to update search skill set files
 function Update-SearchSkillSetFiles {
 
-    Write-Host "Executing SearchSkillSetFiles function..." -ForegroundColor Magenta
+    Write-Host "Executing Update-SearchSkillSetFiles function..." -ForegroundColor Yellow
 
     foreach ($searchSkillSet in $searchSkillSets) {
 

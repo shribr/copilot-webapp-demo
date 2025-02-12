@@ -1,0 +1,22 @@
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 02/11/2025 23:02:37 ***
+2025-02-11 23:03:53 - Resource Group 'RG-COPILOT-DEMO-008' already exists.
+2025-02-11 23:05:09 - Identity 'id-copilot-demo-008' already exists.
+2025-02-11 23:09:12 - Service principal created for identity 'id-copilot-demo-008'.
+2025-02-11 23:09:14 - Storage account 'stcopilotdemo008' already exists.
+2025-02-11 23:09:14 - Virtual Network 'vnet-copilot-demo-008' already exists.
+2025-02-11 23:09:16 - Subnet 'subnet-copilot-demo-008' already exists.
+2025-02-11 23:09:16 - App Service Plan 'asp-copilot-demo-008' already exists.
+2025-02-11 23:09:16 - Cognitive Service 'cog-copilot-demo-008' already exists.
+2025-02-11 23:09:16 - Search Service 'srch-copilot-demo-008' already exists.
+2025-02-11 23:10:35 - Search Index 'srch-index-copilot-demo-008' already exists.
+2025-02-11 23:10:37 - Search Index 'vector-srch-index-copilot-demo-008' already exists.
+2025-02-11 23:11:53 - Search Index 'embeddings-srch-index-copilot-demo-008' already exists.
+2025-02-11 23:13:10 - Search Index 'sharepoint-srch-index-copilot-demo-008' already exists.
+2025-02-11 23:17:50 - Skillset 'srch-skillset-copilot-demo-008' created successfully.
+2025-02-11 23:21:56 - Skillset 'vector-srch-skillset-copilot-demo-008' created successfully.
+2025-02-11 23:25:57 - Skillset 'embeddings-srch-skillset-copilot-demo-008' created successfully.
+2025-02-11 23:25:59 - Failed to create Search Indexer 'srch-indexer-copilot-demo-008': (Line 3235) : Cannot bind parameter 'Uri'. Cannot convert value "https://.search.windows.net/indexers?api-version=" to type "System.Uri". Error: "Invalid URI: The hostname could not be parsed."
+2025-02-11 23:26:02 - Failed to create Search Indexer 'vector-srch-indexer-copilot-demo-008': (Line 3235) : Cannot bind parameter 'Uri'. Cannot convert value "https://.search.windows.net/indexers?api-version=" to type "System.Uri". Error: "Invalid URI: The hostname could not be parsed."
+2025-02-11 23:26:04 - Failed to create Search Indexer 'embeddings-srch-indexer-copilot-demo-008': (Line 3235) : Cannot bind parameter 'Uri'. Cannot convert value "https://.search.windows.net/indexers?api-version=" to type "System.Uri". Error: "Invalid URI: The hostname could not be parsed."
+2025-02-11 23:26:10 - Log Analytics Workspace 'log-copilot-demo-008' created successfully. [1]
