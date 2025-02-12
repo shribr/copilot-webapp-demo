@@ -2990,8 +2990,6 @@ function New-SearchDataSource {
 
     Write-Host "Executing New-SearchDataSource ('$searchDataSourceName') function..." -ForegroundColor Magenta
 
-    $resourceGroupName = $resourceGroup.Name
-
     try {
         $ErrorActionPreference = 'Continue'
 
