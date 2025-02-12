@@ -1916,8 +1916,10 @@ function New-AppService {
                     # Create a new function app
                     az functionapp create --name $appServiceName --resource-group $resourceGroupName --storage-account $storageServiceName --plan $appService.AppServicePlan --app-insights $appInsightsName --runtime $appService.Runtime --os-type "Windows" --functions-version 4 --output none
 
+                    $webAppService = $global:appServices | Where-Object { $_.type -eq 'Web' } | Select-Object -First 1
+
                     $functionAppKey = az functionapp keys list --name $appServiceName --resource-group $resourceGroupName --query "functionKeys.default" --output tsv
-                    az functionapp cors add --methods GET POST PUT --origins '*' --services b --account-name $appServiceName --account-key $functionAppKey
+                    az functionapp cors add --name $appServiceName --allowed-origins $webAppService.Url --resource-group $resourceGroupName
                 }
             }
 
@@ -2148,16 +2150,16 @@ function New-ComputerVisionService {
         [array]$existingResources
     )
 
-    $computerVisionName = $computerVisionService.Name
+    $computerVisionServiceName = $computerVisionService.Name
 
     Write-Host "Executing New-ComputerVisionService ('$computerVisionServiceName') function..." -ForegroundColor Magenta
 
-    if ($existingResources -notcontains $computerVisionName) {
-        $computerVisionName = Get-ValidServiceName -serviceName $computerVisionName
+    if ($existingResources -notcontains $computerVisionServiceName) {
+        $computerVisionServiceName = Get-ValidServiceName -serviceName $computerVisionServiceName
 
         try {
             $ErrorActionPreference = 'Stop'
-            $jsonOutput = az cognitiveservices account create --name $computerVisionName --resource-group $resourceGroupName --location $computerVisionService.Location --kind ComputerVision --sku S1 --output none 2>&1
+            $jsonOutput = az cognitiveservices account create --name $computerVisionServiceName --resource-group $resourceGroupName --location $computerVisionService.Location --kind ComputerVision --sku S1 --output none 2>&1
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -2169,7 +2171,7 @@ function New-ComputerVisionService {
                 $errorCode = $errorInfo["Code"]
                 $errorDetails = $errorInfo["Message"]
 
-                $errorMessage = "Failed to create Computer Vision account '$computerVisionName'. `
+                $errorMessage = "Failed to create Computer Vision account '$computerVisionServiceName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
@@ -2177,11 +2179,11 @@ function New-ComputerVisionService {
                 # Check if the error is due to soft deletion
                 if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
                     # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $computerVisionName -resourceType "ComputerVision" -location $computerVisionService.Location -resourceGroupName $resourceGroupName
+                    Restore-SoftDeletedResource -resourceName $computerVisionServiceName -resourceType "ComputerVision" -location $computerVisionService.Location -resourceGroupName $resourceGroupName
                 }
                 else {
-                    Write-Error "Failed to create Cognitive Services account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Cognitive Services account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to create Cognitive Services account '$computerVisionServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Cognitive Services account '$computerVisionServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
                     Write-Host $errorMessage
                     Write-Log -message $errorMessage -logFilePath $global:LogFilePath
@@ -2190,19 +2192,19 @@ function New-ComputerVisionService {
             else {
                 $global:resourceCounter += 1
 
-                Write-Host "Computer Vision account '$computerVisionName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
-                Write-Log -message "Computer Vision account '$computerVisionName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+                Write-Host "Computer Vision account '$computerVisionServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+                Write-Log -message "Computer Vision account '$computerVisionServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
 
                 try {
                     # Assign custom domain
-                    az cognitiveservices account update --name $computerVisionName --resource-group $resourceGroupName --custom-domain $computerVisionName
+                    az cognitiveservices account update --name $computerVisionServiceName --resource-group $resourceGroupName --custom-domain $computerVisionServiceName
 
-                    Write-Host "Custom Domain created for Computer Vision account '$computerVisionName'."
-                    Write-Log -message "Custom Domain created for Computer Vision account '$computerVisionName'."
+                    Write-Host "Custom Domain created for Computer Vision account '$computerVisionServiceName'."
+                    Write-Log -message "Custom Domain created for Computer Vision account '$computerVisionServiceName'."
                 }
                 catch {
-                    Write-Host "Failed to create custom domain for Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create custom domain for Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Host "Failed to create custom domain for Computer Vision account '$computerVisionServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create custom domain for Computer Vision account '$computerVisionServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
         }
@@ -2210,17 +2212,17 @@ function New-ComputerVisionService {
             # Check if the error is due to soft deletion
             if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
                 # Attempt to restore the soft-deleted Cognitive Services account
-                Restore-SoftDeletedResource -resourceName $computerVisionName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
+                Restore-SoftDeletedResource -resourceName $computerVisionServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
             }
             else {
-                Write-Error "Failed to create Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to create Computer Vision account '$computerVisionName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to create Computer Vision account '$computerVisionServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Computer Vision account '$computerVisionServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
     }
     else {
-        Write-Host "Computer Vision Service '$computerVisionName' already exists." -ForegroundColor Blue
-        Write-Log -message "Computer Vision Service '$computerVisionName' already exists."
+        Write-Host "Computer Vision Service '$computerVisionServiceName' already exists." -ForegroundColor Blue
+        Write-Log -message "Computer Vision Service '$computerVisionServiceName' already exists."
     }
 }
 
@@ -4389,7 +4391,8 @@ function Start-Deployment {
     Add-Content -Path $logFilePath -Value $logMessage
 
     # Start the timer
-    $startTime = Get-Date
+    $startTime = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
+    $startTimeNumber = Get-Date
 
     $startTimeMessage = "*** SCRIPT START TIME: $startTime ***"
     Add-Content -Path $logFilePath -Value $startTimeMessage
@@ -4471,21 +4474,6 @@ function Start-Deployment {
         Write-Host "Identity '$userAssignedIdentityName' already exists." -ForegroundColor Blue
         Write-Log -message "Identity '$userAssignedIdentityName' already exists."
     }
-
-    try {
-        $ErrorActionPreference = 'Stop'
-
-        $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
-        
-        # Ensure the service principal is created
-        az ad sp create --id $assigneePrincipalId
-        Write-Host "Service principal created for identity '$userAssignedIdentityName'."
-        Write-Log -message "Service principal created for identity '$userAssignedIdentityName'."
-    }
-    catch {
-        Write-Error "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
    
     # Create new Azure resources
     New-Resources -resourceGroup $global:resourceGroup `
@@ -4509,7 +4497,7 @@ function Start-Deployment {
     foreach ($appService in $appServices) {
         $appServiceName = $appService.Name
         if ($existingResources -notcontains $appService.Name) {
-            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageServiceName $storageServiceName -appInsightsName $global:appInsightsService.Name -deployZipResources $false
+            New-AppService -appService $appService -resourceGroupName $resourceGroupName -storageServiceName $global:storageService.Name -appInsightsName $global:appInsightsService.Name -deployZipResources $false
 
             $appId = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "id" --output tsv
             Write-Host "App ID for $($appServiceName): $appId"
@@ -4628,8 +4616,13 @@ function Start-Deployment {
     $parametersFileContent | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
 
     # End the timer
-    $endTime = Get-Date
-    $executionTime = $endTime - $startTime
+    $endTime = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
+    $endTimeNumber = Get-Date
+
+    $executionTime = $endTimeNumber - $startTimeNumber
+
+    $endTimeMessage = "*** SCRIPT END TIME: $endTime ***"
+    Add-Content -Path $logFilePath -Value $endTimeMessage
 
     # Format the execution time
     $executionTimeFormatted = "{0:D2} HRS : {1:D2} MIN : {2:D2} SEC : {3:D3} MS" -f $executionTime.Hours, $executionTime.Minutes, $executionTime.Seconds, $executionTime.Milliseconds
