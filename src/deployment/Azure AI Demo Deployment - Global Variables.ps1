@@ -1535,10 +1535,25 @@ function New-ApiManagementApi {
         Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
 
         try {
-            # Add operations
-            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
-            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
-    
+            # Check if the operations already exist
+
+            $keyVaultProxyOperations = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+
+            if ($keyVaultProxyOperations -notcontains "GetOpenAIServiceApiKey") {
+                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
+            }
+            else {
+                Write-Host "Operation 'GetOpenAIServiceApiKey' already exists." -ForegroundColor Blue
+                Write-Log -message "Operation 'GetOpenAIServiceApiKey' already exists." -logFilePath $global:LogFilePath
+            }
+
+            if ($keyVaultProxyOperations -notcontains "GetSearchServiceApiKey") {
+                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
+            }
+            else {
+                Write-Host "Operation 'GetSearchServiceApiKey' already exists." -ForegroundColor Blue
+                Write-Log -message "Operation 'GetSearchServiceApiKey' already exists." -logFilePath $global:LogFilePath
+            }
         }
         catch {
             Write-Error "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -4258,13 +4273,24 @@ function Set-RBACRoles {
         # Retrieve the Object ID of the user-assigned managed identity
         $userAssignedIdentityObjectId = az identity show --name $userAssignedIdentityName --resource-group $resourceGroupName --query 'principalId' --output tsv
 
-        az role assignment create --role "Key Vault Administrator" --assignee $userAssignedIdentityObjectId --scope $scope
-        az role assignment create --role "Key Vault Secrets User" --assignee $userAssignedIdentityObjectId --scope $scope
-        az role assignment create --role "Key Vault Certificate User" --assignee $userAssignedIdentityObjectId --scope $scope
-        az role assignment create --role "Key Vault Crypto User" --assignee $userAssignedIdentityObjectId --scope $scope
+        # Define the roles to check
+        $roles = @("Key Vault Administrator", "Key Vault Secrets User", "Key Vault Certificate User", "Key Vault Crypto User")
 
-        Write-Host "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
-        Write-Log -message "RBAC roles assigned to managed identity: '$userAssignedIdentityName'."
+        foreach ($role in $roles) {
+            # Check if the role assignment already exists
+            $existingAssignment = az role assignment list --assignee $userAssignedIdentityObjectId --scope $scope --role $role --query "[].roleDefinitionName" --output tsv
+
+            if ($existingAssignment -contains $role) {
+                Write-Host "Role '$role' is already assigned to '$userAssignedIdentityName'."
+                Write-Log -message  "Role '$role' is already assigned to '$userAssignedIdentityName'." -logFilePath $global:LogFilePath
+            }
+            else {
+                # Create the role assignment if it doesn't exist
+                az role assignment create --role $role --assignee $userAssignedIdentityObjectId --scope $scope
+                Write-Host "Assigned role '$role' to managed identity: '$userAssignedIdentityName'."
+                Write-Log -message "Assigned role '$role' to managed identity: '$userAssignedIdentityName'." -logFilePath $global:LogFilePath
+            }
+        }
     }
     catch {
         Write-Error "Failed to assign RBAC roles to managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
