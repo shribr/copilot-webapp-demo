@@ -295,7 +295,8 @@
     "Name": "kv-copilot-demo-008",
     "ApiVersion": "7.5",
     "PermissionModel": "VaultAccessPolicy",
-    "Location": "east us"
+    "Location": "east us",
+    "UseRBAC": true
   },
   "keyVaultSecrets": [
     {

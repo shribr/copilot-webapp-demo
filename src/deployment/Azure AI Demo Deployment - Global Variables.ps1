@@ -193,7 +193,7 @@ function ConvertTo-ProperCase {
 function Deploy-AppService {
     param (
         [array]$appService,
-        
+        [string]$resourceGroupName,
         [bool]$deployZipResources,
         [array]$existingResources
     )
@@ -213,7 +213,7 @@ function Deploy-AppService {
     $appServiceName = $appService.Name
     $deployZipPackage = $appService.DeployZipPackage
 
-    $appExists = az webapp show --name $appServiceName --resource-group $resourceGroup.Name --query "name" --output tsv
+    $appExists = az webapp show --name $appServiceName --resource-group $resourceGroupName --query "name" --output tsv
 
     if ($appExists) {
         if ($deployZipResources -eq $true -and $deployZipPackage -eq $true) {
@@ -244,11 +244,11 @@ function Deploy-AppService {
                 if ($appService.Type -eq "Web") {
                     # Deploy the web app
                     #az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroup.Name --src $zipFilePath
-                    az webapp deploy --src-path $zipFilePath --name $appServiceName --resource-group $resourceGroup.Name --type zip
+                    az webapp deploy --src-path $zipFilePath --name $appServiceName --resource-group $resourceGroupName --type zip
                 }
                 else {
                     # Deploy the function app
-                    az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroup.Name --src $zipFilePath
+                    az functionapp deployment source config-zip --name $appServiceName --resource-group $resourceGroupName --src $zipFilePath
 
                     $searchServiceKeys = az search admin-key show --resource-group $resourceGroup.Name --service-name $global:searchServiceName --query "primaryKey" --output tsv
                     $searchServiceApiKey = $searchServiceKeys
@@ -260,7 +260,7 @@ function Deploy-AppService {
                     )
 
                     foreach ($envVar in $envVariables) {
-                        az functionapp config appsettings set --name $appServiceName --resource-group $resourceGroup.Name --settings "$($envVar.name)=$($envVar.value)"
+                        az functionapp config appsettings set --name $appServiceName --resource-group $resourceGroupName --settings "$($envVar.name)=$($envVar.value)"
                     }
                 }
 
