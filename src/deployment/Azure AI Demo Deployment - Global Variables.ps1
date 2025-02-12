@@ -817,7 +817,6 @@ function Get-UniqueSuffix {
         Test-ResourceExists -resourceName $aiService.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $computerVisionService.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $userAssignedIdentity.Name -resourceType "Microsoft.ManagedIdentity/userAssignedIdentities" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $openAIService.Name -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $virtualNetwork.Name -resourceType "Microsoft.Network/virtualNetworks" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $documentIntelligenceService.Name -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $aiHub.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
@@ -4583,7 +4582,7 @@ function Start-Deployment {
     New-AIHubConnection -aiHub $global:aiHub -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiService
 
     # Add OpenAI Service connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "OpenAIService" -serviceName $global:openAIAccountName -serviceProperties $global:openAIService
+    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "OpenAIService" -serviceName $global:openAIServiceName -serviceProperties $global:openAIService
 
     # Add storage account connection to AI Hub
     New-AIHubConnection -aiHubName $aiHubName -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageServiceName -serviceProperties $global:storageService
