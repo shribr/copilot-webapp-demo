@@ -1403,9 +1403,9 @@ function New-AIService {
 
             $jsonOutput = az cognitiveservices account create --name $aiServiceName --resource-group $resourceGroupName --location $location --kind AIServices --sku S0 --output none 2>&1
 
-            $global:aiServiceProperties.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
+            $global:aiService.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
 
-            $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:aiServiceProperties.ApiKey
+            $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:aiService.ApiKey
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
@@ -1469,7 +1469,7 @@ function New-AIService {
     }
     else {
 
-        $global:aiServiceProperties.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
+        $global:aiService.ApiKey = az cognitiveservices account keys list --name $aiServiceName --resource-group $resourceGroupName --query key1 --output tsv
 
         $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:aiService.ApiKey
 
