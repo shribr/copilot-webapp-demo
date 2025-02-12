@@ -97,17 +97,10 @@ param (
     [string]$resourceBaseName = "copilot-demo"
 )
 
-$global:parametersFile = "parameters.json"
-
-# List of all resources pending creation
-$global:ResourceList = @()
-
-# Mapping of global AI Hub connected resources
-$global:AIHubConnectedResources = @()
-
 # Function to Generate visual map of all resources
 function Build-ResourceList {
-    params(
+    param
+    (
         [psobject]$parametersObject
     )
 
@@ -774,7 +767,7 @@ function Get-SearchSkillSets {
 
 # Function to find a unique suffix and create resources
 function Get-UniqueSuffix {
-    params
+    param
     (
         [psobject]$resourceGroup
     )
@@ -863,7 +856,7 @@ function Get-ValidServiceName {
         [string]$serviceName
     )
 
-    Write-Host "Executing Get-ValidServiceName function..." -ForegroundColor Magenta
+    #Write-Host "Executing Get-ValidServiceName function..." -ForegroundColor Magenta
 
     # Convert to lowercase
     $serviceName = $serviceName.ToLower()
@@ -1003,6 +996,19 @@ function Initialize-Parameters {
 
     Write-Host "Executing Initialize-Parameters function..." -ForegroundColor Magenta
 
+    # List of all resources pending creation
+    $global:ResourceList = @()
+
+    # Mapping of global AI Hub connected resources
+    $global:AIHubConnectedResources = @()
+
+    # List of all KeyVault secret keys
+    $global:KeyVaultSecrets = [PSCustomObject]@{
+        StorageServiceApiKey = ""
+        SearchServiceApiKey  = ""
+        OpenAIServiceApiKey  = ""
+    }
+
     # Navigate to the project directory
     Set-DirectoryPath -targetDirectory $global:deploymentPath
 
@@ -1011,7 +1017,7 @@ function Initialize-Parameters {
 
     $global:deploymentType = $parametersObject.deploymentType
 
-    $global:keyVaultSecrets = $parametersObject.KeyVaultSecrets
+    #$global:keyVaultSecrets = $parametersObject.KeyVaultSecrets
     $global:resourceTypes = $parametersObject.resourceTypes
 
     $global:newResourceBaseName = $parametersObject.newResourceBaseName
@@ -1032,9 +1038,10 @@ function Initialize-Parameters {
     $global:aiProject = $parametersObject.aiProject          
     $global:aiService = $parametersObject.aiService
     $global:apiManagementService = $parametersObject.apiManagementService
-    $global:appInsightsService = $parametersObject.appInsightsService   
+    $global:appInsightsService = $parametersObject.appInsightsService  
     $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
     $global:appServicePlan = $parametersObject.AppServicePlan
+    $global:appServices = $parametersObject.appServices
     $global:cognitiveService = $parametersObject.cognitiveService       
     $global:computerVisionService = $parametersObject.computerVisionService  
     $global:containerRegistry = $parametersObject.containerRegistry      
@@ -1043,8 +1050,10 @@ function Initialize-Parameters {
     $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
     $global:openAIService = $parametersObject.openAIService          
     $global:resourceGroup = $parametersObject.resourceGroup
-    $global:searchService = $parametersObject.searchService          
+    $global:searchService = $parametersObject.searchService
+    $global:searchSkillSets = $parametersObject.searchSkillSets          
     $global:storageService = $parametersObject.storageService
+    $global:subNet = $parametersObject.subNet
     $global:userAssignedIdentity = $parametersObject.userAssignedIdentity         
     $global:virtualNetwork = $parametersObject.virtualNetwork         
 
@@ -1094,6 +1103,7 @@ function Initialize-Parameters {
         aiService                    = $global:aiService
         apiManagementService         = $global:apiManagementService
         appInsightsService           = $global:appInsightsService
+        appServices                  = $global:appServices
         appRegistrationClientId      = $parametersObject.appRegistrationClientId
         appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
         appDeploymentOnly            = $parametersObject.appDeploymentOnly
@@ -1142,10 +1152,10 @@ function Initialize-Parameters {
         searchIndexers               = $parametersObject.searchIndexers
         searchPublicInternetResults  = $parametersObject.searchPublicInternetResults
         searchService                = $global:searchService
-        searchSkillSets              = $parametersObject.searchSkillSets
+        searchSkillSets              = $global:searchSkillSets
         siteLogo                     = $parametersObject.siteLogo
         storageService               = $global:storageService
-        subNet                       = $parametersObject.subNet
+        subNet                       = $global:subNet
         subscriptionId               = $global:subscriptionId
         tenantId                     = $global:tenantId
         userAssignedIdentity         = $global:userAssignedIdentity
@@ -1238,7 +1248,7 @@ function New-AIHub {
             az ml workspace create --kind hub --resource-group $resourceGroupName --name $aiHubName --storage-account $storageAccountId --key-vault $keyVaultId
 
             $global:resourceCounter += 1
-            Write-Host "AI Hub: '$aiHubName' created successfully. ($global:resourceCounter)"
+            Write-Host "AI Hub: '$aiHubName' created successfully. ($global:resourceCounter)" -ForegroundColor Green
             Write-Log -message "AI Hub: '$aiHubName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
         }
         catch {
@@ -1290,7 +1300,7 @@ function New-AIHubConnection {
 
             az ml connection create --file $aiConnectionFile --resource-group $resourceGroupName --workspace-name $aiProjectName
 
-            Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' created successfully."
+            Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' created successfully." -ForegroundColor Green
             Write-Log -message  "Azure $resourceType '$serviceName' connection for '$aiHubName' created successfully." -logFilePath $global:LogFilePath
         }
         catch {
@@ -1363,7 +1373,7 @@ function New-AIProject {
         #az ml workspace create --kind project --resource-group $resourceGroup.Name --name $aiProjectName --hub-id $$aiHubResoureceId --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
 
         $global:resourceCounter += 1
-        Write-Host "AI Project: '$aiProjectName' created successfully. [$global:resourceCounter]"
+        Write-Host "AI Project: '$aiProjectName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
         Write-Log -message "AI Project: '$aiProjectName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
     }
     catch {
@@ -1432,7 +1442,7 @@ function New-AIService {
             }
             else {
                 $global:resourceCounter += 1
-                Write-Host "AI Service account '$aiServiceName' created successfully. [$global:resourceCounter]"
+                Write-Host "AI Service account '$aiServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
                 Write-Log -message "AI Service account '$aiServiceName' created successfully. [$global:resourceCounter]"
             }
 
@@ -1513,7 +1523,7 @@ function New-ApiManagementApi {
             Write-Log -message "Failed to add CORS policy to operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
 
-        Write-Host "API 'KeyVaultProxy' and its operations created successfully."
+        Write-Host "API 'KeyVaultProxy' and its operations created successfully." -ForegroundColor Green
         Write-Log -message "API 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
     }
     else {
@@ -1598,7 +1608,7 @@ function New-ApiManagementService {
             else {
 
                 $global:resourceCounter += 1
-                Write-Host "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]"
+                Write-Host "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
                 Write-Log -message "API Management service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
 
@@ -1660,7 +1670,7 @@ function New-AppRegistration {
             $appId = $appRegistration.appId
             $objectId = $appRegistration.objectId
 
-            Write-Host "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
+            Write-Host "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId." -ForegroundColor Green
             Write-Log -message "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
         }
 
@@ -1705,7 +1715,7 @@ function New-AppRegistration {
                     #az ad app permission add --id $appId --api $permissionResourceAppId --api-permissions 
                     #az ad app permission add --id $appId --api $permission.resourceAppId --api-permissions $permissions=Scope
 
-                    Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully."
+                    Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully." -ForegroundColor Green
                     Write-Log -message "Permission '$permissions' for '$appServiceName' with App ID: $appId added successfully." -logFilePath $global:LogFilePath
                 }
                 catch {
@@ -1716,7 +1726,7 @@ function New-AppRegistration {
                 try {
                     az ad app permission grant --id $appId --api $permissionResourceAppId --scope $permissions
 
-                    Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId granted successfully."
+                    Write-Host "Permission '$permissions' for '$appServiceName' with App ID: $appId granted successfully." -ForegroundColor Green
                     Write-Log -message "Permission '$permissions' for '$appServiceName' with App ID: $appId granted successfully." -logFilePath $global:LogFilePath
                 }
                 catch {
@@ -1798,7 +1808,7 @@ function New-AppRegistration {
             # Set Key Vault access policies
             az keyvault set-policy --name $keyVaultName --object-id $objectId --secret-permissions get list set delete --key-permissions get list create delete --certificate-permissions get list create delete
     
-            Write-Host "Key Vault access policies for app '$appServiceName' set successfully."
+            Write-Host "Key Vault access policies for app '$appServiceName' set successfully." -ForegroundColor Green
             Write-Log -message "Key Vault access policies for app '$appServiceName' set successfully.." -logFilePath $global:LogFilePath
         }
         catch {
@@ -1815,18 +1825,20 @@ function New-AppRegistration {
 # Function to create a new Application Insights component
 function New-ApplicationInsights {
     param (
-        [string]$appInsightsName,
+        [psobject]$appInsightsService,
         [string]$location,
         [string]$resourceGroupName,
         [array]$existingResources
     )
+
+    $appInsightsName = $appInsightsService.Name
 
     Write-Host "Executing New-ApplicationInsights ('$appInsightsName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $appInsightsName) {
 
 
-        $appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
+        #$appInsightsName = Get-ValidServiceName -serviceName $appInsightsName
 
         # Try to create an Application Insights component
         try {
@@ -1834,7 +1846,7 @@ function New-ApplicationInsights {
             az monitor app-insights component create --app $appInsightsName --location $location --resource-group $resourceGroupName --application-type web --output none
 
             $global:resourceCounter += 1
-            Write-Host "Application Insights component '$appInsightsName' created successfully. [$global:resourceCounter]"
+            Write-Host "Application Insights component '$appInsightsName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
             Write-Log -message "Application Insights component '$appInsightsName' created successfully. [$global:resourceCounter]"
         }
         catch {
@@ -1904,7 +1916,7 @@ function New-AppService {
             if (-not $appExists) {
 
                 $global:resourceCounter += 1
-                Write-Host "$appServiceType app '$appServiceName' created successfully. Moving on to deployment. [$global:resourceCounter]"
+                Write-Host "$appServiceType app '$appServiceName' created successfully. Moving on to deployment. [$global:resourceCounter]" -ForegroundColor Green
                 Write-Log -message "$appServiceType app '$appServiceName' created successfully. Moving on to deployment. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             else {
@@ -2032,7 +2044,7 @@ function New-AppServicePlanInASE {
         az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --app-service-environment $appServiceEnvironmentName --sku $sku --output none
 
         $global:resourceCounter += 1
-        Write-Host "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'. [$global:resourceCounter]"
+        Write-Host "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'. [$global:resourceCounter]" -ForegroundColor Green
         Write-Log -message "App Service Plan '$appServicePlanName' created in ASE '$appServiceEnvironmentName'. [$global:resourceCounter]"
     }
     catch {
@@ -2092,13 +2104,13 @@ function New-CognitiveService {
             else {
 
                 $global:resourceCounter += 1
-                Write-Host "Cognitive Services account '$cognitiveServiceName' created successfully. [$global:resourceCounter]"
+                Write-Host "Cognitive Services account '$cognitiveServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
                 Write-Log -message "Cognitive Services account '$cognitiveServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
 
                 # Assign managed identity to the Cognitive Services account
                 az cognitiveservices account identity assign --name $cognitiveServiceName --resource-group $resourceGroupName
 
-                Write-Host "Managed identity '$userAssignedIdentityName' assigned to Cognitive Services account '$cognitiveServiceName'."
+                Write-Host "Managed identity '$userAssignedIdentityName' assigned to Cognitive Services account '$cognitiveServiceName'." -ForegroundColor Green
                 Write-Log -message "Managed identity '$userAssignedIdentityName' assigned to Cognitive Services account '$cognitiveServiceName'."
             }
         }
@@ -2170,7 +2182,7 @@ function New-ComputerVisionService {
             else {
                 $global:resourceCounter += 1
 
-                Write-Host "Computer Vision account '$computerVisionName' created successfully. [$global:resourceCounter]"
+                Write-Host "Computer Vision account '$computerVisionName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
                 Write-Log -message "Computer Vision account '$computerVisionName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
 
                 try {
@@ -2250,7 +2262,7 @@ function New-ContainerRegistry {
             else {
                 $global:resourceCounter += 1
 
-                Write-Host "Container Registry '$containerRegistryName' created successfully. [$global:resourceCounter]"
+                Write-Host "Container Registry '$containerRegistryName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
                 Write-Log -message "Container Registry '$containerRegistryName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
         }
@@ -2317,7 +2329,7 @@ function New-DocumentIntelligenceService {
 
                     $global:resourceCounter += 1
 
-                    Write-Host "Document Intelligence account '$documentIntelligenceName' created successfully. [$global:resourceCounter]"
+                    Write-Host "Document Intelligence account '$documentIntelligenceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
                     Write-Log -message "Document Intelligence account '$documentIntelligenceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
                 }
 
@@ -2406,7 +2418,7 @@ function New-KeyVault {
 
                     $global:resourceCounter += 1
 
-                    Write-Host "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]"
+                    Write-Host "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]" -ForegroundColor Green
                     Write-Log -message "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]"
 
                     # Assign RBAC roles to the managed identity
@@ -2414,7 +2426,7 @@ function New-KeyVault {
                 }
                 else {
                     $global:resourceCounter += 1
-                    Write-Host "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]"
+                    Write-Host "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]" -ForegroundColor Green
                     Write-Log -message "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]"
 
                     # Set vault access policies for user
@@ -2469,7 +2481,7 @@ function New-LogAnalyticsWorkspace {
 
             $global:resourceCounter += 1
 
-            Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created successfully. [$global:resourceCounter]"
+            Write-Host "Log Analytics Workspace '$logAnalyticsWorkspaceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
             Write-Log -message "Log Analytics Workspace '$logAnalyticsWorkspaceName' created successfully. [$global:resourceCounter]"
         }
         catch {
@@ -2504,19 +2516,19 @@ function New-ManagedIdentity {
 
         $global:resourceCounter += 1
 
-        Write-Host "User Assigned Identity '$userAssignedIdentityName' created successfully. [$global:resourceCounter]"
+        Write-Host "User Assigned Identity '$userAssignedIdentityName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
         Write-Log -message "User Assigned Identity '$userAssignedIdentityName' created successfully. [$global:resourceCounter]"
 
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 5
 
-        $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
+        $global:assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
 
         try {
             $ErrorActionPreference = 'Stop'
 
             # Ensure the service principal is created
-            az ad sp create --id $assigneePrincipalId
-            Write-Host "Service principal created for identity '$userAssignedIdentityName'."
+            az ad sp create --id $global:assigneePrincipalId
+            Write-Host "Service principal created for identity '$userAssignedIdentityName'." -ForegroundColor Green
             Write-Log -message "Service principal created for identity '$userAssignedIdentityName'."
         }
         catch {
@@ -2639,7 +2651,7 @@ function New-MachineLearningWorkspace {
                 }
             }
             else {
-                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created successfully."
+                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created successfully." -ForegroundColor Green
                 Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created successfully." -logFilePath $global:LogFilePath
                 $global:resourceCounter += 1
 
@@ -2714,7 +2726,7 @@ function New-OpenAIService {
             else {
                 $global:resourceCounter += 1
 
-                Write-Host "Azure OpenAI service '$openAIServiceName' created successfully. [$global:resourceCounter]"
+                Write-Host "Azure OpenAI service '$openAIServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
                 Write-Log -message "Azure OpenAI service '$openAIServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
         }
@@ -2759,7 +2771,7 @@ function New-PrivateEndPoint {
 
     try {
         az network private-endpoint create --name $privateEndpointName --resource-group $resourceGroupName --vnet-name $virtualNetworkName --subnet $subnetId --private-connection-resource-id $privateLinkServiceId --group-id "sqlServer" --connection-name $privateLinkServiceName --location $location --output none
-        Write-Host "Private endpoint '$privateEndpointName' created successfully."
+        Write-Host "Private endpoint '$privateEndpointName' created successfully." -ForegroundColor Green
         Write-Log -message "Private endpoint '$privateEndpointName' created successfully."
     }
     catch {
@@ -2836,7 +2848,7 @@ function New-ResourceGroup {
 
         $global:resourceCounter += 1
 
-        Write-Host "Resource group '$resourceGroupName' created successfully. [$global:resourceCounter]"
+        Write-Host "Resource group '$resourceGroupName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
         Write-Log -message "Resource group '$resourceGroupName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
         $resourceGroupExists = $false
     }
@@ -2850,41 +2862,44 @@ function New-ResourceGroup {
 
 # Function to create resources
 function New-Resources {
-    params(
-        [psobject]$resourceGroup,
-        [psobject]$storageService,
-        [psobject]$virtualNetwork,
-        [psobject]$subNet,
+    param
+    (
+        [psobject]$apiManagementService,
+        [psobject]$appInsights,
         [psobject]$appServicePlan,
         [psobject]$cognitiveService,
-        [psobject]$searchService,
-        [psobject]$searchSkillSets,
-        [psobject]$logAnalyticsWorkspace,
-        [psobject]$appInsights,
-        [psobject]$openAIService,
+        [psobject]$computerVisionService,
         [psobject]$containerRegistry,
         [psobject]$documentIntelligenceService,
-        [psobject]$computerVisionService,
-        [psobject]$apiManagementService,
+        [psobject]$logAnalyticsWorkspace,
+        [psobject]$openAIService,
+        [psobject]$resourceGroup,
+        [psobject]$searchService,
+        [psobject]$searchSkillSets,
+        [psobject]$storageService,
+        [psobject]$subNet,
+        [psobject]$virtualNetwork,
         [array]$existingResources
     )
 
     Write-Host "Executing New-Resources function..." -ForegroundColor Magenta
 
+    $resourceGroupName = $resourceGroup.Name
+
     # **********************************************************************************************************************
     # Create Storage Service
 
-    New-StorageService -storageService $storageService -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-StorageService -storageService $storageService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Virtual Network
 
-    New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-VirtualNetwork -virtualNetwork $virtualNetwork -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Subnet
 
-    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create App Service Environment
@@ -2894,55 +2909,55 @@ function New-Resources {
     # **********************************************************************************************************************
     # Create App Service Plan
 
-    New-AppServicePlan -appServicePlan $appServicePlan -resourceGroupName $resourceGroup.Name -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku $appServicePlanSku -existingResources $existingResources
+    New-AppServicePlan -appServicePlan $appServicePlan -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #New-AppServicePlanInASE -appServicePlanName $appServicePlanName -resourceGroupName $resourceGroup.Name -location $location -appServiceEnvironmentName $appServiceEnvironmentName -sku $appServicePlanSku -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Cognitive Service
 
-    New-CognitiveService -cognitiveService $cognitiveService -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-CognitiveService -cognitiveService $cognitiveService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Search Service
 
-    New-SearchService -searchService $searchService -resourceGroupName $resourceGroup.Name -searchSkillSets $searchSkillSets -existingResources $existingResources
+    New-SearchService -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSets $searchSkillSets -existingResources $existingResources
 
     # **********************************************************************************************************************
     # Create Log Analytics Workspace
 
-    New-LogAnalyticsWorkspace -logAnalyticsWorkspace $logAnalyticsWorkspace -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-LogAnalyticsWorkspace -logAnalyticsWorkspace $logAnalyticsWorkspace -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Application Insights component
 
-    New-ApplicationInsights -appInsightsName $appInsights -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-ApplicationInsights -appInsightsName $appInsights -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create OpenAI service
 
-    New-OpenAIService -openAIService $openAIService -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-OpenAIService -openAIService $openAIService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Container Registry
 
-    New-ContainerRegistry -containerRegistryName $containerRegistryName -resourceGroupName $resourceGroup.Name -location $location -existingResources $existingResources
+    New-ContainerRegistry -containerRegistryName $containerRegistryName -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Document Intelligence service
 
-    New-DocumentIntelligenceService -documentIntelligenceService $documentIntelligenceService -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-DocumentIntelligenceService -documentIntelligenceService $documentIntelligenceService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create Computer Vision service
 
-    New-ComputerVisionService -computerVisionService $computerVisionService -resourceGroupName $resourceGroup.Name -location $location -existingResources $existingResources
+    New-ComputerVisionService -computerVisionService $computerVisionService -resourceGroupName $resourceGroupName -location $location -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create API Management Service
 
     # Commenting out for now because this resource is not being used in the deployment and it takes way too long to provision
-    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroup.Name -existingResources $existingResources
+    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
 }
 
@@ -3052,7 +3067,7 @@ function New-SearchDataSource {
 
             Invoke-RestMethod -Uri $searchDataSourceUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
 
-            Write-Host "DataSource '$searchDataSourceName' created successfully."
+            Write-Host "DataSource '$searchDataSourceName' created successfully." -ForegroundColor Green
             Write-Log -message "DataSource '$searchDataSourceName' created successfully."
                 
             return true
@@ -3128,7 +3143,7 @@ function New-SearchIndex {
         # Create the index
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
-            Write-Host "Index '$searchIndexName' created successfully."
+            Write-Host "Index '$searchIndexName' created successfully." -ForegroundColor Green
             Write-Log -message "Index '$searchIndexName' created successfully."
 
             return true
@@ -3239,21 +3254,20 @@ function New-SearchService {
     param(
         [psobject]$searchService,
         [psobject]$storageService,
-        [psobject]$resourceGroup,
+        [string]$resourceGroupName,
         [psobject]$userAssignedIdentity,
-        [array]$searchSkillSets,
+        [psobject]$searchSkillSets,
         [array]$existingResources
     )
 
     $searchServiceName = $searchService.Name
     $storageServiceName = $storageService.Name
     $userAssignedIdentityName = $userAssignedIdentity.Name
-    $resourceGroupName = $resourceGroup.Name
     $location = $searchService.Location
 
     Write-Host "Executing New-SearchService ('$searchServiceName') function..." -ForegroundColor Magenta
 
-    az provider show --namespace Microsoft.Search --query "resourceTypes[?resourceType=='searchServices'].apiVersions"
+    #az provider show --namespace Microsoft.Search --query "resourceTypes[?resourceType=='searchServices'].apiVersions"
 
     if ($existingResources -notcontains $searchServiceName) {
         $searchServiceName = Get-ValidServiceName -serviceName $searchServiceName
@@ -3680,6 +3694,9 @@ function New-StorageService {
 
     Write-Host "Executing New-StorageService ('$storageServiceName') function..." -ForegroundColor Magenta
 
+    $appService = $global:appServices | Where-Object { $_.Type -eq "Web" }
+    $appServiceUrl = $appService.Url
+
     if ($existingResources -notcontains $storageServiceName) {
 
         try {
@@ -3699,7 +3716,9 @@ function New-StorageService {
 
             # Enable CORS
             az storage cors clear --account-name $storageServiceName --services bfqt
-            az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageServiceName --account-key $storageAccessKey
+            az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageServiceName --account-key $global:storageServiceAccountKey
+            
+            az storage cors add --methods GET POST PUT --origins $appServiceUrl --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageServiceName --account-key $global:storageServiceAccountKey
 
             az storage container create --name $storageContainerName --account-name $storageServiceName --account-key $global:storageServiceAccountKey --output none
 
@@ -3732,10 +3751,10 @@ function New-SubNet {
         [array]$existingResources
     )
 
-    Write-Host "Executing New-SubNet function..." -ForegroundColor Magenta
-
     $subnetName = $subnet.Name
     $subnetAddressPrefix = $subnet.AddressPrefix
+
+    Write-Host "Executing New-SubNet ('$subnetName') function..." -ForegroundColor Magenta
 
     $subnetExists = Test-SubnetExists -resourceGroupName $resourceGroupName -vnetName $vnetName -subnetName $subnetName
 
@@ -3765,9 +3784,9 @@ function New-VirtualNetwork {
         [array]$existingResources
     )
 
-    Write-Host "Executing New-VirtualNetwork function..." -ForegroundColor Magenta
-
     $vnetName = $virtualNetwork.Name
+
+    Write-Host "Executing New-VirtualNetwork ('$vnetName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $vnetName) {
         try {
@@ -3783,11 +3802,16 @@ function New-VirtualNetwork {
             Write-Log -message "Failed to create Virtual Network '$vnetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
     }
+    else {
+        Write-Host "Virtual Network '$vnetName' already exists."
+        Write-Log -message "Virtual Network '$vnetName' already exists."
+    }
 }
 
 # Function to delete Azure resource groups
 function Remove-ResourceGroup {
-    params(
+    param
+    (
         [string]$resourceGroupName
     )
 
@@ -4293,6 +4317,8 @@ function Start-Deployment {
     $global:resourceCounter = 0
     $global:resourceSuffix = 1
 
+    $global:parametersFile = "parameters.json"
+
     # Initialize parameters
     $initParams = Initialize-Parameters -parametersFile $parametersFile
 
@@ -4432,9 +4458,39 @@ function Start-Deployment {
         Write-Host "Identity '$userAssignedIdentityName' already exists."
         Write-Log -message "Identity '$userAssignedIdentityName' already exists."
     }
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
+        
+        # Ensure the service principal is created
+        az ad sp create --id $assigneePrincipalId
+        Write-Host "Service principal created for identity '$userAssignedIdentityName'."
+        Write-Log -message "Service principal created for identity '$userAssignedIdentityName'."
+    }
+    catch {
+        Write-Error "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create service principal for identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
    
     # Create new Azure resources
-    New-Resources
+    New-Resources -resourceGroup $global:resourceGroup `
+        -storageService $global:storageService `
+        -virtualNetwork $global:virtualNetwork `
+        -subNet $global:subNet `
+        -appServicePlan $global:appServicePlan `
+        -cognitiveService $global:cognitiveService `
+        -searchService $global:searchService `
+        -searchSkillSets $global:searchSkillSets `
+        -logAnalyticsWorkspace $global:logAnalyticsWorkspace `
+        -appInsightsService $global:appInsightsService `
+        -openAIService $global:openAIService `
+        -containerRegistry $global:containerRegistry `
+        -documentIntelligenceService $global:documentIntelligenceService `
+        -computerVisionService $global:computerVisionService `
+        -apiManagementService $global:apiManagementService `
+        -existingResources $existingResources
 
     # Create new web app and function app services
     foreach ($appService in $appServices) {
@@ -4729,7 +4785,7 @@ function Test-SubnetExists {
         [string]$subnetName
     )
 
-    Write-Host "Executing Test-SubNetExists function..." -ForegroundColor Magenta
+    #Write-Host "Executing Test-SubNetExists function..." -ForegroundColor Magenta
 
     try {
         $subnet = az network vnet subnet show --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --query "name" --output tsv

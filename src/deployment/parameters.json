@@ -159,6 +159,32 @@
     "Sku": "B1",
     "Location": "east us"
   },
+  "appServices": [
+    {
+      "AppServicePlan": "asp-copilot-demo-008",
+      "DeletePackageAfterDeploy": true,
+      "DeployZipPackage": true,
+      "Location": "east us",
+      "Name": "app-copilot-demo-008",
+      "Path": "app/frontend",
+      "ResourceGroup": "RG-copilot-demo-008",
+      "Runtime": "NODE:20LTS",
+      "Type": "Web",
+      "Url": "https://app-copilot-demo-008.azurewebsites.net"
+    },
+    {
+      "AppServicePlan": "asp-copilot-demo-008",
+      "DeletePackageAfterDeploy": true,
+      "DeployZipPackage": true,
+      "Location": "east us",
+      "Name": "func-copilot-demo-008",
+      "Path": "app/functions/apikeys",
+      "ResourceGroup": "RG-copilot-demo-008",
+      "Runtime": "dotnet-isolated",
+      "Type": "Function",
+      "Url": "https://func-copilot-demo-008.azurewebsites.net"
+    }
+  ],
   "appTitle": "Chat with Microsoft Copilot",
   "azureManagement": {
     "ApiVersion": "2024-06-01-Preview",
@@ -483,6 +509,7 @@
     "ApiKey": "xxx",
     "ApiVersion": "2024-11-01-Preview",
     "Endpoint": "https://srch-copilot-demo-008.search.windows.net",
+    "Location": "east us",
     "Name": "srch-copilot-demo-008",
     "Type": "azure_ai_search",
     "YamlFileName": "search.connection.yaml"
