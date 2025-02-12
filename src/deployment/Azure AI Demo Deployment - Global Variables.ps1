@@ -741,16 +741,15 @@ function Get-SearchIndexers {
 function Get-SearchSkillSets {
     param (
         [string]$searchServiceName,
-        
+        [string]$resourceGroupName,
         [string]$subscriptionId
     )
 
     Write-Host "Executing Get-SearchSkillSets function..." -ForegroundColor Yellow
 
     $subscriptionId = $global:subscriptionId
-    $resourceGroup.Name = $resourceGroup.Name
 
-    $accessToken = az search admin-key show --resource-group $resourceGroup.Name --service-name $searchServiceName --query primaryKey --output tsv
+    $accessToken = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query primaryKey --output tsv
 
     $uri = "https://$searchServiceName.search.windows.net/skillsets?api-version=2024-07-01"
 
@@ -760,7 +759,7 @@ function Get-SearchSkillSets {
         return $skillsets
     }
     catch {
-        Write-Error "Failed to query search skillsets: $_"
+        Write-Error "Failed to query search skillsets: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         return $false
     }
 }
@@ -1051,6 +1050,7 @@ function Initialize-Parameters {
     $global:openAIService = $parametersObject.openAIService
     $global:previousResourceBaseName = $parametersObject.previousResourceBaseName          
     $global:resourceGroup = $parametersObject.resourceGroup
+    $global:searchDataSources = $parametersObject.searchDataSources
     $global:searchIndexers = $parametersObject.searchIndexers
     $global:searchIndexes = $parametersObject.searchIndexes
     $global:searchService = $parametersObject.searchService
@@ -1149,7 +1149,7 @@ function Initialize-Parameters {
         resourceTypes                = $global:resourceTypes
         restoreSoftDeletedResource   = $parametersObject.restoreSoftDeletedResources
         result                       = $result
-        searchDataSources            = $parametersObject.searchDataSources
+        searchDataSources            = $global:searchDataSources
         searchIndexFieldNames        = $parametersObject.searchIndexFieldNames
         searchIndexes                = $global:searchIndexes
         searchIndexers               = $global:searchIndexers
@@ -2969,7 +2969,7 @@ function New-Resources {
 # Function to create a new search datasource
 function New-SearchDataSource {
     param(
-        [psobject]$resourceGroup,
+        [string]$resourceGroupName,
         [psobject]$searchService,
         [psobject]$searchDataSource,
         [psobject]$storageService,
@@ -2979,7 +2979,8 @@ function New-SearchDataSource {
     # https://learn.microsoft.com/en-us/azure/search/search-howto-index-sharepoint-online
 
     $storageServiceName = $storageService.Name
-
+    $searchServiceName = $searchService.Name
+    $searchServiceAPiVersion = $searchService.ApiVersion
     $searchDataSourceName = $searchDataSource.Name
     $searchDataSourceType = $searchDataSource.Type
     $searchDataSourceQuery = $searchDataSource.Query
@@ -2994,9 +2995,9 @@ function New-SearchDataSource {
     try {
         $ErrorActionPreference = 'Continue'
 
-        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchService.Name --query "primaryKey" --output tsv
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
 
-        $storageAccessKey = az storage account keys list --account-name $storageServiceName --resource-group $resourceGroup.Name --query "[0].value" --output tsv
+        $storageAccessKey = az storage account keys list --account-name $storageServiceName --resource-group $resourceGroupName --query "[0].value" --output tsv
 
         foreach ($appService in $global:appServices) {
             $appServiceName = $appService.Name
@@ -3048,7 +3049,7 @@ function New-SearchDataSource {
             }
         }
 
-        $searchDataSourceUrl = "https://$($searchService.Name).search.windows.net/datasources?api-version=$($searchService.APiVersion)"
+        $searchDataSourceUrl = "https://$($searchServiceName).search.windows.net/datasources?api-version=$($searchServiceAPiVersion)"
 
         Write-Host "searchDataSourceUrl: $searchDataSourceUrl"
 
@@ -3362,7 +3363,7 @@ function New-SearchService {
                 $dataSourceExists = $dataSources -contains $searchDataSourceName
 
                 if ($dataSourceExists -eq $false) {
-                    New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $storageServiceName -appId $appId
+                    New-SearchDataSource -searchService $searchService -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageService $storageService -appId $appId
                 }
                 else {
                     Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
@@ -3545,7 +3546,7 @@ function New-SearchService {
             $dataSourceExists = $dataSources -contains $searchDataSourceName
 
             if ($dataSourceExists -eq $false) {
-                New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $storageServiceName -appId $appId
+                New-SearchDataSource -searchService $searchService -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageService $storageService -appId $appId
             }
             else {
                 Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
