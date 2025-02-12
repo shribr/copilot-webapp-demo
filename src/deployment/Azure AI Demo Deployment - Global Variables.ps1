@@ -308,7 +308,7 @@ function Deploy-OpenAIModels {
             $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroup.Name --name $aiServiceName --query "[?name=='$aiModelDeploymentName']" --output tsv
 
             if ($deploymentExists) {
-                Write-Host "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
+                Write-Host "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists." -ForegroundColor Blue
                 Write-Log -message "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
             }
             else {
@@ -565,7 +565,7 @@ function Get-KeyVaultSecret {
 
     try {
         $secret = az keyvault secret show --vault-name $keyVaultName --name $secretName --query "value" --output tsv
-        Write-Host "Secret: '$secretName' already exista."
+        Write-Host "Secret: '$secretName' already exists." -ForegroundColor Blue
         Write-Log -message "Secret: '$SecretName' already exists." -logFilePath $global:LogFilePath
         return $secret
     }
@@ -1269,7 +1269,7 @@ function New-AIHub {
         }
     }
     else {
-        Write-Host "AI Hub '$aiHubName' already exists."
+        Write-Host "AI Hub '$aiHubName' already exists." -ForegroundColor Blue
         Write-Log -message "AI Hub '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 }
@@ -1310,7 +1310,7 @@ function New-AIHubConnection {
         }
     }
     else {
-        Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' already exists."
+        Write-Host "Azure $resourceType '$serviceName' connection for '$aiHubName' already exists." -ForegroundColor Blue
         Write-Log -message "Azure $resourceType '$serviceName' connection for '$aiHubName' already exists." -logFilePath $global:LogFilePath
     }
 }
@@ -1472,7 +1472,7 @@ function New-AIService {
 
         $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:aiService.ApiKey
 
-        Write-Host "AI Service '$aiServiceName' already exists."
+        Write-Host "AI Service '$aiServiceName' already exists." -ForegroundColor Blue
         Write-Log -message "AI Service '$aiServiceName' already exists." -logFilePath $global:LogFilePath
     }
 }
@@ -1527,7 +1527,7 @@ function New-ApiManagementApi {
         Write-Log -message "API 'KeyVaultProxy' and its operations created successfully." -logFilePath $global:LogFilePath
     }
     else {
-        Write-Host "API 'KeyVaultProxy' already exists."
+        Write-Host "API 'KeyVaultProxy' already exists." -ForegroundColor Blue
         Write-Log -message "API 'KeyVaultProxy' already exists." -logFilePath $global:LogFilePath
 
         try {
@@ -1621,7 +1621,7 @@ function New-ApiManagementService {
         }
     }
     else {
-        Write-Host "Api Management service '$apiManagementServiceName' already exists."
+        Write-Host "Api Management service '$apiManagementServiceName' already exists." -ForegroundColor Blue
         Write-Log -message "Api Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
 
         $status = az apim show --resource-group $resourceGroup.Name --name $apiManagementServiceName --query "provisioningState" -o tsv
@@ -1690,7 +1690,7 @@ function New-AppRegistration {
                 New-SearchDataSource -searchServiceName $global:searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $global:storageServiceName -appId $appId
             }
             else {
-                Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
                 Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
             }
         }
@@ -1855,7 +1855,7 @@ function New-ApplicationInsights {
         }
     }
     else {
-        Write-Host "Application Insights '$appInsightsName' already exists."
+        Write-Host "Application Insights '$appInsightsName' already exists." -ForegroundColor Blue
         Write-Log -message "Application Insights '$appInsightsName' already exists."
     }
 }
@@ -1984,7 +1984,7 @@ function New-AppServiceEnvironment {
         }
     }
     else {
-        Write-Host "App Service Environment '$appServiceEnvironmentName' already exists."
+        Write-Host "App Service Environment '$appServiceEnvironmentName' already exists." -ForegroundColor Blue
         Write-Log -message "App Service Environment '$appServiceEnvironmentName' already exists."
     }
 }
@@ -2018,7 +2018,7 @@ function New-AppServicePlan {
         }
     }
     else {
-        Write-Host "App Service Plan '$appServicePlanName' already exists."
+        Write-Host "App Service Plan '$appServicePlanName' already exists." -ForegroundColor Blue
         Write-Log -message "App Service Plan '$appServicePlanName' already exists."
     }
 }
@@ -2127,7 +2127,7 @@ function New-CognitiveService {
         }
     }
     else {
-        Write-Host "Cognitive Service '$cognitiveServiceName' already exists."
+        Write-Host "Cognitive Service '$cognitiveServiceName' already exists." -ForegroundColor Blue
         Write-Log -message "Cognitive Service '$cognitiveServiceName' already exists." -logFilePath $global:LogFilePath
     }
 }
@@ -2211,7 +2211,7 @@ function New-ComputerVisionService {
         }
     }
     else {
-        Write-Host "Computer Vision Service '$computerVisionName' already exists."
+        Write-Host "Computer Vision Service '$computerVisionName' already exists." -ForegroundColor Blue
         Write-Log -message "Computer Vision Service '$computerVisionName' already exists."
     }
 }
@@ -2272,7 +2272,7 @@ function New-ContainerRegistry {
         }
     }
     else {
-        Write-Host "Container Registry '$containerRegistryName' already exists."
+        Write-Host "Container Registry '$containerRegistryName' already exists." -ForegroundColor Blue
         Write-Log -message "Container Registry '$containerRegistryName' already exists."
     }
 }
@@ -2361,7 +2361,7 @@ function New-DocumentIntelligenceService {
         }
     }
     else {
-        Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists."
+        Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists." -ForegroundColor Blue
         Write-Log -message "Document Intelligence Service '$documentIntelligenceName' already exists."
     }
 }
@@ -2454,7 +2454,7 @@ function New-KeyVault {
         #Set-KeyVaultSecrets -keyVaultName $keyVaultName -resourceGroupName $resourceGroup.Name
     }
     else {
-        Write-Host "Key Vault '$keyVaultName' already exists."
+        Write-Host "Key Vault '$keyVaultName' already exists." -ForegroundColor Blue
         Write-Log -message "Key Vault '$keyVaultName' already exists."
     }
 }
@@ -2490,7 +2490,7 @@ function New-LogAnalyticsWorkspace {
         }
     }
     else {
-        Write-Host "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
+        Write-Host "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists." -ForegroundColor Blue
         Write-Log -message "Log Analytics workspace '$logAnalyticsWorkspaceName' already exists."
     }
 }
@@ -2664,7 +2664,7 @@ function New-MachineLearningWorkspace {
         }
     }
     else {
-        Write-Host "AI Project '$aiProjectName' already exists."
+        Write-Host "AI Project '$aiProjectName' already exists." -ForegroundColor Blue
         Write-Log -message "AI Project '$aiProjectName' already exists." -logFilePath $global:LogFilePath
     }
 }
@@ -2750,7 +2750,7 @@ function New-OpenAIService {
         }
     }
     else {
-        Write-Host "Azure OpenAI service '$openAIServiceName' already exists."
+        Write-Host "Azure OpenAI service '$openAIServiceName' already exists." -ForegroundColor Blue
         Write-Log -message "Azure OpenAI service '$openAIServiceName' already exists."
     }
 }
@@ -3358,7 +3358,7 @@ function New-SearchService {
                     New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $storageServiceName -appId $appId
                 }
                 else {
-                    Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                    Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
                 }
             }
@@ -3375,7 +3375,7 @@ function New-SearchService {
                     New-SearchIndex -searchService $searchService -resourceGroupName $resourceGroupName -searchIndex $index
                 }
                 else {
-                    Write-Host "Search Index '$indexName' already exists."
+                    Write-Host "Search Index '$indexName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Index '$indexName' already exists."
                 }
             }
@@ -3394,7 +3394,7 @@ function New-SearchService {
                     New-SearchSkillSet -searchService $searchService -resourceGroupName $resourceGroupName -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
                 }
                 else {
-                    Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                    Write-Host "Search Skill Set '$searchSkillSetName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
                 }
             }
@@ -3419,7 +3419,7 @@ function New-SearchService {
                             New-SearchIndexer -searchService $searchService -resourceGroup $resourceGroup -searchIndexer $indexer -searchIndexName $indexName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchedule $searchIndexerSchedule
                         }
                         else {
-                            Write-Host "Search Indexer '$indexer' already exists."
+                            Write-Host "Search Indexer '$indexer' already exists." -ForegroundColor Blue
                             Write-Log -message "Search Indexer '$indexer' already exists." -logFilePath $global:LogFilePath
                         }
                     }
@@ -3441,7 +3441,7 @@ function New-SearchService {
     }
     else {
 
-        Write-Host "Search Service '$searchServiceName' already exists."
+        Write-Host "Search Service '$searchServiceName' already exists." -ForegroundColor Blue
         Write-Log -message "Search Service '$searchServiceName' already exists."
 
         #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
@@ -3515,7 +3515,7 @@ function New-SearchService {
                 New-SearchIndex -searchService $searchService -resourceGroupName $resourceGroupName -searchIndex $index
             }
             else {
-                Write-Host "Search Index '$indexName' already exists."
+                Write-Host "Search Index '$indexName' already exists." -ForegroundColor Blue
                 Write-Log -message "Search Index '$indexName' already exists."
             }
         }
@@ -3542,7 +3542,7 @@ function New-SearchService {
                 New-SearchDataSource -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchDataSource $searchDataSource -storageServiceName $storageServiceName -appId $appId
             }
             else {
-                Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
                 Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
             }
         }
@@ -3561,7 +3561,7 @@ function New-SearchService {
                 New-SearchSkillSet -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchSkillSet $searchSkillSet -cognitiveServiceName $cognitiveServiceName
             }
             else {
-                Write-Host "Search Skill Set '$searchSkillSetName' already exists."
+                Write-Host "Search Skill Set '$searchSkillSetName' already exists." -ForegroundColor Blue
                 Write-Log -message "Search Skill Set '$searchSkillSetName' already exists."
             }
         }
@@ -3585,7 +3585,7 @@ function New-SearchService {
                     New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
                 }
                 else {
-                    Write-Host "Search Indexer '$indexerName' already exists."
+                    Write-Host "Search Indexer '$indexerName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Indexer '$indexerName' already exists."
                 }
 
@@ -3737,7 +3737,7 @@ function New-StorageService {
 
         $global:keyVaultSecrets.StorageServiceApiKey = $global:storageServiceAccountKey
 
-        Write-Host "Storage account '$storageServiceName' already exists."
+        Write-Host "Storage account '$storageServiceName' already exists." -ForegroundColor Blue
         Write-Log -message "Storage account '$storageServiceName' already exists."
     }
 }
@@ -3771,7 +3771,7 @@ function New-SubNet {
         }
     }
     else {
-        Write-Host "Subnet '$subnetName' already exists."
+        Write-Host "Subnet '$subnetName' already exists." -ForegroundColor Blue
         Write-Log -message "Subnet '$subnetName' already exists."
     }
 }
@@ -3803,7 +3803,7 @@ function New-VirtualNetwork {
         }
     }
     else {
-        Write-Host "Virtual Network '$vnetName' already exists."
+        Write-Host "Virtual Network '$vnetName' already exists." -ForegroundColor Blue
         Write-Log -message "Virtual Network '$vnetName' already exists."
     }
 }
@@ -4414,7 +4414,7 @@ function Start-Deployment {
     }
 
     if ($resourceGroupExists -eq $true) {
-        Write-Host "Resource Group '$resourceGroupName' already exists."
+        Write-Host "Resource Group '$resourceGroupName' already exists." -ForegroundColor Blue
         Write-Log -message "Resource Group '$resourceGroupName' already exists." -logFilePath $logFilePath
     }
     else {
@@ -4455,7 +4455,7 @@ function Start-Deployment {
         New-ManagedIdentity -userAssignedIdentity $global:userAssignedIdentity -resourceGroupName $resourceGroupName
     }
     else {
-        Write-Host "Identity '$userAssignedIdentityName' already exists."
+        Write-Host "Identity '$userAssignedIdentityName' already exists." -ForegroundColor Blue
         Write-Log -message "Identity '$userAssignedIdentityName' already exists."
     }
 
@@ -4512,7 +4512,7 @@ function Start-Deployment {
         New-KeyVault -keyVault $global:keyVault -resourceGroupName $resourceGroupName -existingResources $existingResources
     }
     else {
-        Write-Host "Key Vault '$keyVaultName' already exists."
+        Write-Host "Key Vault '$keyVaultName' already exists." -ForegroundColor Blue
         Write-Log -message "Key Vault '$keyVaultName' already exists."
     }
 
@@ -4596,7 +4596,7 @@ function Start-Deployment {
                     New-SearchDataSource -searchServiceName $global:searchService.Name -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageServiceName $global:storageService.Name -appId $appId
                 }
                 else {
-                    Write-Host "Search Service Data Source '$searchDataSourceName' already exists."
+                    Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
                 }
             }
