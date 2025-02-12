@@ -691,7 +691,7 @@ function Get-SearchIndexes {
         [string]$subscriptionId
     )
 
-    #Write-Host "Executing Get-SearchIndexes function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-SearchIndexes function..." -ForegroundColor Yellow
 
     $subscriptionId = $global:subscriptionId
     $resourceGroup.Name = $resourceGroup.Name
@@ -3344,12 +3344,18 @@ function New-SearchService {
             # Example for how to obtain the sharepoint siteid for use with the REST Api: https://fedairs.sharepoint.com/sites/MicrosoftCopilotDemo/_api/site
             $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 
+            $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+                
+            $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+                        
+            $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+
             foreach ($appService in $global:appServices) {
                 if ($appService.Type -eq "Web") {
                     $appServiceName = $appService.Name
                     #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
                     $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
-                    Write-Host "App ID for $($appServiceName): $appId"
+                    #Write-Host "App ID for $($appServiceName): $appId"
                 }
             }
 
@@ -3371,7 +3377,6 @@ function New-SearchService {
             foreach ($index in $global:searchIndexes) {
                 $indexName = $index.Name
 
-                $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
                 $searchIndexExists = $searchIndexes -contains $indexName
 
                 if ($searchIndexExists -eq $false) {
@@ -3386,8 +3391,6 @@ function New-SearchService {
             foreach ($searchSkillSet in $searchSkillSets) {
 
                 $searchSkillSetName = $searchSkillSet.Schema.Name
-
-                $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
 
                 $searchSkillSetExists = $existingSearchSkillSets -contains $searchSkillSetName
 
@@ -3413,7 +3416,6 @@ function New-SearchService {
 
                         $searchDataSourceName = $indexer.DataSourceName
 
-                        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
                         $searchIndexerExists = $searchIndexers -contains $indexerName
 
                         if ($searchIndexerExists -eq $false) {
@@ -3503,16 +3505,22 @@ function New-SearchService {
         #     Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         # }
 
+        $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+
+        $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+                
+        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+                        
+        $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+             
         try {
             $ErrorActionPreference = 'Continue'
 
-            $dataSources = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -dataSourceName $searchDataSourceName
             $dataSourceExists = $dataSources -contains $searchDataSourceName
 
             foreach ($index in $global:searchIndexes) {
                 $indexName = $index.Name
 
-                $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
                 $searchIndexExists = $searchIndexes -contains $indexName
 
                 if ($searchIndexExists -eq $false) {
@@ -3529,7 +3537,7 @@ function New-SearchService {
                 if ($appService.Type -eq "Web") {
                     #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
                     $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
-                    Write-Host "App ID for $($appServiceName): $appId"
+                    #Write-Host "App ID for $($appServiceName): $appId"
                     break
                 }
             }
@@ -3550,8 +3558,6 @@ function New-SearchService {
             foreach ($searchSkillSet in $searchSkillSets) {
 
                 $searchSkillSetName = $searchSkillSet.Schema.Name
-
-                $existingSearchSkillSets = Get-SearchSkillSets -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchSkillSetName $searchSkillSetName
 
                 $searchSkillSetExists = $existingSearchSkillSets -contains $searchSkillSetName
 
@@ -3576,7 +3582,6 @@ function New-SearchService {
 
                     $searchDataSourceName = $indexer.DataSourceName
 
-                    $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
                     $searchIndexerExists = $searchIndexers -contains $indexerName
 
                     if ($searchIndexerExists -eq $false) {
@@ -4647,7 +4652,7 @@ function Start-SearchIndexer {
         [string]$searchIndexerName
     )
 
-    Write-Host "Executing Start-Deployment function..." -ForegroundColor Magenta
+    #Write-Host "Executing Start-SearchIndexer function..." -ForegroundColor Magenta
 
     # try {
     #     $ErrorActionPreference = 'Stop'
