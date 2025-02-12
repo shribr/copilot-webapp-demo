@@ -3417,7 +3417,7 @@ function New-SearchService {
 
                         $searchDataSourceName = $indexer.DataSourceName
 
-                        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+                        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
                         $searchIndexerExists = $searchIndexers -contains $indexerName
 
                         if ($searchIndexerExists -eq $false) {
@@ -3582,7 +3582,7 @@ function New-SearchService {
 
                 $searchDataSourceName = $indexer.DataSourceName
 
-                $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
+                $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
                 $searchIndexerExists = $searchIndexers -contains $indexerName
 
                 if ($searchIndexerExists -eq $false) {
