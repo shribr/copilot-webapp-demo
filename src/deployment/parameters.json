@@ -269,7 +269,8 @@
   "deployApiManagementService": true,
   "deployZipResources": true,
   "documentIntelligenceService": {
-    "Name": "docintel-copilot-demo-008"
+    "Name": "docintel-copilot-demo-008",
+    "Location": "east us"
   },
   "domainName": "azurewebsites.net",
   "exposeApiScopes": [
