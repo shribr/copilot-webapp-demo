@@ -2291,12 +2291,12 @@ function New-DocumentIntelligenceService {
         [array]$existingResources
     )
 
-    $documentIntelligenceName = $documentIntelligenceService.Name
+    $documentIntelligenceServiceName = $documentIntelligenceService.Name
     $location = $documentIntelligenceService.Location
 
     Write-Host "Executing New-DocumentIntelligenceService ('$documentIntelligenceServiceName') function..." -ForegroundColor Magenta
 
-    if ($existingResources -notcontains $documentIntelligenceName) {
+    if ($existingResources -notcontains $documentIntelligenceServiceName) {
 
         $availableLocations = az cognitiveservices account list-skus --kind FormRecognizer --query "[].locations" --output tsv
 
@@ -2306,17 +2306,17 @@ function New-DocumentIntelligenceService {
             try {
                 $ErrorActionPreference = 'Stop'
 
-                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --sku S0 --output none 2>&1
+                $jsonOutput = az cognitiveservices account create --name $documentIntelligenceServiceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --kind FormRecognizer --sku S0 --output none 2>&1
                 # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
 
                 if ($jsonOutput -match "error") {
 
                     $jsonProperties = '{"restore": true}'
-                    $jsonOutput = az resource create --subscription $global:subscriptionId -g $resourceGroupName -n $documentIntelligenceName --location $documentIntelligenceService.Location --namespace Microsoft.CognitiveServices --resource-type accounts --properties $jsonProperties
+                    $jsonOutput = az resource create --subscription $global:subscriptionId -g $resourceGroupName -n $documentIntelligenceServiceName --location $documentIntelligenceService.Location --namespace Microsoft.CognitiveServices --resource-type accounts --properties $jsonProperties
 
                     $errorInfo = Format-ErrorInfo -jsonOutput $jsonOutput
 
-                    $errorMessage = "Failed to create Document Intelligence Service: '$documentIntelligenceName'. `
+                    $errorMessage = "Failed to create Document Intelligence Service: '$documentIntelligenceServiceName'. `
         `Error: $($errorInfo.Code) `
         `Code: $($errorInfo.Error) `
         `Details: $($errorInfo.SKU)"
@@ -2335,8 +2335,8 @@ function New-DocumentIntelligenceService {
 
                     $global:resourceCounter += 1
 
-                    Write-Host "Document Intelligence account '$documentIntelligenceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
-                    Write-Log -message "Document Intelligence account '$documentIntelligenceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+                    Write-Host "Document Intelligence account '$documentIntelligenceServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+                    Write-Log -message "Document Intelligence account '$documentIntelligenceServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
                 }
 
             }
@@ -2346,18 +2346,18 @@ function New-DocumentIntelligenceService {
                     try {
                         $ErrorActionPreference = 'Stop'
                         # Attempt to restore the soft-deleted Cognitive Services account
-                        Recover-SoftDeletedResource -resourceName $documentIntelligenceName -resourceType "DocumentIntelligence" -resourceGroupName $resourceGroupName
-                        Write-Host "Document Intelligence account '$documentIntelligenceName' restored."
-                        Write-Log -message "Document Intelligence account '$documentIntelligenceName' restored."
+                        Recover-SoftDeletedResource -resourceName $documentIntelligenceServiceName -resourceType "DocumentIntelligence" -resourceGroupName $resourceGroupName
+                        Write-Host "Document Intelligence account '$documentIntelligenceServiceName' restored."
+                        Write-Log -message "Document Intelligence account '$documentIntelligenceServiceName' restored."
                     }
                     catch {
-                        Write-Error "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                        Write-Log -message "Failed to restore Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Error "Failed to restore Document Intelligence account '$documentIntelligenceServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to restore Document Intelligence account '$documentIntelligenceServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                     }
                 }
                 else {
-                    Write-Error "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Error "Failed to create Document Intelligence account '$documentIntelligenceServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Document Intelligence account '$documentIntelligenceServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
             }
         }
@@ -2367,8 +2367,8 @@ function New-DocumentIntelligenceService {
         }
     }
     else {
-        Write-Host "Document Intelligence Service '$documentIntelligenceName' already exists." -ForegroundColor Blue
-        Write-Log -message "Document Intelligence Service '$documentIntelligenceName' already exists."
+        Write-Host "Document Intelligence Service '$documentIntelligenceServiceName' already exists." -ForegroundColor Blue
+        Write-Log -message "Document Intelligence Service '$documentIntelligenceServiceName' already exists."
     }
 }
 
