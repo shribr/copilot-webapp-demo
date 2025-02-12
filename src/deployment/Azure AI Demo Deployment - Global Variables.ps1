@@ -441,7 +441,7 @@ function Format-CustomErrorInfo {
 # Function to get a list of Azure tenants
 function Get-Azure-Tenants() {
     
-    Write-Host "Executing Get-Azure-Tenants function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-Azure-Tenants function..." -ForegroundColor Yellow
 
     $tenantId = ""
     $optionSelected = 0
@@ -502,7 +502,7 @@ function Get-CognitiveServicesApiKey {
         [string]$cognitiveServiceName
     )
 
-    Write-Host "Executing Get-CognitiveServicesApiKey function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-CognitiveServicesApiKey function..." -ForegroundColor Yellow
 
     try {
         # Run the Azure CLI command and capture the output
@@ -534,7 +534,7 @@ function Get-DataSources {
         [string]$searchServiceName
     )
 
-    Write-Host "Executing Get-DataSources function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-DataSources function..." -ForegroundColor Yellow
 
     # Get the admin key for the search service
     #
@@ -561,7 +561,7 @@ function Get-KeyVaultSecret {
         [string]$secretName
     )
 
-    Write-Host "Executing Get-KeyVaultSecret function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-KeyVaultSecret function..." -ForegroundColor Yellow
 
     try {
         $secret = az keyvault secret show --vault-name $keyVaultName --name $secretName --query "value" --output tsv
@@ -691,7 +691,7 @@ function Get-SearchIndexes {
         [string]$subscriptionId
     )
 
-    Write-Host "Executing Get-SearchIndexes function..." -ForegroundColor Magenta
+    #Write-Host "Executing Get-SearchIndexes function..." -ForegroundColor Magenta
 
     $subscriptionId = $global:subscriptionId
     $resourceGroup.Name = $resourceGroup.Name
@@ -718,7 +718,7 @@ function Get-SearchIndexers {
         [string]$resourceGroupName
     )
 
-    Write-Host "Executing Get-SearchIndexers function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-SearchIndexers function..." -ForegroundColor Yellow
 
     $subscriptionId = $global:subscriptionId
 
@@ -745,7 +745,7 @@ function Get-SearchSkillSets {
         [string]$subscriptionId
     )
 
-    Write-Host "Executing Get-SearchSkillSets function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-SearchSkillSets function..." -ForegroundColor Yellow
 
     $subscriptionId = $global:subscriptionId
     $resourceGroup.Name = $resourceGroup.Name
@@ -772,7 +772,7 @@ function Get-UniqueSuffix {
         [psobject]$resourceGroup
     )
 
-    Write-Host "Executing Get-UniqueSuffix function..." -ForegroundColor Magenta
+    Write-Host "Executing Get-UniqueSuffix function..." -ForegroundColor Yellow
 
     $resourceGroupName = $resourceGroup.Name
 
@@ -1050,6 +1050,8 @@ function Initialize-Parameters {
     $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
     $global:openAIService = $parametersObject.openAIService          
     $global:resourceGroup = $parametersObject.resourceGroup
+    $global:searchIndexers = $parametersObject.searchIndexers
+    $global:searchIndexes = $parametersObject.searchIndexes
     $global:searchService = $parametersObject.searchService
     $global:searchSkillSets = $parametersObject.searchSkillSets          
     $global:storageService = $parametersObject.storageService
@@ -1148,8 +1150,8 @@ function Initialize-Parameters {
         result                       = $result
         searchDataSources            = $parametersObject.searchDataSources
         searchIndexFieldNames        = $parametersObject.searchIndexFieldNames
-        searchIndexes                = $parametersObject.searchIndexes
-        searchIndexers               = $parametersObject.searchIndexers
+        searchIndexes                = $global:searchIndexes
+        searchIndexers               = $global:searchIndexers
         searchPublicInternetResults  = $parametersObject.searchPublicInternetResults
         searchService                = $global:searchService
         searchSkillSets              = $global:searchSkillSets
@@ -1826,12 +1828,12 @@ function New-AppRegistration {
 function New-ApplicationInsights {
     param (
         [psobject]$appInsightsService,
-        [string]$location,
         [string]$resourceGroupName,
         [array]$existingResources
     )
 
     $appInsightsName = $appInsightsService.Name
+    $location = $appInsightsService.Location
 
     Write-Host "Executing New-ApplicationInsights ('$appInsightsName') function..." -ForegroundColor Magenta
 
@@ -2865,7 +2867,7 @@ function New-Resources {
     param
     (
         [psobject]$apiManagementService,
-        [psobject]$appInsights,
+        [psobject]$appInsightsService,
         [psobject]$appServicePlan,
         [psobject]$cognitiveService,
         [psobject]$computerVisionService,
@@ -2882,7 +2884,7 @@ function New-Resources {
         [array]$existingResources
     )
 
-    Write-Host "Executing New-Resources function..." -ForegroundColor Magenta
+    #Write-Host "Executing New-Resources function..." -ForegroundColor Magenta
 
     $resourceGroupName = $resourceGroup.Name
 
@@ -2931,7 +2933,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create Application Insights component
 
-    New-ApplicationInsights -appInsightsName $appInsights -resourceGroupName $resourceGroupName -existingResources $existingResources
+    New-ApplicationInsights -appInsightsName $appInsightsService -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
     # Create OpenAI service
@@ -3172,14 +3174,14 @@ function New-SearchIndexer {
         [psobject]$searchIndexer,
         [string]$searchIndexName,
         [string]$searchDatasourceName,
-        [string]$searchSkillSetName,
-        [string]$searchIndexerSchedule = "0 0 0 * * *"
+        [string]$searchSkillSetName
     )
 
     $searchServiceName = $searchService.Name
     $searchServiceApiVersion = $searchService.ApiVersion
     $searchIndexerName = $searchIndexer.Name
     $searchIndexerSchema = $searchIndexer.Schema
+    $searchIndexerSchedule
 
     Write-Host "Executing New-SearchIndexer ('$searchIndexerName') function..." -ForegroundColor Magenta
 
@@ -3192,7 +3194,7 @@ function New-SearchIndexer {
 
         Set-Content -Path $searchIndexerSchema -Value $updatedContent
 
-        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroup.Name --service-name $searchServiceName --query "primaryKey" --output tsv
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
 
         $searchIndexerUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceAPiVersion"
 
@@ -3284,7 +3286,7 @@ function New-SearchService {
 
             $global:resourceCounter += 1
 
-            Write-Host "Search Service '$searchServiceName' created successfully. [$global:resourceCounter]"
+            Write-Host "Search Service '$searchServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
             Write-Log -message "Search Service '$searchServiceName' created successfully. [$global:resourceCounter]"
 
             $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
@@ -3407,24 +3409,25 @@ function New-SearchService {
                     foreach ($indexer in $filteredSearchIndexers) {
                         $indexName = $indexer.IndexName
                         $indexerName = $indexer.Name
-                        $indexerSchema = $indexer.Schema
-                        $indexerSkillSetName = $indexer.SkillSetName
 
                         $searchDataSourceName = $indexer.DataSourceName
 
-                        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchIndexerName $indexerName
+                        $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
                         $searchIndexerExists = $searchIndexers -contains $indexerName
 
                         if ($searchIndexerExists -eq $false) {
-                            New-SearchIndexer -searchService $searchService -resourceGroup $resourceGroup -searchIndexer $indexer -searchIndexName $indexName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchedule $searchIndexerSchedule
+                            New-SearchIndexer -searchService $searchService `
+                                -resourceGroupName $resourceGroupName `
+                                -searchIndexName $indexName `
+                                -searchIndexer $indexer
                         }
                         else {
-                            Write-Host "Search Indexer '$indexer' already exists." -ForegroundColor Blue
-                            Write-Log -message "Search Indexer '$indexer' already exists." -logFilePath $global:LogFilePath
+                            Write-Host "Search Indexer '$indexerName' already exists." -ForegroundColor Blue
+                            Write-Log -message "Search Indexer '$indexerName' already exists." -logFilePath $global:LogFilePath
                         }
                     }
 
-                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchIndexerName $indexerName
+                    Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
 
                     Start-Sleep -Seconds 10
                 }
@@ -3448,7 +3451,7 @@ function New-SearchService {
         #az search service update --name $searchServiceName --resource-group $resourceGroup.Name --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
         #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroup.Name/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
 
-        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroup.Name --service-name $searchServiceName --query "primaryKey" --output tsv
+        $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
 
         $global:searchService.ApiKey = $searchServiceApiKey
 
@@ -3506,7 +3509,6 @@ function New-SearchService {
 
         foreach ($index in $global:searchIndexes) {
             $indexName = $index.Name
-            $indexSchema = $index.Schema
 
             $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name
             $searchIndexExists = $searchIndexes -contains $indexName
@@ -3573,23 +3575,24 @@ function New-SearchService {
             foreach ($indexer in $filteredSearchIndexers) {
                 $indexName = $indexer.IndexName
                 $indexerName = $indexer.Name
-                $indexerSchema = $indexer.Schema
-                $indexerSkillSetName = $indexer.SkillSetName
 
                 $searchDataSourceName = $indexer.DataSourceName
 
-                $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchIndexerName $indexerName
+                $searchIndexers = Get-SearchIndexers -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
                 $searchIndexerExists = $searchIndexers -contains $indexerName
 
                 if ($searchIndexerExists -eq $false) {
-                    New-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchIndexName $indexName -searchIndexerName $indexerName -searchDatasourceName $searchDatasourceName -searchSkillSetName $indexerSkillSetName -searchIndexerSchema $indexerSchema -searchIndexerSchedule $searchIndexerSchedule
+                    New-SearchIndexer -searchServiceName $searchServiceName `
+                        -resourceGroupName $resourceGroupName `
+                        -searchIndexName $indexName `
+                        -searchIndexer $indexer
                 }
                 else {
                     Write-Host "Search Indexer '$indexerName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Indexer '$indexerName' already exists."
                 }
 
-                Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -searchIndexerName $indexerName
+                Start-SearchIndexer -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName -searchIndexerName $indexerName
 
             }
 
@@ -3657,7 +3660,7 @@ function New-SearchSkillSet {
 
             Invoke-RestMethod -Uri $skillSetUrl -Method Post -Body $jsonBody -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
 
-            Write-Host "Skillset '$searchSkillSetName' created successfully."
+            Write-Host "Skillset '$searchSkillSetName' created successfully." -ForegroundColor Green
             Write-Log -message "Skillset '$searchSkillSetName' created successfully."
 
             return true
@@ -4161,8 +4164,8 @@ function Set-KeyVaultAccessPolicies {
         $ErrorActionPreference = 'Stop'
         # Set policy for the user
         az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-        Write-Host "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
-        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+        Write-Host "    Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'." -ForegroundColor Yellow
+        Write-Log -message "    Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
     }
     catch {
         Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -4187,8 +4190,8 @@ function Set-KeyVaultRoles {
     try {
         $ErrorActionPreference = 'Stop'
         az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-        Write-Host "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
-        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+        Write-Host " Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'." -ForegroundColor Yellow
+        Write-Log -message "    Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
     }
     catch {
         Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"

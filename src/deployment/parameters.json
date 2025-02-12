@@ -149,7 +149,8 @@
     }
   ],
   "appInsightsService": {
-    "Name": "appi-copilot-demo-008"
+    "Name": "appi-copilot-demo-008",
+    "Location": "east us"
   },
   "appServiceEnvironment": {
     "Name": "ase-copilot-demo-008"
@@ -453,6 +454,7 @@
       "Name": "srch-indexer-copilot-demo-008",
       "Schema": "search-indexer-schema.json",
       "SkillSetName": "srch-skillset-copilot-demo-008",
+      "Schedule": "0 0 0 * * *",
       "DataSourceName": "srch-datasource-blob-copilot-demo-008",
       "Active": true
     },
@@ -461,6 +463,7 @@
       "Name": "vector-srch-indexer-copilot-demo-008",
       "Schema": "vector-search-indexer-schema.json",
       "SkillSetName": "vector-srch-skillset-copilot-demo-008",
+      "Schedule": "0 0 0 * * *",
       "DataSourceName": "srch-datasource-blob-copilot-demo-008",
       "Active": true
     },
@@ -469,6 +472,7 @@
       "Name": "embeddings-srch-indexer-copilot-demo-008",
       "Schema": "embeddings-search-indexer-schema.json",
       "SkillSetName": "embeddings-srch-skillset-copilot-demo-008",
+      "Schedule": "0 0 0 * * *",
       "DataSourceName": "srch-datasource-blob-copilot-demo-008",
       "Active": true
     },
@@ -477,6 +481,7 @@
       "Name": "sharepoint-srch-indexer-copilot-demo-008",
       "Schema": "sharepoint-search-indexer-schema.json",
       "SkillSetName": "",
+      "Schedule": "0 0 0 * * *",
       "DataSourceName": "srch-datasource-sharepoint-copilot-demo-008",
       "Active": false
     }
@@ -511,6 +516,7 @@
     "Endpoint": "https://srch-copilot-demo-008.search.windows.net",
     "Location": "east us",
     "Name": "srch-copilot-demo-008",
+    "Sku": "basic",
     "Type": "azure_ai_search",
     "YamlFileName": "search.connection.yaml"
   },
