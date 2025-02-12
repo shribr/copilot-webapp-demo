@@ -247,7 +247,8 @@
     "Sku": "S0"
   },
   "computerVisionService": {
-    "Name": "cv-copilot-demo-008"
+    "Name": "cv-copilot-demo-008",
+    "Location": "east us"
   },
   "configFilePath": "app/frontend/config.json",
   "containerRegistry": {

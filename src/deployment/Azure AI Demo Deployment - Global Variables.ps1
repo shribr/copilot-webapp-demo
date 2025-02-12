@@ -1560,7 +1560,7 @@ function New-ApiManagementApi {
 # Function to create and deploy Api Management service
 function New-ApiManagementService {
     param (
-        
+        [string]$resourceGroupName,
         [psobject]$apiManagementService,
         [array]$existingResources
     )
@@ -1578,7 +1578,7 @@ function New-ApiManagementService {
     if ($existingResources -notcontains $apiManagementServiceName) {
         try {
             $ErrorActionPreference = 'Stop'
-            $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroup.Name --no-wait --output none 2>&1
+            $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait --output none 2>&1
 
             Write-Host $jsonOutput
 
@@ -1627,7 +1627,7 @@ function New-ApiManagementService {
         Write-Host "Api Management service '$apiManagementServiceName' already exists." -ForegroundColor Blue
         Write-Log -message "Api Management service '$apiManagementServiceName' already exists." -logFilePath $global:LogFilePath
 
-        $status = az apim show --resource-group $resourceGroup.Name --name $apiManagementServiceName --query "provisioningState" -o tsv
+        $status = az apim show --resource-group $resourceGroupName --name $apiManagementServiceName --query "provisioningState" -o tsv
 
         if ($status -eq "Activating") {
             Write-Host "Api Management service '$apiManagementServiceName' is activating."
@@ -1635,7 +1635,7 @@ function New-ApiManagementService {
             return
         }
 
-        New-ApiManagementApi -resourceGroupName $resourceGroup.Name -apiManagementServiceName $apiManagementServiceName
+        New-ApiManagementApi -resourceGroupName $resourceGroupName -apiManagementServiceName $apiManagementServiceName
     }
 }
 
@@ -2688,7 +2688,7 @@ function New-OpenAIService {
 
     Write-Host "Executing New-OpenAIService ('$openAIServiceName') function..." -ForegroundColor Magenta
 
-    if ($existingResources -notcontains $openAIAccountName) {
+    if ($existingResources -notcontains $openAIServiceName) {
 
         try {
             $ErrorActionPreference = 'Stop'
