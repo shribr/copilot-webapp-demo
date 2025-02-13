@@ -314,30 +314,36 @@ function Deploy-OpenAIModels {
                 Write-Log -message "Model deployment '$aiModelDeploymentName' for '$aiServiceName' already exists."
             }
             else {
-                # Create the deployment if it does not exist
-                $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $aiServiceName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
-
-                # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
-
-                if ($jsonOutput -match "error") {
-
-                    $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
-
-                    $errorName = $errorInfo["Error"]
-                    $errorCode = $errorInfo["Code"]
-                    $errorDetails = $errorInfo["Message"]
-
-                    $errorMessage = "Failed to deploy Model '$aiModelDeploymentName' for '$aiServiceName'. `
-        Error: $errorName `
-        Code: $errorCode `
-        Message: $errorDetails"
-
-                    Write-Host $errorMessage
-                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                try {
+                    # Create the deployment if it does not exist
+                    $jsonOutput = az cognitiveservices account deployment create --resource-group $resourceGroupName --name $aiServiceName --deployment-name $aiModelDeploymentName --model-name $aiModelType --model-format $aiModelFormat --model-version $aiModelVersion --sku-name $aiModelSkuName --sku-capacity $aiModelSkuCapacity 2>&1
+    
+                    # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
+    
+                    if ($jsonOutput -match "error") {
+    
+                        $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+    
+                        $errorName = $errorInfo["Error"]
+                        $errorCode = $errorInfo["Code"]
+                        $errorDetails = $errorInfo["Message"]
+    
+                        $errorMessage = "Failed to deploy Model '$aiModelDeploymentName' for '$aiServiceName'. `
+            Error: $errorName `
+            Code: $errorCode `
+            Message: $errorDetails"
+    
+                        Write-Host $errorMessage
+                        Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                    }
+                    else {
+                        Write-Host "Model '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -ForegroundColor Green
+                        Write-Log -message "Model '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -logFilePath $global:LogFilePath
+                    }
                 }
-                else {
-                    Write-Host "Mdel '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -ForegroundColor Green
-                    Write-Log -message "Model '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -logFilePath $global:LogFilePath
+                catch {
+                    Write-Error "Failed to create Model deployment '$aiModelDeploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                    Write-Log -message "Failed to create Model deployment '$aiModelDeploymentName' for '$aiServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 }
 
 
@@ -1284,12 +1290,13 @@ function New-AIHubConnection {
         [string]$aiProjectName,
         [string]$resourceGroupName,
         [string]$resourceType,
-        [string]$serviceName,
-        [string]$serviceProperties,
+        [psobject]$serviceProperties,
         [array]$existingResources
     )
 
     Write-Host "Executing New-AIHubConnection ('$serviceName') function..." -ForegroundColor Magenta
+
+    $serviceName = $serviceProperties.Name
 
     #https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-blob?view=azureml-api-2
 
@@ -1593,44 +1600,74 @@ function New-ApiManagementService {
         return
     }
 
+    #$deletedApimServiceList = az apim deletedservice list --query "[?name=='$apiManagementServiceName'].name" --output tsv
+    $deletedApimServiceNames = az apim deletedservice list --query "[].name" --output tsv
+    $apimServiceExistsInDeletedState = $deletedApimServiceNames -contains $apiManagementServiceName
+
     if ($existingResources -notcontains $apiManagementServiceName) {
         try {
             $ErrorActionPreference = 'Stop'
-            $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait --output none 2>&1
 
-            Write-Host $jsonOutput
+            if ($apimServiceExistsInDeletedState) {
+                Write-Host "API Management Service '$apiManagementServiceName' exists in a soft-deleted state. Attempting to restore the service..."
+                Write-Log -message "API Management Service '$apiManagementServiceName' exists in a soft-deleted state. Attempting to restore the service..." -logFilePath $global:LogFilePath
 
-            if ($jsonOutput -match "error") {
+                $jsonOutput = az apim undelete --name $apiManagementServiceName --resource-group $resourceGroupName --output none 2>&1
 
-                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+                if ($jsonOutput -match "error") {
 
-                $errorName = $errorInfo["Error"]
-                $errorCode = $errorInfo["Code"]
-                $errorDetails = $errorInfo["Message"]
+                    $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
-                $errorMessage = "Failed to create API Management Service '$apiManagementServiceName'. `
+                    $errorName = $errorInfo["Error"]
+                    $errorCode = $errorInfo["Code"]
+                    $errorDetails = $errorInfo["Message"]
+
+                    $errorMessage = "Failed to restore API Management Service '$apiManagementServiceName'."
+                }
+                else {
+                    $global:resourceCounter += 1
+                    Write-Host "API Management Service '$apiManagementServiceName' restored successfully. [$global:resourceCounter]" -ForegroundColor Green
+                    Write-Log -message "API Management Service '$apiManagementServiceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+                }
+            }
+            else {
+                
+                $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait --output none 2>&1
+
+                #Write-Host $jsonOutput
+
+                if ($jsonOutput -match "error") {
+
+                    $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+
+                    $errorName = $errorInfo["Error"]
+                    $errorCode = $errorInfo["Code"]
+                    $errorDetails = $errorInfo["Message"]
+
+                    $errorMessage = "Failed to create API Management Service '$apiManagementServiceName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
 
-                # Check if the error is due to soft deletion
-                if (($errorCode -match "FlagMustBeSetForRestore" -or $errorCode -match "ServiceAlreadyExistsInSoftDeletedState" ) -and $global:restoreSoftDeletedResource) {
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resourceName $apiManagementServiceName -resourceType "ApiManagementService" -location $location -resourceGroupName $resourceGroupName
+                    # Check if the error is due to soft deletion
+                    if (($errorCode -match "FlagMustBeSetForRestore" -or $errorCode -match "ServiceAlreadyExistsInSoftDeletedState" ) -and $global:restoreSoftDeletedResource) {
+                        # Attempt to restore the soft-deleted Cognitive Services account
+                        Restore-SoftDeletedResource -resourceName $apiManagementServiceName -resourceType "ApiManagementService" -location $location -resourceGroupName $resourceGroupName
+                    }
+                    else {
+                        Write-Error "Failed to create API Management Service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to create API Management Service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+
+                        Write-Host $errorMessage
+                        Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                    }
                 }
                 else {
-                    Write-Error "Failed to create API Management Service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                    Write-Log -message "Failed to create API Management Service '$apiManagementServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-                    Write-Host $errorMessage
-                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                    $global:resourceCounter += 1
+                    Write-Host "API Management Service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+                    Write-Log -message "API Management Service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
                 }
-            }
-            else {
-
-                $global:resourceCounter += 1
-                Write-Host "API Management Service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
-                Write-Log -message "API Management Service '$apiManagementServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
 
             New-ApiManagementApi -resourceGroupName $resourceGroupName -keyVaultName $keyVaultName -apiManagementService $apiManagementService
@@ -4588,21 +4625,22 @@ function Start-Deployment {
 
     Start-Sleep -Seconds 10
 
-    # Deploy AI Models
-    Deploy-OpenAIModels -aiProject $global:aiProject -aiServiceName $global:aiService.Name -aiModels $global:aiModels -resourceGroupName $resourceGroupName -existingResources $existingResources
+    $aiHubConnections = @(
+        @{ resourceType = "AIService"; serviceProperties = $global:aiService },
+        @{ resourceType = "OpenAIService"; serviceProperties = $global:openAIService },
+        @{ resourceType = "StorageAccount"; serviceProperties = $global:storageService },
+        @{ resourceType = "SearchService"; serviceProperties = $global:searchService }
+    )
 
-    # Add AI Service connection to AI Hub
-    New-AIHubConnection -aiHub $global:aiHub -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiService
-
-    # Add OpenAI Service connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "OpenAIService" -serviceName $global:openAIServiceName -serviceProperties $global:openAIService
-
-    # Add storage account connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "StorageAccount" -serviceName $global:storageServiceName -serviceProperties $global:storageService
-
-    # Add search service connection to AI Hub
-    New-AIHubConnection -aiHubName $aiHubName -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "SearchService" -serviceName $global:searchServiceName -serviceProperties $global:searchService
-
+    foreach ($conn in $aiHubConnections) {
+        New-AIHubConnection `
+            -aiHubName $global:aiHub.Name `
+            -aiProjectName $global:aiProject.Name `
+            -resourceGroupName $resourceGroupName `
+            -resourceType $conn.resourceType `
+            -serviceProperties $conn.serviceProperties
+    }
+    
     # Remove the Machine Learning Workspace
     #Remove-MachineLearningWorkspace -resourceGroupName $resourceGroup.Name -aiProjectName $aiProjectName
 
@@ -4881,7 +4919,7 @@ function Update-AIConnectionFile {
         "AIService" {
             $endpoint = "https://$serviceName.cognitiveservices.azure.com"
             $resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$serviceName"
-            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiServiceName
+            $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiService.Name
 
             $content = @"
 name: $serviceName
