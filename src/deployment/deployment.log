@@ -342,3 +342,35 @@
 2025-02-13 03:10:37 - Identity 'id-copilot-demo-009' already exists.
 2025-02-13 03:10:39 - Storage account 'stcopilotdemo009' already exists.
 2025-02-13 03:10:39 - Virtual Network 'vnet-copilot-demo-009' already exists.
+2025-02-13 03:11:56 - Subnet 'subnet-copilot-demo-009' already exists.
+2025-02-13 03:11:56 - App Service Plan 'asp-copilot-demo-009' already exists.
+2025-02-13 03:11:56 - Cognitive Service 'cog-copilot-demo-009' already exists.
+2025-02-13 03:11:56 - Search Service 'srch-copilot-demo-009' already exists.
+2025-02-13 03:12:03 - Search Index 'srch-index-copilot-demo-009' already exists.
+2025-02-13 03:12:03 - Search Index 'vector-srch-index-copilot-demo-009' already exists.
+2025-02-13 03:12:03 - Search Index 'embeddings-srch-index-copilot-demo-009' already exists.
+2025-02-13 03:12:03 - Search Index 'sharepoint-srch-index-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Service Data Source 'srch-datasource-blob-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Service Data Source 'srch-datasource-sharepoint-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Skill Set 'srch-skillset-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Skill Set 'vector-srch-skillset-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Indexer 'srch-indexer-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Indexer 'vector-srch-indexer-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Search Indexer 'embeddings-srch-indexer-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Log Analytics workspace 'log-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Application Insights 'appi-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Azure OpenAI service 'openai-service-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Container Registry 'crcopilotdemo009' already exists.
+2025-02-13 03:12:04 - Document Intelligence Service 'docintel-copilot-demo-009' already exists.
+2025-02-13 03:12:04 - Computer Vision Service 'cv-copilot-demo-009' already exists.
+2025-02-13 03:12:22 - API Management Service 'apim-copilot-demo-009' already exists.
+2025-02-13 03:13:39 - API Management Service 'apim-copilot-demo-009' is activating.
+2025-02-13 03:17:33 - Key Vault: 'kv-copilot-demo-009' restored with Vault Access Policies. [1]
+2025-02-13 03:22:36 - Role 'Key Vault Administrator' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:25:08 - Role 'Key Vault Secrets User' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:28:55 - Role 'Key Vault Certificate User' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:33:59 - Role 'Key Vault Crypto User' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:35:27 -     Key Vault 'kv-copilot-demo-009' policy permissions set for application: 'id-copilot-demo-009'.
+2025-02-13 03:39:33 - Role 'Key Vault Administrator' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:39:35 - Role 'Key Vault Secrets User' is already assigned to 'id-copilot-demo-009'.

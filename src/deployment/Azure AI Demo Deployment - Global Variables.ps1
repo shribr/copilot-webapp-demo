@@ -2672,7 +2672,7 @@ function New-MachineLearningWorkspace {
             $mlWorkspaceFile = Update-MLWorkspaceFile `
                 -aiProjectName $aiProjectName `
                 -aiHubName $aiHubName `
-                -resourceGroupName $resourceGroup.Name `
+                -resourceGroupName $resourceGroupName `
                 -appInsightsName $appInsightsName `
                 -keyVaultName $keyVaultName `
                 -location $location `
