@@ -37,7 +37,7 @@
       "Location": "east us",
       "Sku": {
         "Capacity": 100,
-        "Name": "Standard"
+        "Name": "GlobalStandard"
       },
       "Type": "gpt-4o",
       "Path": "chat/completions"

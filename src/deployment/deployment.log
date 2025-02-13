@@ -1,0 +1,33 @@
+*** LOG SEQUENCE: 1 ***
+*** SCRIPT START TIME: 2025-02-12 08:10:54 PM ***
+2025-02-12 20:10:56 - Resource Group 'RG-COPILOT-DEMO-008' already exists.
+2025-02-12 20:10:57 - Identity 'id-copilot-demo-008' already exists.
+2025-02-12 20:10:59 - Storage account 'stcopilotdemo008' already exists.
+2025-02-12 20:10:59 - Virtual Network 'vnet-copilot-demo-008' already exists.
+2025-02-12 20:11:04 - Subnet 'subnet-copilot-demo-008' already exists.
+2025-02-12 20:11:04 - App Service Plan 'asp-copilot-demo-008' already exists.
+2025-02-12 20:11:04 - Cognitive Service 'cog-copilot-demo-008' already exists.
+2025-02-12 20:11:04 - Search Service 'srch-copilot-demo-008' already exists.
+2025-02-12 20:16:12 - Search Index 'srch-index-copilot-demo-008' already exists.
+2025-02-12 20:16:12 - Search Index 'vector-srch-index-copilot-demo-008' already exists.
+2025-02-12 20:16:12 - Search Index 'embeddings-srch-index-copilot-demo-008' already exists.
+2025-02-12 20:16:12 - Search Index 'sharepoint-srch-index-copilot-demo-008' already exists.
+2025-02-12 20:16:13 - Search Service Data Source 'srch-datasource-blob-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Search Skill Set 'srch-skillset-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Search Skill Set 'vector-srch-skillset-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Search Indexer 'srch-indexer-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Search Indexer 'vector-srch-indexer-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Search Indexer 'embeddings-srch-indexer-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Log Analytics workspace 'log-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Application Insights 'appi-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Azure OpenAI service 'openai-service-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Container Registry 'crcopilotdemo008' already exists.
+2025-02-12 20:16:17 - Document Intelligence Service 'docintel-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - Computer Vision Service 'cv-copilot-demo-008' already exists.
+2025-02-12 20:16:17 - API Management Service 'apim-copilot-demo-008' already exists.
+2025-02-12 20:16:19 - API 'KeyVaultProxy' already exists.
+2025-02-12 20:18:55 - Key Vault 'kv-copilot-demo-008' already exists.
+2025-02-12 20:18:58 - Role 'Key Vault Administrator' is already assigned to 'id-copilot-demo-008'.
+2025-02-12 20:19:00 - Role 'Key Vault Secrets User' is already assigned to 'id-copilot-demo-008'.
+2025-02-12 20:21:31 - Role 'Key Vault Certificate User' is already assigned to 'id-copilot-demo-008'.

@@ -336,7 +336,7 @@ function Deploy-OpenAIModels {
                     Write-Log -message $errorMessage -logFilePath $global:LogFilePath
                 }
                 else {
-                    Write-Host "Mdel '$aiModelDeploymentName' for '$aiServiceName' deployed successfully."
+                    Write-Host "Mdel '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -ForegroundColor Green
                     Write-Log -message "Model '$aiModelDeploymentName' for '$aiServiceName' deployed successfully." -logFilePath $global:LogFilePath
                 }
 
