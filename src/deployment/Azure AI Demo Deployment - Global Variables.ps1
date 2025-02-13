@@ -1296,9 +1296,9 @@ function New-AIHubConnection {
         [array]$existingResources
     )
 
-    Write-Host "Executing New-AIHubConnection ('$serviceName') function..." -ForegroundColor Magenta
-
     $serviceName = $serviceProperties.Name
+
+    Write-Host "Executing New-AIHubConnection ('$serviceName') function..." -ForegroundColor Magenta
 
     #https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-connection-blob?view=azureml-api-2
 

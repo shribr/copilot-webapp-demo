@@ -374,3 +374,20 @@
 2025-02-13 03:35:27 -     Key Vault 'kv-copilot-demo-009' policy permissions set for application: 'id-copilot-demo-009'.
 2025-02-13 03:39:33 - Role 'Key Vault Administrator' is already assigned to 'id-copilot-demo-009'.
 2025-02-13 03:39:35 - Role 'Key Vault Secrets User' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:43:21 - Role 'Key Vault Certificate User' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:48:24 - Role 'Key Vault Crypto User' is already assigned to 'id-copilot-demo-009'.
+2025-02-13 03:51:47 - AI Hub: 'hub-ai-copilot-demo-009' created successfully. [2]
+2025-02-13 03:53:21 - AI Service 'ai-service-copilot-demo-009' already exists.
+2025-02-13 03:53:27 - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-13 03:53:28 - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-13 03:53:29 - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-13 03:54:03 - File 'ml.workspace.yaml' created and populated.
+2025-02-13 03:58:34 - AI Project 'project-ai-copilot-demo-009' in '/subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-009/providers/Microsoft.MachineLearningServices/workspaces/hub-ai-copilot-demo-009' created successfully.
+2025-02-13 04:01:14 - File 'ai.connection.yaml' created and populated.
+2025-02-13 04:01:23 - Azure AIService 'ai-service-copilot-demo-009' connection for 'hub-ai-copilot-demo-009' created successfully.
+2025-02-13 04:01:30 - File 'openai.connection.yaml' created and populated.
+2025-02-13 04:01:35 - Azure OpenAIService 'openai-service-copilot-demo-009' connection for 'hub-ai-copilot-demo-009' created successfully.
+2025-02-13 04:02:55 - File 'storage.connection.yaml' created and populated.
+2025-02-13 04:03:01 - Azure StorageAccount 'stcopilotdemo009' connection for 'hub-ai-copilot-demo-009' created successfully.
+2025-02-13 04:03:06 - File 'search.connection.yaml' created and populated.
+2025-02-13 04:04:26 - Azure SearchService 'srch-copilot-demo-009' connection for 'hub-ai-copilot-demo-009' created successfully.
