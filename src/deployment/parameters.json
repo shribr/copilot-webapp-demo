@@ -79,6 +79,7 @@
     "ApiKey": "5c25eb463aa8431588b6d0f22f0ba417",
     "ApiVersion": "2024-08-01-preview",
     "Endpoint": "https://ai-service-copilot-demo-008.cognitiveservices.azure.com/",
+    "Location": "east us",
     "Name": "ai-service-copilot-demo-008",
     "ServiceName": "ai-service-copilot-demo-008",
     "Type": "azure_ai_services",
@@ -296,7 +297,7 @@
     "ApiVersion": "7.5",
     "PermissionModel": "VaultAccessPolicy",
     "Location": "east us",
-    "UseRBAC": true
+    "UseRBAC": false
   },
   "keyVaultSecrets": [
     {

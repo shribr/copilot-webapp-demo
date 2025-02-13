@@ -2609,6 +2609,7 @@ function New-MachineLearningWorkspace {
 
     $subscriptionId = $global:subscriptionId
 
+    $location = $aiProject.Location
     $storageServiceName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageServiceName"
     $containerRegistryName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ContainerRegistry/registries/$containerRegistryName"
     $keyVaultName = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
@@ -2632,7 +2633,7 @@ function New-MachineLearningWorkspace {
                 -keyVaultName $keyVaultName `
                 -location $location `
                 -subscriptionId $subscriptionId `
-                storageServiceName $storageServiceName `
+                -storageServiceName $storageServiceName `
                 -containerRegistryName $containerRegistryName `
                 -userAssignedIdentityName $userAssignedIdentityName 2>&1
 
@@ -4191,8 +4192,8 @@ function Set-KeyVaultAccessPolicies {
         $ErrorActionPreference = 'Stop'
         # Set policy for the user
         az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --upn $userPrincipalName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
-        Write-Host "    Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'." -ForegroundColor Yellow
-        Write-Log -message "    Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
+        Write-Host "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'." -ForegroundColor Yellow
+        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userPrincipalName'."
     }
     catch {
         Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user '$userPrincipalName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -5321,7 +5322,7 @@ function Update-MLWorkspaceFile {
 
     #$userAssignedIdentityName = $global:userAssignedIdentityName
 
-    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
+    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $global:userAssignedIdentity.Name --query 'principalId' --output tsv
 
     #`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
 
