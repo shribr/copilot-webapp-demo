@@ -293,7 +293,7 @@ function Deploy-OpenAIModels {
         [array]$existingResources
     )
 
-    Write-Host "ExecutingDeploy-OpenAIModels function..." -ForegroundColor Magenta
+    Write-Host "Executing Deploy-OpenAIModels function..." -ForegroundColor Magenta
 
     foreach ($aiModel in $aiModels) {
         $aiModelDeploymentName = $aiModel.DeploymentName
