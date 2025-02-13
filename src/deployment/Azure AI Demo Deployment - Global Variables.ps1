@@ -1028,6 +1028,8 @@ function Initialize-Parameters {
     $global:newResourceBaseName = $parametersObject.newResourceBaseName
     $global:previousFullResourceBaseName = $parametersObject.previousFullResourceBaseName
 
+    $global:restoreSoftDeletedResources = $parametersObject.restoreSoftDeletedResources
+
     if ($global:deploymentType -eq "New") {
         Update-ResourceBaseName -newResourceBaseName $global:newResourceBaseName
         $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
@@ -1153,7 +1155,7 @@ function Initialize-Parameters {
         resourceSuffix               = $parametersObject.resourceSuffix
         resourceSuffixCounter        = $parametersObject.resourceSuffixCounter
         resourceTypes                = $global:resourceTypes
-        restoreSoftDeletedResource   = $parametersObject.restoreSoftDeletedResources
+        restoreSoftDeletedResources  = $global:restoreDeletedResources
         result                       = $result
         searchDataSources            = $global:searchDataSources
         searchIndexFieldNames        = $parametersObject.searchIndexFieldNames

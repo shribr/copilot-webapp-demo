@@ -306,3 +306,23 @@
 2025-02-13 02:12:09 - Computer Vision Service 'cv-copilot-demo-009' already exists.
 2025-02-13 02:12:22 - API Management Service 'apim-copilot-demo-009' exists in a soft-deleted state. Attempting to restore the service...
 2025-02-13 02:16:11 - API Management Service 'apim-copilot-demo-009' restored successfully. [1]
+2025-02-13 02:19:08 - API 'KeyVaultProxy' and its operations created successfully.
+2025-02-13 02:27:35 - Web app 'app-copilot-demo-009' created successfully. Moving on to deployment. [2]
+2025-02-13 02:30:07 - Skipping deployment for Web app 'app-copilot-demo-009'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2025-02-13 02:35:53 - Function app 'func-copilot-demo-009' created successfully. Moving on to deployment. [3]
+2025-02-13 02:38:25 - Skipping deployment for Function app 'func-copilot-demo-009'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2025-02-13 02:43:33 - Failed to create Key Vault: 'kv-copilot-demo-009'. 
+        Error: (ConflictError) A vault with the same name already exists in deleted state. You need to either recover or purge existing key vault. Follow this link https://go.microsoft.com/fwlink/?linkid=2149745 for more information on soft delete. 
+        Code: ConflictError 
+        Message: A vault with the same name already exists in deleted state. You need to either recover or purge existing key vault. Follow this link https://go.microsoft.com/fwlink/?linkid=2149745 for more information on soft delete.
+2025-02-13 02:43:36 -     Key Vault 'kv-copilot-demo-009' policy permissions set for application: 'id-copilot-demo-009'.
+2025-02-13 02:49:57 - Assigned role 'Key Vault Administrator' to managed identity: 'id-copilot-demo-009'.
+2025-02-13 02:52:31 - Assigned role 'Key Vault Secrets User' to managed identity: 'id-copilot-demo-009'.
+2025-02-13 02:53:50 - Assigned role 'Key Vault Certificate User' to managed identity: 'id-copilot-demo-009'.
+2025-02-13 02:57:39 - Assigned role 'Key Vault Crypto User' to managed identity: 'id-copilot-demo-009'.
+2025-02-13 02:57:55 - AI Hub: 'hub-ai-copilot-demo-009' created successfully. [4]
+2025-02-13 02:58:35 - AI Service account 'ai-service-copilot-demo-009' created successfully. [5]
+2025-02-13 02:58:51 - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-13 02:58:57 - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-13 02:59:03 - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-13 02:59:09 - File 'ml.workspace.yaml' created and populated.
