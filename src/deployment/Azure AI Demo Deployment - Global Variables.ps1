@@ -1612,7 +1612,10 @@ function New-ApiManagementService {
                 Write-Host "API Management Service '$apiManagementServiceName' exists in a soft-deleted state. Attempting to restore the service..."
                 Write-Log -message "API Management Service '$apiManagementServiceName' exists in a soft-deleted state. Attempting to restore the service..." -logFilePath $global:LogFilePath
 
-                $jsonOutput = az apim undelete --name $apiManagementServiceName --resource-group $resourceGroupName --output none 2>&1
+                #$jsonOutput = az apim undelete --name $apiManagementServiceName --resource-group $resourceGroupName --output none 2>&1
+                $jsonOutput = az apim deletedservice purge --service-name $apiManagementServiceName --location $apiManagementService.Location --output none 2>&1
+
+                $jsonOutput = az apim create -n $apiManagementServiceName --publisher-name $apiManagementService.PublisherName --publisher-email $apiManagementService.PublisherEmail --resource-group $resourceGroupName --no-wait --output none 2>&1
 
                 if ($jsonOutput -match "error") {
 

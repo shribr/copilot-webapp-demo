@@ -247,3 +247,62 @@
 2025-02-13 01:15:33 - Document Intelligence account 'docintel-copilot-demo-009' created successfully. [10]
 2025-02-13 01:15:36 - Computer Vision account 'cv-copilot-demo-009' created successfully. [11]
 2025-02-13 01:15:40 - Custom Domain created for Computer Vision account 'cv-copilot-demo-009'.
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 2025-02-13 01:43:38 AM ***
+2025-02-13 01:43:39 - Resource Group 'RG-COPILOT-DEMO-009' already exists.
+2025-02-13 01:44:55 - Identity 'id-copilot-demo-009' already exists.
+2025-02-13 01:44:59 - Storage account 'stcopilotdemo009' already exists.
+2025-02-13 01:44:59 - Virtual Network 'vnet-copilot-demo-009' already exists.
+2025-02-13 01:46:19 - Subnet 'subnet-copilot-demo-009' already exists.
+2025-02-13 01:46:19 - App Service Plan 'asp-copilot-demo-009' already exists.
+2025-02-13 01:46:19 - Cognitive Service 'cog-copilot-demo-009' already exists.
+2025-02-13 01:46:19 - Search Service 'srch-copilot-demo-009' already exists.
+2025-02-13 01:48:55 - Search Index 'srch-index-copilot-demo-009' already exists.
+2025-02-13 01:48:55 - Search Index 'vector-srch-index-copilot-demo-009' already exists.
+2025-02-13 01:48:55 - Search Index 'embeddings-srch-index-copilot-demo-009' already exists.
+2025-02-13 01:48:55 - Search Index 'sharepoint-srch-index-copilot-demo-009' already exists.
+2025-02-13 01:48:56 - Search Service Data Source 'srch-datasource-blob-copilot-demo-009' already exists.
+2025-02-13 01:48:56 - Search Service Data Source 'srch-datasource-sharepoint-copilot-demo-009' already exists.
+2025-02-13 01:48:56 - Search Skill Set 'srch-skillset-copilot-demo-009' already exists.
+2025-02-13 01:48:56 - Search Skill Set 'vector-srch-skillset-copilot-demo-009' already exists.
+2025-02-13 01:48:56 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-009' already exists.
+2025-02-13 01:48:58 - Search Indexer 'srch-indexer-copilot-demo-009' created successfully.
+2025-02-13 01:48:59 - Search Indexer 'vector-srch-indexer-copilot-demo-009' created successfully.
+2025-02-13 01:49:01 - Search Indexer 'embeddings-srch-indexer-copilot-demo-009' created successfully.
+2025-02-13 01:49:01 - Log Analytics workspace 'log-copilot-demo-009' already exists.
+2025-02-13 01:49:01 - Application Insights 'appi-copilot-demo-009' already exists.
+2025-02-13 01:49:01 - Azure OpenAI service 'openai-service-copilot-demo-009' already exists.
+2025-02-13 01:49:01 - Container Registry 'crcopilotdemo009' already exists.
+2025-02-13 01:49:01 - Document Intelligence Service 'docintel-copilot-demo-009' already exists.
+2025-02-13 01:49:01 - Computer Vision Service 'cv-copilot-demo-009' already exists.
+2025-02-13 01:49:30 - API Management Service 'apim-copilot-demo-009' exists in a soft-deleted state. Attempting to restore the service...
+*** LOG SEQUENCE: 10 ***
+*** SCRIPT START TIME: 2025-02-13 02:01:01 AM ***
+2025-02-13 02:07:18 - Resource Group 'RG-COPILOT-DEMO-009' already exists.
+2025-02-13 02:08:34 - Identity 'id-copilot-demo-009' already exists.
+2025-02-13 02:08:37 - Storage account 'stcopilotdemo009' already exists.
+2025-02-13 02:08:37 - Virtual Network 'vnet-copilot-demo-009' already exists.
+2025-02-13 02:08:39 - Subnet 'subnet-copilot-demo-009' already exists.
+2025-02-13 02:08:39 - App Service Plan 'asp-copilot-demo-009' already exists.
+2025-02-13 02:08:39 - Cognitive Service 'cog-copilot-demo-009' already exists.
+2025-02-13 02:08:39 - Search Service 'srch-copilot-demo-009' already exists.
+2025-02-13 02:12:08 - Search Index 'srch-index-copilot-demo-009' already exists.
+2025-02-13 02:12:08 - Search Index 'vector-srch-index-copilot-demo-009' already exists.
+2025-02-13 02:12:08 - Search Index 'embeddings-srch-index-copilot-demo-009' already exists.
+2025-02-13 02:12:08 - Search Index 'sharepoint-srch-index-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Service Data Source 'srch-datasource-blob-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Service Data Source 'srch-datasource-sharepoint-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Skill Set 'srch-skillset-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Skill Set 'vector-srch-skillset-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Indexer 'srch-indexer-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Indexer 'vector-srch-indexer-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Search Indexer 'embeddings-srch-indexer-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Log Analytics workspace 'log-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Application Insights 'appi-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Azure OpenAI service 'openai-service-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Container Registry 'crcopilotdemo009' already exists.
+2025-02-13 02:12:09 - Document Intelligence Service 'docintel-copilot-demo-009' already exists.
+2025-02-13 02:12:09 - Computer Vision Service 'cv-copilot-demo-009' already exists.
+2025-02-13 02:12:22 - API Management Service 'apim-copilot-demo-009' exists in a soft-deleted state. Attempting to restore the service...
+2025-02-13 02:16:11 - API Management Service 'apim-copilot-demo-009' restored successfully. [1]
