@@ -286,12 +286,14 @@ function Deploy-AppService {
 # Function to deploy an Azure AI model
 function Deploy-OpenAIModels {
     param (
-        [string]$aiProjectName,
+        [psobject]$aiProject,
         [string]$aiServiceName,
         [array]$aiModels,
         [string]$resourceGroupName,
         [array]$existingResources
     )
+
+    $aiProjectName = $aiProject.Name
 
     Write-Host "Executing Deploy-OpenAIModels function..." -ForegroundColor Magenta
 
@@ -4587,7 +4589,7 @@ function Start-Deployment {
     Start-Sleep -Seconds 10
 
     # Deploy AI Models
-    Deploy-OpenAIModels -aiProject $global:aiProject -aiModels $global:aiModels -resourceGroupName $resourceGroupName -existingResources $existingResources
+    Deploy-OpenAIModels -aiProject $global:aiProject -aiServiceName $global:aiService.Name -aiModels $global:aiModels -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # Add AI Service connection to AI Hub
     New-AIHubConnection -aiHub $global:aiHub -aiProjectName $global:aiProject.Name -resourceGroupName $resourceGroupName -resourceType "AIService" -serviceName $global:aiServiceName -serviceProperties $global:aiService
