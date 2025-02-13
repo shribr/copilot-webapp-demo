@@ -4646,6 +4646,8 @@ function Start-Deployment {
             -serviceProperties $conn.serviceProperties
     }
     
+    Deploy-OpenAIModels -aiProject $global:aiProject -aiServiceName $global:aiService.Name -aiModels $global:aiModels -resourceGroupName $resourceGroupName -existingResources $existingResources
+
     # Remove the Machine Learning Workspace
     #Remove-MachineLearningWorkspace -resourceGroupName $resourceGroup.Name -aiProjectName $aiProjectName
 
@@ -4983,7 +4985,7 @@ account_name: $storageServiceName
 
     try {
         $content | Out-File -FilePath $yamlFileName -Encoding utf8 -Force
-        Write-Host "File '$yamlFileName' created and populated."
+        Write-Host "File '$yamlFileName' created and populated." -ForegroundColor Green
         Write-Log -message "File '$yamlFileName' created and populated."
     }
     catch {
