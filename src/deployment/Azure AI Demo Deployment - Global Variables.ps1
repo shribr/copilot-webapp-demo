@@ -1028,7 +1028,7 @@ function Initialize-Parameters {
     $global:newResourceBaseName = $parametersObject.newResourceBaseName
     $global:previousFullResourceBaseName = $parametersObject.previousFullResourceBaseName
 
-    $global:restoreSoftDeletedResources = $parametersObject.restoreSoftDeletedResources
+    $global:restoreSoftDeletedResourcess = $parametersObject.restoreSoftDeletedResourcess
 
     if ($global:deploymentType -eq "New") {
         Update-ResourceBaseName -newResourceBaseName $global:newResourceBaseName
@@ -1155,7 +1155,7 @@ function Initialize-Parameters {
         resourceSuffix               = $parametersObject.resourceSuffix
         resourceSuffixCounter        = $parametersObject.resourceSuffixCounter
         resourceTypes                = $global:resourceTypes
-        restoreSoftDeletedResources  = $global:restoreDeletedResources
+        restoreSoftDeletedResourcess = $global:restoreSoftDeletedResourcess
         result                       = $result
         searchDataSources            = $global:searchDataSources
         searchIndexFieldNames        = $parametersObject.searchIndexFieldNames
@@ -1264,7 +1264,7 @@ function New-AIHub {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
                 try {
                     Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiHubName -location $location -resourceType "AIHub"
                 }
@@ -1434,7 +1434,7 @@ function New-AIService {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
+                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResources) {
                     try {
                         # Attempt to restore the soft-deleted Cognitive Services account
                         Restore-SoftDeletedResource -resourceName $aiServiceName -resourceType "AIServices" -location $location -resourceGroupName $resourceGroupName
@@ -1463,7 +1463,7 @@ function New-AIService {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
                 try {
                     Restore-SoftDeletedResource -resourceGroupName $resourceGroupName -resourceName $aiServiceName -location $location -resourceType "AIService"
                 }
@@ -1655,7 +1655,7 @@ function New-ApiManagementService {
         Message: $errorDetails"
 
                     # Check if the error is due to soft deletion
-                    if (($errorCode -match "FlagMustBeSetForRestore" -or $errorCode -match "ServiceAlreadyExistsInSoftDeletedState" ) -and $global:restoreSoftDeletedResource) {
+                    if (($errorCode -match "FlagMustBeSetForRestore" -or $errorCode -match "ServiceAlreadyExistsInSoftDeletedState" ) -and $global:restoreSoftDeletedResources) {
                         # Attempt to restore the soft-deleted Cognitive Services account
                         Restore-SoftDeletedResource -resourceName $apiManagementServiceName -resourceType "ApiManagementService" -location $location -resourceGroupName $resourceGroupName
                     }
@@ -2158,7 +2158,7 @@ function New-CognitiveService {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
+                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResources) {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveService" -location $cognitiveService.Location -resourceGroupName $resourceGroupName
                 }
@@ -2185,7 +2185,7 @@ function New-CognitiveService {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
                 # Attempt to restore the soft-deleted Cognitive Services account
                 Restore-SoftDeletedResource -resourceName $cognitiveServiceName -resourceType "CognitiveService" -resourceGroupName $resourceGroupName
             }
@@ -2236,7 +2236,7 @@ function New-ComputerVisionService {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
+                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResources) {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     Restore-SoftDeletedResource -resourceName $computerVisionServiceName -resourceType "ComputerVision" -location $computerVisionService.Location -resourceGroupName $resourceGroupName
                 }
@@ -2269,7 +2269,7 @@ function New-ComputerVisionService {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
                 # Attempt to restore the soft-deleted Cognitive Services account
                 Restore-SoftDeletedResource -resourceName $computerVisionServiceName -resourceType "CognitiveServices" -resourceGroupName $resourceGroupName
             }
@@ -2320,7 +2320,7 @@ function New-ContainerRegistry {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
+                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResources) {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     Restore-SoftDeletedResource -resourceName $containerRegistryName -resourceType "ContainerRegistry" -location $containerRegistryLocation -resourceGroupName $resourceGroupName
                 }
@@ -2386,7 +2386,7 @@ function New-DocumentIntelligenceService {
         `Details: $($errorInfo.SKU)"
 
                     # Check if the error is due to soft deletion
-                    if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
+                    if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResources) {
                         # Attempt to restore the soft-deleted Cognitive Services account
                         Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "DocumentIntelligence" -location $documentIntelligenceService.Location -resourceGroupName $resourceGroupName
                     }
@@ -2406,7 +2406,7 @@ function New-DocumentIntelligenceService {
             }
             catch {
                 # Check if the error is due to soft deletion
-                if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+                if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
                     try {
                         $ErrorActionPreference = 'Stop'
                         # Attempt to restore the soft-deleted Cognitive Services account
@@ -2473,7 +2473,7 @@ function New-KeyVault {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorCode -match "ConflictError" -and $global:restoreSoftDeletedResource) {
+                if ($errorCode -match "ConflictError" -and $global:restoreSoftDeletedResources) {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "KeyVault" -location $location -resourceGroupName $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
                 }
@@ -2506,7 +2506,7 @@ function New-KeyVault {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
                 Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "KeyVault" -location $location -resourceGroupName $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
             }
             else {
@@ -2709,7 +2709,7 @@ function New-MachineLearningWorkspace {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorDetails -match "soft-deleted workspace" -and $global:restoreSoftDeletedResource) {
+                if ($errorDetails -match "soft-deleted workspace" -and $global:restoreSoftDeletedResources) {
                     # Attempt to restore the soft-deleted Cognitive Services account
                     Restore-SoftDeletedResource -resourceName $aiProjectName -resourceType "MachineLearningWorkspace" -location $location -resourceGroupName $resourceGroupName
                 }
@@ -2776,7 +2776,7 @@ function New-OpenAIService {
         Message: $errorDetails"
 
                 # Check if the error is due to soft deletion
-                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResource) {
+                if ($errorCode -match "FlagMustBeSetForRestore" -and $global:restoreSoftDeletedResources) {
                     try {
                         # Attempt to restore the soft-deleted Cognitive Services account
                         Restore-SoftDeletedResource -resourceName $openAIServiceName -resourceType "OpenAI" -location $location -resourceGroupName $resourceGroupName
@@ -2803,7 +2803,7 @@ function New-OpenAIService {
         }
         catch {
             # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResource) {
+            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
                 try {
                     $ErrorActionPreference = 'Stop'
                     # Attempt to restore the soft-deleted Cognitive Services service

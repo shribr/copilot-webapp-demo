@@ -326,3 +326,19 @@
 2025-02-13 02:58:57 - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
 2025-02-13 02:59:03 - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
 2025-02-13 02:59:09 - File 'ml.workspace.yaml' created and populated.
+*** LOG SEQUENCE: 11 ***
+*** SCRIPT START TIME: 2025-02-13 03:05:51 AM ***
+2025-02-13 03:05:52 - Resource Group 'RG-COPILOT-DEMO-009' already exists.
+2025-02-13 03:05:54 - Identity 'id-copilot-demo-009' already exists.
+2025-02-13 03:05:57 - Storage account 'stcopilotdemo009' already exists.
+2025-02-13 03:05:57 - Virtual Network 'vnet-copilot-demo-009' already exists.
+2025-02-13 03:06:03 - Subnet 'subnet-copilot-demo-009' already exists.
+2025-02-13 03:06:03 - App Service Plan 'asp-copilot-demo-009' already exists.
+2025-02-13 03:06:03 - Cognitive Service 'cog-copilot-demo-009' already exists.
+2025-02-13 03:06:03 - Search Service 'srch-copilot-demo-009' already exists.
+*** LOG SEQUENCE: 12 ***
+*** SCRIPT START TIME: 2025-02-13 03:10:35 AM ***
+2025-02-13 03:10:36 - Resource Group 'RG-COPILOT-DEMO-009' already exists.
+2025-02-13 03:10:37 - Identity 'id-copilot-demo-009' already exists.
+2025-02-13 03:10:39 - Storage account 'stcopilotdemo009' already exists.
+2025-02-13 03:10:39 - Virtual Network 'vnet-copilot-demo-009' already exists.
