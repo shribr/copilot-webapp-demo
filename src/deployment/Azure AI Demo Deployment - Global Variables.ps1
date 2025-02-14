@@ -1075,6 +1075,15 @@ function Initialize-Parameters {
         $global:useRBAC = $false
     }
 
+    $global:cognitiveServicesList = @(
+        $global:aiService,
+        $global:cognitiveService,
+        $global:computerVisionService,
+        $global:openAIService,
+        $global:documentIntelligenceService
+    )
+
+
     # Make sure the previousFullResourceBaseName is different than the current one.
     if ($parametersObject.previousFullResourceBaseName -eq $parametersObject.newFullResourceBaseName -and $parametersObject.redeployResources -eq $false) {
         Write-Host "The previousFullResourceBaseName parameter is the same as the newFullResourceBaseName parameter. Please change the previousFullResourceBaseName parameter to a different value."
@@ -2031,20 +2040,19 @@ function New-AppServicePlanInASE {
 
 function New-CognitiveServiceResources {
     param (
-        [array]$cognitiveServiceList
+        [array]$cognitiveServicesList
     )
 
     $resourceGroupName = $global:resourceGroup.Name
 
-    foreach ($service in $global:cognitiveServiceList) {
+    foreach ($service in $cognitiveServicesList) {
         $serviceName = $service.Name
         $serviceType = $service.Type
+        $serviceDescription = $service.Description
 
-        Write-Host "Executing New-CognitiveServiceResources ('$serviceName') function..." -ForegroundColor Magenta
+        Write-Host "Executing New-CognitiveServiceResources $serviceDescription ('$serviceName') function..." -ForegroundColor Magenta
 
         if ($global:existingResources -notcontains $serviceName) {
-
-            Write-Host "Processing $serviceType service: $serviceName..." -ForegroundColor Cyan
 
             # Check if a soft-deleted instance exists
             $deletedResource = az cognitiveservices account list-deleted `
@@ -2059,7 +2067,7 @@ function New-CognitiveServiceResources {
                     Restore-SoftDeletedResource -resource $service -resourceGroupName $resourceGroupName
                 }
                 else {
-                    Write-Host "Creating $serviceType service '$serviceName'..." -ForegroundColor Cyan
+                    Write-Host "Creating $serviceDescription '$serviceName'..." -ForegroundColor Cyan
 
                     $createResult = az cognitiveservices account create `
                         --name $serviceName `
@@ -2078,11 +2086,11 @@ function New-CognitiveServiceResources {
                 }
             }
             catch {
-                Write-Error "Error processing $serviceType service '$serviceName': $_"
+                Write-Error "Error processing $serviceDescription '$serviceName': $_"
             }
         }
         else {
-            Write-Host "$serviceType service '$serviceName' already exists." -ForegroundColor Blue
+            Write-Host "$serviceDescription '$serviceName' already exists." -ForegroundColor Blue
         }
     }
 }
@@ -2649,7 +2657,7 @@ function New-Resources {
     #**********************************************************************************************************************
     # Create Cognitive Service
 
-    New-CognitiveServiceResources -cognitiveServiceList $global:cognitiveServiceList
+    New-CognitiveServiceResources -cognitiveServicesList $global:cognitiveServicesList
 
     # **********************************************************************************************************************
     # Create Search Service
@@ -3641,7 +3649,8 @@ function Restore-SoftDeletedResource {
 
     $resourceName = $resource.Name
     $resourceType = $resource.Type
-    $location = $resource.Location
+    $resourceDescription = $resource.Description
+    $resourceLocation = $resource.Location
 
     Write-Host "Executing Restore-SoftDeletedResource ('$resourceName') function..." -ForegroundColor Magenta
 
@@ -3652,7 +3661,7 @@ function Restore-SoftDeletedResource {
             try {
                 $ErrorActionPreference = 'Stop'
                 # Attempt to restore the soft-deleted Key Vault
-                az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $location --output none
+                az keyvault recover --name $resourceName --resource-group $resourceGroupName --location $resourceLocation --output none
 
                 $global:resourceCounter += 1
 
@@ -3675,7 +3684,7 @@ function Restore-SoftDeletedResource {
                 Write-Output "Restoring API Management Service: $resourceName"
                 az resource update --ids $(az apim show --name $resourceName --resource-group $resourceGroupName --query 'id' --output tsv) --set properties.deletionRecoveryLevel="Recoverable"
 
-                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
+                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($resourceLocation.ToUpper() -replace '\s', '') --output none
 
                 $global:resourceCounter += 1
 
@@ -3695,21 +3704,21 @@ function Restore-SoftDeletedResource {
         "CognitiveService" {
             # Code to restore Cognitive Service
             try {
-                Write-Output "Restoring Cognitive Service: $resourceName"
+                Write-Output "Restoring '$resourceDescription': $resourceName"
 
                 if ($resourceType -eq "Api Management Service") {
                     az resource update --ids $(az apim show --name $resourceName --resource-group $resourceGroupName --query 'id' --output tsv) --set properties.deletionRecoveryLevel="Recoverable"
                 }
 
-                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($location.ToUpper() -replace '\s', '') --output none
+                az cognitiveservices account recover --name $resourceName --resource-group $resourceGroupName --location $($resourceLocation.ToUpper() -replace '\s', '') --output none
 
                 $global:resourceCounter += 1
-                Write-Host "Cognitive Service '$resourceName' restored successfully. [$global:resourceCounter]"
-                Write-Log -message "Cognitive Service '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+                Write-Host "$resourceDescription '$resourceName' restored successfully. [$global:resourceCounter]"
+                Write-Log -message "$resourceDescription '$resourceName' restored successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             catch {
-                Write-Error "Failed to restore Cognitive Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to restore Cognitive Service '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to restore $resourceDescription '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to restore $resourceDescription '$resourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
         }
         "ContainerRegistry" {
@@ -4051,7 +4060,7 @@ function Start-Deployment {
     }
 
     #$resourceGroupExists = Test-ResourceGroupExists -resourceGroupName $resourceGroupName
-    $resourceGroupExists = $resourceGroupExists = az group exists --resource-group $resourceGroupName
+    $resourceGroupExists = az group exists --resource-group $resourceGroupName
     
     if ($deleteResourceGroup -eq $true) {
         # Delete existing resource groups with the same name

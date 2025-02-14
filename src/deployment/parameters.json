@@ -83,9 +83,11 @@
     "Endpoint": "https://ai-service-copilot-demo-009.cognitiveservices.azure.com/",
     "Location": "east us",
     "Name": "ai-service-copilot-demo-009",
-    "ServiceName": "ai-service-copilot-demo-009",
-    "Type": "Azure AI",
-    "Kind": "azure_ai_services",
+    "ConnectionName": "azure_ai_services",
+    "Description": "Azure AI Service",
+    "Type": "CognitiveService",
+    "Kind": "AIServices",
+    "Sku": "S0",
     "YamlFileName": "ai.connection.yaml"
   },
   "answerGenerationConfig": {
@@ -249,17 +251,21 @@
   ],
   "cognitiveService": {
     "Name": "cog-copilot-demo-009",
+    "ConnectionName": "azure_cognitive",
+    "Description": "Cognitive Service",
     "Location": "east us",
     "Sku": "S0",
-    "Kind": "CognitiveServices",
-    "Type": "Cognitive"
+    "Type": "CognitiveService",
+    "Kind": "Cognitive"
   },
   "computerVisionService": {
     "Name": "cv-copilot-demo-009",
+    "ConnectionName": "azure_computer_vision",
+    "Description": "Computer Vision Service",
     "Location": "east us",
     "Sku": "S0",
-    "Kind": "ComputerVision",
-    "Type": "Computer Vision"
+    "Type": "CognitiveService",
+    "Kind": "ComputerVision"
   },
   "configFilePath": "app/frontend/config.json",
   "containerRegistry": {
@@ -282,9 +288,11 @@
   "deployZipResources": true,
   "documentIntelligenceService": {
     "Name": "docintel-copilot-demo-009",
+    "ConnectionName": "azure_doc_intelligence",
+    "Description": "Document Intelligence Service",
     "Location": "east us",
-    "Kind": "DocumentIntelligence",
-    "Type": "Document Intelligence",
+    "Type": "CognitiveService",
+    "Kind": "FormRecognizer",
     "Sku": "S0"
   },
   "domainName": "azurewebsites.net",
@@ -356,7 +364,11 @@
     "Endpoint": "https://openai-service-copilot-demo-009.openai.azure.com/",
     "Location": "east us",
     "Name": "openai-service-copilot-demo-009",
-    "Type": "azure_open_ai",
+    "ConnectionName": "azure_open_ai",
+    "Description": "OpenAI Service",
+    "Type": "CognitiveService",
+    "Kind": "OpenAI",
+    "Sku": "S0",
     "YamlFileName": "openai.connection.yaml"
   },
   "organizationInfo": {
