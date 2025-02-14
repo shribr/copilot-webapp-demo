@@ -293,8 +293,6 @@ function Deploy-OpenAIModels {
         [array]$existingResources
     )
 
-    $aiProjectName = $aiProject.Name
-
     Write-Host "Executing Deploy-OpenAIModels function..." -ForegroundColor Magenta
 
     foreach ($aiModel in $aiModels) {
@@ -1052,7 +1050,8 @@ function Initialize-Parameters {
     $global:cognitiveService = $parametersObject.cognitiveService       
     $global:computerVisionService = $parametersObject.computerVisionService  
     $global:containerRegistry = $parametersObject.containerRegistry      
-    $global:documentIntelligenceService = $parametersObject.documentIntelligenceService  
+    $global:documentIntelligenceService = $parametersObject.documentIntelligenceService
+    $global:functionAppService = $appServices | Where-Object { $_.Type -eq "Function" | Select-Object -First 1 }
     $global:keyVault = $parametersObject.keyVault               
     $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
     $global:openAIService = $parametersObject.openAIService
@@ -1118,73 +1117,74 @@ function Initialize-Parameters {
 
     # Build-ResourceList -parametersObject $parametersObject
 
-    # return @{
-    #     aiHub                        = $global:aiHub
-    #     aiModels                     = $global:aiModels
-    #     aiProject                    = $global:aiProject
-    #     aiService                    = $global:aiService
-    #     apiManagementService         = $global:apiManagementService
-    #     appInsightsService           = $global:appInsightsService
-    #     appServices                  = $global:appServices
-    #     appRegistrationClientId      = $parametersObject.appRegistrationClientId
-    #     appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
-    #     appDeploymentOnly            = $parametersObject.appDeploymentOnly
-    #     appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
-    #     appServiceEnvironment        = $global:appServiceEnvironment
-    #     appServicePlan               = $global:appServicePlan
-    #     azureManagement              = $parametersObject.azureManagement
-    #     cognitiveService             = $global:cognitiveService
-    #     computerVisionService        = $global:computerVisionService
-    #     configFilePath               = $parametersObject.configFilePath
-    #     containerRegistry            = $global:containerRegistry
-    #     createResourceGroup          = $parametersObject.createResourceGroup
-    #     currentFullResourceBaseName  = $parametersObject.currentFullResourceBaseName
-    #     deleteResourceGroup          = $parametersObject.deleteResourceGroup
-    #     deployApiManagementService   = $parametersObject.deployApiManagementService
-    #     deploymentType               = $global:deploymentType
-    #     deployZipResources           = $parametersObject.deployZipResources
-    #     documentIntelligenceService  = $global:documentIntelligenceService
-    #     exposeApiScopes              = $parametersObject.exposeApiScopes
-    #     keyVault                     = $global:keyVault
-    #     keyVaultSecrets              = $global:KeyVaultSecrets
-    #     location                     = $parametersObject.location
-    #     logAnalyticsWorkspace        = $global:logAnalyticsWorkspace
-    #     machineLearningService       = $parametersObject.machineLearningService
-    #     managedIdentityName          = $parametersObject.managedIdentityName
-    #     newResourceBaseName          = $global:newResourceBaseName
-    #     newFullResourceBaseName      = $global:newFullResourceBaseName
-    #     #objectId                     = $global:objectId
-    #     openAIService                = $global:openAIService
-    #     parameters                   = $parametersObject
-    #     previousFullResourceBaseName = $global:previousFullResourceBaseName
-    #     previousResourceBaseName     = $global:previousResourceBaseName
-    #     redeployResources            = $parametersObject.redeployResources
-    #     redisCacheName               = $parametersObject.redisCacheName
-    #     resourceBaseName             = $parametersObject.resourceBaseName
-    #     resourceGroup                = $global:resourceGroup
-    #     resourceGuid                 = $global:resourceGuid
-    #     resourceSuffix               = $parametersObject.resourceSuffix
-    #     resourceSuffixCounter        = $parametersObject.resourceSuffixCounter
-    #     resourceTypes                = $global:resourceTypes
-    #     restoreSoftDeletedResourcess = $global:restoreSoftDeletedResourcess
-    #     result                       = $result
-    #     searchDataSources            = $global:searchDataSources
-    #     searchIndexFieldNames        = $parametersObject.searchIndexFieldNames
-    #     searchIndexes                = $global:searchIndexes
-    #     searchIndexers               = $global:searchIndexers
-    #     searchPublicInternetResults  = $parametersObject.searchPublicInternetResults
-    #     searchService                = $global:searchService
-    #     searchSkillSets              = $global:searchSkillSets
-    #     siteLogo                     = $parametersObject.siteLogo
-    #     storageService               = $global:storageService
-    #     subNet                       = $global:subNet
-    #     subscriptionId               = $global:subscriptionId
-    #     tenantId                     = $global:tenantId
-    #     userAssignedIdentity         = $global:userAssignedIdentity
-    #     useRBAC                      = $global:useRBAC
-    #     userPrincipalName            = $global:userPrincipalName
-    #     virtualNetwork               = $global:virtualNetwork
-    # }
+    return @{
+        aiHub                        = $global:aiHub
+        aiModels                     = $global:aiModels
+        aiProject                    = $global:aiProject
+        aiService                    = $global:aiService
+        apiManagementService         = $global:apiManagementService
+        appInsightsService           = $global:appInsightsService
+        appServices                  = $global:appServices
+        appRegistrationClientId      = $parametersObject.appRegistrationClientId
+        appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
+        appDeploymentOnly            = $parametersObject.appDeploymentOnly
+        appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
+        appServiceEnvironment        = $global:appServiceEnvironment
+        appServicePlan               = $global:appServicePlan
+        azureManagement              = $parametersObject.azureManagement
+        cognitiveService             = $global:cognitiveService
+        computerVisionService        = $global:computerVisionService
+        configFilePath               = $parametersObject.configFilePath
+        containerRegistry            = $global:containerRegistry
+        createResourceGroup          = $parametersObject.createResourceGroup
+        currentFullResourceBaseName  = $parametersObject.currentFullResourceBaseName
+        deleteResourceGroup          = $parametersObject.deleteResourceGroup
+        deployApiManagementService   = $parametersObject.deployApiManagementService
+        deploymentType               = $global:deploymentType
+        deployZipResources           = $parametersObject.deployZipResources
+        documentIntelligenceService  = $global:documentIntelligenceService
+        exposeApiScopes              = $parametersObject.exposeApiScopes
+        functionAppService           = $global:functionAppService
+        keyVault                     = $global:keyVault
+        keyVaultSecrets              = $global:KeyVaultSecrets
+        location                     = $parametersObject.location
+        logAnalyticsWorkspace        = $global:logAnalyticsWorkspace
+        machineLearningService       = $parametersObject.machineLearningService
+        managedIdentityName          = $parametersObject.managedIdentityName
+        newResourceBaseName          = $global:newResourceBaseName
+        newFullResourceBaseName      = $global:newFullResourceBaseName
+        #objectId                     = $global:objectId
+        openAIService                = $global:openAIService
+        parameters                   = $parametersObject
+        previousFullResourceBaseName = $global:previousFullResourceBaseName
+        previousResourceBaseName     = $global:previousResourceBaseName
+        redeployResources            = $parametersObject.redeployResources
+        redisCacheName               = $parametersObject.redisCacheName
+        resourceBaseName             = $parametersObject.resourceBaseName
+        resourceGroup                = $global:resourceGroup
+        resourceGuid                 = $global:resourceGuid
+        resourceSuffix               = $parametersObject.resourceSuffix
+        resourceSuffixCounter        = $parametersObject.resourceSuffixCounter
+        resourceTypes                = $global:resourceTypes
+        restoreSoftDeletedResourcess = $global:restoreSoftDeletedResourcess
+        result                       = $result
+        searchDataSources            = $global:searchDataSources
+        searchIndexFieldNames        = $parametersObject.searchIndexFieldNames
+        searchIndexes                = $global:searchIndexes
+        searchIndexers               = $global:searchIndexers
+        searchPublicInternetResults  = $parametersObject.searchPublicInternetResults
+        searchService                = $global:searchService
+        searchSkillSets              = $global:searchSkillSets
+        siteLogo                     = $parametersObject.siteLogo
+        storageService               = $global:storageService
+        subNet                       = $global:subNet
+        subscriptionId               = $global:subscriptionId
+        tenantId                     = $global:tenantId
+        userAssignedIdentity         = $global:userAssignedIdentity
+        useRBAC                      = $global:useRBAC
+        userPrincipalName            = $global:userPrincipalName
+        virtualNetwork               = $global:virtualNetwork
+    }
 }
 
 # Function to login to Azure account
@@ -1254,7 +1254,6 @@ function New-AIHub {
     $keyVaultName = $global:keyVault.Name
 
     $aiHubName = $aiHub.Name
-    $location = $aiHub.Location
 
     Write-Host "Executing New-AIHub ('$aiHubName') function..." -ForegroundColor Magenta
 
@@ -1893,7 +1892,6 @@ function New-AppService {
 
                     $webAppService = $global:appServices | Where-Object { $_.type -eq 'Web' } | Select-Object -First 1
 
-                    $functionAppKey = az functionapp keys list --name $appServiceName --resource-group $resourceGroupName --query "functionKeys.default" --output tsv
                     az functionapp cors add --name $appServiceName --allowed-origins $webAppService.Url --resource-group $resourceGroupName
                 }
             }
@@ -2038,6 +2036,7 @@ function New-AppServicePlanInASE {
     }
 }
 
+# Function to create new Cognitive Services resources
 function New-CognitiveServiceResources {
     param (
         [array]$cognitiveServicesList
@@ -2047,7 +2046,6 @@ function New-CognitiveServiceResources {
 
     foreach ($service in $cognitiveServicesList) {
         $serviceName = $service.Name
-        $serviceType = $service.Type
         $serviceDescription = $service.Description
 
         Write-Host "Executing New-CognitiveServiceResources $serviceDescription ('$serviceName') function..." -ForegroundColor Magenta
@@ -2078,10 +2076,10 @@ function New-CognitiveServiceResources {
                         --output tsv 2>&1
 
                     if ($LASTEXITCODE -eq 0) {
-                        Write-Host "$serviceType '$serviceName' created successfully." -ForegroundColor Green
+                        Write-Host "$serviceDescription '$serviceName' created successfully." -ForegroundColor Green
                     }
                     else {
-                        Write-Error "Failed to create $serviceType service '$serviceName'. Error: $createResult"
+                        Write-Error "Failed to create $serviceDescription '$serviceName'. Error: $createResult"
                     }
                 }
             }
@@ -2171,6 +2169,8 @@ function New-KeyVault {
     $userPrincipalName = $global:userPrincipalName
     $useRBAC = $keyVault.UseRBAC
    
+    $jsonOutput = ""
+    
     Write-Host "Executing New-KeyVault ('$keyVaultName') function..." -ForegroundColor Magenta
 
     if ($existingResources -notcontains $keyVaultName) {
@@ -2178,86 +2178,70 @@ function New-KeyVault {
         try {
             $ErrorActionPreference = 'Continue'
 
-            #$deletedServiceExists = az keyvault list-deleted --query "[?name=='$keyVaultName']" --output tsv
+            $deletedService = az keyvault list-deleted --query "[?name=='$keyVaultName']" | ConvertFrom-Json
 
-            $jsonOutput = az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $useRBAC --output none 2>&1
+            if ($deletedService.Name -eq $keyVaultName) {
+                Write-Host "Found soft-deleted Key Vault '$keyVaultName'. Attempting restore..." -ForegroundColor Yellow
 
-            if ($jsonOutput -match "error") {
+                # Restore the soft-deleted Key Vault
+                Restore-SoftDeletedResource -resource $keyVault -resourceGroupName $resourceGroupName
+            }
+            else {
+                $jsonOutput = az keyvault create --name $keyVaultName --resource-group $resourceGroupName --location $location --enable-rbac-authorization $useRBAC --output none 2>&1
+            
+                if ($jsonOutput -match "error") {
 
-                $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
+                    $errorInfo = Format-CustomErrorInfo -jsonOutput $jsonOutput
 
-                $errorName = $errorInfo["Error"]
-                $errorCode = $errorInfo["Code"]
-                $errorDetails = $errorInfo["Message"]
+                    $errorName = $errorInfo["Error"]
+                    $errorCode = $errorInfo["Code"]
+                    $errorDetails = $errorInfo["Message"]
 
-                $errorMessage = "Failed to create Key Vault: '$keyVaultName'. `
+                    $errorMessage = "Failed to create Key Vault: '$keyVaultName'. `
         Error: $errorName `
         Code: $errorCode `
         Message: $errorDetails"
 
-                # Check if the error is due to soft deletion
-                if ($errorCode -match "ConflictError" -and $global:restoreSoftDeletedResources) {
-                    # Attempt to restore the soft-deleted Cognitive Services account
-                    Restore-SoftDeletedResource -resource $keyVault -resourceGroupName $resourceGroupName
-                
+                    Write-Error $errorMessage
+                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
+                }
+                else {
+                    Write-Host "Key Vault '$keyVaultName' created successfully." -ForegroundColor Green
+                    Write-Log -message "Key Vault '$keyVaultName' created successfully." -logFilePath $global:LogFilePath
+
+                    $global:resourceCounter += 1
+
                     if ($useRBAC) {
-
-                        $global:resourceCounter += 1
-
-                        Write-Host "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]" -ForegroundColor Green
+                        Write-Host "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]"
                         Write-Log -message "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]"
 
                         # Assign RBAC roles to the managed identity
                         Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
                     }
                     else {
-
-                        $global:resourceCounter += 1
-
-                        Write-Host "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]" -ForegroundColor Green
+                        Write-Host "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]"
                         Write-Log -message "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]"
 
                         # Set vault access policies for user
                         Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
                     }
                 }
-                else {
-                    Write-Error $errorMessage
-                    Write-Log -message $errorMessage -logFilePath $global:LogFilePath
-                }
 
-            }
-            else {
-                if ($useRBAC) {
-
-                    $global:resourceCounter += 1
-
-                    Write-Host "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]" -ForegroundColor Green
-                    Write-Log -message "Key Vault '$keyVaultName' created with RBAC enabled. [$global:resourceCounter]"
-
-                    # Assign RBAC roles to the managed identity
-                    Set-RBACRoles -userAssignedIdentityName $userAssignedIdentityName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
-                }
-                else {
-                    $global:resourceCounter += 1
-                    Write-Host "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]" -ForegroundColor Green
-                    Write-Log -message "Key Vault '$keyVaultName' created with Vault Access Policies. [$global:resourceCounter]"
-
-                    # Set vault access policies for user
-                    Set-KeyVaultAccessPolicies -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName -userPrincipalName $userPrincipalName
-                }
             }
         }
         catch {
-            # Check if the error is due to soft deletion
-            if ($_ -match "has been soft-deleted" -and $restoreSoftDeletedResources) {
-                Restore-SoftDeletedResource -resourceName $keyVaultName -resourceType "KeyVault" -location $location -resourceGroupName $resourceGroupName -useRBAC $true -userAssignedIdentityName $userAssignedIdentityName
-            }
-            else {
-                Write-Error "Failed to restore soft-deleted Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to restore soft-deleted Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
+            Write-Error "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Key Vault '$keyVaultName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         }
+    }
+    else {
+        Write-Host "Key Vault '$keyVaultName' already exists." -ForegroundColor Blue
+        Write-Log -message "Key Vault '$keyVaultName' already exists."
+    }
+
+    $keyVaultExists = az keyvault show --name $keyVaultName --resource-group $resourceGroupName --query "name" --output tsv
+
+    if ($keyVaultExists -ne $null) {
 
         Set-KeyVaultRoles -keyVaultName $keyVaultName `
             -resourceGroupName $resourceGroup.Name `
@@ -2265,16 +2249,10 @@ function New-KeyVault {
             -userPrincipalName $userPrincipalName `
             -useRBAC $useRBAC
 
-        #Set-KeyVaultSecrets -keyVaultName $keyVaultName -resourceGroupName $resourceGroup.Name
-    }
-    else {
-        Write-Host "Key Vault '$keyVaultName' already exists." -ForegroundColor Blue
-        Write-Log -message "Key Vault '$keyVaultName' already exists."
-    }
+        $global:openAiService.ApiKey = az cognitiveservices account keys list --name $global:openAiService.Name --resource-group $resourceGroupName --query key1 --output tsv
 
-    $global:openAiService.ApiKey = az cognitiveservices account keys list --name $global:openAiService.Name --resource-group $resourceGroupName --query key1 --output tsv
-
-    $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:openAiService.ApiKey
+        $global:KeyVaultSecrets.OpenAIServiceApiKey = $global:openAiService.ApiKey
+    }
 }
 
 # Function to create a new Log Analytics workspace
@@ -2587,7 +2565,7 @@ function New-ResourceGroup {
     try {
         az group create --name $resourceGroupName --location $resourceGroupLocation --output none
 
-        $global:resourceCounter += 1
+        #$global:resourceCounter += 1
 
         Write-Host "Resource group '$resourceGroupName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
         Write-Log -message "Resource group '$resourceGroupName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
@@ -2900,7 +2878,6 @@ function New-SearchIndexer {
     $searchServiceApiVersion = $searchService.ApiVersion
     $searchIndexerName = $searchIndexer.Name
     $searchIndexerSchema = $searchIndexer.Schema
-    $searchIndexerSchedule = $searchIndexer.Schedule
 
     Write-Host "Executing New-SearchIndexer ('$searchIndexerName') function..." -ForegroundColor Magenta
 
@@ -2983,7 +2960,6 @@ function New-SearchService {
     )
 
     $searchServiceName = $searchService.Name
-    $storageServiceName = $storageService.Name
     $cognitiveServiceName = $cognitiveService.Name
     $userAssignedIdentityName = $userAssignedIdentity.Name
     $location = $searchService.Location
@@ -4079,7 +4055,7 @@ function Start-Deployment {
 
     #return
 
-    $existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
+    $global:existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
 
     # Show-ExistingResourceProvisioningStatus
     
@@ -4147,33 +4123,16 @@ function Start-Deployment {
     #**********************************************************************************************************************
     # Create Key Vault
 
-    $keyVaultName = $global:keyVault.Name
+    New-KeyVault -keyVault $global:keyVault -resourceGroupName $resourceGroupName -existingResources $existingResources
 
-    if ($existingResources -notcontains $keyVaultName) {
-        New-KeyVault -keyVault $global:keyVault -resourceGroupName $resourceGroupName -existingResources $existingResources
-    }
-    else {
-        Write-Host "Key Vault '$keyVaultName' already exists." -ForegroundColor Blue
-        Write-Log -message "Key Vault '$keyVaultName' already exists."
-    }
-
+    # Create Key Vault Roles
     Set-RBACRoles -userAssignedIdentity $global:userAssignedIdentity.Name -resourceGroupName $resourceGroupName
-
-    # Filter appService nodes with type equal to 'function'
-    $functionAppServices = $appServices | Where-Object { $_.type -eq 'Function' }
-
-    # Return the first instance of the filtered appService nodes
-    $functionAppService = $functionAppServices | Select-Object -First 1
-
-    $functionAppServiceName = $functionAppService.Name
 
     # Create a new AI Hub and Model
     New-AIHub -aiHub $global:aiHub -resourceGroupName $resourceGroupName -existingResources $existingResources
 
-    # Create a new AI Service
-    #New-AIService -aiService $global:aiService -resourceGroupName $resourceGroupName  -existingResources $existingResources
-
-    #Set-KeyVaultSecrets -keyVaultName $global:keyVault.Name -resourceGroupName $resourceGroupName
+    # Create Key Vault Secrets
+    Set-KeyVaultSecrets -keyVaultName $global:keyVault.Name -resourceGroupName $resourceGroupName
 
     # The CLI needs to be updated to allow Azure AI Studio projects to be created correctly.
     # This code will create a new workspace in ML Studio but not in AI Studio.
@@ -4228,7 +4187,7 @@ function Start-Deployment {
             New-AppService -appService $appService -resourceGroupName $resourceGroupName -userAssignedIdentityName $global:userAssignedIdentity.Name -storageServiceName $global:storageService.Name -appInsightsName $global:appInsightsService.Name -deployZipResources $true
         }
             
-        if ($appService.Name -ne $functionAppServiceName) {
+        if ($appService.Name -ne $global:functionAppService.Name) {
             New-AppRegistration -appServiceName $appService.Name -resourceGroupName $resourceGroupName -keyVaultName $global:keyVault.Name -appServiceUrl $appService.Url -parametersFile $global:parametersFile
             
             $appServiceName = $appService.Name

@@ -256,7 +256,7 @@
     "Location": "east us",
     "Sku": "S0",
     "Type": "CognitiveService",
-    "Kind": "Cognitive"
+    "Kind": "CognitiveServices"
   },
   "computerVisionService": {
     "Name": "cv-copilot-demo-009",
@@ -315,10 +315,11 @@
   "installRequiredExtensionsOnly": true,
   "keyVault": {
     "Name": "kv-copilot-demo-009",
+    "Description": "Key Vault",
     "ApiVersion": "7.5",
     "PermissionModel": "VaultAccessPolicy",
     "Location": "east us",
-    "Type": "Key Vault",
+    "Type": "KeyVault",
     "UseRBAC": false,
     "userAssignedIdentityName": "id-copilot-demo-009"
   },
