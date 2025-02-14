@@ -2,59 +2,39 @@
   "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
   "addIns": [],
   "api": {
-    "acceptMappedClaims": null,
+    "acceptMappedClaims": "",
     "knownClientApplications": [],
-    "oauth2PermissionScopes": [
-      {
-        "adminConsentDescription": "Allow the application to read data from the API.",
-        "adminConsentDisplayName": "Read data from API",
-        "id": "e4bc803f-96a7-465c-aed1-795d778b8b68",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-        "userConsentDisplayName": "Read data from API",
-        "value": "read_data"
-      },
-      {
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "adminConsentDisplayName": "Access API as user",
-        "id": "93ebbea6-d139-49df-ad02-3df4e99ad77f",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
-        "userConsentDisplayName": "Access API as user",
-        "value": "access_as_user"
-      }
-    ],
+    "oauth2PermissionScopes": [],
     "preAuthorizedApplications": [],
     "requestedAccessTokenVersion": 2
   },
-  "appId": "0fe52d7b-b008-41c5-8e7e-53ac5098a495",
+  "appId": "d756979f-6cb5-4d8b-825c-e8188e9b2fbe",
   "appRoles": [],
-  "applicationTemplateId": null,
-  "certification": null,
-  "createdDateTime": "2025-02-05T03:11:48Z",
-  "defaultRedirectUri": null,
-  "deletedDateTime": null,
-  "description": null,
-  "disabledByMicrosoftStatus": null,
-  "displayName": "app-copilot-demo-007",
-  "groupMembershipClaims": null,
-  "id": "22d29916-8d56-4180-8add-bacc6ebd1351",
+  "applicationTemplateId": "",
+  "certification": {},
+  "createdDateTime": "2025-02-13T03:17:37Z",
+  "defaultRedirectUri": "",
+  "deletedDateTime": "",
+  "description": "",
+  "disabledByMicrosoftStatus": "",
+  "displayName": "app-copilot-demo-008",
+  "groupMembershipClaims": "",
+  "id": "5073ae0e-7f06-45c8-b99d-c6137c0b544a",
   "identifierUris": [],
   "info": {
-    "logoUrl": null,
-    "marketingUrl": null,
-    "privacyStatementUrl": null,
-    "supportUrl": null,
-    "termsOfServiceUrl": null
+    "logoUrl": "",
+    "marketingUrl": "",
+    "privacyStatementUrl": "",
+    "supportUrl": "",
+    "termsOfServiceUrl": ""
   },
-  "isDeviceOnlyAuthSupported": null,
-  "isFallbackPublicClient": null,
+  "isDeviceOnlyAuthSupported": false,
+  "isFallbackPublicClient": false,
   "keyCredentials": [],
-  "nativeAuthenticationApisEnabled": null,
-  "notes": null,
-  "optionalClaims": null,
+  "nativeAuthenticationApisEnabled": false,
+  "notes": "",
+  "oauth2RequiredPostResponse": false,
+  "optionalClaims": {},
   "parentalControlSettings": {
     "countriesBlockedForMinors": [],
     "legalAgeGroupRule": "Allow"
@@ -64,65 +44,30 @@
     "redirectUris": []
   },
   "publisherDomain": "FedAIRS.onmicrosoft.com",
-  "requestSignatureVerification": null,
-  "requiredResourceAccess": [
-    {
-      "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
-      "resourceAccess": [
-        {
-          "id": "f53da476-18e3-4152-8e01-aec403e6edc0",
-          "type": "Scope"
-        }
-      ]
-    },
-    {
-      "resourceAppId": "00000002-0000-0000-c000-000000000000",
-      "resourceAccess": [
-        {
-          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-          "type": "Scope"
-        },
-        {
-          "id": "df85f4d6-205c-4ac5-a5ea-6bf408dba283",
-          "type": "Scope"
-        },
-        {
-          "id": "76bc735e-aecd-4a1d-8b4c-2b915deabb79",
-          "type": "Scope"
-        },
-        {
-          "id": "205e70e5-aba6-4c52-a976-6d2d46c48043",
-          "type": "Scope"
-        },
-        {
-          "id": "f89c84ef-20d0-4b54-87e9-02e856d66d53",
-          "type": "Scope"
-        }
-      ]
-    }
-  ],
-  "samlMetadataUrl": null,
-  "serviceManagementReference": null,
-  "servicePrincipalLockConfiguration": null,
+  "requestSignatureVerification": {},
+  "requiredResourceAccess": [],
+  "samlMetadataUrl": false,
+  "serviceManagementReference": false,
+  "servicePrincipalLockConfiguration": {},
   "signInAudience": "AzureADandPersonalMicrosoftAccount",
   "spa": {
     "redirectUris": []
   },
   "tags": [],
-  "tokenEncryptionKeyId": null,
-  "uniqueName": null,
+  "tokenEncryptionKeyId": false,
+  "uniqueName": false,
   "verifiedPublisher": {
-    "addedDateTime": null,
-    "displayName": null,
-    "verifiedPublisherId": null
+    "addedDateTime": "",
+    "displayName": "",
+    "verifiedPublisherId": ""
   },
   "web": {
-    "homePageUrl": null,
+    "homePageUrl": "",
     "implicitGrantSettings": {
       "enableAccessTokenIssuance": false,
       "enableIdTokenIssuance": false
     },
-    "logoutUrl": null,
+    "logoutUrl": "",
     "redirectUriSettings": [],
     "redirectUris": []
   }

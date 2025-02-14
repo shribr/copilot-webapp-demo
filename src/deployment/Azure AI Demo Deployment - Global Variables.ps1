@@ -172,7 +172,7 @@ function ConvertTo-ProperCase {
         [string]$inputString
     )
 
-    Write-Host "Executing ConvertTo_ProperCase function..." -ForegroundColor Magenta
+    #Write-Host "Executing ConvertTo_ProperCase function..." -ForegroundColor Magenta
 
     # Split the input string into words
     $words = $inputString -split "\s+"
@@ -304,6 +304,9 @@ function Deploy-OpenAIModels {
         $aiModelSkuCapacity = $aiModel.Sku.Capacity
    
         try {
+
+            $ErrorActionPreference = 'SilentlyContinue'
+
             # Check if the deployment already exists
             $deploymentExists = az cognitiveservices account deployment list --resource-group $resourceGroupName --name $aiServiceName --query "[?name=='$aiModelDeploymentName']" --output tsv
 
@@ -1025,6 +1028,7 @@ function Initialize-Parameters {
     $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
     $global:newResourceBaseName = $parametersObject.newResourceBaseName
     $global:previousFullResourceBaseName = $parametersObject.previousFullResourceBaseName
+    $global:currentFullResourceBaseName = $parametersObject.currentFullResourceBaseName
 
     $global:restoreSoftDeletedResourcess = $parametersObject.restoreSoftDeletedResourcess
 
@@ -1137,7 +1141,7 @@ function Initialize-Parameters {
         configFilePath               = $parametersObject.configFilePath
         containerRegistry            = $global:containerRegistry
         createResourceGroup          = $parametersObject.createResourceGroup
-        currentFullResourceBaseName  = $parametersObject.currentFullResourceBaseName
+        currentFullResourceBaseName  = $global:currentFullResourceBaseName
         deleteResourceGroup          = $parametersObject.deleteResourceGroup
         deployApiManagementService   = $parametersObject.deployApiManagementService
         deploymentType               = $global:deploymentType
@@ -1759,6 +1763,8 @@ function New-AppRegistration {
             # Even though the manifest files for the AD and MS Graph APIs are the same, unless I add the permissions using the GUI in the web portal the values will be saved as AD Graph and not MS Graph.
             # I still need to figure out how to add the permissions from the MS Graph API instead of the AD Graph API.
 
+            # https://learn.microsoft.com/en-us/entra/identity-platform/reference-microsoft-graph-app-manifest
+
             $app.requiredResourceAccess = $appRegRequiredResourceAccess
             #$app.spa.redirectUris = $appServiceUrl
 
@@ -1766,8 +1772,10 @@ function New-AppRegistration {
             $appJson = $app | ConvertTo-Json -Depth 10
     
             # Update the application with the modified manifest
+            #$appId = "5073ae0e-7f06-45c8-b99d-c6137c0b544a"
+            
             $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-            az ad app update --id $appId --set appManifest.json
+            az ad app update --id $appId --set "appManifest.json"
             
             az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
             az ad app update --id $appId --set api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)
@@ -1775,6 +1783,9 @@ function New-AppRegistration {
             #az ad app update --id $appId --identifier-uris $identifierUris
             #az ad app update --id $appId --set displayName=app-copilot-demo-002
             #az ad app update --id $appId --set notes=test
+
+            # $body = Get-Content -Raw -Path "appManifest.json" 
+            # az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/5073ae0e-7f06-45c8-b99d-c6137c0b544a" --body $body
 
             Write-Host "Scope for app '$appServiceName' added successfully."
             Write-Log -message "Scope for app '$appServiceName' added successfully." -logFilePath $global:LogFilePath
@@ -3798,12 +3809,17 @@ function Set-KeyVaultRoles {
         [string]$location
     )
 
+    $userAssignedIdentityObjectId = az identity show --name $userAssignedIdentityName --resource-group $resourceGroupName --query 'principalId' --output tsv
+
     Write-Host "Executing Set-KeyVaultRoles function..." -ForegroundColor Magenta
 
     # Set policy for the application
     try {
         $ErrorActionPreference = 'Stop'
-        az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        #az keyvault set-policy --name $keyVaultName --object-id $userAssignedIdentityObjectId --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        #az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        az keyvault set-policy --name $keyVaultName --object-id $userAssignedIdentityObjectId --resource-group $resourceGroupName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
+        
         Write-Host " Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'." -ForegroundColor Yellow
         Write-Log -message "    Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
     }
@@ -3954,7 +3970,6 @@ function Start-Deployment {
     # Alphabetize the parameters object
     #$parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
 
-
     if ($global:appDeploymentOnly -eq $false) {
     
         # Need to install VS Code extensions before executing main deployment script
@@ -4078,6 +4093,8 @@ function Start-Deployment {
 
     $userPrincipalName = $global:userPrincipalName
 
+
+
     #**********************************************************************************************************************
     # Create User Assigned Identity
 
@@ -4179,7 +4196,7 @@ function Start-Deployment {
     #Remove-MachineLearningWorkspace -resourceGroupName $resourceGroup.Name -aiProjectName $aiProjectName
 
     # Update configuration file for web frontend
-    Update-ConfigFile - configFilePath "app/frontend/config.json"
+    Update-ConfigFile - configFilePath "app/frontend/config.json" -resourceGroupName $resourceGroupName
 
     # Deploy web app and function app services
     foreach ($appService in $appServices) {
@@ -4215,7 +4232,7 @@ function Start-Deployment {
         }
     }
 
-    # Set $global:previousFullResourceBaseName to the $currentResourceBaseName
+    # Set $global:previousFullResourceBaseName to the $currentResourceBaseName for use during the next deployment
     $global:previousFullResourceBaseName = $global:currentFullResourceBaseName
 
     $parametersFileContent = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
@@ -4490,22 +4507,12 @@ api_key: $apiKey
         "StorageAccount" {
             $containerName = $servicePropertiesHashtable["ContainerName"]
             $endpoint = "https://$storageServiceName.blob.core.windows.net/$containerName"
-            #$resourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup.Name/providers/Microsoft.Storage/storageAccounts/$storageServiceName"
-
-            <#
- # {            $storageAccountKey = az storage account keys list `
-                --resource-group $resourceGroup.Name `
-                --account-name $storageServiceName `
-                --query "[0].value" `
-                --output tsv:Enter a comment or description}
-#>
-
             $content = @"
 name: $serviceName
 type: azure_blob
 url: $endpoint
 container_name: $containerName
-account_name: $storageServiceName
+account_name: $serviceName
 "@
         }
     }
