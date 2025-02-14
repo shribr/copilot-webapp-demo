@@ -25,7 +25,9 @@
   ],
   "aiHub": {
     "Name": "hub-ai-copilot-demo-009",
-    "Location": "east us"
+    "Location": "east us",
+    "Kind": "AzureAIHub",
+    "Type": "Azure AI Hub"
   },
   "aiModels": [
     {
@@ -82,7 +84,8 @@
     "Location": "east us",
     "Name": "ai-service-copilot-demo-009",
     "ServiceName": "ai-service-copilot-demo-009",
-    "Type": "azure_ai_services",
+    "Type": "Azure AI",
+    "Kind": "azure_ai_services",
     "YamlFileName": "ai.connection.yaml"
   },
   "answerGenerationConfig": {
@@ -107,6 +110,8 @@
     "Location": "east us",
     "Name": "apim-copilot-demo-009",
     "Path": "/path",
+    "Type": "Api Management",
+    "Kind": "api_management",
     "PublisherEmail": "amschrei@microsoft.com",
     "PublisherName": "Ami Schreiber",
     "ResourceGroup": "RG-copilot-demo-009",
@@ -245,11 +250,16 @@
   "cognitiveService": {
     "Name": "cog-copilot-demo-009",
     "Location": "east us",
-    "Sku": "S0"
+    "Sku": "S0",
+    "Kind": "CognitiveServices",
+    "Type": "Cognitive"
   },
   "computerVisionService": {
     "Name": "cv-copilot-demo-009",
-    "Location": "east us"
+    "Location": "east us",
+    "Sku": "S0",
+    "Kind": "ComputerVision",
+    "Type": "Computer Vision"
   },
   "configFilePath": "app/frontend/config.json",
   "containerRegistry": {
@@ -272,7 +282,10 @@
   "deployZipResources": true,
   "documentIntelligenceService": {
     "Name": "docintel-copilot-demo-009",
-    "Location": "east us"
+    "Location": "east us",
+    "Kind": "DocumentIntelligence",
+    "Type": "Document Intelligence",
+    "Sku": "S0"
   },
   "domainName": "azurewebsites.net",
   "exposeApiScopes": [
@@ -297,7 +310,9 @@
     "ApiVersion": "7.5",
     "PermissionModel": "VaultAccessPolicy",
     "Location": "east us",
-    "UseRBAC": false
+    "Type": "Key Vault",
+    "UseRBAC": false,
+    "userAssignedIdentityName": "id-copilot-demo-009"
   },
   "keyVaultSecrets": [
     {
@@ -341,7 +356,6 @@
     "Endpoint": "https://openai-service-copilot-demo-009.openai.azure.com/",
     "Location": "east us",
     "Name": "openai-service-copilot-demo-009",
-    "ServiceName": "openai-service-copilot-demo-009",
     "Type": "azure_open_ai",
     "YamlFileName": "openai.connection.yaml"
   },
