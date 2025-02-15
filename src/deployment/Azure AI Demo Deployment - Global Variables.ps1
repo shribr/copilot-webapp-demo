@@ -2121,6 +2121,9 @@ function New-ContainerRegistry {
         $containerRegistryFile = Update-ContainerRegistryFile -resourceGroupName $resourceGroupName -containerRegistry $containerRegistry
 
         try {
+
+            $ErrorActionPreference = 'SilentlyContinue'
+
             $jsonOutput = az ml registry create --file $containerRegistryFile --resource-group $resourceGroupName 2>&1
 
             # The Azure CLI does not return a terminating error when the deployment fails, so we need to check the output for the error message
@@ -3820,12 +3823,12 @@ function Set-KeyVaultRoles {
         #az keyvault set-policy --name $keyVaultName --resource-group $resourceGroupName --spn $userAssignedIdentityName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
         az keyvault set-policy --name $keyVaultName --object-id $userAssignedIdentityObjectId --resource-group $resourceGroupName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
         
-        Write-Host " Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'." -ForegroundColor Yellow
-        Write-Log -message "    Key Vault '$keyVaultName' policy permissions set for application: '$userAssignedIdentityName'."
+        Write-Host " Key Vault '$keyVaultName' policy permissions set for user: '$userAssignedIdentityName'." -ForegroundColor Yellow
+        Write-Log -message "    Key Vault '$keyVaultName' policy permissions set for user: '$userAssignedIdentityName'."
     }
     catch {
-        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for application: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to set Key Vault '$keyVaultName' policy permissions for user: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
 }
 

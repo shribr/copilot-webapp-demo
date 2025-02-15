@@ -12,7 +12,7 @@ workspace_hub: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroup
 identity:
   type: user_assigned
   tenant_id: e362c86f-e64a-4e58-b26a-c8bf314b1093
-  principal_id: ceb7d090-b1d4-4934-9983-5fd951a7c274
+  principal_id: a3d2221b-b2ae-41d6-b7e4-e6e7b94956b6
   user_assigned_identities:
     /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-COPILOT-DEMO-009/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-copilot-demo-009: {}
 #tags:
