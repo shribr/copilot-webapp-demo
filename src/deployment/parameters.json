@@ -101,11 +101,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -123,7 +119,7 @@
     "ResourceGroup": "RG-copilot-demo-009",
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
   },
-  "appRegistrationClientId": "d756979f-6cb5-4d8b-825c-e8188e9b2fbe",
+  "appRegistrationClientId": "e8e374ea-dd2f-4225-83bf-867ade167d50",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
@@ -267,7 +263,7 @@
     "ConnectionName": "azure_computer_vision",
     "Description": "Computer Vision Service",
     "Location": "east us",
-    "Sku": "S0",
+    "Sku": "S1",
     "Type": "CognitiveService",
     "Kind": "ComputerVision"
   },

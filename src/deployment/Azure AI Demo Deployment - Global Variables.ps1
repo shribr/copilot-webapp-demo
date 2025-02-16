@@ -2087,7 +2087,9 @@ function New-CognitiveServiceResources {
                         --output tsv 2>&1
 
                     if ($LASTEXITCODE -eq 0) {
-                        Write-Host "$serviceDescription '$serviceName' created successfully." -ForegroundColor Green
+                        $global:resourceCounter += 1
+                        Write-Host "$serviceDescription '$serviceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+                        Write-Log -message "$serviceDescription '$serviceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
                     }
                     else {
                         Write-Error "Failed to create $serviceDescription '$serviceName'. Error: $createResult"
@@ -3424,7 +3426,7 @@ function New-StorageService {
 
             $global:resourceCounter += 1
 
-            Write-Host "Storage account '$storageServiceName' created successfully. [$global:resourceCounter]"
+            Write-Host "Storage account '$storageServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
             Write-Log -message "Storage account '$storageServiceName' created successfully. [$global:resourceCounter]"
 
             # Retrieve the storage account key
