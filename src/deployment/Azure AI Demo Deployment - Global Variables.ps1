@@ -192,7 +192,7 @@ function ConvertTo-ProperCase {
 # Function to deploy an app service
 function Deploy-AppService {
     param (
-        [array]$appService,
+        [psobject]$appService,
         [string]$resourceGroupName,
         [bool]$deployZipResources,
         [array]$existingResources
@@ -1047,6 +1047,7 @@ function Initialize-Parameters {
     $global:aiProject = $parametersObject.aiProject          
     $global:aiService = $parametersObject.aiService
     $global:apiManagementService = $parametersObject.apiManagementService
+    $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
     $global:appInsightsService = $parametersObject.appInsightsService  
     $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
     $global:appServicePlan = $parametersObject.AppServicePlan
@@ -1131,7 +1132,7 @@ function Initialize-Parameters {
         appServices                  = $global:appServices
         appRegistrationClientId      = $parametersObject.appRegistrationClientId
         appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
-        appDeploymentOnly            = $parametersObject.appDeploymentOnly
+        appDeploymentOnly            = $global:appDeploymentOnly
         appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
         appServiceEnvironment        = $global:appServiceEnvironment
         appServicePlan               = $global:appServicePlan
@@ -1446,10 +1447,9 @@ function New-ApiManagementApi {
         }
                 
         try {
-            # Add CORS policy to operations [THIS DOES NOT WORK]
-            az apim api operation policy set --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
-            az apim api operation policy set --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
-    
+            # Add CORS policy to operations [THIS DOES NOT WORK. NO SUCH COMMAND EXISTS]
+            #az apim api operation policy set --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
+            #az apim api operation policy set --resource-group $resourceGroup.Name --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --xml-policy "<inbound><base /><cors><allowed-origins><origin>$global:appService.Url</origin></allowed-origins><allowed-methods><method>GET</method></allowed-methods></cors></inbound>"
         }
         catch {
             Write-Error "Failed to add CORS policy to operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1613,9 +1613,9 @@ function New-ApiManagementService {
             Write-Log -message "API Management Service '$apiManagementServiceName' is activating." -logFilePath $global:LogFilePath
             return
         }
-
-        New-ApiManagementApi -resourceGroupName $resourceGroupName -apiManagementService $apiManagementService -keyVaultName $keyVaultName
     }
+
+    New-ApiManagementApi -resourceGroupName $resourceGroupName -apiManagementService $apiManagementService -keyVaultName $keyVaultName
 }
 
 # Function to register an app, set API permissions, expose the API, and set Key Vault access policies
@@ -3826,7 +3826,7 @@ function Set-KeyVaultRoles {
         az keyvault set-policy --name $keyVaultName --object-id $userAssignedIdentityObjectId --resource-group $resourceGroupName --key-permissions get list update create import delete backup restore recover purge encrypt decrypt unwrapKey wrapKey --secret-permissions get list set delete backup restore recover purge --certificate-permissions get list delete create import update managecontacts getissuers listissuers setissuers deleteissuers manageissuers recover purge
         
         Write-Host " Key Vault '$keyVaultName' policy permissions set for user: '$userAssignedIdentityName'." -ForegroundColor Yellow
-        Write-Log -message "    Key Vault '$keyVaultName' policy permissions set for user: '$userAssignedIdentityName'."
+        Write-Log -message "Key Vault '$keyVaultName' policy permissions set for user: '$userAssignedIdentityName'."
     }
     catch {
         Write-Error "Failed to set Key Vault '$keyVaultName' policy permissions for user: '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -4036,6 +4036,21 @@ function Start-Deployment {
 
     $resourceGroupName = $global:resourceGroup.Name
 
+    if ($global:appDeploymentOnly -eq $true) {
+
+        # Update configuration file for web frontend
+        Update-ConfigFile -resourceGroupName $resourceGroupName -configFilePath "app/frontend/config.json"
+        
+        # Deploy web app and function app services
+        foreach ($appService in $appServices) {
+            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -deployZipResources $true
+
+            #New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroup.Name -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
+        }
+
+        return
+    }
+
     if ($appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
@@ -4079,21 +4094,6 @@ function Start-Deployment {
 
     # Show-ExistingResourceProvisioningStatus
     
-    if ($global:appDeploymentOnly -eq $true) {
-
-        # Update configuration file for web frontend
-        Update-ConfigFile -resourceGroupName $resourceGroupName -configFilePath "app/frontend/config.json"
-        
-        # Deploy web app and function app services
-        foreach ($appService in $appServices) {
-            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -deployZipResources $true
-
-            #New-App-Registration -appServiceName $appService.Name -resourceGroupName $resourceGroup.Name -keyVaultName $global:keyVaultName -appServiceUrl $appService.Url -appRegRequiredResourceAccess $global:appRegRequiredResourceAccess -exposeApiScopes $global:exposeApiScopes -parametersFile $global:parametersFile
-        }
-
-        return
-    }
-
     Reset-DeploymentPath
 
     $userPrincipalName = $global:userPrincipalName
@@ -4595,20 +4595,28 @@ function Update-ConfigFile {
 
     try {
 
-        $functionAppName = $global:appServices | Where-Object { $_.type -eq 'Function' } | Select-Object -First 1
-        $appServiceName = $global:appServices | Where-Object { $_.type -eq 'Web' } | Select-Object -First 1
+        $functionApp = $global:appServices | Where-Object { $_.type -eq 'Function' } | Select-Object -First 1
+        $appService = $global:appServices | Where-Object { $_.type -eq 'Web' } | Select-Object -First 1
        
+        $storageServiceName = $global:storageService.Name
+        $searchServiceName = $global:searchService.Name
+        $openAIServiceName = $global:openAIService.Name
+        $aiServiceName = $global:aiService.Name
+        $functionAppName = $functionApp.Name
+        $appServiceName = $appService.Name
+
         $fullResourceBaseName = $global:newFullResourceBaseName
 
-        $storageKey = az storage account keys list --resource-group  $resourceGroupName --account-name $global:storageService.Name --query "[0].value" --output tsv
+        $storageKey = az storage account keys list --resource-group  $resourceGroupName --account-name $storageServiceName --query "[0].value" --output tsv
         $startDate = (Get-Date).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
         $expirationDate = (Get-Date).AddYears(1).Date.AddDays(-1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ssZ")
-        $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $global:searchService.Name --query "primaryKey" --output tsv
-        $openAIApiKey = az cognitiveservices account keys list --resource-group  $resourceGroupName --name $global:openAIService.Name --query "key1" --output tsv
-        $aiServiceKey = az cognitiveservices account keys list --resource-group  $resourceGroupName --name $aiService.Name --query "key1" --output tsv
+        $searchApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+        $openAIApiKey = az cognitiveservices account keys list --resource-group  $resourceGroupName --name $openAIServiceName --query "key1" --output tsv
+        $aiServiceKey = az cognitiveservices account keys list --resource-group  $resourceGroupName --name $aiServiceName --query "key1" --output tsv
         $functionApiKey = az functionapp keys list --resource-group  $resourceGroupName --name $functionAppName --query "functionKeys.default" --output tsv
-        $functionAppUrl = az functionapp show -g  $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
-        
+        #$functionAppUrl = az functionapp show -g  $resourceGroupName -n $functionAppName --query "defaultHostName" --output tsv
+        $functionAppUrl = $functionApp.Url
+
         #$apimSubscriptionKey = az apim api list --resource-group $resourceGroupName --service-name $global:apiManagementService.Name --query "SubscriptionKey" --output tsv
         #$global:applicationManagementService.SubscriptionKey = $apimSubscriptionKey
 
@@ -4640,7 +4648,7 @@ function Update-ConfigFile {
 
         # Extract the 'sig' parameter value from the SAS token
         if ($storageSAS -match "sig=([^&]+)") {
-            $storageSASKey = $matches[1]
+            $storageSIG = $matches[1]
         }
         else {
             Write-Error "Failed to extract 'sig' parameter from SAS token."
@@ -4681,7 +4689,8 @@ function Update-ConfigFile {
         $config.AZURE_OPENAI_SERVICE_API_KEY = $aiServiceKey
         $config.AZURE_FUNCTION_API_KEY = $functionApiKey
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
-        $config.AZURE_FUNCTION_APP_URL = "https://$functionAppUrl"
+        $config.AZURE_FUNCTION_APP_URL = $functionAppUrl
+
         $config.AZURE_APIM_SERVICE_NAME = $global:apiManagementService.Name
 
         if ($global:apiManagementService.SubscriptionKey) {
@@ -4689,24 +4698,26 @@ function Update-ConfigFile {
         }
 
         $config.AZURE_APP_REG_CLIENT_APP_ID = $appRegistrationClientId
-        $config.AZURE_APP_SERVICE_NAME = $appService.Name
+        $config.AZURE_APP_SERVICE_NAME = $appServiceName
         $config.AZURE_KEY_VAULT_NAME = $global:keyVault.Name
         $config.AZURE_KEY_VAULT_API_VERSION = $global:keyVault.ApiVersion
         $config.AZURE_RESOURCE_BASE_NAME = $global:resourceBaseName
-        $config.AZURE_SEARCH_API_KEY = $searchApiKey
-        $config.AZURE_SEARCH_API_VERSION = $global:searchServiceApiVersion
-        $config.AZURE_SEARCH_SEMANTIC_CONFIG = "vector-profile-srch-index-$fullResourceBaseName-semantic-configuration" -join ""
+        $config.AZURE_SEARCH_SERVICE_API_KEY = $searchApiKey
+        $config.AZURE_SEARCH_SERVICE_API_VERSION = $global:searchService.ApiVersion
+        $config.AZURE_SEARCH_SERVICE_SEMANTIC_CONFIG = "vector-profile-srch-index-$fullResourceBaseName-semantic-configuration" -join ""
         $config.AZURE_SEARCH_SERVICE_NAME = $global:searchService.Name
+
         $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageService.Name
         $config.AZURE_STORAGE_API_VERSION = $global:storageService.ApiVersion
         $config.AZURE_STORAGE_FULL_URL = $storageUrl
         $config.AZURE_STORAGE_KEY = $storageKey
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
-        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSASKey
+        $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSIG
         $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
         $config.AZURE_STORAGE_SAS_TOKEN.SRT = $storageSRT
         $config.AZURE_STORAGE_SAS_TOKEN.SS = $storageSS
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
+
         $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
         $config.OPENAI_ACCOUNT_NAME = $global:openAIService.Name
         $config.OPENAI_API_KEY = $openAIApiKey
@@ -4773,7 +4784,7 @@ function Update-ConfigFile {
                 @{
                     "type"       = "azure_search"
                     "parameters" = @{
-                        "endpoint"       = "https://$global:searchServiceName.search.windows.net"
+                        "endpoint"       = "https://$searchServiceName.search.windows.net"
                         "index_name"     = "$vectorSearchIndexName"
                         "authentication" = @{
                             "type" = "api_key"

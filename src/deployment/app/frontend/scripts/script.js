@@ -1131,7 +1131,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
     const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
 
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
+    let searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
     let jsonString = JSON.stringify(openAIRequestBody);
 
     const region = config.REGION;
@@ -1556,9 +1556,9 @@ async function getSasToken() {
 // Function to get the search indexer status
 async function getSearchIndexerStatus(searchIndexers) {
     // Retrieve configuration which should include your Azure Search service name and API key
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
+    let searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
+    const searchServiceApiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const keyVaultEndPoint = "https://vault.azure.net/.default"
     const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
@@ -2154,9 +2154,9 @@ async function renderPanelIcons() {
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
+    let searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
+    const searchServiceApiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
     const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const keyVaultEndPoint = "https://vault.azure.net/.default"
     const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
@@ -2194,6 +2194,10 @@ async function runSearchIndexer(searchIndexers) {
         var searchIndexerName = searchIndexer.Name;
         //var searchIndexName = searchIndexer.IndexName;
         //var searchIndexerSchema = searchIndexer.Schema;
+
+        if (searchIndexerName.indexOf("sharepoint") > -1) {
+            continue;
+        }
 
         var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
 
