@@ -2600,8 +2600,7 @@ async function uploadFilesToAzure(files) {
                     'Content-Length': file.size.toString(),
                     'x-ms-date': date,
                     'x-ms-version': apiVersion,
-                    'x-ms-blob-content-type': file.type,
-                    'x-ms-blob-type': 'BlockBlob'
+                    'x-ms-blob-content-type': file.type
                 },
                 body: file
             });

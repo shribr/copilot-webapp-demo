@@ -79,7 +79,7 @@
   },
   "aiService": {
     "ApiKey": "5c25eb463aa8431588b6d0f22f0ba417",
-    "ApiVersion": "2024-08-01-preview",
+    "ApiVersion": "2024-10-01",
     "Endpoint": "https://ai-service-copilot-demo-009.cognitiveservices.azure.com/",
     "Location": "east us",
     "Name": "ai-service-copilot-demo-009",
@@ -170,11 +170,11 @@
   },
   "appServices": [
     {
+      "Name": "app-copilot-demo-009",
       "AppServicePlan": "asp-copilot-demo-009",
       "DeletePackageAfterDeploy": true,
       "DeployZipPackage": true,
       "Location": "east us",
-      "Name": "app-copilot-demo-009",
       "Path": "app/frontend",
       "ResourceGroup": "RG-copilot-demo-009",
       "Runtime": "NODE:20LTS",
@@ -182,11 +182,11 @@
       "Url": "https://app-copilot-demo-009.azurewebsites.net"
     },
     {
+      "Name": "func-copilot-demo-009",
       "AppServicePlan": "asp-copilot-demo-009",
       "DeletePackageAfterDeploy": true,
       "DeployZipPackage": true,
       "Location": "east us",
-      "Name": "func-copilot-demo-009",
       "Path": "app/functions/apikeys",
       "ResourceGroup": "RG-copilot-demo-009",
       "Runtime": "dotnet-isolated",
@@ -251,6 +251,8 @@
   ],
   "cognitiveService": {
     "Name": "cog-copilot-demo-009",
+    "ApiKey": "xxx",
+    "ApiVersion": "2024-10-01",
     "ConnectionName": "azure_cognitive",
     "Description": "Cognitive Service",
     "Location": "east us",
@@ -260,6 +262,8 @@
   },
   "computerVisionService": {
     "Name": "cv-copilot-demo-009",
+    "ApiKey": "xxx",
+    "ApiVersion": "2024-10-01",
     "ConnectionName": "azure_computer_vision",
     "Description": "Computer Vision Service",
     "Location": "east us",
@@ -288,6 +292,8 @@
   "deployZipResources": true,
   "documentIntelligenceService": {
     "Name": "docintel-copilot-demo-009",
+    "ApiKey": "xxx",
+    "ApiVersion": "2024-10-01",
     "ConnectionName": "azure_doc_intelligence",
     "Description": "Document Intelligence Service",
     "Location": "east us",
@@ -323,6 +329,26 @@
     "UseRBAC": false,
     "userAssignedIdentityName": "id-copilot-demo-009"
   },
+  "keyVaultProxyOperations": [
+    {
+      "Name": "GetOpenAIServiceApiKey",
+      "DisplayName": "Get OpenAI Service API Key",
+      "Method": "GET",
+      "UrlTemplate": "/secrets/OpenAIServiceApiKey"
+    },
+    {
+      "Name": "GetSearchServiceApiKey",
+      "DisplayName": "Get Search Service API Key",
+      "Method": "GET",
+      "UrlTemplate": "/secrets/SearchServiceApiKey"
+    },
+    {
+      "Name": "GetStorageServiceApiKey",
+      "DisplayName": "Get Storage Service API Key",
+      "Method": "GET",
+      "UrlTemplate": "/secrets/StorageServiceApiKey"
+    }
+  ],
   "keyVaultSecrets": [
     {
       "Name": "StorageServiceApiKey",
@@ -361,7 +387,7 @@
   },
   "openAIService": {
     "ApiKey": "f622a933e72049049ac0af3dcfd90db1",
-    "ApiVersion": "2024-08-01-preview",
+    "ApiVersion": "2024-10-01",
     "Endpoint": "https://openai-service-copilot-demo-009.openai.azure.com/",
     "Location": "east us",
     "Name": "openai-service-copilot-demo-009",
@@ -1092,7 +1118,7 @@
   "storageService": {
     "AccountName": "stcopilotdemo009",
     "Location": "east us",
-    "ApiVersion": "2023-11-01",
+    "ApiVersion": "2025-01-05",
     "ContainerName": "content",
     "Kind": "StorageV2",
     "Sku": "Standard_LRS",

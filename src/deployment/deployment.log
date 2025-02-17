@@ -35,3 +35,79 @@
 2025-02-15 21:57:52 - Config.json file updated successfully.
 2025-02-15 22:00:18 - Web app 'app-copilot-demo-009' deployed successfully.
 2025-02-15 22:05:25 - Function app 'func-copilot-demo-009' deployed successfully.
+*** LOG SEQUENCE: 4 ***
+*** SCRIPT START TIME: 2025-02-15 10:15:45 PM ***
+2025-02-15 22:17:36 - Config.json file updated successfully.
+2025-02-15 22:18:56 - Web app 'app-copilot-demo-009' deployed successfully.
+2025-02-15 22:22:00 - Function app 'func-copilot-demo-009' deployed successfully.
+*** LOG SEQUENCE: 5 ***
+*** SCRIPT START TIME: 2025-02-16 09:32:47 PM ***
+2025-02-16 21:34:16 - Config.json file updated successfully.
+2025-02-16 21:37:13 - Web app 'app-copilot-demo-009' deployed successfully.
+*** LOG SEQUENCE: 6 ***
+*** SCRIPT START TIME: 2025-02-16 09:38:55 PM ***
+2025-02-16 21:42:56 - Config.json file updated successfully.
+2025-02-16 21:46:57 - Web app 'app-copilot-demo-009' deployed successfully.
+*** LOG SEQUENCE: 7 ***
+*** SCRIPT START TIME: 2025-02-16 09:48:54 PM ***
+2025-02-16 21:48:56 - Resource Group 'RG-COPILOT-DEMO-009' already exists.
+2025-02-16 21:50:12 - Identity 'id-copilot-demo-009' already exists.
+2025-02-16 21:50:14 - Storage account 'stcopilotdemo009' already exists.
+2025-02-16 21:50:14 - Virtual Network 'vnet-copilot-demo-009' already exists.
+2025-02-16 21:51:34 - Subnet 'subnet-copilot-demo-009' already exists.
+2025-02-16 21:51:34 - App Service Plan 'asp-copilot-demo-009' already exists.
+2025-02-16 21:51:34 - Search Service 'srch-copilot-demo-009' already exists.
+2025-02-16 21:52:57 - Search Index 'srch-index-copilot-demo-009' already exists.
+2025-02-16 21:52:57 - Search Index 'vector-srch-index-copilot-demo-009' already exists.
+2025-02-16 21:52:57 - Search Index 'embeddings-srch-index-copilot-demo-009' already exists.
+2025-02-16 21:52:57 - Search Index 'sharepoint-srch-index-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Service Data Source 'srch-datasource-blob-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Service Data Source 'srch-datasource-sharepoint-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Skill Set 'srch-skillset-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Skill Set 'vector-srch-skillset-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Skill Set 'embeddings-srch-skillset-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Indexer 'srch-indexer-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Indexer 'vector-srch-indexer-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Search Indexer 'embeddings-srch-indexer-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Log Analytics workspace 'log-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Application Insights 'appi-copilot-demo-009' already exists.
+2025-02-16 21:54:13 - Container Registry 'crcopilotdemo009' already exists.
+2025-02-16 21:54:16 - API Management Service 'apim-copilot-demo-009' already exists.
+2025-02-16 21:54:18 - API 'KeyVaultProxy' already exists.
+2025-02-16 21:54:23 - Operation 'GetOpenAIServiceApiKey' created successfully.
+2025-02-16 21:55:40 - Operation 'GetSearchServiceApiKey' created successfully.
+2025-02-16 21:55:42 - Operation 'GetStorageServiceApiKey' created successfully.
+2025-02-16 21:55:42 - Key Vault 'kv-copilot-demo-009' already exists.
+2025-02-16 21:57:05 - Key Vault 'kv-copilot-demo-009' policy permissions set for user: 'id-copilot-demo-009'.
+2025-02-16 21:58:25 - Role 'Key Vault Administrator' is already assigned to 'id-copilot-demo-009'.
+2025-02-16 22:44:12 - Role 'Key Vault Secrets User' is already assigned to 'id-copilot-demo-009'.
+2025-02-16 22:56:46 - Role 'Key Vault Certificate User' is already assigned to 'id-copilot-demo-009'.
+2025-02-16 22:59:18 - Role 'Key Vault Crypto User' is already assigned to 'id-copilot-demo-009'.
+2025-02-16 22:59:18 - AI Hub 'hub-ai-copilot-demo-009' already exists.
+2025-02-16 22:59:21 - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-16 22:59:22 - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-16 22:59:23 - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-009'.
+2025-02-16 22:59:23 - AI Project 'project-ai-copilot-demo-009' already exists.
+2025-02-16 22:59:51 - Azure AIService 'ai-service-copilot-demo-009' connection for 'hub-ai-copilot-demo-009' already exists.
+2025-02-16 23:00:05 - Azure OpenAIService 'openai-service-copilot-demo-009' connection for 'hub-ai-copilot-demo-009' already exists.
+2025-02-16 23:00:10 - Azure StorageAccount 'stcopilotdemo009' connection for 'hub-ai-copilot-demo-009' already exists.
+2025-02-16 23:00:15 - Azure SearchService 'srch-copilot-demo-009' connection for 'hub-ai-copilot-demo-009' already exists.
+2025-02-16 23:00:24 - Model deployment 'gpt-4o' for 'ai-service-copilot-demo-009' already exists.
+2025-02-16 23:00:26 - Failed to deploy Model 'text-embedding' for 'ai-service-copilot-demo-009'. 
+            Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - text-embedding-3-large, which is bigger than the current available capacity 50. The current quota usage is 300 and the quota limit is 350 for quota Tokens Per Minute (thousands) - text-embedding-3-large. 
+            Code: InsufficientQuota 
+            Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - text-embedding-3-large, which is bigger than the current available capacity 50. The current quota usage is 300 and the quota limit is 350 for quota Tokens Per Minute (thousands) - text-embedding-3-large.
+2025-02-16 23:00:28 - Failed to deploy Model 'dall-e-3' for 'ai-service-copilot-demo-009'. 
+            Error: (InsufficientQuota) This operation require 2 new capacity in quota Capacity Unit - Dalle, which is bigger than the current available capacity 0. The current quota usage is 2 and the quota limit is 2 for quota Capacity Unit - Dalle. 
+            Code: InsufficientQuota 
+            Message: This operation require 2 new capacity in quota Capacity Unit - Dalle, which is bigger than the current available capacity 0. The current quota usage is 2 and the quota limit is 2 for quota Capacity Unit - Dalle.
+2025-02-16 23:00:41 - Config.json file updated successfully.
+2025-02-16 23:01:01 - App 'app-copilot-demo-009' is already registered with App ID: e8e374ea-dd2f-4225-83bf-867ade167d50.
+2025-02-16 23:03:05 - parameters.json updated successfully.
+2025-02-16 23:09:24 - Api permissions set for app 'app-copilot-demo-009'.
+*** LOG SEQUENCE: 8 ***
+*** SCRIPT START TIME: 2025-02-16 11:13:16 PM ***
+*** LOG SEQUENCE: 9 ***
+*** SCRIPT START TIME: 2025-02-16 11:15:33 PM ***
+2025-02-16 23:18:18 - Config.json file updated successfully.
+2025-02-16 23:20:01 - Web app 'app-copilot-demo-009' deployed successfully.

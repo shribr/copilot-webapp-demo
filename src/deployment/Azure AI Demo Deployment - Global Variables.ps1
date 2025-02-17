@@ -596,6 +596,7 @@ function Get-LatestApiVersion {
 
     $apiVersions = az provider show --namespace $resourceProviderNamespace --query "resourceTypes[?resourceType=='$resourceType'].apiVersions[]" --output json | ConvertFrom-Json
     $latestApiVersion = ($apiVersions | Sort-Object -Descending)[0]
+    
     return $latestApiVersion
 }
 
@@ -1048,7 +1049,8 @@ function Initialize-Parameters {
     $global:aiService = $parametersObject.aiService
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
-    $global:appInsightsService = $parametersObject.appInsightsService  
+    $global:appInsightsService = $parametersObject.appInsightsService
+    $global:appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
     $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
     $global:appServicePlan = $parametersObject.AppServicePlan
     $global:appServices = $parametersObject.appServices
@@ -1057,7 +1059,8 @@ function Initialize-Parameters {
     $global:containerRegistry = $parametersObject.containerRegistry      
     $global:documentIntelligenceService = $parametersObject.documentIntelligenceService
     $global:functionAppService = $appServices | Where-Object { $_.Type -eq "Function" | Select-Object -First 1 }
-    $global:keyVault = $parametersObject.keyVault               
+    $global:keyVault = $parametersObject.keyVault
+    $global:keyVaultProxyOperations = $parametersObject.keyVaultProxyOperations   
     $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
     $global:openAIService = $parametersObject.openAIService
     $global:previousResourceBaseName = $parametersObject.previousResourceBaseName          
@@ -1131,7 +1134,7 @@ function Initialize-Parameters {
         appInsightsService           = $global:appInsightsService
         appServices                  = $global:appServices
         appRegistrationClientId      = $parametersObject.appRegistrationClientId
-        appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
+        appRegRequiredResourceAccess = $global:appRegRequiredResourceAccess
         appDeploymentOnly            = $global:appDeploymentOnly
         appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
         appServiceEnvironment        = $global:appServiceEnvironment
@@ -1151,6 +1154,7 @@ function Initialize-Parameters {
         exposeApiScopes              = $parametersObject.exposeApiScopes
         functionAppService           = $global:functionAppService
         keyVault                     = $global:keyVault
+        keyVaultProxyOperations      = $global:keyVaultProxyOperations
         keyVaultSecrets              = $global:KeyVaultSecrets
         location                     = $parametersObject.location
         logAnalyticsWorkspace        = $global:logAnalyticsWorkspace
@@ -1428,7 +1432,9 @@ function New-ApiManagementApi {
         try {
             # Create the API
             az apim api create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --display-name "KeyVault Proxy" --path keyvault --service-url "https://$keyVaultName.vault.azure.net/" --protocols https
- 
+            
+            Write-Host "API 'KeyVaultProxy' created successfully." -ForegroundColor Green
+            Write-Log -message "API 'KeyVaultProxy' created successfully." -logFilePath $global:LogFilePath
         }
         catch {
             Write-Error "Failed to create API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -1436,14 +1442,33 @@ function New-ApiManagementApi {
         }
 
         try {
-            # Add operations
-            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
-            az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
-    
+            # Check if the operations already exist
+
+            $keyVaultProxyOperationsList = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+
+            foreach ($operation in $global:keyVaultProxyOperations) {
+                if ($keyVaultProxyOperationsList -notcontains $operation) {
+                    
+                    try {
+                        az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id $operation.Name --display-name $operation.DisplayName --method $operation.Method --url-template $operation.UrlTemplate
+                        
+                        Write-Host "Operation '$($operation.Name)' created successfully." -ForegroundColor Green
+                        Write-Log -message "Operation '$($operation.Name)' created successfully." -logFilePath $global:LogFilePath
+                    }
+                    catch {
+                        Write-Error "Failed to create operation '$($operation.Name)': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to create operation '$($operation.Name)': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+                    }
+                }
+                else {
+                    Write-Host "Operation '$($operation.Name)' already exists." -ForegroundColor Blue
+                    Write-Log -message "Operation '$($operation.Name)' already exists." -logFilePath $global:LogFilePath
+                }
+            }
         }
         catch {
-            Write-Error "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            Write-Error "Failed to get list of operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to get list of operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
                 
         try {
@@ -1466,27 +1491,31 @@ function New-ApiManagementApi {
         try {
             # Check if the operations already exist
 
-            $keyVaultProxyOperations = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+            $keyVaultProxyOperationsList = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
 
-            if ($keyVaultProxyOperations -notcontains "GetOpenAIServiceApiKey") {
-                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetOpenAIServiceApiKey --display-name "Get OpenAI Service Api Key" --method GET --url-template "/secrets/OpenAIServiceApiKey"
-            }
-            else {
-                Write-Host "Operation 'GetOpenAIServiceApiKey' already exists." -ForegroundColor Blue
-                Write-Log -message "Operation 'GetOpenAIServiceApiKey' already exists." -logFilePath $global:LogFilePath
-            }
-
-            if ($keyVaultProxyOperations -notcontains "GetSearchServiceApiKey") {
-                az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id GetSearchServiceApiKey --display-name "Get Search Service Api Key" --method GET --url-template "/secrets/SearchServiceApiKey"
-            }
-            else {
-                Write-Host "Operation 'GetSearchServiceApiKey' already exists." -ForegroundColor Blue
-                Write-Log -message "Operation 'GetSearchServiceApiKey' already exists." -logFilePath $global:LogFilePath
+            foreach ($operation in $global:keyVaultProxyOperations) {
+                if ($keyVaultProxyOperationsList -notcontains $operation) {
+                    
+                    try {
+                        az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id $operation.Name --display-name $operation.DisplayName --method $operation.Method --url-template $operation.UrlTemplate
+                        
+                        Write-Host "Operation '$($operation.Name)' created successfully." -ForegroundColor Green
+                        Write-Log -message "Operation '$($operation.Name)' created successfully." -logFilePath $global:LogFilePath
+                    }
+                    catch {
+                        Write-Error "Failed to create operation '$($operation.Name)': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                        Write-Log -message "Failed to create operation '$($operation.Name)': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+                    }
+                }
+                else {
+                    Write-Host "Operation '$($operation.Name)' already exists." -ForegroundColor Blue
+                    Write-Log -message "Operation '$($operation.Name)' already exists." -logFilePath $global:LogFilePath
+                }
             }
         }
         catch {
-            Write-Error "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            Write-Log -message "Failed to create operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
+            Write-Error "Failed to get list of operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to get list of operations for API 'KeyVaultProxy': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
                 
         try {
@@ -4710,7 +4739,7 @@ function Update-ConfigFile {
         $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageService.Name
         $config.AZURE_STORAGE_API_VERSION = $global:storageService.ApiVersion
         $config.AZURE_STORAGE_FULL_URL = $storageUrl
-        $config.AZURE_STORAGE_KEY = $storageKey
+        $config.AZURE_STORAGE_API_KEY = $storageKey
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSIG
         $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
@@ -5008,11 +5037,11 @@ function Update-ParameterFileApiVersions {
     $aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
     $cognitiveServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
 
-    $parametersObject.storageApiVersion = $storageApiVersion
-    $parametersObject.openAIApiVersion = $openAIApiVersion
-    $parametersObject.searchServiceAPIVersion = $searchServiceAPIVersion
-    $parametersObject.aiServiceApiVersion = $aiServiceApiVersion
-    $parametersObject.cognitiveServiceApiVersion = $cognitiveServiceApiVersion
+    $parametersObject.storageService.ApiVersion = $storageApiVersion
+    $parametersObject.openAIService.ApiVersion = $openAIApiVersion
+    $parametersObject.searchService.APIVersion = $searchServiceAPIVersion
+    $parametersObject.aiService.ApiVersion = $aiServiceApiVersion
+    $parametersObject.cognitiveService.ApiVersion = $cognitiveServiceApiVersion
 
     # Convert the updated parameters object back to JSON and save it to the file
     $parametersObject | ConvertTo-Json -Depth 10 | Set-Content -Path $parametersFile
