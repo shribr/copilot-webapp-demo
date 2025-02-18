@@ -2,9 +2,9 @@
 
 ## Overview
 
-This project is a web application that allows users to chat with Azure Copilot to query their own data. In addition to responses returned by Copilot, the application also provides the user with source references, suggested "Follow up Questions", "Supporting Content" and a "Thought Process" tab which allows the user to understand how the AI arrived at it's answers. 
+This project is a web application that allows users to chat with Azure Copilot to query their own data. In addition to responses returned by Copilot, the application also provides the user with source references, suggested "Follow up Questions", "Supporting Content" and a "Thought Process" tab which allows the user to understand how the AI arrived at it's answers.
 
->[!NOTE]
+> [!NOTE]
 > As an added bonus, a varity of AI personas are included which provide varying prompts based on their assigned descriptions. This allows the AI to focus on role specific aspects of the data being searched that would logically be most important to the selected persona. So, while searching the exact same dataset, the information which would be of interest to an IT professional would not be the same as what an attorney might be interested in. A list of all the included personas can be found [here](#chat-personas-list).
 
 The solution is fully configurable via a parameters.json file. It includes a simple HTML interface and a PowerShell script for deployment.
@@ -88,16 +88,13 @@ The index.html file includes the following screens:
 - [msazurermtools.azurerm-vscode-tools](https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools) - Azure Resource Manager tools
 - [redhat.vscode-yaml](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) - YAML language support
 
-## Getting Started
+## Installation
 
-### Installation
-
-All of the steps below must be performed in the terminal within VS Code. 
+All of the steps below must be performed in the terminal within VS Code.
 
 Also, you must have an active Azure subscription and be signed into that account in VS Code.
 
 <img width="600" alt="VS Code Accounts" src="src/deployment/images/azure-ai-demo-vscode-accounts.png">
-
 
 1. Clone the repository:
 
@@ -113,7 +110,7 @@ Also, you must have an active Azure subscription and be signed into that account
 > [!NOTE]
 > You must navigate to the `src/deployment` directory within the solution before executing the PowerShell script.
 
-### Deployment
+## Deployment
 
 The main PowerShell script [Azure AI Demo Deployment.ps1](./src/deployment/Azure%20AI%20Demo%20Deployment.ps1) automates the deployment of all the required Azure resources for this custom Copilot web application. There is a template titled [parameters.json](./src/deployment/parameters.json) which contains configuration settings for every aspect of the deployment. It includes initialization, helper functions, resource creation, update functions, and logging to ensure a smooth and automated deployment process.
 
@@ -144,109 +141,299 @@ The image below shows a diagram of the deployed resources:
 
 <img width="1423" alt="azure-ai-demo-resource-visualizer" src="src/deployment/images/azure-ai-demo-resource-visualizer.png">
 
-#### Script Workflow and Functions List
+---
 
-1. **Initialization and Setup:**
+### Function List
 
-   - The script begins by setting the default parameters file (`parameters.json`).
-   - Defines global variables for resource types and KeyVault secrets.
-   - Sets the deployment path based on the current location.
+#### Deployment & Utility Functions
 
-2. **Parameter Initialization:**
+- `Build-ResourceList`  
+  _Description:_ Generates and displays a table of resource names, types, and statuses using global resource objects (populated from the parameters).
 
-   - The `Initialize-Parameters` function reads parameters from the specified JSON file.
-   - Sets global variables for various Azure resources and configurations.
-   - Retrieves the subscription ID, tenant ID, object ID, and user principal name using Azure CLI commands.
+- `Check-Azure-Login`  
+  _Description:_ Checks if the user is logged in to Azure (by calling “az account show”) and returns true or false.
 
-3. **Resource Creation Functions:**
+- `ConvertTo-ProperCase`  
+  _Description:_ Converts input strings to title case (capitalizing the first letter of each word).
 
-   - The script defines multiple functions to create various Azure resources, such as:
+- `Deploy-AppService`  
+  _Description:_ Deploys an individual app service (web app or function app) by checking for its existence, optionally zipping code, and deploying via Azure CLI.
 
-     - `New-AIHub`: Creates AI Hub and AI Model.
-     - `New-AIService`: Creates AI service.
-     - `New-ApiManagementService`: - Creates new Api Management service.
-     - `New-ApplicationInsights`: Creates new Application Insights service.
-     - `New-AppService`: Creates and deploys app services (web apps or function apps).
-     - `New-AppServiceEnvironment`: Creates new App Service Environment.
-     - `New-AppServicePlanInASE`: Creates new App Service Plan in the ASE.
-     - `New-CognitiveServicesAccount`: Creates new Cognitive Services account.
-     - `New-ComputerVisionAccount`: Creates new Computer Vision account.
-     - `New-ContainerRegistry`: Creates new Container Registry.
-     - `New-DocumentIntelligenceAccount`: Creates new Document Intelligence account.
-     - `New-KeyVault`: Creates a Key Vault and sets access policies.
-     - `New-LogAnalyticsWorkspace`: Creates new Log Analytics Workspace.
-     - `New-MachineLearningWorkspace`: Creates new Machine Learning Workspace. This will ultimately be deleted and replaced with a manual step detailed [below](#azure_ai_machine_learning_workspace).
-     - `New-ManagedIdentity`: Creates a new managed identity.
-     - `New-OpenAIAccount`: Creates a new OpenAI Account.
-     - `New-PrivateEndPoint`: Creates a new private endpoint.
-     - `New-ResourceGroup`: Creates a new resource group.
-     - `New-Resources`: Creates multiple Azure resources like storage accounts, app service plans, search services, etc.
-     - `New-SearchDataSource`, `New-SearchIndex`, `New-SearchIndexer`, `New-SearchService` and `New-SearchSkillSet`: Creates search-related resources.
-     - `New-StorageAccount`: Creates a new Storage Account.
-     - `New-SubNet`: Creates a new SubNet.
-     - `New-VirtualNetwork`, `New-SubNet`: Create virtual network and subnets.
+- `Deploy-OpenAIModels`  
+  _Description:_ Iterates over a list of AI models and deploys each using the Azure CLI to a Cognitive Services (or Azure OpenAI) account.
 
-     - `New-ApiManagementService`: Creates and deploys API Management service.
+- `Find-AppRoot`  
+  _Description:_ Recursively searches upward from a given directory until the “app” folder is found (used to set the app’s root directory).
 
-4. **Helper Functions:**
+- `Format-ErrorInfo`  
+  _Description:_ Splits an error message into separate parts (Error, Code, SKU) for display.
 
-   - The script includes several helper functions for various tasks, such as:
-     - `ConvertTo-ProperCase`: Converts a string to proper case.
-     - `Deploy-OpenAIModel`: Deploys an Azure AI model.
-     - `Find-AppRoot`: Finds the app root directory.
-     - `Format-ErrorInfo`, `Format-CustomErrorInfo`: Format error information.
-     - `Get-CognitiveServicesApiKey`: Retrieves the API key for Cognitive Services.
-     - `Get-DataSources`: Tests if a datasource exists.
-     - `Get-LatestApiVersion`: Gets the latest API version for a resource type.
-     - `Get-LatestDotNetRuntime`: Gets the latest .NET runtime version.
-     - `Get-Parameters-Sorted`: Alphabetizes the parameters object.
-     - `Get-RandomInt`: Generates a random integer.
-     - `Get-SearchIndexes`, `Get-SearchIndexers`, `Get-SearchSkillSets`: Check if a search index, indexer, or skillset exists.
-     - `Get-UniqueSuffix`: Finds a unique suffix for resource names.
-     - `Get-ValidServiceName`: Ensures the service name is valid.
-     - `Initialize-Parameters`: Initializes the parameters.
-     - `Install-Extensions`: Installs Visual Studio Code extensions.
-     - `Invoke-AzureRestMethod`: Invokes an Azure REST API method.
-     - `New-RandomPassword`: Generates a random password.
-     - `Remove-AzureResourceGroup`: Deletes Azure resource groups.
-     - `Remove-MachineLearningWorkspace`: Deletes a Machine Learning Workspace.
-     - `Reset-SearchIndexer`: Resets a search indexer.
-     - `Restore-SoftDeletedResource`: Restores soft-deleted resources.
-     - `Set-DirectoryPath`: Sets the directory location.
-     - `Set-KeyVaultAccessPolicies`, `Set-KeyVaultRoles`, `Set-KeyVaultSecrets`: Manage Key Vault access and secrets.
-     - `Set-RBACRoles`: Assigns RBAC roles to a managed identity.
-     - `Split-Guid`: Splits a GUID and returns the first 8 characters.
-     - `Start-Deployment`: Starts the deployment.
-     - `Start-SearchIndexer`: Runs a search indexer.
-     - `Test-DirectoryExists`: Checks if a directory exists and creates it if not.
-     - `Test-ResourceGroupExists`, `Test-ResourceExists`: Check if a resource group or resource exists.
-     - `Test-SubnetExists`: Checks if a subnet exists.
-     - `Update-AIConnectionFile`: Updates the AI connection configuration file with new connection details.
-     - `Update-AIProjectFile`: Updates the AI project configuration file with new project details.
-     - `Update-ConfigFile`: Update configuration files to be used by front-end JavaScript code. This includes all of the service names, urls and any newly generated API keys.
-     - `Update-ContainerRegistryFile`: Updates the container registry configuration file with new settings.
-     - `Update-MLWorkspaceFile`: Updates the machine learning workspace configuration file with new parameters.
-     - `Update-ParameterFileApiVersions`: Updates the `parameters.json` file with the latest API versions for Azure resources.
-     - `Update-SearchIndexFiles`: Updates the search index configuration files with new index settings.
-     - `Write-Log`: Writes messages to a log file.
+- `Format-CustomErrorInfo`  
+  _Description:_ Processes CLI JSON output (split by “:” in each line) to build and return a hashtable of error details.
 
-5. **Main Script Execution:**
+---
 
-   - Initialize parameters by calling `Initialize-Parameters`.
-   - Sets the user-assigned identity name.
-   - Sets the directory path to the deployment path.
-   - Starts the deployment by calling `Start-Deployment`.
+#### Tenant, Subscription, and API Key Helpers
 
-6. **Deployment Process:**
+- `Get-Azure-Tenants`  
+  _Description:_ Lists available Azure tenants, prompts the user to select one and then lets the user pick a subscription.
 
-   - The `Start-Deployment` function orchestrates the deployment process:
-   - Initializes the sequence number and check if the log file exists.
-   - Logs the start time and sequence number.
-   - Checks if the resource group exists and create it if necessary.
-   - Creates various Azure resources by calling the respective functions.
-   - Logs the total execution time and write it to the log file.
+- `Get-CognitiveServicesApiKey`  
+  _Description:_ Retrieves the primary API key for a given Cognitive Services resource.
 
-#### Manual Deployment Steps
+- `Get-KeyVaultSecret`  
+  _Description:_ Checks for the existence of a secret in the specified Key Vault; returns the secret if found.
+
+- `Get-LatestApiVersion`  
+  _Description:_ Using the “az provider show” command, retrieves and returns the latest API version for a specified resource type.
+
+- `Get-LatestDotNetRuntime`  
+  _Description:_ For either web apps or function apps, queries available .NET runtime versions (filtering by operating system) and returns the latest version.
+
+- `Get-OperatingSystem`  
+  _Description:_ Detects the current OS (Windows, Linux, macOS, or Unknown) by inspecting `$PSVersionTable`.
+
+- `Get-Parameters-Sorted`  
+  _Description:_ Returns a new parameters object with its property names sorted alphabetically.
+
+- `Get-RandomInt`  
+  _Description:_ Uses a cryptographically secure random number generator to return a random integer modulo a given maximum.
+
+---
+
+#### Search Service Helpers
+
+- `Get-SearchDataSources`  
+  _Description:_ Uses the search service’s REST API (with an admin key) to list data source names.
+
+- `Get-SearchIndexes`  
+  _Description:_ Retrieves the list of indexes from the specified Azure Search service.
+
+- `Get-SearchIndexers`  
+  _Description:_ Retrieves the list of indexers from the specified Azure Search service.
+
+- `Get-SearchSkillSets`  
+  _Description:_ Retrieves the names of search skill sets via the Azure Search REST API.
+
+- `Start-SearchIndexer`  
+  _Description:_ Triggers a run of an Azure Search indexer via its REST API.
+
+---
+
+#### Name & Suffix/Validation Functions
+
+- `Get-UniqueSuffix`  
+  _Description:_ Iterates until a unique suffix is found for resources; updates global name variables to prevent conflicts.
+
+- `Get-ValidServiceName`  
+  _Description:_ Normalizes a service name (lowercase, no invalid characters, no consecutive dashes).
+
+- `Increment-FormattedNumber`  
+  _Description:_ Increments a numeric string while preserving a fixed width (leading zeros).
+
+- `Split-Guid`  
+  _Description:_ Generates a new GUID, removes dashes, and returns the first five characters.
+
+---
+
+#### Installation and Initialization Functions
+
+- `Install-AzureCLI`  
+  _Description:_ Checks if the Azure CLI is installed; if not, installs it using OS‑specific commands.
+
+- `Install-Extensions`  
+  _Description:_ Installs Visual Studio Code extensions from an “extensions.json” file (and handles legacy Azure ML extensions as needed).
+
+- `Initialize-Parameters`  
+  _Description:_ Loads the deployment parameters from a JSON file and initializes many global variables (resource names, subscription details, etc.); returns a consolidated parameters object.
+
+- `Initialize-Azure-Login`  
+  _Description:_ Ensures the user is logged in to Azure (invokes device‑code login if needed).
+
+- `Invoke-AzureRestMethod`  
+  _Description:_ Sends a REST API call to an Azure endpoint using an access token and returns the result.
+
+---
+
+#### AI & Resource Creation Functions
+
+- `New-AIHub`  
+  _Description:_ Creates a new AI Hub (ML workspace of type “hub”), using storage and Key Vault IDs; handles restoration if the hub was soft‑deleted.
+
+- `New-AIHubConnection`  
+  _Description:_ Establishes a connection between an AI hub and a resource by generating/updating a connection file and invoking the Azure ML CLI.
+
+- `New-AIProject`  
+  _Description:_ Creates a new AI project (ML workspace with “project” kind) using dependent resources (App Insights, managed identity, storage, etc.).
+
+- `New-ApiManagementApi`  
+  _Description:_ Creates a “KeyVault Proxy” API inside an API Management service and its operations (CORS policy code is commented out).
+
+- `New-ApiManagementService`  
+  _Description:_ Creates (or restores) an API Management service and then configures it via `New-ApiManagementApi`.
+
+- `New-AppRegistration`  
+  _Description:_ Registers an application in Azure AD, sets API permissions and exposes API scopes, and updates Key Vault access policies.
+
+- `New-ApplicationInsights`  
+  _Description:_ Creates a new Application Insights component if it doesn’t already exist in the resource group.
+
+- `New-AppService`  
+  _Description:_ Creates and deploys an app service. For web apps it creates the web app; for functions it creates a function app, then deploys code using `Deploy-AppService`.
+
+- `New-AppServiceEnvironment`  
+  _Description:_ Creates an App Service Environment (ASE) to host app services in an isolated plan; waits for creation before proceeding.
+
+- `New-AppServicePlan`  
+  _Description:_ Creates an App Service Plan in the specified resource group and location if not already present.
+
+- `New-AppServicePlanInASE`  
+  _Description:_ Creates an App Service Plan specifically inside an existing ASE.
+
+- `New-CognitiveServiceResources`  
+  _Description:_ Iterates over a list of cognitive services (AI, Computer Vision, OpenAI, etc.) and creates each resource (with soft‑delete handling).
+
+- `New-ContainerRegistry`  
+  _Description:_ Creates a container registry for hosting Docker images; handles errors and soft‑deletion.
+
+- `New-KeyVault`  
+  _Description:_ Creates (or restores) a Key Vault, then calls helper functions to set access policies and retrieves its API key.
+
+- `New-LogAnalyticsWorkspace`  
+  _Description:_ Creates a Log Analytics workspace if it does not already exist.
+
+- `New-ManagedIdentity`  
+  _Description:_ Creates a user‑assigned managed identity, updates the parameters file, and assigns the necessary roles.
+
+- `New-MachineLearningWorkspace`  
+  _Description:_ Creates a machine learning workspace (an AI project) by combining resources such as storage, container registry, Key Vault, and App Insights.
+
+- `New-PrivateEndPoint`  
+  _Description:_ Creates a private endpoint (for example, for securing SQL or storage access) using Azure CLI.
+
+- `New-RandomPassword`  
+  _Description:_ Generates a random password of a specified length (with a minimum count of non‑alphanumeric characters).
+
+- `New-ResourceGroup`  
+  _Description:_ Creates a new Azure resource group, checking (and appending a suffix) until a unique name is found.
+
+- `New-Resources`  
+  _Description:_ A master function that sequentially calls many other `New-*` functions to provision storage, networking, cognitive services, search service, etc.
+
+- `New-SearchDataSource`  
+  _Description:_ Creates a new search datasource (for SharePoint or blob storage) in an Azure Search service using REST calls.
+
+- `New-SearchIndex`  
+  _Description:_ Creates a new search index by reading a schema file, updating placeholders, and sending a POST request to the search service.
+
+- `New-SearchIndexer`  
+  _Description:_ Creates a new search indexer (to populate an index) via a REST API call after updating its JSON schema file.
+
+- `New-SearchService`  
+  _Description:_ Creates (or updates) an Azure Search service; retrieves its API key, and may configure associated resources like skills and indexers.
+
+- `New-SearchSkillSet`  
+  _Description:_ Creates a new search skillset by reading a schema file, updating it (including inserting a cognitive services key), and issuing a REST call.
+
+- `New-StorageService`  
+  _Description:_ Creates a new Azure Storage account and container, retrieves the storage key, and configures CORS rules.
+
+- `New-SubNet`  
+  _Description:_ Creates a subnet within a virtual network if it doesn’t already exist (using delegations where applicable).
+
+- `New-VirtualNetwork`  
+  _Description:_ Creates a new virtual network in the specified resource group if not already present.
+
+---
+
+#### Deletion, Reset, and Restoration Functions
+
+- `Remove-ResourceGroup`  
+  _Description:_ Deletes an Azure resource group if it exists, logging success or failure.
+
+- `Remove-MachineLearningWorkspace`  
+  _Description:_ Deletes an existing machine learning workspace (AI project) via the Azure CLI.
+
+- `Reset-DeploymentPath`  
+  _Description:_ Navigates up from the current directory until the “deployment” folder is reached; returns that path.
+
+- `Reset-SearchIndexer`  
+  _Description:_ Resets a search indexer by sending a POST request to the reset endpoint of the Azure Search service.
+
+- `Restore-SoftDeletedResource`  
+  _Description:_ Based on the resource type (Key Vault, Storage, API Management, etc.), attempts to recover a soft‑deleted resource.
+
+---
+
+#### Directory, Logging, and File Update Helpers
+
+- `Set-DirectoryPath`  
+  _Description:_ Changes the current working directory to a given target directory (throwing an error if it does not exist).
+
+- `Set-KeyVaultAccessPolicies`  
+  _Description:_ Sets Key Vault access policies for the current user (using the user principal name) via Azure CLI.
+
+- `Set-KeyVaultRoles`  
+  _Description:_ Configures access roles on a Key Vault for a managed identity by assigning roles (RBAC or access policies).
+
+- `Set-KeyVaultSecrets`  
+  _Description:_ Iterates over defined secrets in a global object and stores each secret in the Key Vault.
+
+- `Set-RBACRoles`  
+  _Description:_ Assigns RBAC roles (such as “Key Vault Administrator” and related roles) to a managed identity for the target resource group scope.
+
+- `Show-ExistingResourceProvisioningStatus`  
+  _Description:_ Lists all resources in a resource group and displays their current provisioning states.
+
+- `Test-DirectoryExists`  
+  _Description:_ Checks whether a specified directory exists and creates it if not.
+
+- `Test-ResourceGroupExists`, `Test-ResourceExists`, and `Test-SubnetExists`  
+  _Description:_ Helper functions that use Azure CLI commands to verify the existence of a resource group, a generic resource (by name, group, and type), or a subnet.
+
+- `Update-AIConnectionFile`  
+  _Description:_ Updates or creates an AI connection YAML file for a resource (for AI services, OpenAI, search, or storage) using a defined schema.
+
+- `Update-AIProjectFile`  
+  _Description:_ Generates or updates the AI project file (`ai.project.yaml`) for an ML workspace using provided resource IDs and identity details.
+
+- `Update-ConfigFile`  
+  _Description:_ Updates the web frontend configuration (`config.json`) with the latest resource names, keys, URLs, SAS tokens, and other settings.
+
+- `Update-ContainerRegistryFile`  
+  _Description:_ Updates (or creates) a YAML file for the container registry by replacing resource base name placeholders.
+
+- `Update-MLWorkspaceFile`  
+  _Description:_ Updates (or creates) the ML workspace YAML file with current resource settings (storage, Key Vault, App Insights, identity, etc.).
+
+- `Update-ParametersFileAppRegistration`  
+  _Description:_ Updates the parameters JSON file with new application registration details (client app ID, URI, etc.).
+
+- `Update-ParameterFileApiVersions`  
+  _Description:_ (Not currently active) Updates the parameters JSON file with the latest API versions for various resource types.
+
+- `Update-ResourceBaseName`  
+  _Description:_ Updates the resource base name in the parameters file by incrementing a suffix and replacing all occurrences in the file.
+
+- `Update-SearchIndexFiles`  
+  _Description:_ (Not currently used) Updates search index schema files by replacing resource base name tokens.
+
+- `Update-SearchSkillSetFiles`  
+  _Description:_ Iterates over search skill set files and updates them with the current resource base name.
+
+- `Write-Log`  
+  _Description:_ Writes messages with timestamps to a deployment log file and resets the working directory afterward.
+
+---
+
+#### Main Script Execution
+
+- `Start-Deployment`  
+  _Description:_ The master function that orchestrates the entire deployment process. It initializes paths and globals, installs required CLI tools and extensions (if needed), logs the start time and sequence number, creates or updates resource groups and resources (by calling many of the `New-*` functions above), updates configuration files, and finally logs the total execution time.---
+
+---
+
+### Manual Deployment Steps
 
 There are several manual steps which need to be performed for a variety of reasons but mainly because neither the Azure CLI or PowerShell have been fully updated to allow certain tasks to be executed fully. Much of the documentation is still incomplete and several of the specs are actually incorrect at the time of this writing.
 
