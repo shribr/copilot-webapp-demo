@@ -167,13 +167,14 @@ The image below shows a diagram of the deployed resources:
 
 - `New-RandomPassword`  
   _Description:_ Generates a random password of a specified length (with a minimum count of non‑alphanumeric characters).
-  - `Get-Parameters-Sorted`  
+
+- `Get-Parameters-Sorted`  
   _Description:_ Returns a new parameters object with its property names sorted alphabetically.
 
 - `Get-RandomInt`  
   _Description:_ Uses a cryptographically secure random number generator to return a random integer modulo a given maximum.
 
-  - `Split-Guid`  
+- `Split-Guid`  
   _Description:_ Generates a new GUID, removes dashes, and returns the first five characters.
 
 ---
