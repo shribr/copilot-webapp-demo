@@ -1064,6 +1064,7 @@ function Initialize-Parameters {
     $global:computerVisionService = $parametersObject.computerVisionService  
     $global:containerRegistry = $parametersObject.containerRegistry      
     $global:documentIntelligenceService = $parametersObject.documentIntelligenceService
+    $global:exposeApiScopes = $parametersObject.exposeApiScopes
     $global:functionAppService = $appServices | Where-Object { $_.Type -eq "Function" | Select-Object -First 1 }
     $global:keyVault = $parametersObject.keyVault
     $global:keyVaultProxyOperations = $parametersObject.keyVaultProxyOperations   
@@ -1158,7 +1159,7 @@ function Initialize-Parameters {
         deploymentType               = $global:deploymentType
         deployZipResources           = $parametersObject.deployZipResources
         documentIntelligenceService  = $global:documentIntelligenceService
-        exposeApiScopes              = $parametersObject.exposeApiScopes
+        exposeApiScopes              = $global:exposeApiScopes
         functionAppService           = $global:functionAppService
         keyVault                     = $global:keyVault
         keyVaultProxyOperations      = $global:keyVaultProxyOperations
@@ -1665,13 +1666,13 @@ function New-AppRegistration {
         $appRegRequiredResourceAccessJson = $global:appRegRequiredResourceAccess | ConvertTo-Json -Depth 4
 
         # Check if the app is already registered
-        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --output tsv
+        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --output json | ConvertFrom-Json
 
         $objectId = ""
         
         if ($existingApp) {
             $appId = $existingApp.appId
-            $objectId = az ad app show --id $appId --query "objectId" --output tsv
+            $objectId = az ad app show --id $appId --query "id" --output json | ConvertFrom-Json
             $appUri = $existingApp.appUri
 
             Write-Host "App '$appServiceName' is already registered with App ID: $appId and Object ID: $objectId." -ForegroundColor Blue
@@ -1682,7 +1683,7 @@ function New-AppRegistration {
             $appRegistration = az ad app create --display-name $appServiceName --sign-in-audience AzureADandPersonalMicrosoftAccount | ConvertFrom-Json
 
             $appId = $appRegistration.appId
-            $objectId = az ad app show --id $appId --query "objectId" --output tsv
+            $objectId = az ad app show --id $appId --query "id" --output json | ConvertFrom-Json
             $appUri = $appRegistration.appUri
 
             Write-Host "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId." -ForegroundColor Green
@@ -1752,9 +1753,9 @@ function New-AppRegistration {
 
         try {
             # Check and expose the API
-            $existingScopes = az ad app show --id $appId --query "oauth2Permissions[].value" --output tsv
+            $existingScopes = az ad app show --id $appId --query "oauth2Permissions[].value" --output json | ConvertFrom-Json
             $apiScopes = @()
-            foreach ($scope in $exposeApiScopes) {
+            foreach ($scope in $global:exposeApiScopes) {
                 if (-not ($existingScopes -contains $scope.value)) {
                     $apiScopes += @{
                         "adminConsentDescription" = $scope.adminConsentDescription
@@ -1802,7 +1803,7 @@ function New-AppRegistration {
             #$appId = "5073ae0e-7f06-45c8-b99d-c6137c0b544a"
             
             $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-            az ad app update --appId $appId --set "appManifest.json"
+            az ad app update --id $appId --set "appManifest.json"
             
             try {
                 az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
@@ -3140,14 +3141,14 @@ function New-SearchService {
 
                 if ($dataSourceExists -eq $false) {
                     New-SearchDataSource -searchService $searchService -resourceGroupName $resourceGroupName -searchDataSource $searchDataSource -storageService $storageService -appId $appId
+                
+                    $dataSourceExists = $true
                 }
                 else {
                     Write-Host "Search Service Data Source '$searchDataSourceName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Service Data Source '$searchDataSourceName' already exists."
                 }
             }
-
-            #$dataSourceExists = Get-DataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroup.Name -dataSourceName $searchDataSourceName
 
             foreach ($index in $global:searchIndexes) {
                 $indexName = $index.Name
@@ -3161,6 +3162,8 @@ function New-SearchService {
                     Write-Host "Search Index '$indexName' already exists." -ForegroundColor Blue
                     Write-Log -message "Search Index '$indexName' already exists."
                 }
+
+                $searchIndexExists = $true
             }
 
             foreach ($searchSkillSet in $searchSkillSets) {
@@ -3499,14 +3502,32 @@ function New-StorageService {
 
             $global:keyVaultSecrets.StorageServiceApiKey = $global:storageServiceAccountKey
 
+            try {
+                az storage container create --name $storageContainerName --account-name $storageServiceName --account-key $global:storageServiceAccountKey --output none
+
+                Write-Host "Storage container '$storageContainerName' created successfully." -ForegroundColor Green
+                Write-Log -message "Storage container '$storageContainerName' created successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to create Storage Account '$storageServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to create Storage Account '$storageServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
             # Enable CORS
-            az storage cors clear --account-name $storageServiceName --services bfqt
-            az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageServiceName --account-key $global:storageServiceAccountKey
-            
-            az storage cors add --methods GET POST PUT --origins $appServiceUrl --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageServiceName --account-key $global:storageServiceAccountKey
 
-            az storage container create --name $storageContainerName --account-name $storageServiceName --account-key $global:storageServiceAccountKey --output none
-
+            try {
+                az storage cors clear --account-name $storageServiceName --services bfqt
+                
+                az storage cors add --methods GET POST PUT --origins '*' --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageServiceName --account-key $global:storageServiceAccountKey
+                
+                az storage cors add --methods GET POST PUT --origins $appServiceUrl --allowed-headers '*' --exposed-headers '*' --max-age 200 --services b --account-name $storageServiceName --account-key $global:storageServiceAccountKey
+    
+                Write-Host "CORS rules added to Storage Account '$storageServiceName'." -ForegroundColor Green
+                Write-Log -message "CORS rules added to Storage Account '$storageServiceName'." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to add CORS rules to Storage Account '$storageServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to add CORS rules to Storage Account '$storageServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
         }
         catch {
             Write-Error "Failed to create Storage Account '$storageServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -3515,6 +3536,9 @@ function New-StorageService {
     }
     else {
 
+        Write-Host "Storage account '$storageServiceName' already exists." -ForegroundColor Blue
+        Write-Log -message "Storage account '$storageServiceName' already exists."
+
         # Retrieve the storage account key
         $global:storageServiceAccountKey = az storage account keys list --account-name $storageServiceName --resource-group $resourceGroupName --query "[0].value" --output tsv
 
@@ -3522,8 +3546,16 @@ function New-StorageService {
 
         $global:keyVaultSecrets.StorageServiceApiKey = $global:storageServiceAccountKey
 
-        Write-Host "Storage account '$storageServiceName' already exists." -ForegroundColor Blue
-        Write-Log -message "Storage account '$storageServiceName' already exists."
+        $containerExists = az storage container exists --name $storageContainerName --account-name $storageServiceName --account-key $global:storageServiceAccountKey --output tsv
+
+        if ($containerExists -eq "false") {
+            az storage container create --name $storageContainerName --account-name $storageServiceName --account-key $global:storageServiceAccountKey --output none
+
+            Write-Host "Storage container '$storageContainerName' created successfully." -ForegroundColor Green
+            Write-Log -message "Storage container '$storageContainerName' created successfully." -logFilePath $global:LogFilePath
+        }
+
+
     }
 }
 
@@ -4331,7 +4363,7 @@ function Start-Deployment {
     # End the timer
     $endTime = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
     $endTimeNumber = Get-Date
-    "yyyy-MM-dd hh:mm:ss tt"
+
     $executionTime = $endTimeNumber - $startTimeNumber
 
     $endTimeMessage = "*** SCRIPT END TIME: $endTime ***"
