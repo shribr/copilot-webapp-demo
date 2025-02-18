@@ -156,6 +156,9 @@ The image below shows a diagram of the deployed resources:
 - `ConvertTo-ProperCase`  
   _Description:_ Converts input strings to title case (capitalizing the first letter of each word).
 
+- `Show-ExistingResourceProvisioningStatus`  
+  _Description:_ Lists all resources in a resource group and displays their current provisioning states.
+
 - `Find-AppRoot`  
   _Description:_ Recursively searches upward from a given directory until the “app” folder is found (used to set the app’s root directory).
 
@@ -173,6 +176,9 @@ The image below shows a diagram of the deployed resources:
 
 - `Get-RandomInt`  
   _Description:_ Uses a cryptographically secure random number generator to return a random integer modulo a given maximum.
+
+- `Set-DirectoryPath`  
+  _Description:_ Changes the current working directory to a given target directory (throwing an error if it does not exist).
 
 - `Split-Guid`  
   _Description:_ Generates a new GUID, removes dashes, and returns the first five characters.
@@ -393,12 +399,6 @@ The image below shows a diagram of the deployed resources:
 
 #### Directory, Logging, and File Update Helpers
 
-- `Set-DirectoryPath`  
-  _Description:_ Changes the current working directory to a given target directory (throwing an error if it does not exist).
-  
-- `Show-ExistingResourceProvisioningStatus`  
-  _Description:_ Lists all resources in a resource group and displays their current provisioning states.
-
 - `Update-AIConnectionFile`  
   _Description:_ Updates or creates an AI connection YAML file for a resource (for AI services, OpenAI, search, or storage) using a defined schema.
 
@@ -416,9 +416,6 @@ The image below shows a diagram of the deployed resources:
 
 - `Update-ParametersFileAppRegistration`  
   _Description:_ Updates the parameters JSON file with new application registration details (client app ID, URI, etc.).
-
-- `Update-ParameterFileApiVersions`  
-  _Description:_ (Not currently active) Updates the parameters JSON file with the latest API versions for various resource types.
 
 - `Update-ResourceBaseName`  
   _Description:_ Updates the resource base name in the parameters file by incrementing a suffix and replacing all occurrences in the file.
