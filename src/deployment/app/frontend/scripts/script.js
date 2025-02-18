@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const height = window.innerHeight;
 
         // Add your resize logic here
-        console.log(`Window resized to width: ${width}, height: ${height}`);
+        //console.log(`Window resized to width: ${width}, height: ${height}`);
 
         // Example: Adjust the display of leftNavContainer based on the new width
         const leftNavContainer = document.getElementById('left-nav-container');
@@ -2183,7 +2183,7 @@ async function runSearchIndexer(searchIndexers) {
             console.log("Token acquired via popup");
         }
 
-        const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
+        searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
 
         // Insert a delay of 5 seconds
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -2203,7 +2203,8 @@ async function runSearchIndexer(searchIndexers) {
 
         var headers = {
             'api-key': searchApiKey,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'mode': 'no-cors'
         };
 
         // Invoke the REST method to run the search indexer
@@ -2213,7 +2214,7 @@ async function runSearchIndexer(searchIndexers) {
                 headers: headers
             });
             //No need to return anything from the search indexer
-            const data = response;
+            const data = await response.json();
             console.log('Indexer run response:', data);
         } catch (error) {
             console.error(`Error running search indexer`, error.message);

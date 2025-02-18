@@ -464,6 +464,7 @@
     "microsoft.alertsmanagement/alerts",
     "microsoft.insights/actiongroups"
   ],
+  "searchDataSourcesApiVersion": "2024-07-01",
   "searchDataSources": [
     {
       "Name": "srch-datasource-blob-copilot-demo-009",
@@ -568,6 +569,7 @@
     }
   ],
   "searchPublicInternetResults": true,
+  "searchRestApiVersion": "2024-07-01",
   "searchService": {
     "AIServicesResourceID": "",
     "ApiKey": "xxx",

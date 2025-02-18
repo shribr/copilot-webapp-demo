@@ -1,7 +1,7 @@
 {
   "CUSTOM_APP_TITLE": "GAO Chat using Microsoft Copilot",
   "DEFAULT_APP_TITLE": "Chat with Microsoft Copilot",
-  "AUTHENTICATION_MODE": "API_KEY",
+  "AUTHENTICATION_MODE": "MSAL",
   "AZURE_OPENAI_SERVICE_API_KEY": "8d4b9c9f1a78421ab13ade3e053858c3",
   "AZURE_OPENAI_SERVICE_SECRET_NAME": "OpenAIServiceApiKey",
   "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-009",
@@ -24,7 +24,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo009.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-14T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=qfbt&srt=co&sig=c4s1qzk5Wn9F3jt00NzgNRmfSBQeixeT8Ggn2IU%2Bazc%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo009.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-15T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=btqf&srt=co&sig=7BlaMsRXRaA3griafkJ7xkSojymevz%2BsRanXqrselLM%3D",
   "AZURE_STORAGE_API_KEY": "atghVfMOVlDbJ8W8BosPdPrw3hNPt/BrwNuJD+JdDxCGvpEKG8LCkV9HOvyRMaj2I9c7EvrEHJnO+AStPHlclg==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -113,13 +113,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "qfbt",
+    "SS": "btqf",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-02-14T23:59:59Z",
-    "ST": "2025-02-14T23:59:59Z",
+    "SE": "2026-02-15T23:59:59Z",
+    "ST": "2025-02-15T23:59:59Z",
     "SPR": "https",
-    "SIG": "c4s1qzk5Wn9F3jt00NzgNRmfSBQeixeT8Ggn2IU%2Bazc%3D",
+    "SIG": "7BlaMsRXRaA3griafkJ7xkSojymevz%2BsRanXqrselLM%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -283,7 +283,7 @@
       "parameters": {
         "role_information": "",
         "index_name": "vector-srch-index-copilot-demo-009",
-        "endpoint": "https://.search.windows.net",
+        "endpoint": "https://srch-copilot-demo-009.search.windows.net",
         "authentication": {
           "key": "Aja3rG7uZlZE9LAuwiiEMK9rlZURhibduExVpeAhkTAzSeB1MXdD",
           "type": "api_key"

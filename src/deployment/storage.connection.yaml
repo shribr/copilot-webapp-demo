@@ -1,5 +1,5 @@
 name: stcopilotdemo009
 type: azure_blob
-url: https://.blob.core.windows.net/content
+url: https://stcopilotdemo009.blob.core.windows.net/content
 container_name: content
 account_name: stcopilotdemo009

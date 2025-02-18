@@ -4,7 +4,28 @@
   "api": {
     "acceptMappedClaims": null,
     "knownClientApplications": [],
-    "oauth2PermissionScopes": [],
+    "oauth2PermissionScopes": [
+      {
+        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
+        "adminConsentDisplayName": "Access API as user",
+        "id": "a9e0efe9-22fb-4857-87a8-e8bb7105939f",
+        "isEnabled": true,
+        "type": "User",
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "userConsentDisplayName": "Access API as user",
+        "value": "access_as_user"
+      },
+      {
+        "adminConsentDescription": "Allow the application to read data from the API.",
+        "adminConsentDisplayName": "Read data from API",
+        "id": "94eb6afb-b6ca-4f0b-a9e7-3703127c9281",
+        "isEnabled": true,
+        "type": "Admin",
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "userConsentDisplayName": "Read data from API",
+        "value": "read_data"
+      }
+    ],
     "preAuthorizedApplications": [],
     "requestedAccessTokenVersion": 2
   },
@@ -20,7 +41,9 @@
   "displayName": "app-copilot-demo-009",
   "groupMembershipClaims": null,
   "id": "242aabb0-4779-4702-9c3e-a5110883aeac",
-  "identifierUris": [],
+  "identifierUris": [
+    "api://e8e374ea-dd2f-4225-83bf-867ade167d50"
+  ],
   "info": {
     "logoUrl": null,
     "marketingUrl": null,
@@ -44,13 +67,50 @@
   },
   "publisherDomain": "FedAIRS.onmicrosoft.com",
   "requestSignatureVerification": null,
-  "requiredResourceAccess": null,
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
+      "resourceAccess": [
+        {
+          "id": "f53da476-18e3-4152-8e01-aec403e6edc0",
+          "type": "Scope"
+        }
+      ]
+    },
+    {
+      "resourceAppId": "00000009-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        },
+        {
+          "id": "df85f4d6-205c-4ac5-a5ea-6bf408dba283",
+          "type": "Scope"
+        },
+        {
+          "id": "76bc735e-aecd-4a1d-8b4c-2b915deabb79",
+          "type": "Scope"
+        },
+        {
+          "id": "205e70e5-aba6-4c52-a976-6d2d46c48043",
+          "type": "Scope"
+        },
+        {
+          "id": "f89c84ef-20d0-4b54-87e9-02e856d66d53",
+          "type": "Scope"
+        }
+      ]
+    }
+  ],
   "samlMetadataUrl": null,
   "serviceManagementReference": null,
   "servicePrincipalLockConfiguration": null,
   "signInAudience": "AzureADandPersonalMicrosoftAccount",
   "spa": {
-    "redirectUris": []
+    "redirectUris": {
+      "uri": "https://app-copilot-demo-009.azurewebsites.net"
+    }
   },
   "tags": [],
   "tokenEncryptionKeyId": null,
