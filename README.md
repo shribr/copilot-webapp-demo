@@ -145,7 +145,7 @@ The image below shows a diagram of the deployed resources:
 
 ### Function List
 
-#### Deployment & Utility Functions
+#### Utility Functions
 
 - `Build-ResourceList`  
   _Description:_ Generates and displays a table of resource names, types, and statuses using global resource objects (populated from the parameters).
@@ -156,12 +156,6 @@ The image below shows a diagram of the deployed resources:
 - `ConvertTo-ProperCase`  
   _Description:_ Converts input strings to title case (capitalizing the first letter of each word).
 
-- `Deploy-AppService`  
-  _Description:_ Deploys an individual app service (web app or function app) by checking for its existence, optionally zipping code, and deploying via Azure CLI.
-
-- `Deploy-OpenAIModels`  
-  _Description:_ Iterates over a list of AI models and deploys each using the Azure CLI to a Cognitive Services (or Azure OpenAI) account.
-
 - `Find-AppRoot`  
   _Description:_ Recursively searches upward from a given directory until the “app” folder is found (used to set the app’s root directory).
 
@@ -170,6 +164,27 @@ The image below shows a diagram of the deployed resources:
 
 - `Format-CustomErrorInfo`  
   _Description:_ Processes CLI JSON output (split by “:” in each line) to build and return a hashtable of error details.
+
+- `New-RandomPassword`  
+  _Description:_ Generates a random password of a specified length (with a minimum count of non‑alphanumeric characters).
+  - `Get-Parameters-Sorted`  
+  _Description:_ Returns a new parameters object with its property names sorted alphabetically.
+
+- `Get-RandomInt`  
+  _Description:_ Uses a cryptographically secure random number generator to return a random integer modulo a given maximum.
+
+  - `Split-Guid`  
+  _Description:_ Generates a new GUID, removes dashes, and returns the first five characters.
+
+---
+
+#### Deployment Functions
+
+- `Deploy-AppService`  
+  _Description:_ Deploys an individual app service (web app or function app) by checking for its existence, optionally zipping code, and deploying via Azure CLI.
+
+- `Deploy-OpenAIModels`  
+  _Description:_ Iterates over a list of AI models and deploys each using the Azure CLI to a Cognitive Services (or Azure OpenAI) account.
 
 ---
 
@@ -192,12 +207,6 @@ The image below shows a diagram of the deployed resources:
 
 - `Get-OperatingSystem`  
   _Description:_ Detects the current OS (Windows, Linux, macOS, or Unknown) by inspecting `$PSVersionTable`.
-
-- `Get-Parameters-Sorted`  
-  _Description:_ Returns a new parameters object with its property names sorted alphabetically.
-
-- `Get-RandomInt`  
-  _Description:_ Uses a cryptographically secure random number generator to return a random integer modulo a given maximum.
 
 ---
 
@@ -231,8 +240,11 @@ The image below shows a diagram of the deployed resources:
 - `Increment-FormattedNumber`  
   _Description:_ Increments a numeric string while preserving a fixed width (leading zeros).
 
-- `Split-Guid`  
-  _Description:_ Generates a new GUID, removes dashes, and returns the first five characters.
+- `Test-DirectoryExists`  
+  _Description:_ Checks whether a specified directory exists and creates it if not.
+
+- `Test-ResourceGroupExists`, `Test-ResourceExists`, and `Test-SubnetExists`  
+  _Description:_ Helper functions that use Azure CLI commands to verify the existence of a resource group, a generic resource (by name, group, and type), or a subnet.
 
 ---
 
@@ -255,7 +267,7 @@ The image below shows a diagram of the deployed resources:
 
 ---
 
-#### AI & Resource Creation Functions
+#### Resource Creation Functions
 
 - `New-AIHub`  
   _Description:_ Creates a new AI Hub (ML workspace of type “hub”), using storage and Key Vault IDs; handles restoration if the hub was soft‑deleted.
@@ -267,7 +279,7 @@ The image below shows a diagram of the deployed resources:
   _Description:_ Creates a new AI project (ML workspace with “project” kind) using dependent resources (App Insights, managed identity, storage, etc.).
 
 - `New-ApiManagementApi`  
-  _Description:_ Creates a “KeyVault Proxy” API inside an API Management service and its operations (CORS policy code is commented out).
+  _Description:_ Creates a “KeyVault Proxy” API inside an API Management service and its operations.
 
 - `New-ApiManagementService`  
   _Description:_ Creates (or restores) an API Management service and then configures it via `New-ApiManagementApi`.
@@ -310,9 +322,6 @@ The image below shows a diagram of the deployed resources:
 
 - `New-PrivateEndPoint`  
   _Description:_ Creates a private endpoint (for example, for securing SQL or storage access) using Azure CLI.
-
-- `New-RandomPassword`  
-  _Description:_ Generates a random password of a specified length (with a minimum count of non‑alphanumeric characters).
 
 - `New-ResourceGroup`  
   _Description:_ Creates a new Azure resource group, checking (and appending a suffix) until a unique name is found.
@@ -365,10 +374,7 @@ The image below shows a diagram of the deployed resources:
 
 ---
 
-#### Directory, Logging, and File Update Helpers
-
-- `Set-DirectoryPath`  
-  _Description:_ Changes the current working directory to a given target directory (throwing an error if it does not exist).
+#### Security and Permissions
 
 - `Set-KeyVaultAccessPolicies`  
   _Description:_ Sets Key Vault access policies for the current user (using the user principal name) via Azure CLI.
@@ -382,14 +388,15 @@ The image below shows a diagram of the deployed resources:
 - `Set-RBACRoles`  
   _Description:_ Assigns RBAC roles (such as “Key Vault Administrator” and related roles) to a managed identity for the target resource group scope.
 
+---
+
+#### Directory, Logging, and File Update Helpers
+
+- `Set-DirectoryPath`  
+  _Description:_ Changes the current working directory to a given target directory (throwing an error if it does not exist).
+  
 - `Show-ExistingResourceProvisioningStatus`  
   _Description:_ Lists all resources in a resource group and displays their current provisioning states.
-
-- `Test-DirectoryExists`  
-  _Description:_ Checks whether a specified directory exists and creates it if not.
-
-- `Test-ResourceGroupExists`, `Test-ResourceExists`, and `Test-SubnetExists`  
-  _Description:_ Helper functions that use Azure CLI commands to verify the existence of a resource group, a generic resource (by name, group, and type), or a subnet.
 
 - `Update-AIConnectionFile`  
   _Description:_ Updates or creates an AI connection YAML file for a resource (for AI services, OpenAI, search, or storage) using a defined schema.
