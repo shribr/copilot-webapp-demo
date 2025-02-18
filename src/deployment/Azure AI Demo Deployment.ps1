@@ -1665,30 +1665,32 @@ function New-AppRegistration {
         $appRegRequiredResourceAccessJson = $global:appRegRequiredResourceAccess | ConvertTo-Json -Depth 4
 
         # Check if the app is already registered
-        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --query "[].appId" --output tsv
+        $existingApp = az ad app list --filter "displayName eq '$appServiceName'" --output tsv
 
         $objectId = ""
         
         if ($existingApp) {
-            Write-Host "App '$appServiceName' is already registered with App ID: $existingApp."
-            Write-Log -message "App '$appServiceName' is already registered with App ID: $existingApp."
-
-            $appId = $existingApp
+            $appId = $existingApp.appId
             $objectId = az ad app show --id $appId --query "objectId" --output tsv
+            $appUri = $existingApp.appUri
+
+            Write-Host "App '$appServiceName' is already registered with App ID: $appId and Object ID: $objectId." -ForegroundColor Blue
+            Write-Log -message "App '$appServiceName' is already registered with App ID: $appId and Object ID: $objectId."
         }
         else {
             # Register the app
             $appRegistration = az ad app create --display-name $appServiceName --sign-in-audience AzureADandPersonalMicrosoftAccount | ConvertFrom-Json
 
             $appId = $appRegistration.appId
-            $objectId = $appRegistration.objectId
+            $objectId = az ad app show --id $appId --query "objectId" --output tsv
+            $appUri = $appRegistration.appUri
 
             Write-Host "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId." -ForegroundColor Green
             Write-Log -message "App '$appServiceName' registered successfully with App ID: $appId and Object ID: $objectId."
         }
 
         # Update the parameters file with the new app registration details
-        Update-ParametersFile-AppRegistration -parametersFile $parametersFile -appId $appId -appUri $appUri
+        Update-ParametersFileAppRegistration -parametersFile $parametersFile -appId $appId -appUri $appUri
 
         $permissions = "User.Read.All"
         $apiPermissions = ""
@@ -1800,39 +1802,39 @@ function New-AppRegistration {
             #$appId = "5073ae0e-7f06-45c8-b99d-c6137c0b544a"
             
             $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-            az ad app update --id $appId --set "appManifest.json"
+            az ad app update --appId $appId --set "appManifest.json"
             
             try {
                 az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
                 
-                Write-Host "Sign-in audience for app '$appServiceName' updated successfully." -ForegroundColor Green
-                Write-Log -message "Sign-in audience for app '$appServiceName' updated successfully." -logFilePath $global:LogFilePath
+                Write-Host "The property 'Sign-in audience' for '$appServiceName' app registration updated successfully." -ForegroundColor Green
+                Write-Log -message "The property 'Sign-in audience' for '$appServiceName' app registration updated successfully." -logFilePath $global:LogFilePath
             }
             catch {
-                Write-Error "Failed to update sign-in-audience for app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to update sign-in-audience for app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to update 'sign-in-audience' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to update 'sign-in-audience' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
 
             try {
                 az ad app update --id $appId --set api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)
 
-                Write-Host "oauth2PermissionScopes for app '$appServiceName' updated successfully." -ForegroundColor Green
-                Write-Log -message "oauth2PermissionScopes for app '$appServiceName' updated successfully." -logFilePath $global:LogFilePath
+                Write-Host "The property 'oauth2PermissionScopes' for '$appServiceName' app registration updated successfully." -ForegroundColor Green
+                Write-Log -message "The property 'oauth2PermissionScopes' for '$appServiceName' app registration updated successfully." -logFilePath $global:LogFilePath
             }
             catch {
-                Write-Error "Failed to update oauth2PermissionScopes for app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to update oauth2PermissionScopes for app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to update 'oauth2PermissionScopes' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to update 'oauth2PermissionScopes' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
             
             try {
                 az ad app update --id $appId --required-resource-accesses $appRegRequiredResourceAccessJson
 
-                Write-Host "required-resource-accesses for app '$appServiceName' updated successfully." -ForegroundColor Green
-                Write-Log -message "required-resource-accesses for app '$appServiceName' updated successfully." -logFilePath $global:LogFilePath
+                Write-Host "The property 'required-resource-accesses' for '$appServiceName' app registration updated successfully." -ForegroundColor Green
+                Write-Log -message "The property 'required-resource-accesses' for '$appServiceName' app registration updated successfully." -logFilePath $global:LogFilePath
             }
             catch {
-                Write-Error "Failed to update required-resource-accesses for app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to update required-resource-accesses for app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Error "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
             
             #az ad app update --id $appId --identifier-uris $identifierUris
@@ -1965,15 +1967,16 @@ function New-AppService {
             if (-not $appExists) {
 
                 $global:resourceCounter += 1
-                Write-Host "$appServiceType app '$appServiceName' created successfully. Moving on to deployment. [$global:resourceCounter]" -ForegroundColor Green
-                Write-Log -message "$appServiceType app '$appServiceName' created successfully. Moving on to deployment. [$global:resourceCounter]" -logFilePath $global:LogFilePath
+                Write-Host "$appServiceType app '$appServiceName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+                Write-Log -message "$appServiceType app '$appServiceName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
             }
             else {
-                Write-Host "$appServiceType app '$appServiceName' already exists. Moving on to deployment."
-                Write-Log -message "$appServiceType app '$appServiceName' already exists. Moving on to deployment." -logFilePath $global:LogFilePath
+                Write-Host "$appServiceType app '$appServiceName' already exists."
+                Write-Log -message "$appServiceType app '$appServiceName' already exists." -logFilePath $global:LogFilePath
             }
 
-            Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -deployZipResources $deployZipResources -deployZipPackage $deployZipPackage
+            # Deploy the app service
+            # Deploy-AppService -appService $appService -resourceGroupName $resourceGroupName -deployZipResources $deployZipResources -deployZipPackage $deployZipPackage
         }
         catch {
             Write-Error "Failed to create $appServiceType app '$appServiceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -2527,14 +2530,19 @@ function New-MachineLearningWorkspace {
                 }
             }
             else {
-                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created successfully." -ForegroundColor Green
-                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created successfully." -logFilePath $global:LogFilePath
+
+                $aiHubName = $global:aiHub.Name
+
+                Write-Host "AI Project '$aiProjectName' in '$aiHubName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+                Write-Log -message "AI Project '$aiProjectName' in '$aiHubName' created successfully. [$global:resourceCounter]" -logFilePath $global:LogFilePath
                 $global:resourceCounter += 1
 
                 return $jsonOutput
             }
         }
         catch {
+            $aiHubName = $global:aiHub.Name
+
             Write-Error "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create AI project '$aiProjectName' in '$aiHubName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_" -logFilePath $global:LogFilePath
         }
@@ -4290,7 +4298,7 @@ function Start-Deployment {
             #$appId = az webapp show --name $appService.Name --resource-group $resourceGroup.Name --query "id" --output tsv
             $appId = az ad app list --filter "displayName eq '$($appServiceName)'" --query "[].appId" --output tsv
             
-            Write-Host "App ID for $($appServiceName): $appId"
+            #Write-Host "App ID for $($appServiceName): $appId"
 
             # Executing this function again because now that the app service has been created, the app ID is available and therefore the SharePoint datasource can be created.
             $dataSources = Get-SearchDataSources -resourceGroupName $resourceGroupName -searchServiceName $global:searchService.Name
@@ -4913,8 +4921,8 @@ function Update-ConfigFile {
         # Write the updated JSON back to the file
         $updatedConfig | Set-Content -Path $configFilePath
 
-        Write-Host "Config.json file updated successfully."
-        Write-Log -message "Config.json file updated successfully."
+        Write-Host "The file Config.json has been updated successfully."
+        Write-Log -message "The file Config.json has been updated successfully."
     }
     catch {
         Write-Host "Failed to update the Config.json file: : (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -5031,14 +5039,14 @@ identity:
 }
 
 # Function to update parameters.json with new values from app registration
-function Update-ParametersFile-AppRegistration {
+function Update-ParametersFileAppRegistration {
     param (
         [string]$parametersFile,
         [string]$appId,
         [string]$appUri
     )
 
-    Write-Host "Executing Update-ParametersFile-AppRegistration function..." -ForegroundColor Yellow
+    Write-Host "Executing Update-ParametersFileAppRegistration function..." -ForegroundColor Yellow
 
     try {
         $ErrorActionPreference = 'Stop'
@@ -5055,8 +5063,8 @@ function Update-ParametersFile-AppRegistration {
         # Write the updated JSON back to the parameters.json file
         Set-Content -Path $parametersFile -Value $updatedParametersJson
 
-        Write-Host "parameters.json updated successfully."
-        Write-Log -message "parameters.json updated successfully."
+        Write-Host "The parameters.json file has been updated successfully." -ForegroundColor Green
+        Write-Log -message "The parameters.json file has been updated successfully."
     }
     catch {
         Write-Error "Failed to update parameters.json: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
@@ -5190,8 +5198,7 @@ function Write-Log {
     $currentDirectory = (Get-Location).Path
 
     Set-DirectoryPath -targetDirectory $global:deploymentPath
-
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss tt"
     $logMessage = "$timestamp - $message"
 
     Add-Content -Path $logFilePath -Value $logMessage
