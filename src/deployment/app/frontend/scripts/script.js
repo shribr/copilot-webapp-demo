@@ -2022,8 +2022,8 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
     const sampleRows = document.querySelectorAll('.document-row.sample');
 
     // Clear existing document rows except the header
-    const existingRows = docList.querySelectorAll('document-table .document-row:not(.header)');
-    existingRows.forEach(row => row.style.display = 'none');
+    const existingRows = docList.querySelectorAll('tr.document-row');
+    existingRows.forEach(row => docList.removeChild(row));
 
     if (blobs.length === 0) {
         // Show sample rows if no results
@@ -2133,6 +2133,17 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             // Append the document row to the document list
             docList.appendChild(documentRow);
         });
+    }
+
+    const width = window.innerWidth;
+
+    if (width < 1350) {
+        const elements = document.getElementsByClassName('blob-name');
+        Array.from(elements).forEach(element => element.classList.remove('no-before'));
+    }
+    else {
+        const elements = document.getElementsByClassName('blob-name');
+        Array.from(elements).forEach(element => element.classList.add('no-before'));
     }
 }
 
@@ -2576,7 +2587,7 @@ async function uploadFilesToAzure(files) {
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
-    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.SVG;
+    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
     const editIcon = config.ICONS.EDIT.MONOTONE;
     const deleteIcon = config.ICONS.DELETE.MONOTONE;
 
