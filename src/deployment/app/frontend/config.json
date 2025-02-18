@@ -24,7 +24,7 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-16T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=btfq&srt=co&sig=agiyBp9fFM0hcpE6d/3LpMLvNjxBhegZ/%2BKV6/ihAyY%3D",
+  "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-16T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bqft&srt=co&sig=aeXFeJ43r%2Bk74XkqbvZtgfN3qxGLr/b2CPTpyAksoD4%3D",
   "AZURE_STORAGE_API_KEY": "LVoLvh3ZfT2uMR1hgZTox9J7ouKrSX6PihoI2u5U7ZurJMAqdd8qv1qFEpOEEcNuIql0Lf8U7beq+ASt8DDNPw==",
   "AZURE_STORAGE_URL": "blob.core.windows.net",
   "AZURE_SUBSCRIPTION_ID": "bfb3a031-f26f-4783-b278-60173de9ccf4",
@@ -49,46 +49,46 @@
   "SITE_LOGO": null,
   "AI_MODELS": [
     {
+      "DeploymentName": "gpt-4o",
       "ApiKey": "87abb39b9ec94a48aa53d2ab762bae94",
-      "Path": "chat/completions",
-      "ModelVersion": "2024-08-06",
-      "Type": "gpt-4o",
       "KeyWordTriggers": null,
+      "ModelVersion": "2024-08-06",
+      "Format": "OpenAI",
+      "Type": "gpt-4o",
       "ApiVersion": "2024-08-01-preview",
+      "Path": "chat/completions",
       "Sku": {
         "Name": "GlobalStandard",
         "Capacity": 100
-      },
-      "Format": "OpenAI",
-      "DeploymentName": "gpt-4o"
+      }
     },
     {
+      "DeploymentName": "text-embedding",
       "ApiKey": "87abb39b9ec94a48aa53d2ab762bae94",
-      "Path": "images/generations",
-      "ModelVersion": "1",
-      "Type": "text-embedding-3-large",
       "KeyWordTriggers": null,
+      "ModelVersion": "1",
+      "Format": "OpenAI",
+      "Type": "text-embedding-3-large",
       "ApiVersion": "2023-05-15",
+      "Path": "images/generations",
       "Sku": {
         "Name": "Standard",
         "Capacity": 100
-      },
-      "Format": "OpenAI",
-      "DeploymentName": "text-embedding"
+      }
     },
     {
+      "DeploymentName": "dall-e-3",
       "ApiKey": "87abb39b9ec94a48aa53d2ab762bae94",
-      "Path": "images/generations",
-      "ModelVersion": "3.0",
-      "Type": "dall-e-3",
       "KeyWordTriggers": null,
+      "ModelVersion": "3.0",
+      "Format": "OpenAI",
+      "Type": "dall-e-3",
       "ApiVersion": "2024-02-01",
+      "Path": "images/generations",
       "Sku": {
         "Name": "Standard",
         "Capacity": 2
-      },
-      "Format": "OpenAI",
-      "DeploymentName": "dall-e-3"
+      }
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -113,49 +113,49 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "btfq",
+    "SS": "bqft",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-02-16T23:59:59Z",
     "ST": "2025-02-16T23:59:59Z",
     "SPR": "https",
-    "SIG": "agiyBp9fFM0hcpE6d/3LpMLvNjxBhegZ/%2BKV6/ihAyY%3D",
+    "SIG": "aeXFeJ43r%2Bk74XkqbvZtgfN3qxGLr/b2CPTpyAksoD4%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
-    "max_tokens": 800,
-    "stop": null,
-    "frequency_penalty": 0,
-    "data_sources": [
-      {
-        "parameters": {
-          "authentication": {
-            "key": "wUd4TQaxs7K8TutKt49ZtVRHbBD2HiuJSUmbRDf9sQAzSeBXi01r",
-            "type": "api_key"
-          },
-          "endpoint": "https://srch-copilot-demo-007.search.windows.net",
-          "index_name": "vector-srch-index-copilot-demo-007"
-        },
-        "type": "azure_search"
-      }
-    ],
     "messages": [
       {
-        "role_information": "You are a helpful assistant",
         "content": "",
-        "role": "system"
+        "role": "system",
+        "role_information": "You are a helpful assistant"
       },
       {
         "content": "",
         "role": "user"
       }
     ],
+    "max_tokens": 800,
+    "data_sources": [
+      {
+        "type": "azure_search",
+        "parameters": {
+          "authentication": {
+            "type": "api_key",
+            "key": "wUd4TQaxs7K8TutKt49ZtVRHbBD2HiuJSUmbRDf9sQAzSeBXi01r"
+          },
+          "endpoint": "https://srch-copilot-demo-007.search.windows.net",
+          "index_name": "vector-srch-index-copilot-demo-007"
+        }
+      }
+    ],
     "presence_penalty": 0,
-    "stream": false,
     "temperature": 0.7,
-    "top_p": 0.95
+    "frequency_penalty": 0,
+    "top_p": 0.95,
+    "stop": null,
+    "stream": false
   },
   "CHAT_PERSONAS": [
     {
@@ -280,16 +280,16 @@
   },
   "DATA_SOURCES": [
     {
+      "type": "azure_search",
       "parameters": {
         "authentication": {
-          "key": "wUd4TQaxs7K8TutKt49ZtVRHbBD2HiuJSUmbRDf9sQAzSeBXi01r",
-          "type": "api_key"
+          "type": "api_key",
+          "key": "wUd4TQaxs7K8TutKt49ZtVRHbBD2HiuJSUmbRDf9sQAzSeBXi01r"
         },
         "role_information": "",
         "endpoint": "https://srch-copilot-demo-007.search.windows.net",
         "index_name": "vector-srch-index-copilot-demo-007"
-      },
-      "type": "azure_search"
+      }
     }
   ],
   "FILE_TYPES": {
