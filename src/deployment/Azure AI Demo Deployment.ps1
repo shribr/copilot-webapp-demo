@@ -967,14 +967,14 @@ function Install-Extensions {
         $isInstalled = code --list-extensions | Where-Object { $_ -eq $extensionName }
 
         if ($isInstalled) {
-            Write-Host "Extension '$extensionName' is already installed."
+            Write-Host "Extension '$extensionName' is already installed." -ForegroundColor Blue
             continue
         }
         else {
 
             try {
                 code --install-extension $extensionName
-                Write-Host "Installed extension '$extensionName' successfully."
+                Write-Host "Installed extension '$extensionName' successfully." -ForegroundColor Green
             }
             catch {
                 Write-Error "Failed to install extension '$extensionName': $_"
@@ -993,7 +993,7 @@ function Install-Extensions {
     else {
         try {
             az extension add --name ml
-            Write-Host "Azure Machine Learning extension installed successfully."
+            Write-Host "Azure Machine Learning extension installed successfully." -ForegroundColor Green
         }
         catch {
             Write-Error "Failed to install Azure Machine Learning extension: $_"
@@ -4099,7 +4099,7 @@ function Start-Deployment {
     $startTimeMessage = "*** SCRIPT START TIME: $startTime ***"
     Add-Content -Path $logFilePath -Value $startTimeMessage
 
-    Write-Host "Getting initial value '$($global:resourceGroup.Name)' for global variable 'resourceGroup.Name' and setting local 'resourceGroupName' variable with that value." -ForegroundColor Cyan
+    #Write-Host "Getting initial value '$($global:resourceGroup.Name)' for global variable 'resourceGroup.Name' and setting local 'resourceGroupName' variable with that value." -ForegroundColor Cyan
 
     $resourceGroupName = $global:resourceGroup.Name
 
@@ -4331,7 +4331,7 @@ function Start-Deployment {
     # End the timer
     $endTime = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
     $endTimeNumber = Get-Date
-
+    "yyyy-MM-dd hh:mm:ss tt"
     $executionTime = $endTimeNumber - $startTimeNumber
 
     $endTimeMessage = "*** SCRIPT END TIME: $endTime ***"
@@ -5198,7 +5198,7 @@ function Write-Log {
     $currentDirectory = (Get-Location).Path
 
     Set-DirectoryPath -targetDirectory $global:deploymentPath
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss tt"
+    $timestamp = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
     $logMessage = "$timestamp - $message"
 
     Add-Content -Path $logFilePath -Value $logMessage
