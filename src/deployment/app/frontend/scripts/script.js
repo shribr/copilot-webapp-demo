@@ -786,9 +786,9 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
                     formattedText = `<ol>${formattedText}</ol>`;
                 }
 
-                console.log(formattedText);
+                //console.log(formattedText);
 
-                const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+                const answerListHTML = '<div class="answer-results">' + formattedText + footNoteLinks + '</div>';
 
                 answers += answerListHTML;
 
