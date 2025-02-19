@@ -1,5 +1,5 @@
 {
-  "name": "embeddings-srch-index-copilot-demo-010",
+  "name": "embeddings-srch-index-copilot-demo-007",
   "fields": [
     {
       "name": "id",
@@ -74,7 +74,7 @@
       "facetable": false,
       "synonymMaps": [],
       "dimensions": 3072,
-      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-010-text-profile"
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-007-text-profile"
     }
   ],
   "scoringProfiles": [],
@@ -96,7 +96,7 @@
   "semantic": {
     "configurations": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-010-semantic-configuration",
+        "name": "vector-profile-srch-index-copilot-demo-007-semantic-configuration",
         "prioritizedFields": {
           "prioritizedContentFields": [
             {
@@ -111,7 +111,7 @@
   "vectorSearch": {
     "algorithms": [
       {
-        "name": "vector-config-srch-index-copilot-demo-010-algorithm",
+        "name": "vector-config-srch-index-copilot-demo-007-algorithm",
         "kind": "hnsw",
         "hnswParameters": {
           "m": 4,
@@ -123,8 +123,8 @@
     ],
     "profiles": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-010-text-profile",
-        "algorithm": "vector-config-srch-index-copilot-demo-010-algorithm"
+        "name": "vector-profile-srch-index-copilot-demo-007-text-profile",
+        "algorithm": "vector-config-srch-index-copilot-demo-007-algorithm"
       }
     ],
     "vectorizers": [],

@@ -2758,6 +2758,9 @@ function New-SearchDataSource {
         [string]$appId = ""
     )
 
+    $subscriptionId = $global:subscriptionId
+    $userAssignedIdentityName = $global:userAssignedIdentity.Name
+
     # https://learn.microsoft.com/en-us/azure/search/search-howto-index-sharepoint-online
 
     $storageServiceName = $storageService.Name
@@ -2839,6 +2842,10 @@ function New-SearchDataSource {
                 name  = $searchDataSourceContainerName
                 query = $searchDataSourceQuery
             }
+            #identity    = @{
+            #     "@odata.type"          = "#Microsoft.Azure.Search.DataUserAssignedIdentity"
+            #     "userAssignedIdentity" = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"            
+            # }
         }
 
         # Convert the body hashtable to JSON
@@ -3058,7 +3065,7 @@ function New-SearchService {
         try {
             $ErrorActionPreference = 'Stop'
 
-            az search service create --name $searchServiceName --resource-group $resourceGroupName --location $location --sku basic --output none
+            az search service create --name $searchServiceName --resource-group $resourceGroupName --identity-type SystemAssigned --location $location --sku basic --output none
 
             if ($LASTEXITCODE -ne 0) {
                 throw "Failed to create search service: $createServiceOutput"
