@@ -1060,6 +1060,7 @@ function Initialize-Parameters {
     $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
     $global:appServicePlan = $parametersObject.AppServicePlan
     $global:appServices = $parametersObject.appServices
+    $global:azureManagement = $parametersObject.azureManagement
     $global:cognitiveService = $parametersObject.cognitiveService       
     $global:computerVisionService = $parametersObject.computerVisionService  
     $global:containerRegistry = $parametersObject.containerRegistry      
@@ -1147,7 +1148,7 @@ function Initialize-Parameters {
         appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
         appServiceEnvironment        = $global:appServiceEnvironment
         appServicePlan               = $global:appServicePlan
-        azureManagement              = $parametersObject.azureManagement
+        azureManagement              = $global:azureManagement
         cognitiveService             = $global:cognitiveService
         computerVisionService        = $global:computerVisionService
         configFilePath               = $parametersObject.configFilePath
@@ -2806,7 +2807,9 @@ function New-SearchDataSource {
 
         switch ($searchDataSourceType) {
             "azureblob" {
-                $searchDataSourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageServiceName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
+                #$searchDataSourceConnectionString = "DefaultEndpointsProtocol=https;AccountName=$storageServiceName;AccountKey=$storageAccessKey;EndpointSuffix=core.windows.net"
+                # For User Assigned Identity
+                $searchDataSourceConnectionString = "ResourceId=/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageServiceName;"
             }
             "azuresql" {
                 $searchDataSourceConnectionString = "Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlServerAdmin;Password=$sqlServerAdminPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
@@ -2828,24 +2831,37 @@ function New-SearchDataSource {
             }
         }
 
+        # https://docs.azure.cn/en-us/search/search-howto-managed-identities-storage
+
         $searchDataSourceUrl = "https://$($searchServiceName).search.windows.net/datasources?api-version=$($searchServiceAPiVersion)"
 
         Write-Host "searchDataSourceUrl: $searchDataSourceUrl"
 
-        $body = @{
-            name        = $searchDataSourceName
-            type        = $searchDataSourceType
-            credentials = @{
-                connectionString = $searchDataSourceConnectionString
+        if ($searchDataSourceType -eq "sharepoint") {
+            $body = @{
+                name        = $searchDataSourceName
+                type        = $searchDataSourceType
+                credentials = @{
+                    connectionString = $searchDataSourceConnectionString
+                }
+                container   = @{
+                    name  = $searchDataSourceContainerName
+                    query = $searchDataSourceQuery
+                }
             }
-            container   = @{
-                name  = $searchDataSourceContainerName
-                query = $searchDataSourceQuery
+        }
+        else {
+            $body = @{
+                name        = $searchDataSourceName
+                type        = $searchDataSourceType
+                credentials = @{
+                    connectionString = $searchDataSourceConnectionString
+                }
+                container   = @{
+                    name  = $searchDataSourceContainerName
+                    query = $searchDataSourceQuery
+                }
             }
-            #identity    = @{
-            #     "@odata.type"          = "#Microsoft.Azure.Search.DataUserAssignedIdentity"
-            #     "userAssignedIdentity" = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"            
-            # }
         }
 
         # Convert the body hashtable to JSON
@@ -3051,8 +3067,10 @@ function New-SearchService {
 
     $searchServiceName = $searchService.Name
     $cognitiveServiceName = $cognitiveService.Name
-    $userAssignedIdentityName = $userAssignedIdentity.Name
+    $userAssignedIdentityName = $global:userAssignedIdentity.Name
     $location = $searchService.Location
+    $subscriptionId = $global:subscriptionId
+    $azureManagementApiVersion = $global:azureManagement.ApiVersion
 
     Write-Host "Executing New-SearchService ('$searchServiceName') function..." -ForegroundColor Magenta
 
@@ -3083,11 +3101,13 @@ function New-SearchService {
             $global:KeyVaultSecrets.SearchServiceApiKey = $searchServiceApiKey
 
             $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
-            $searchManagementUrl += "?api-version=$($global:azureManagement.ApiVersion)"
+            $searchManagementUrl += "?api-version=$($azureManagementApiVersion)"
 
             #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
             # az search service update --name $searchServiceName --resource-group $resourceGroup.Name --identity SystemAssigned --aad-auth-failure-mode http401WithBearerChallenge --auth-options aadOrApiKey
             #  --identity type=UserAssigned userAssignedIdentities="/subscriptions/$subscriptionId/resourcegroups/$resourceGroup.Name/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+
+            # https://docs.azure.cn/en-us/search/search-howto-managed-identities-data-sources?tabs=portal-sys%2Crest-user
 
             try {
                 $ErrorActionPreference = 'Continue'
@@ -3102,7 +3122,7 @@ function New-SearchService {
                         hostingMode    = "default"
                     }
                     identity   = @{
-                        type                   = "SystemAssigned, UserAssigned"
+                        type                   = "UserAssigned"
                         userAssignedIdentities = @{
                             "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
                         }
@@ -3110,16 +3130,17 @@ function New-SearchService {
                 }
 
                 # Convert the body hashtable to JSON
+                $jsonBody = $body | ConvertTo-Json -Depth 10
 
-                # $accessToken = (az account get-access-token --query accessToken -o tsv)
+                $accessToken = (az account get-access-token --query accessToken -o tsv)
 
-                # $headers = @{
-                #    "api-key"       = $searchServiceApiKey
-                #    "Authorization" = "Bearer $accessToken"  # Add the authorization header
-                #}
+                $headers = @{
+                    "api-key"       = $searchServiceApiKey
+                    "Authorization" = "Bearer $accessToken"  # Add the authorization header
+                }
 
                 #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-                #Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+                Invoke-RestMethod -Uri $searchManagementUrl -Method PUT -Body $jsonBody -ContentType "application/json" -Headers $headers
 
             }
             catch {
@@ -3250,48 +3271,48 @@ function New-SearchService {
 
         $global:keyVaultSecrets.SearchServiceApiKey = $searchServiceApiKey
 
-        $searchManagementUrl = "https://management.azure.com/subscriptions/$global:subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
-        $searchManagementUrl += "?api-version=$global:azureManagement.ApiVersion"
+        $searchManagementUrl = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Search/searchServices/$searchServiceName"
+        $searchManagementUrl += "?api-version=$azureManagementApiVersion"
 
-        # try {
-        #     $ErrorActionPreference = 'Continue'
+        try {
+            $ErrorActionPreference = 'Continue'
 
-        #     $body = @{
-        #         location   = $location.Replace(" ", "")
-        #         sku        = @{
-        #             name = "basic"
-        #         }
-        #         properties = @{
-        #             replicaCount   = 1
-        #             partitionCount = 1
-        #             hostingMode    = "default"
-        #         }
-        #         identity   = @{
-        #             type                   = "SystemAssigned, UserAssigned"
-        #             userAssignedIdentities = @{
-        #                 "/subscriptions/$subscriptionId/resourcegroups/$resourceGroup.Name/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
-        #             }
-        #         }
-        #     }
+            $body = @{
+                location   = $location.Replace(" ", "")
+                sku        = @{
+                    name = "basic"
+                }
+                properties = @{
+                    replicaCount   = 1
+                    partitionCount = 1
+                    hostingMode    = "default"
+                }
+                identity   = @{
+                    type                   = "UserAssigned"
+                    userAssignedIdentities = @{
+                        "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
+                    }
+                }
+            }
 
-        #     # Convert the body hashtable to JSON
-        #     $jsonBody = $body | ConvertTo-Json -Depth 10
+            # Convert the body hashtable to JSON
+            $jsonBody = $body | ConvertTo-Json -Depth 10
 
-        #     $accessToken = (az account get-access-token --query accessToken -o tsv)
+            $accessToken = (az account get-access-token --query accessToken -o tsv)
 
-        #     $headers = @{
-        #         "api-key"       = $searchServiceApiKey
-        #         "Authorization" = "Bearer $accessToken"  # Add the authorization header
-        #     }
+            $headers = @{
+                "api-key"       = $searchServiceApiKey
+                "Authorization" = "Bearer $accessToken"  # Add the authorization header
+            }
 
-        #     #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
-        #     Invoke-RestMethod -Uri $searchManagementUrl -Method Patch -Body $jsonBody -ContentType "application/json" -Headers $headers
+            #THIS IS FAILING BUT SHOULD WORK. COMMENTING OUT UNTIL I CAN FIGURE OUT WHY IT'S NOT.
+            Invoke-RestMethod -Uri $searchManagementUrl -Method PUT -Body $jsonBody -ContentType "application/json" -Headers $headers
 
-        # }
-        # catch {
-        #     Write-Error "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        #     Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        # }
+        }
+        catch {
+            Write-Error "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to update Search Service '$searchServiceName' with managed identity '$userAssignedIdentityName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
 
         $dataSources = Get-SearchDataSources -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
 

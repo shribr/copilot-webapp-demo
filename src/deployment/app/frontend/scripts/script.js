@@ -774,6 +774,20 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
                     }
                 }
 
+                // Regex explanation:
+                // - (\d+\.\s): Matches a number, a dot and a following space
+                // - (.*?)(?=\s+\d+\.|$): Lazily captures all characters until it finds another numbered item (preceded by some whitespace and a number and dot)
+                //   or reaches the end of the string.
+                const regex = /(\d+\.\s)(.*?)(?=\s+\d+\.|$)/g;
+
+                let formattedText = answerText.replace(regex, (_, marker, content) => `<li>${content.trim()}</li>`);
+
+                if (formattedText.includes('<li>')) {
+                    formattedText = `<ol>${formattedText}</ol>`;
+                }
+
+                console.log(formattedText);
+
                 const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
 
                 answers += answerListHTML;
