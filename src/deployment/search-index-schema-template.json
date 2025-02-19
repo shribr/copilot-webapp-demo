@@ -222,7 +222,10 @@
     }
   ],
   "scoringProfiles": [],
-  "corsOptions": null,
+  "corsOptions": {
+    "allowedOrigins": ["*"],
+    "maxAgeInSeconds": 300
+  },
   "suggesters": [],
   "analyzers": [],
   "tokenizers": [],

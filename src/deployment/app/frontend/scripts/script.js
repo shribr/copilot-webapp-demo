@@ -1601,6 +1601,10 @@ async function getSearchIndexerStatus(searchIndexers) {
         //var searchIndexName = searchIndexer.IndexName;
         //var searchIndexerSchema = searchIndexer.Schema;
 
+        if (searchIndexerName.indexOf("sharepoint") > -1) {
+            continue;
+        }
+
         var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/status?api-version=${searchServiceApiVersion}`;
 
         var headers = {
@@ -2200,12 +2204,22 @@ async function runSearchIndexer(searchIndexers) {
         await new Promise(resolve => setTimeout(resolve, 5000));
     }
 
+    const searchIndexerStatus = await getSearchIndexerStatus(searchIndexers);
+
     // Iterate over the search indexers and run each one
     for (const searchIndexer of searchIndexers) {
         var searchIndexerName = searchIndexer.Name;
         //var searchIndexName = searchIndexer.IndexName;
         //var searchIndexerSchema = searchIndexer.Schema;
 
+        const indexer = searchIndexerStatus.find(indexer => indexer.name === searchIndexerName);
+        const indexerStatus = indexer ? indexer.status : 'unknown';
+
+        // Skip the indexer if it is already running
+        if (indexerStatus === "running") {
+            console.log(`Indexer ${searchIndexerName} is already running. Skipping...`);
+            continue;
+        }
         if (searchIndexerName.indexOf("sharepoint") > -1) {
             continue;
         }
@@ -2225,8 +2239,8 @@ async function runSearchIndexer(searchIndexers) {
                 headers: headers
             });
             //No need to return anything from the search indexer
-            const data = await response.json();
-            console.log('Indexer run response:', data);
+            //const data = await response.json();
+            console.log('Indexer ran successfully:', searchIndexerName);
         } catch (error) {
             console.error(`Error running search indexer`, error.message);
         }

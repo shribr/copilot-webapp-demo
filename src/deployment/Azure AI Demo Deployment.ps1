@@ -1795,7 +1795,10 @@ function New-AppRegistration {
 
             $app.requiredResourceAccess = $appRegRequiredResourceAccess
             $app.spa.redirectUris = $identifierUrisArray
-
+            #$app.replyUrlsWithType = @{
+            #   "url"  = $appServiceUrl
+            #  "type" = "Spa"
+            #}
             # Convert the updated manifest back to JSON
             $appJson = $app | ConvertTo-Json -Depth 10
     
