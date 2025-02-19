@@ -2,7 +2,7 @@
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "cognitiveServices": {
     "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
-    "key": "146bf8e15ffc4a3481af71b463c8171f"
+    "key": "1654b4a3e8a84a6daff921f3434c9682"
   },
   "description": "Skillset to chunk documents and generate embeddings",
   "indexProjections": {

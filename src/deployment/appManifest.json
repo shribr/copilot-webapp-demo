@@ -6,28 +6,8 @@
     "knownClientApplications": [],
     "oauth2PermissionScopes": [
       {
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "adminConsentDisplayName": "Access API as user",
-        "id": "a9e0efe9-22fb-4857-87a8-e8bb7105939f",
-        "isEnabled": true,
         "type": "User",
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
-        "userConsentDisplayName": "Access API as user",
-        "value": "access_as_user"
-      },
-      {
-        "adminConsentDescription": "Allow the application to read data from the API.",
-        "adminConsentDisplayName": "Read data from API",
-        "id": "94eb6afb-b6ca-4f0b-a9e7-3703127c9281",
-        "isEnabled": true,
-        "type": "Admin",
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-        "userConsentDisplayName": "Read data from API",
-        "value": "read_data"
-      },
-      {
-        "type": "User",
-        "id": "dbc932ba-4f67-4be0-b18f-9e6c49d39cde",
+        "id": "b2326786-ba12-4ca4-ab1e-6645c124527f",
         "userConsentDisplayName": "Access API as user",
         "adminConsentDisplayName": "Access API as user",
         "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
@@ -37,7 +17,7 @@
       },
       {
         "type": "User",
-        "id": "fdc0c455-03c3-434b-8c34-74e7b8d9557b",
+        "id": "8368684e-9541-4939-b270-644f1c4caa6c",
         "userConsentDisplayName": "Read data from API",
         "adminConsentDisplayName": "Read data from API",
         "adminConsentDescription": "Allow the application to read data from the API.",
@@ -49,21 +29,19 @@
     "preAuthorizedApplications": [],
     "requestedAccessTokenVersion": 2
   },
-  "appId": "e8e374ea-dd2f-4225-83bf-867ade167d50",
+  "appId": "ca35fca5-035b-4cf2-aeae-9af805cca31a",
   "appRoles": [],
   "applicationTemplateId": null,
   "certification": null,
-  "createdDateTime": "2025-02-15T07:12:01Z",
+  "createdDateTime": "2025-02-19T23:30:02Z",
   "defaultRedirectUri": null,
   "deletedDateTime": null,
   "description": null,
   "disabledByMicrosoftStatus": null,
   "displayName": "app-copilot-demo-009",
   "groupMembershipClaims": null,
-  "id": "242aabb0-4779-4702-9c3e-a5110883aeac",
-  "identifierUris": [
-    "api://e8e374ea-dd2f-4225-83bf-867ade167d50"
-  ],
+  "id": "68b066c5-8231-42be-ad5f-865fd953942f",
+  "identifierUris": [],
   "info": {
     "logoUrl": null,
     "marketingUrl": null,

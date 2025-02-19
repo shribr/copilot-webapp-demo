@@ -1430,6 +1430,20 @@ function New-ApiManagementApi {
     # Check if the API already exists
     $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
 
+    $global:existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
+
+    $apiManagementServiceExists = $global:existingResources -contains $apiManagementServiceName
+
+    if ($apiManagementServiceExists) {
+        $status = az apim show --resource-group $resourceGroupName --name $apiManagementServiceName --query "provisioningState" -o tsv
+
+        if ($status -eq "Activating") {
+            Write-Host "API Management Service '$apiManagementServiceName' is activating. Please wait until it is fully provisioned and then rerun the deployment script again." -ForegroundColor Yellow
+            Write-Log -message "API Management Service '$apiManagementServiceName' is activating. Please wait until it is fully provisioned and then rerun the deployment script again." -logFilePath $global:LogFilePath
+            return
+        }
+    }
+
     if (-not $apiExists) {
         try {
             # Create the API
@@ -2861,6 +2875,10 @@ function New-SearchDataSource {
                     name  = $searchDataSourceContainerName
                     query = $searchDataSourceQuery
                 }
+                identity    = @{
+                    "@odata.type"        = "#Microsoft.Azure.Search.DataUserAssignedIdentity"
+                    userAssignedIdentity = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
+                }
             }
         }
 
@@ -3122,7 +3140,7 @@ function New-SearchService {
                         hostingMode    = "default"
                     }
                     identity   = @{
-                        type                   = "UserAssigned"
+                        type                   = "SystemAssigned,UserAssigned"
                         userAssignedIdentities = @{
                             "/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName" = @{}
                         }
@@ -4569,10 +4587,11 @@ function Test-SubnetExists {
     )
 
     #Write-Host "Executing Test-SubNetExists function..." -ForegroundColor Magenta
-
+    
     try {
-        $subnet = az network vnet subnet show --resource-group $resourceGroupName --vnet-name $vnetName --name $subnetName --query "name" --output tsv
-        if ($subnet) {
+        $subNetExists = az network vnet subnet list --resource-group $resourceGroupName --vnet-name $vnetName --query "[?name=='$subnetName'].name" --output tsv
+        
+        if ($subNetExists) {
             return $true
         }
         else {
