@@ -1,115 +1,107 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 2025-02-18 01:23:39 AM ***
-2025-02-18 01:23:45 AM - Resource group 'RG-COPILOT-DEMO-007' created successfully. [0]
-2025-02-18 01:23:58 AM - User Assigned Identity 'id-copilot-demo-007' created successfully. [1]
-2025-02-18 01:24:05 AM - Service principal created for identity 'id-copilot-demo-007'.
-2025-02-18 01:24:24 AM - User 'id-copilot-demo-007' assigned to role: 'Contributor'.
-2025-02-18 01:24:27 AM - User 'id-copilot-demo-007' assigned to role: 'Cognitive Services OpenAI User'.
-2025-02-18 01:24:30 AM - User 'id-copilot-demo-007' assigned to role: 'Search Index Data Reader'.
-2025-02-18 01:24:32 AM - User 'id-copilot-demo-007' assigned to role: 'Storage Blob Data Reader'.
-2025-02-18 01:24:58 AM - Storage account 'stcopilotdemo007' created successfully. [2]
-2025-02-18 01:25:01 AM - Storage container 'content' created successfully.
-2025-02-18 01:25:10 AM - CORS rules added to Storage Account 'stcopilotdemo007'.
-2025-02-18 01:25:27 AM - Virtual Network 'vnet-copilot-demo-007' created successfully. [3]
-2025-02-18 01:25:42 AM - Subnet 'subnet-copilot-demo-007' created successfully.
-2025-02-18 01:25:55 AM - App Service Plan 'asp-copilot-demo-007' created successfully. [4]
-2025-02-18 01:26:32 AM - Azure AI Service 'ai-service-copilot-demo-007' created successfully. [5]
-2025-02-18 01:26:37 AM - Cognitive Service 'cog-copilot-demo-007' created successfully. [6]
-2025-02-18 01:26:43 AM - Computer Vision Service 'cv-copilot-demo-007' created successfully. [7]
-2025-02-18 01:27:19 AM - OpenAI Service 'openai-service-copilot-demo-007' created successfully. [8]
-2025-02-18 01:28:26 AM - Document Intelligence Service 'docintel-copilot-demo-007' created successfully. [9]
-2025-02-18 01:28:33 AM - Search Service 'srch-copilot-demo-007' created successfully. [10]
-2025-02-18 01:28:44 AM - DataSource 'srch-datasource-blob-copilot-demo-007' created successfully.
-2025-02-18 01:28:48 AM - DataSource 'srch-datasource-sharepoint-copilot-demo-007' created successfully.
-2025-02-18 01:28:51 AM - Index 'srch-index-copilot-demo-007' created successfully.
-2025-02-18 01:28:53 AM - Index 'vector-srch-index-copilot-demo-007' created successfully.
-2025-02-18 01:28:55 AM - Index 'embeddings-srch-index-copilot-demo-007' created successfully.
-2025-02-18 01:28:57 AM - Index 'sharepoint-srch-index-copilot-demo-007' created successfully.
-2025-02-18 01:29:10 AM - Skillset 'srch-skillset-copilot-demo-007' created successfully.
-2025-02-18 01:29:23 AM - Skillset 'vector-srch-skillset-copilot-demo-007' created successfully.
-2025-02-18 01:29:35 AM - Skillset 'embeddings-srch-skillset-copilot-demo-007' created successfully.
-2025-02-18 01:29:37 AM - Search Indexer 'srch-indexer-copilot-demo-007' created successfully.
-2025-02-18 01:29:38 AM - Search Indexer 'vector-srch-indexer-copilot-demo-007' created successfully.
-2025-02-18 01:29:40 AM - Search Indexer 'embeddings-srch-indexer-copilot-demo-007' created successfully.
-2025-02-18 01:29:56 AM - Log Analytics Workspace 'log-copilot-demo-007' created successfully. [11]
-2025-02-18 01:30:01 AM - Application Insights component 'appi-copilot-demo-007' created successfully. [12]
-2025-02-18 01:30:01 AM - File 'container.registry.yaml' created and populated.
-2025-02-18 01:32:42 AM - Container Registry 'crcopilotdemo007' created successfully. [13]
-2025-02-18 01:32:48 AM - API Management Service 'apim-copilot-demo-007' exists in a soft-deleted state. Attempting to restore the service...
-2025-02-18 01:33:57 AM - API Management Service 'apim-copilot-demo-007' restored successfully. [14]
-2025-02-18 01:34:00 AM - API 'KeyVaultProxy' created successfully.
-2025-02-18 01:34:03 AM - Operation 'GetOpenAIServiceApiKey' created successfully.
-2025-02-18 01:34:05 AM - Operation 'GetSearchServiceApiKey' created successfully.
-2025-02-18 01:34:06 AM - Operation 'GetStorageServiceApiKey' created successfully.
-2025-02-18 01:34:06 AM - API 'KeyVaultProxy' and its operations created successfully.
-2025-02-18 01:34:09 AM - API 'KeyVaultProxy' created successfully.
-2025-02-18 01:34:12 AM - Operation 'GetOpenAIServiceApiKey' created successfully.
-2025-02-18 01:34:14 AM - Operation 'GetSearchServiceApiKey' created successfully.
-2025-02-18 01:34:15 AM - Operation 'GetStorageServiceApiKey' created successfully.
-2025-02-18 01:34:15 AM - API 'KeyVaultProxy' and its operations created successfully.
-2025-02-18 01:37:29 AM - Web app 'app-copilot-demo-007' created successfully. [15]
-2025-02-18 02:07:01 AM - Function app 'func-copilot-demo-007' created successfully. [16]
-2025-02-18 02:08:08 AM - Key Vault 'kv-copilot-demo-007' created successfully.
-2025-02-18 02:08:08 AM - Key Vault 'kv-copilot-demo-007' created with Vault Access Policies. [17]
-2025-02-18 02:08:12 AM - Key Vault 'kv-copilot-demo-007' policy permissions set for user: ''.
-2025-02-18 02:08:27 AM - Key Vault 'kv-copilot-demo-007' policy permissions set for user: 'id-copilot-demo-007'.
-2025-02-18 02:08:45 AM - Assigned role 'Key Vault Administrator' to managed identity: 'id-copilot-demo-007'.
-2025-02-18 02:08:51 AM - Assigned role 'Key Vault Secrets User' to managed identity: 'id-copilot-demo-007'.
-2025-02-18 02:08:58 AM - Assigned role 'Key Vault Certificate User' to managed identity: 'id-copilot-demo-007'.
-2025-02-18 02:09:03 AM - Assigned role 'Key Vault Crypto User' to managed identity: 'id-copilot-demo-007'.
-2025-02-18 02:10:45 AM - AI Hub: 'hub-ai-copilot-demo-007' created successfully. [18]
-2025-02-18 02:10:49 AM - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-007'.
-2025-02-18 02:10:52 AM - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-007'.
-2025-02-18 02:10:55 AM - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-007'.
-2025-02-18 02:10:58 AM - File 'ml.workspace.yaml' created and populated.
-2025-02-18 02:11:44 AM - AI Project 'project-ai-copilot-demo-007' in 'hub-ai-copilot-demo-007' created successfully. [18]
-2025-02-18 02:12:09 AM - File 'ai.connection.yaml' created and populated.
-2025-02-18 02:12:29 AM - Azure AIService 'ai-service-copilot-demo-007' connection for 'hub-ai-copilot-demo-007' created successfully.
-2025-02-18 02:12:32 AM - File 'openai.connection.yaml' created and populated.
-2025-02-18 02:12:48 AM - Azure OpenAIService 'openai-service-copilot-demo-007' connection for 'hub-ai-copilot-demo-007' created successfully.
-2025-02-18 02:12:48 AM - File 'storage.connection.yaml' created and populated.
-2025-02-18 02:13:04 AM - Azure StorageAccount 'stcopilotdemo007' connection for 'hub-ai-copilot-demo-007' created successfully.
-2025-02-18 02:13:04 AM - File 'search.connection.yaml' created and populated.
-2025-02-18 02:13:20 AM - Azure SearchService 'srch-copilot-demo-007' connection for 'hub-ai-copilot-demo-007' created successfully.
-2025-02-18 02:13:28 AM - Model 'gpt-4o' for 'ai-service-copilot-demo-007' deployed successfully.
-2025-02-18 02:13:35 AM - Model 'text-embedding' for 'ai-service-copilot-demo-007' deployed successfully.
-2025-02-18 02:13:42 AM - Failed to deploy Model 'dall-e-3' for 'ai-service-copilot-demo-007'. 
+*** SCRIPT START TIME: 2025-02-18 06:57:17 PM ***
+2025-02-18 06:57:24 PM - Resource group 'RG-COPILOT-DEMO-010' created successfully. [0]
+2025-02-18 06:57:28 PM - User Assigned Identity 'id-copilot-demo-010' created successfully. [1]
+2025-02-18 06:57:35 PM - Service principal created for identity 'id-copilot-demo-010'.
+2025-02-18 06:57:54 PM - User 'id-copilot-demo-010' assigned to role: 'Contributor'.
+2025-02-18 06:57:56 PM - User 'id-copilot-demo-010' assigned to role: 'Cognitive Services OpenAI User'.
+2025-02-18 06:57:58 PM - User 'id-copilot-demo-010' assigned to role: 'Search Index Data Reader'.
+2025-02-18 06:58:02 PM - User 'id-copilot-demo-010' assigned to role: 'Storage Blob Data Reader'.
+2025-02-18 06:58:27 PM - Storage account 'stcopilotdemo010' created successfully. [2]
+2025-02-18 06:58:29 PM - Storage container 'content' created successfully.
+2025-02-18 06:58:38 PM - CORS rules added to Storage Account 'stcopilotdemo010'.
+2025-02-18 06:58:52 PM - Virtual Network 'vnet-copilot-demo-010' created successfully. [3]
+2025-02-18 06:59:06 PM - Subnet 'subnet-copilot-demo-010' created successfully.
+2025-02-18 06:59:17 PM - App Service Plan 'asp-copilot-demo-010' created successfully. [4]
+2025-02-18 06:59:59 PM - Azure AI Service 'ai-service-copilot-demo-010' created successfully. [5]
+2025-02-18 07:00:05 PM - Cognitive Service 'cog-copilot-demo-010' created successfully. [6]
+2025-02-18 07:00:10 PM - Computer Vision Service 'cv-copilot-demo-010' created successfully. [7]
+2025-02-18 07:00:46 PM - OpenAI Service 'openai-service-copilot-demo-010' created successfully. [8]
+2025-02-18 07:01:54 PM - Document Intelligence Service 'docintel-copilot-demo-010' created successfully. [9]
+2025-02-18 07:02:03 PM - Search Service 'srch-copilot-demo-010' created successfully. [10]
+2025-02-18 07:02:20 PM - DataSource 'srch-datasource-blob-copilot-demo-010' created successfully.
+2025-02-18 07:02:24 PM - Failed to create datasource 'srch-datasource-sharepoint-copilot-demo-010': (Line 2847) : 
+{
+  "error": {
+    "code": "",
+    "message": "Property \u0027ApplicationId\u0027 must not be empty. It must be in the following formats: SharePointOnlineEndpoint=[SharePointOnline URI];ApplicationId=[application Id];"
+  }
+}
+2025-02-18 07:02:27 PM - Index 'srch-index-copilot-demo-010' created successfully.
+2025-02-18 07:02:29 PM - Index 'vector-srch-index-copilot-demo-010' created successfully.
+2025-02-18 07:02:31 PM - Index 'embeddings-srch-index-copilot-demo-010' created successfully.
+2025-02-18 07:02:46 PM - Index 'sharepoint-srch-index-copilot-demo-010' created successfully.
+2025-02-18 07:03:00 PM - Skillset 'srch-skillset-copilot-demo-010' created successfully.
+2025-02-18 07:03:12 PM - Skillset 'vector-srch-skillset-copilot-demo-010' created successfully.
+2025-02-18 07:03:24 PM - Skillset 'embeddings-srch-skillset-copilot-demo-010' created successfully.
+2025-02-18 07:03:27 PM - Search Indexer 'srch-indexer-copilot-demo-010' created successfully.
+2025-02-18 07:03:28 PM - Search Indexer 'vector-srch-indexer-copilot-demo-010' created successfully.
+2025-02-18 07:03:30 PM - Search Indexer 'embeddings-srch-indexer-copilot-demo-010' created successfully.
+2025-02-18 07:03:52 PM - Log Analytics Workspace 'log-copilot-demo-010' created successfully. [11]
+2025-02-18 07:04:02 PM - Application Insights component 'appi-copilot-demo-010' created successfully. [12]
+2025-02-18 07:04:03 PM - File 'container.registry.yaml' created and populated.
+2025-02-18 07:06:28 PM - Container Registry 'crcopilotdemo010' created successfully. [13]
+2025-02-18 07:06:40 PM - API Management Service 'apim-copilot-demo-010' created successfully. [14]
+2025-02-18 07:06:43 PM - API 'KeyVaultProxy' created successfully.
+2025-02-18 07:06:46 PM - Operation 'GetOpenAIServiceApiKey' created successfully.
+2025-02-18 07:07:05 PM - Operation 'GetSearchServiceApiKey' created successfully.
+2025-02-18 07:07:07 PM - Operation 'GetStorageServiceApiKey' created successfully.
+2025-02-18 07:07:07 PM - API 'KeyVaultProxy' and its operations created successfully.
+2025-02-18 07:07:10 PM - API 'KeyVaultProxy' created successfully.
+2025-02-18 07:07:15 PM - Operation 'GetOpenAIServiceApiKey' created successfully.
+2025-02-18 07:07:16 PM - Operation 'GetSearchServiceApiKey' created successfully.
+2025-02-18 07:07:17 PM - Operation 'GetStorageServiceApiKey' created successfully.
+2025-02-18 07:07:17 PM - API 'KeyVaultProxy' and its operations created successfully.
+2025-02-18 07:52:22 PM - Web app 'app-copilot-demo-010' created successfully. [15]
+2025-02-18 07:52:25 PM - Skipping deployment for Web app 'app-copilot-demo-010'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2025-02-18 07:52:58 PM - Function app 'func-copilot-demo-010' created successfully. [16]
+2025-02-18 07:53:01 PM - Skipping deployment for Function app 'func-copilot-demo-010'. If you would like to deploy and overwrite the existing app open the parameters.json file and change the 'deployZipResources' parameter to 'true' and rerun this script.
+2025-02-18 07:53:58 PM - Key Vault 'kv-copilot-demo-010' created successfully.
+2025-02-18 07:53:58 PM - Key Vault 'kv-copilot-demo-010' created with Vault Access Policies. [17]
+2025-02-18 07:54:00 PM - Key Vault 'kv-copilot-demo-010' policy permissions set for user: ''.
+2025-02-18 07:54:03 PM - Key Vault 'kv-copilot-demo-010' policy permissions set for user: 'id-copilot-demo-010'.
+2025-02-18 07:54:10 PM - Assigned role 'Key Vault Administrator' to managed identity: 'id-copilot-demo-010'.
+2025-02-18 07:54:14 PM - Assigned role 'Key Vault Secrets User' to managed identity: 'id-copilot-demo-010'.
+2025-02-18 07:54:17 PM - Assigned role 'Key Vault Certificate User' to managed identity: 'id-copilot-demo-010'.
+2025-02-18 07:54:21 PM - Assigned role 'Key Vault Crypto User' to managed identity: 'id-copilot-demo-010'.
+2025-02-18 07:55:07 PM - AI Hub: 'hub-ai-copilot-demo-010' created successfully. [18]
+2025-02-18 07:55:08 PM - Secret: 'StorageServiceApiKey' stored in Key Vault: 'kv-copilot-demo-010'.
+2025-02-18 07:55:09 PM - Secret: 'SearchServiceApiKey' stored in Key Vault: 'kv-copilot-demo-010'.
+2025-02-18 07:55:11 PM - Secret: 'OpenAIServiceApiKey' stored in Key Vault: 'kv-copilot-demo-010'.
+2025-02-18 07:55:12 PM - File 'ml.workspace.yaml' created and populated.
+2025-02-18 07:55:46 PM - AI Project 'project-ai-copilot-demo-010' in 'hub-ai-copilot-demo-010' created successfully. [18]
+2025-02-18 07:56:02 PM - File 'ai.connection.yaml' created and populated.
+2025-02-18 07:56:12 PM - Azure AIService 'ai-service-copilot-demo-010' connection for 'hub-ai-copilot-demo-010' created successfully.
+2025-02-18 07:56:13 PM - File 'openai.connection.yaml' created and populated.
+2025-02-18 07:56:19 PM - Azure OpenAIService 'openai-service-copilot-demo-010' connection for 'hub-ai-copilot-demo-010' created successfully.
+2025-02-18 07:56:19 PM - File 'storage.connection.yaml' created and populated.
+2025-02-18 07:56:24 PM - Azure StorageAccount 'stcopilotdemo010' connection for 'hub-ai-copilot-demo-010' created successfully.
+2025-02-18 07:56:24 PM - File 'search.connection.yaml' created and populated.
+2025-02-18 07:56:29 PM - Azure SearchService 'srch-copilot-demo-010' connection for 'hub-ai-copilot-demo-010' created successfully.
+2025-02-18 07:56:31 PM - Model 'gpt-4o' for 'ai-service-copilot-demo-010' deployed successfully.
+2025-02-18 07:56:38 PM - Failed to deploy Model 'text-embedding' for 'ai-service-copilot-demo-010'. 
+            Error: (InsufficientQuota) This operation require 100 new capacity in quota Tokens Per Minute (thousands) - text-embedding-3-large, which is bigger than the current available capacity 50. The current quota usage is 300 and the quota limit is 350 for quota Tokens Per Minute (thousands) - text-embedding-3-large. 
+            Code: InsufficientQuota 
+            Message: This operation require 100 new capacity in quota Tokens Per Minute (thousands) - text-embedding-3-large, which is bigger than the current available capacity 50. The current quota usage is 300 and the quota limit is 350 for quota Tokens Per Minute (thousands) - text-embedding-3-large.
+2025-02-18 07:56:40 PM - Failed to deploy Model 'dall-e-3' for 'ai-service-copilot-demo-010'. 
             Error: (InsufficientQuota) This operation require 2 new capacity in quota Capacity Unit - Dalle, which is bigger than the current available capacity 0. The current quota usage is 2 and the quota limit is 2 for quota Capacity Unit - Dalle. 
             Code: InsufficientQuota 
             Message: This operation require 2 new capacity in quota Capacity Unit - Dalle, which is bigger than the current available capacity 0. The current quota usage is 2 and the quota limit is 2 for quota Capacity Unit - Dalle.
-2025-02-18 02:14:17 AM - The file Config.json has been updated successfully.
-2025-02-18 02:14:29 AM - Web app 'app-copilot-demo-007' already exists.
-2025-02-18 02:14:35 AM - App 'app-copilot-demo-007' is already registered with App ID: 0fe52d7b-b008-41c5-8e7e-53ac5098a495 and Object ID: 22d29916-8d56-4180-8add-bacc6ebd1351.
-2025-02-18 02:14:35 AM - The parameters.json file has been updated successfully.
-2025-02-18 02:14:41 AM - Api permissions set for app 'app-copilot-demo-007'.
-2025-02-18 02:14:53 AM - The property 'Sign-in audience' for 'app-copilot-demo-007' app registration updated successfully.
-2025-02-18 02:14:56 AM - The property 'oauth2PermissionScopes' for 'app-copilot-demo-007' app registration updated successfully.
-2025-02-18 02:15:01 AM - The property 'required-resource-accesses' for 'app-copilot-demo-007' app registration updated successfully.
-2025-02-18 02:15:01 AM - Scope for app 'app-copilot-demo-007' added successfully.
-2025-02-18 02:15:06 AM - Key Vault access policies for app 'app-copilot-demo-007' set successfully..
-2025-02-18 02:15:13 AM - Search Service Data Source 'srch-datasource-blob-copilot-demo-007' already exists.
-2025-02-18 02:15:13 AM - Search Service Data Source 'srch-datasource-sharepoint-copilot-demo-007' already exists.
-2025-02-18 02:15:26 AM - Function app 'func-copilot-demo-007' already exists.
-*** SCRIPT END TIME: 2025-02-18 02:15:26 AM ***
-2025-02-18 02:15:26 AM - *** TOTAL SCRIPT EXECUTION TIME: 00 HRS : 51 MIN : 46 SEC : 863 MS ***
+2025-02-18 07:56:53 PM - The file Config.json has been updated successfully.
+2025-02-18 07:56:56 PM - Web app 'app-copilot-demo-010' already exists.
+2025-02-18 07:57:29 PM - Web app 'app-copilot-demo-010' deployed successfully.
+2025-02-18 07:57:37 PM - App 'app-copilot-demo-010' registered successfully with App ID: 83f759c7-4d1c-4cbd-9305-53040153d939 and Object ID: 22c5e05b-2073-471b-960e-33c4c1615e10.
+2025-02-18 07:57:37 PM - The parameters.json file has been updated successfully.
+2025-02-18 07:57:40 PM - Api permissions set for app 'app-copilot-demo-010'.
+2025-02-18 07:57:44 PM - The property 'Sign-in audience' for 'app-copilot-demo-010' app registration updated successfully.
+2025-02-18 07:57:45 PM - The property 'oauth2PermissionScopes' for 'app-copilot-demo-010' app registration updated successfully.
+2025-02-18 07:57:48 PM - The property 'required-resource-accesses' for 'app-copilot-demo-010' app registration updated successfully.
+2025-02-18 07:57:48 PM - Scope for app 'app-copilot-demo-010' added successfully.
+2025-02-18 07:57:50 PM - Key Vault access policies for app 'app-copilot-demo-010' set successfully..
+2025-02-18 07:57:52 PM - Search Service Data Source 'srch-datasource-blob-copilot-demo-010' already exists.
+2025-02-18 07:57:56 PM - DataSource 'srch-datasource-sharepoint-copilot-demo-010' created successfully.
+2025-02-18 07:58:00 PM - Function app 'func-copilot-demo-010' already exists.
+2025-02-18 07:58:45 PM - Function app 'func-copilot-demo-010' deployed successfully.
+*** SCRIPT END TIME: 2025-02-18 07:58:45 PM ***
+2025-02-18 07:58:45 PM - *** TOTAL SCRIPT EXECUTION TIME: 01 HRS : 01 MIN : 27 SEC : 207 MS ***
 
-*** LOG SEQUENCE: 2 ***
-*** SCRIPT START TIME: 2025-02-18 03:15:03 PM ***
-2025-02-18 03:15:13 PM - The file Config.json has been updated successfully.
-2025-02-18 03:15:35 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-18 03:16:21 PM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 3 ***
-*** SCRIPT START TIME: 2025-02-18 06:31:52 PM ***
-2025-02-18 06:32:03 PM - The file Config.json has been updated successfully.
-2025-02-18 06:32:21 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-18 06:33:09 PM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 4 ***
-*** SCRIPT START TIME: 2025-02-18 06:33:59 PM ***
-2025-02-18 06:34:09 PM - The file Config.json has been updated successfully.
-2025-02-18 06:34:24 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-18 06:35:15 PM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 5 ***
-*** SCRIPT START TIME: 2025-02-18 06:44:07 PM ***
-2025-02-18 06:44:17 PM - The file Config.json has been updated successfully.
-2025-02-18 06:44:34 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-18 06:45:24 PM - Function app 'func-copilot-demo-007' deployed successfully.

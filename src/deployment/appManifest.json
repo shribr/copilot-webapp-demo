@@ -1,119 +1,80 @@
 {
-  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
+  "id": "22c5e05b-2073-471b-960e-33c4c1615e10",
+  "acceptMappedClaims": null,
+  "accessTokenAcceptedVersion": 2,
   "addIns": [],
-  "api": {
-    "acceptMappedClaims": null,
-    "knownClientApplications": [],
-    "oauth2PermissionScopes": [
-      {
-        "adminConsentDescription": "Allow the application to read data from the API.",
-        "adminConsentDisplayName": "Read data from API",
-        "id": "e4bc803f-96a7-465c-aed1-795d778b8b68",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-        "userConsentDisplayName": "Read data from API",
-        "value": "read_data"
-      },
-      {
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "adminConsentDisplayName": "Access API as user",
-        "id": "93ebbea6-d139-49df-ad02-3df4e99ad77f",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
-        "userConsentDisplayName": "Access API as user",
-        "value": "access_as_user"
-      },
-      {
-        "adminConsentDisplayName": "Access API as user",
-        "userConsentDisplayName": "Access API as user",
-        "isEnabled": true,
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
-        "value": "access_as_user",
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "type": "User",
-        "id": "232df311-9ae5-4218-a3dd-8306be6283e8"
-      },
-      {
-        "adminConsentDisplayName": "Read data from API",
-        "userConsentDisplayName": "Read data from API",
-        "isEnabled": true,
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-        "value": "read_data",
-        "adminConsentDescription": "Allow the application to read data from the API.",
-        "type": "User",
-        "id": "81c77c45-21e8-47d8-a8bf-f7ce3b937123"
-      }
-    ],
-    "preAuthorizedApplications": [
-      {
-        "appId": "0fe52d7b-b008-41c5-8e7e-53ac5098a495",
-        "delegatedPermissionIds": [
-          "e4bc803f-96a7-465c-aed1-795d778b8b68",
-          "93ebbea6-d139-49df-ad02-3df4e99ad77f"
-        ]
-      }
-    ],
-    "requestedAccessTokenVersion": 2
-  },
-  "appId": "0fe52d7b-b008-41c5-8e7e-53ac5098a495",
+  "allowPublicClient": null,
+  "appId": "83f759c7-4d1c-4cbd-9305-53040153d939",
   "appRoles": [],
-  "applicationTemplateId": null,
-  "certification": null,
-  "createdDateTime": "2025-02-05T03:11:48Z",
-  "defaultRedirectUri": null,
-  "deletedDateTime": null,
+  "oauth2AllowUrlPathMatching": false,
+  "createdDateTime": "2025-02-19T00:57:31Z",
   "description": null,
+  "certification": null,
   "disabledByMicrosoftStatus": null,
-  "displayName": "app-copilot-demo-007",
   "groupMembershipClaims": null,
-  "id": "22d29916-8d56-4180-8add-bacc6ebd1351",
-  "identifierUris": [
-    "api://0fe52d7b-b008-41c5-8e7e-53ac5098a495"
-  ],
-  "info": {
-    "logoUrl": null,
-    "marketingUrl": null,
-    "privacyStatementUrl": null,
-    "supportUrl": null,
-    "termsOfServiceUrl": null
+  "identifierUris": ["api://83f759c7-4d1c-4cbd-9305-53040153d939"],
+  "informationalUrls": {
+    "termsOfService": null,
+    "support": null,
+    "privacy": null,
+    "marketing": null
   },
-  "isDeviceOnlyAuthSupported": null,
-  "isFallbackPublicClient": null,
   "keyCredentials": [],
-  "nativeAuthenticationApisEnabled": null,
+  "knownClientApplications": [],
+  "logoUrl": null,
+  "logoutUrl": null,
+  "name": "app-copilot-demo-010",
   "notes": null,
+  "oauth2AllowIdTokenImplicitFlow": false,
+  "oauth2AllowImplicitFlow": false,
+  "oauth2Permissions": [
+    {
+      "adminConsentDescription": "Allow the application to read data from the API.",
+      "adminConsentDisplayName": "Read data from API",
+      "id": "557293de-e1d2-4ec8-a88a-18aab9a1d6b0",
+      "isEnabled": true,
+      "lang": null,
+      "origin": "Application",
+      "type": "User",
+      "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+      "userConsentDisplayName": "Read data from API",
+      "value": "read_data"
+    },
+    {
+      "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
+      "adminConsentDisplayName": "Access API as user",
+      "id": "ca7be5d6-bb11-4f5e-a380-3883a04560e6",
+      "isEnabled": true,
+      "lang": null,
+      "origin": "Application",
+      "type": "User",
+      "userConsentDescription": "Allow the application to access the API on your behalf.",
+      "userConsentDisplayName": "Access API as user",
+      "value": "access_as_user"
+    }
+  ],
+  "oauth2RequirePostResponse": false,
   "optionalClaims": null,
+  "orgRestrictions": [],
   "parentalControlSettings": {
     "countriesBlockedForMinors": [],
     "legalAgeGroupRule": "Allow"
   },
   "passwordCredentials": [],
-  "publicClient": {
-    "redirectUris": []
-  },
+  "preAuthorizedApplications": [],
   "publisherDomain": "FedAIRS.onmicrosoft.com",
-  "requestSignatureVerification": null,
+  "replyUrlsWithType": [
+    {
+      "url": "https://app-copilot-demo-010.azurewebsites.net",
+      "type": "Spa"
+    }
+  ],
   "requiredResourceAccess": [
     {
-      "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
       "resourceAccess": [
         {
-          "id": "f53da476-18e3-4152-8e01-aec403e6edc0",
-          "type": "Scope"
-        }
-      ]
-    },
-    {
-      "resourceAppId": "00000007-0000-0000-c000-000000000000",
-      "resourceAccess": [
-        {
-          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-          "type": "Scope"
-        },
-        {
-          "id": "df85f4d6-205c-4ac5-a5ea-6bf408dba283",
+          "id": "10465720-29dd-4523-a11a-6a75c743c9d9",
           "type": "Scope"
         },
         {
@@ -127,35 +88,26 @@
         {
           "id": "f89c84ef-20d0-4b54-87e9-02e856d66d53",
           "type": "Scope"
+        },
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        }
+      ]
+    },
+    {
+      "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
+      "resourceAccess": [
+        {
+          "id": "f53da476-18e3-4152-8e01-aec403e6edc0",
+          "type": "Scope"
         }
       ]
     }
   ],
   "samlMetadataUrl": null,
-  "serviceManagementReference": null,
-  "servicePrincipalLockConfiguration": null,
+  "signInUrl": null,
   "signInAudience": "AzureADandPersonalMicrosoftAccount",
-  "spa": {
-    "redirectUris": {
-      "uri": "https://app-copilot-demo-007.azurewebsites.net"
-    }
-  },
   "tags": [],
-  "tokenEncryptionKeyId": null,
-  "uniqueName": null,
-  "verifiedPublisher": {
-    "addedDateTime": null,
-    "displayName": null,
-    "verifiedPublisherId": null
-  },
-  "web": {
-    "homePageUrl": null,
-    "implicitGrantSettings": {
-      "enableAccessTokenIssuance": true,
-      "enableIdTokenIssuance": true
-    },
-    "logoutUrl": null,
-    "redirectUriSettings": [],
-    "redirectUris": []
-  }
+  "tokenEncryptionKeyId": null
 }

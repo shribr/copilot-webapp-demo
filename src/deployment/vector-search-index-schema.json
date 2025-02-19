@@ -1,5 +1,5 @@
 {
-  "name": "vector-srch-index-copilot-demo-007",
+  "name": "vector-srch-index-copilot-demo-010",
   "fields": [
     {
       "name": "content",
@@ -99,7 +99,7 @@
       "facetable": false,
       "synonymMaps": [],
       "dimensions": 1024,
-      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-007-text-profile"
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-010-text-profile"
     },
     {
       "name": "image_vector",
@@ -113,7 +113,7 @@
       "facetable": false,
       "synonymMaps": [],
       "dimensions": 1024,
-      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-007-image-profile"
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-010-image-profile"
     }
   ],
   "scoringProfiles": [],
@@ -135,7 +135,7 @@
   "semantic": {
     "configurations": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-007-semantic-configuration",
+        "name": "vector-profile-srch-index-copilot-demo-010-semantic-configuration",
         "prioritizedFields": {
           "titleField": {
             "fieldName": "title"
@@ -156,7 +156,7 @@
   "vectorSearch": {
     "algorithms": [
       {
-        "name": "vector-config-srch-index-copilot-demo-007-algorithm",
+        "name": "vector-config-srch-index-copilot-demo-010-algorithm",
         "kind": "hnsw",
         "hnswParameters": {
           "m": 4,
@@ -168,19 +168,19 @@
     ],
     "profiles": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-007-text-profile",
-        "algorithm": "vector-config-srch-index-copilot-demo-007-algorithm",
-        "vectorizer": "vector-profile-srch-index-copilot-demo-007-text-vectorizer"
+        "name": "vector-profile-srch-index-copilot-demo-010-text-profile",
+        "algorithm": "vector-config-srch-index-copilot-demo-010-algorithm",
+        "vectorizer": "vector-profile-srch-index-copilot-demo-010-text-vectorizer"
       },
       {
-        "name": "vector-profile-srch-index-copilot-demo-007-image-profile",
-        "algorithm": "vector-config-srch-index-copilot-demo-007-algorithm",
-        "vectorizer": "vector-profile-srch-index-copilot-demo-007-image-vectorizer"
+        "name": "vector-profile-srch-index-copilot-demo-010-image-profile",
+        "algorithm": "vector-config-srch-index-copilot-demo-010-algorithm",
+        "vectorizer": "vector-profile-srch-index-copilot-demo-010-image-vectorizer"
       }
     ],
     "vectorizers": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-007-text-vectorizer",
+        "name": "vector-profile-srch-index-copilot-demo-010-text-vectorizer",
         "kind": "aiServicesVision",
         "aiServicesVisionParameters": {
           "modelVersion": "2023-04-15",
@@ -188,7 +188,7 @@
         }
       },
       {
-        "name": "vector-profile-srch-index-copilot-demo-007-image-vectorizer",
+        "name": "vector-profile-srch-index-copilot-demo-010-image-vectorizer",
         "kind": "aiServicesVision",
         "aiServicesVisionParameters": {
           "modelVersion": "2023-04-15",
