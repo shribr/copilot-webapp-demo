@@ -735,7 +735,11 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                 const citations = context.citations;
 
-                // NOTE: At the time of this writing if model version 2024-08-06 is not used, the title value from the citations object is not returned in the response
+                // NOTE #1: At the time of this writing if model version 2024-08-06 is not used, the title value from the citations object is not returned in the response.
+
+                // NOTE #2: If additional metadata like filepath, title or url are null, you may need to reset and rerun the indexer(s). 
+                // This may be the ACTUAL reason for the null values and not the model version as stated above. Need further investigation.
+
                 if (citations) {
 
                     console.log(citations);
@@ -1620,7 +1624,7 @@ async function getSearchIndexerStatus(searchIndexers) {
             });
 
             const data = await response.json();
-            console.log('Indexer status:', data.lastResult.status);
+            console.log(`Indexer: ${searchIndexerName} status:`, data.lastResult.status);
 
             searchIndexerStatusArray.push({ "name": searchIndexerName, "status": data.lastResult.status });
         } catch (error) {
@@ -2216,7 +2220,7 @@ async function runSearchIndexer(searchIndexers) {
         const indexerStatus = indexer ? indexer.status : 'unknown';
 
         // Skip the indexer if it is already running
-        if (indexerStatus === "running") {
+        if (indexerStatus === "inProgress" || indexerStatus === "running") {
             console.log(`Indexer ${searchIndexerName} is already running. Skipping...`);
             continue;
         }
@@ -2240,7 +2244,7 @@ async function runSearchIndexer(searchIndexers) {
             });
             //No need to return anything from the search indexer
             //const data = await response.json();
-            console.log('Indexer ran successfully:', searchIndexerName);
+            console.log('Operation "run search indexer" is now executing for', searchIndexerName);
         } catch (error) {
             console.error(`Error running search indexer`, error.message);
         }
