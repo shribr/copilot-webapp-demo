@@ -4,7 +4,7 @@
   "currentFullResourceBaseName": "copilot-demo-009",
   "deploymentType": "Existing",
   "fullResourceBaseName": "copilot-demo-009",
-  "previousFullResourceBaseName": "copilot-demo-009",
+  "previousFullResourceBaseName": "copilot-demo-008",
   "previousResourceBaseName": "copilot-demo",
   "resourceSuffix": 1,
   "resourceSuffixCounter": "009",
@@ -101,11 +101,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -135,7 +131,7 @@
       ]
     },
     {
-      "resourceAppId": "00000009-0000-0000-c000-000000000000",
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
       "resourceAccess": [
         {
           "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",

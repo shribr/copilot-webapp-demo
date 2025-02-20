@@ -1427,9 +1427,6 @@ function New-ApiManagementApi {
 
     Write-Host "Executing New-ApiManagementApi ('$apiManagementServiceName') function..." -ForegroundColor Magenta
 
-    # Check if the API already exists
-    $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
-
     $global:existingResources = az resource list --resource-group $resourceGroupName --query "[].name" --output tsv | Sort-Object
 
     $apiManagementServiceExists = $global:existingResources -contains $apiManagementServiceName
@@ -1444,6 +1441,9 @@ function New-ApiManagementApi {
         }
     }
 
+    # Check if the API already exists
+    $apiExists = az apim api show --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+   
     if (-not $apiExists) {
         try {
             # Create the API
@@ -1810,6 +1810,7 @@ function New-AppRegistration {
 
             $app.requiredResourceAccess = $appRegRequiredResourceAccess
             $app.spa.redirectUris = $identifierUrisArray
+
             #$app.replyUrlsWithType = @{
             #   "url"  = $appServiceUrl
             #  "type" = "Spa"
@@ -1821,7 +1822,7 @@ function New-AppRegistration {
             #$appId = "5073ae0e-7f06-45c8-b99d-c6137c0b544a"
             
             $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-            az ad app update --id $appId --set "appManifest.json"
+            #az ad app update --id $appId --set "appManifest.json"
             
             try {
                 az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
@@ -1835,7 +1836,13 @@ function New-AppRegistration {
             }
 
             try {
-                az ad app update --id $appId --set api.oauth2PermissionScopes=$($app.api.oauth2PermissionScopes | ConvertTo-Json -Depth 10)
+                
+                $scopesJsonArray = $app.api.oauth2PermissionScopes | ForEach-Object { $_ | ConvertTo-Json -Depth 10 }
+                $oauth2PermissionScopesJson = '{"oauth2PermissionScopes": [' + ($scopesJsonArray -join ", ") + "] }"
+
+                $oauth2PermissionScopesJson | Out-File -FilePath "oauth2PermissionScopes.json" -Encoding utf8
+
+                az ad app update --id $appId --set api=@oauth2PermissionScopes.json
 
                 Write-Host "The property 'oauth2PermissionScopes' for '$appServiceName' app registration updated successfully." -ForegroundColor Green
                 Write-Log -message "The property 'oauth2PermissionScopes' for '$appServiceName' app registration updated successfully." -logFilePath $global:LogFilePath
@@ -1860,8 +1867,10 @@ function New-AppRegistration {
             #az ad app update --id $appId --set displayName=app-copilot-demo-002
             #az ad app update --id $appId --set notes=test
 
-            # $body = Get-Content -Raw -Path "appManifest.json" 
-            # az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/5073ae0e-7f06-45c8-b99d-c6137c0b544a" --body $body
+            $appUri = "https://graph.microsoft.com/v1.0/$appId"
+
+            $body = Get-Content -Raw -Path "appManifest.json" 
+            az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/$appId" --body $body
 
             Write-Host "Scope for app '$appServiceName' added successfully."
             Write-Log -message "Scope for app '$appServiceName' added successfully." -logFilePath $global:LogFilePath

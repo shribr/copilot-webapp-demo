@@ -7,23 +7,23 @@
     "oauth2PermissionScopes": [
       {
         "type": "User",
-        "id": "b2326786-ba12-4ca4-ab1e-6645c124527f",
+        "value": "access_as_user",
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "isEnabled": true,
         "userConsentDisplayName": "Access API as user",
         "adminConsentDisplayName": "Access API as user",
         "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "isEnabled": true,
-        "value": "access_as_user",
-        "userConsentDescription": "Allow the application to access the API on your behalf."
+        "id": "2fd57579-aacf-4883-a974-d5f5ca740da5"
       },
       {
         "type": "User",
-        "id": "8368684e-9541-4939-b270-644f1c4caa6c",
+        "value": "read_data",
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "isEnabled": true,
         "userConsentDisplayName": "Read data from API",
         "adminConsentDisplayName": "Read data from API",
         "adminConsentDescription": "Allow the application to read data from the API.",
-        "isEnabled": true,
-        "value": "read_data",
-        "userConsentDescription": "Allow the application to read data from the API on your behalf."
+        "id": "7a9f01d1-40e6-434c-b09c-b8eb8d089023"
       }
     ],
     "preAuthorizedApplications": [],
@@ -76,7 +76,7 @@
       ]
     },
     {
-      "resourceAppId": "00000009-0000-0000-c000-000000000000",
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
       "resourceAccess": [
         {
           "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",

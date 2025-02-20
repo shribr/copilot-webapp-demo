@@ -1,8 +1,8 @@
 {
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "cognitiveServices": {
-    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
-    "key": "1654b4a3e8a84a6daff921f3434c9682"
+    "key": "d49e0e5590b04e1fae7ce011e9b67a01",
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
   },
   "description": "Generic Skillset",
   "indexProjections": {

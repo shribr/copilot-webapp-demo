@@ -1,0 +1,19 @@
+{"oauth2PermissionScopes": [{
+  "adminConsentDescription": "Allow the application to read data from the API.",
+  "adminConsentDisplayName": "Read data from API",
+  "id": "5c5643dd-3e81-4452-89c6-ea7d9a68c8ef",
+  "isEnabled": true,
+  "type": "User",
+  "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+  "userConsentDisplayName": "Read data from API",
+  "value": "read_data"
+}, {
+  "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
+  "adminConsentDisplayName": "Access API as user",
+  "id": "ef207b90-f72f-4f77-920c-eb102e0dbe14",
+  "isEnabled": true,
+  "type": "User",
+  "userConsentDescription": "Allow the application to access the API on your behalf.",
+  "userConsentDisplayName": "Access API as user",
+  "value": "access_as_user"
+}] }
