@@ -6,42 +6,64 @@
     "knownClientApplications": [],
     "oauth2PermissionScopes": [
       {
-        "type": "User",
-        "value": "access_as_user",
-        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "adminConsentDescription": "Allow the application to read data from the API.",
+        "adminConsentDisplayName": "Read data from API",
+        "id": "242e8d29-4a20-4d96-9369-9bb59b7b26ad",
         "isEnabled": true,
-        "userConsentDisplayName": "Access API as user",
-        "adminConsentDisplayName": "Access API as user",
-        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-        "id": "2fd57579-aacf-4883-a974-d5f5ca740da5"
+        "type": "User",
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "userConsentDisplayName": "Read data from API",
+        "value": "read_data"
       },
       {
-        "type": "User",
-        "value": "read_data",
-        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
+        "adminConsentDisplayName": "Access API as user",
+        "id": "d4d93556-98ca-4b51-8712-02854daf8197",
         "isEnabled": true,
-        "userConsentDisplayName": "Read data from API",
-        "adminConsentDisplayName": "Read data from API",
+        "type": "User",
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "userConsentDisplayName": "Access API as user",
+        "value": "access_as_user"
+      },
+      {
+        "id": "3b637a0d-18cf-42fe-9d08-e1703b65ee39",
+        "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
+        "userConsentDisplayName": "Access API as user",
+        "isEnabled": true,
+        "userConsentDescription": "Allow the application to access the API on your behalf.",
+        "adminConsentDisplayName": "Access API as user",
+        "type": "User",
+        "value": "access_as_user"
+      },
+      {
+        "id": "156dcba3-a425-4537-b017-2194373172a0",
         "adminConsentDescription": "Allow the application to read data from the API.",
-        "id": "7a9f01d1-40e6-434c-b09c-b8eb8d089023"
+        "userConsentDisplayName": "Read data from API",
+        "isEnabled": true,
+        "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+        "adminConsentDisplayName": "Read data from API",
+        "type": "User",
+        "value": "read_data"
       }
     ],
     "preAuthorizedApplications": [],
     "requestedAccessTokenVersion": 2
   },
-  "appId": "ca35fca5-035b-4cf2-aeae-9af805cca31a",
+  "appId": "6782b97e-07a2-48fa-9f7e-5fa0c237fd52",
   "appRoles": [],
   "applicationTemplateId": null,
   "certification": null,
-  "createdDateTime": "2025-02-19T23:30:02Z",
+  "createdDateTime": "2025-02-20T06:14:31Z",
   "defaultRedirectUri": null,
   "deletedDateTime": null,
   "description": null,
   "disabledByMicrosoftStatus": null,
-  "displayName": "app-copilot-demo-009",
+  "displayName": "app-copilot-demo-008",
   "groupMembershipClaims": null,
-  "id": "68b066c5-8231-42be-ad5f-865fd953942f",
-  "identifierUris": [],
+  "id": "f1b56dc6-cf24-46fb-a56d-b7243f421649",
+  "identifierUris": [
+    "api://6782b97e-07a2-48fa-9f7e-5fa0c237fd52"
+  ],
   "info": {
     "logoUrl": null,
     "marketingUrl": null,
@@ -107,7 +129,7 @@
   "signInAudience": "AzureADandPersonalMicrosoftAccount",
   "spa": {
     "redirectUris": {
-      "uri": "https://app-copilot-demo-009.azurewebsites.net"
+      "uri": "https://app-copilot-demo-008.azurewebsites.net"
     }
   },
   "tags": [],

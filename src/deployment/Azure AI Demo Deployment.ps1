@@ -1056,6 +1056,7 @@ function Initialize-Parameters {
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
     $global:appInsightsService = $parametersObject.appInsightsService
+    $global:appRegistrationClientId = $parametersObject.appRegistrationClientId
     $global:appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
     $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
     $global:appServicePlan = $parametersObject.AppServicePlan
@@ -1142,7 +1143,7 @@ function Initialize-Parameters {
         apiManagementService         = $global:apiManagementService
         appInsightsService           = $global:appInsightsService
         appServices                  = $global:appServices
-        appRegistrationClientId      = $parametersObject.appRegistrationClientId
+        appRegistrationClientId      = $global:appRegistrationClientId
         appRegRequiredResourceAccess = $global:appRegRequiredResourceAccess
         appDeploymentOnly            = $global:appDeploymentOnly
         appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
@@ -1380,7 +1381,7 @@ function New-AIProject {
         $aiHubResoureceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.MachineLearningServices/workspaces/$aiHubName"
 
         <#
- # {        $aiProjectFile = Update-AIProjectFile `
+  {        $aiProjectFile = Update-AIProjectFile `
             -aiProjectName $aiProjectName `
             -resourceGroupName $resourceGroup.Name `
             -appInsightsName $appInsightsResourceId `
@@ -1788,16 +1789,27 @@ function New-AppRegistration {
             # Retrieve the current application manifest
             $app = az ad app show --id $appId | ConvertFrom-Json
     
+            $appRegistrationClientId = $global:appRegistrationClientId
+
             # Define the identifierUrisArray
             $appServiceUrl = $global:appServices | Where-Object { $_.Name -eq $appServiceName } | Select-Object -ExpandProperty Url
 
             $identifierUrisArray = @{"uri" = $appServiceUrl }
-            #$identifierUris = "https://app-$global:resourceBaseName.azurewebsites.net api://$global:appRegistrationClientId"
-            #$identifierUris = "api://$global:appRegistrationClientId"
+            #$identifierUris = "https://app-$global:resourceBaseName.azurewebsites.net api://$appRegistrationClientId"
+            $identifierUris = "api://$appRegistrationClientId"
 
             # Update the identifierUris and oauth2PermissionScopes properties
             #$app.identifierUris = $identifierUris
             $app.api.oauth2PermissionScopes += $apiScopes
+
+            #az ad app update --id $appId--set preAuthorizedApplications="[{\"appId\": \"$appRegistrationClientId\", \"delegatedPermissionIds\": [\"242e8d29-4a20-4d96-9369-9bb59b7b26ad\", \"d4d93556-98ca-4b51-8712-02854daf8197\"]}]"
+
+            # 2025-02-20 ADS: The code below is not working as expected. I need to figure out how to add the permissions from the MS Graph API instead of the AD Graph API.
+            # az rest  `
+            #     --method PATCH `
+            #     --uri "https://graph.microsoft.com/v1.0/applications/$appId" `
+            #     --headers 'Content-Type=application/json' `
+            #     --body "{api:{preAuthorizedApplications:[{'appId':'$appRegistrationClientId','delegatedPermissionIds':['242e8d29-4a20-4d96-9369-9bb59b7b26ad', 'd4d93556-98ca-4b51-8712-02854daf8197'] }] }}"
 
             # The issue with the below code is that the entries made for the API access permissions are using AD Graph and not MS Graph. The AD graph does not have "name" or "description" properties.
             # So even though the original code I had set in the parameters file was correct, the code below is not working as expected so I removed those two properties from the parameters.json file.
@@ -1809,20 +1821,23 @@ function New-AppRegistration {
             # https://learn.microsoft.com/en-us/entra/identity-platform/reference-microsoft-graph-app-manifest
 
             $app.requiredResourceAccess = $appRegRequiredResourceAccess
-            $app.spa.redirectUris = $identifierUrisArray
+            # $app.spa.redirectUris = $identifierUrisArray
 
-            #$app.replyUrlsWithType = @{
-            #   "url"  = $appServiceUrl
-            #  "type" = "Spa"
-            #}
+            # $app.replyUrlsWithType = @{
+            #     "url"  = $appServiceUrl
+            #     "type" = "Spa"
+            # }
             # Convert the updated manifest back to JSON
-            $appJson = $app | ConvertTo-Json -Depth 10
-    
+            #$appJson = $app | ConvertTo-Json -Depth 10
+            #$appSpaJson = $app.spa | ConvertTo-Json -Depth 10
+
+            #$appSpaJson = '"spa": { "redirectUris": [' + $appServiceUrl + ']}'
+            
             # Update the application with the modified manifest
             #$appId = "5073ae0e-7f06-45c8-b99d-c6137c0b544a"
             
-            $appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
-            #az ad app update --id $appId --set "appManifest.json"
+            #$appJson | Out-File -FilePath "appManifest.json" -Encoding utf8
+            #az ad app update --id $appId --set spa=$appSpaJson
             
             try {
                 az ad app update --id $appId --sign-in-audience AzureADandPersonalMicrosoftAccount
@@ -1862,7 +1877,31 @@ function New-AppRegistration {
                 Write-Error "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
                 Write-Log -message "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
+
+            try {
+                az ad app update --id $appId --required-resource-accesses $appRegRequiredResourceAccessJson
+
+                Write-Host "The property 'required-resource-accesses' for '$appServiceName' app registration updated successfully." -ForegroundColor Green
+                Write-Log -message "The property 'required-resource-accesses' for '$appServiceName' app registration updated successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
             
+            try {
+                $identifierUris = "api://$appRegistrationClientId"
+
+                az ad app update --id $appId --identifier-uris $identifierUris
+
+                Write-Host "The property 'identifier-uris' for '$appServiceName' app registration updated successfully." -ForegroundColor Green
+                Write-Log -message "The property 'identifier-uris' for '$appServiceName' app registration updated successfully." -logFilePath $global:LogFilePath
+            }
+            catch {
+                Write-Error "Failed to update 'identifier-uris' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+                Write-Log -message "Failed to update 'identifier-uris' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            }
+
             #az ad app update --id $appId --identifier-uris $identifierUris
             #az ad app update --id $appId --set displayName=app-copilot-demo-002
             #az ad app update --id $appId --set notes=test
@@ -4366,7 +4405,7 @@ function Start-Deployment {
         }
     }
     
-    Deploy-OpenAIModels -aiProject $global:aiProject -aiServiceName $global:aiService.Name -aiModels $global:aiModels -resourceGroupName $resourceGroupName -existingResources $existingResources
+    Deploy-OpenAIModels -aiProject $global:aiProject -aiServiceName $global:openAIService.Name -aiModels $global:aiModels -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # Remove the Machine Learning Workspace
     #Remove-MachineLearningWorkspace -resourceGroupName $resourceGroup.Name -aiProjectName $aiProjectName
