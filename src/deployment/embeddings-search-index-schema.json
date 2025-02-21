@@ -39,6 +39,18 @@
       "synonymMaps": []
     },
     {
+      "name": "title",
+      "type": "Edm.String",
+      "key": false,
+      "retrievable": true,
+      "stored": true,
+      "searchable": true,
+      "filterable": true,
+      "sortable": false,
+      "facetable": false,
+      "synonymMaps": []
+    },
+    {
       "name": "sourcepage",
       "type": "Edm.String",
       "key": false,
@@ -79,9 +91,7 @@
   ],
   "scoringProfiles": [],
   "corsOptions": {
-    "allowedOrigins": [
-      "*"
-    ],
+    "allowedOrigins": ["*"],
     "maxAgeInSeconds": 300
   },
   "suggesters": [],
