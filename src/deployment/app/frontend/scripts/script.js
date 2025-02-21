@@ -798,19 +798,25 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
         let answerListHTML = '';
 
-        if (isImageQuestion && azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
-            answerListHTML = `<div class="answer-results">${azureOpenAIResults[0]}</div>`;
-        }
-        else {
-
-            if (azureOpenAIResults[0].error && (azureOpenAIResults[0].error.code == 429 || azureOpenAIResults[0].error.code == 400)) {
-
-                answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
-                console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
+        if (isImageQuestion && !azureOpenAIResults.error) {
+            if (azureOpenAIResults.length > 0) {
+                answerListHTML = `<div class="answer-results">${azureOpenAIResults[0]}</div>`;
             }
             else {
                 answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
                 console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
+            }
+        }
+        else {
+
+            if (azureOpenAIResults.error && (azureOpenAIResults.error.code == 429 || azureOpenAIResults.error.code == 400)) {
+
+                answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
+                console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults.error);
+            }
+            else {
+                answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+                console.error('Error getting results from Azure OpenAI:', azureOpenAIResults.error);
             }
         }
 
@@ -1291,24 +1297,26 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
         const images = await invokeRESTAPI(endpoint, httpMethod, httpContentType, httpHeaders, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
 
-        for (const image of images.data) {
+        if (!images.error) {
+            for (const image of images.data) {
 
-            let imageTableRow = document.createElement('tr');
-            imageTableRow.class = 'image-table-row';
+                let imageTableRow = document.createElement('tr');
+                imageTableRow.class = 'image-table-row';
 
-            let imageTableCell = document.createElement('td');
-            imageTableCell.class = 'image-table-cell';
+                let imageTableCell = document.createElement('td');
+                imageTableCell.class = 'image-table-cell';
 
-            imageTableCell.innerHTML = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image">`;
+                imageTableCell.innerHTML = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image">`;
 
-            imageTableRow.appendChild(imageTableCell);
-            imageTableBody.appendChild(imageTableRow);
+                imageTableRow.appendChild(imageTableCell);
+                imageTableBody.appendChild(imageTableRow);
 
-            aiImage = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image" style="width: 80%; height: auto;">`;
+                aiImage = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image" style="width: 80%; height: auto;">`;
 
-            results.push(aiImage);
+                results.push(aiImage);
 
-            console.log('Image generation result URL: ' + image.url);
+                console.log('Image generation result URL: ' + image.url);
+            }
         }
 
         imageTable.appendChild(imageTableBody);

@@ -4936,7 +4936,7 @@ function Update-ConfigFile {
 
         # Update the config with the new key-value pair
         # Update the config with the new key-value pair
-        $config.AZURE_OPENAI_SERVICE_API_KEY = $aiServiceKey
+        $config.AZURE_OPENAI_SERVICE_API_KEY = $openAIApiKey
         $config.AZURE_FUNCTION_API_KEY = $functionApiKey
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_APP_URL = $functionAppUrl
