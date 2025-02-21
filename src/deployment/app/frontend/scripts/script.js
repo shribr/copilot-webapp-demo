@@ -814,15 +814,13 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
         let answerListHTML = '';
 
-        if (isImageQuestion) {
-            if (azureOpenAIResults.error === undefined) {
-                if (azureOpenAIResults.data.length > 0) {
-                    answerListHTML = `<div class="answer-results"><img src='${azureOpenAIResults.data[0].url}' title='${azureOpenAIResults.data[0].revised_prompt}' style='width:100%'></div>`;
-                }
-                else {
-                    answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
-                    console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
-                }
+        if (azureOpenAIResults.error === undefined) {
+            if (azureOpenAIResults.data.length > 0) {
+                answerListHTML = `<div class="answer-results"><img src='${azureOpenAIResults.data[0].url}' title='${azureOpenAIResults.data[0].revised_prompt}' style='width:100%'></div>`;
+            }
+            else {
+                answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+                console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
             }
         }
 
