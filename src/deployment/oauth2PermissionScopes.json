@@ -1,7 +1,7 @@
 {"oauth2PermissionScopes": [{
   "adminConsentDescription": "Allow the application to read data from the API.",
   "adminConsentDisplayName": "Read data from API",
-  "id": "242e8d29-4a20-4d96-9369-9bb59b7b26ad",
+  "id": "7047b9a0-bfab-4cfd-b213-b0b273906920",
   "isEnabled": true,
   "type": "User",
   "userConsentDescription": "Allow the application to read data from the API on your behalf.",
@@ -10,14 +10,14 @@
 }, {
   "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
   "adminConsentDisplayName": "Access API as user",
-  "id": "d4d93556-98ca-4b51-8712-02854daf8197",
+  "id": "ebf47646-2490-480c-814c-e601f1dc4ea8",
   "isEnabled": true,
   "type": "User",
   "userConsentDescription": "Allow the application to access the API on your behalf.",
   "userConsentDisplayName": "Access API as user",
   "value": "access_as_user"
 }, {
-  "id": "8c3d8a59-32de-4a8f-9575-f2f0fde49ff6",
+  "id": "534951d7-9263-434c-bf25-153558bd1cc3",
   "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
   "userConsentDisplayName": "Access API as user",
   "isEnabled": true,
@@ -26,7 +26,7 @@
   "type": "User",
   "value": "access_as_user"
 }, {
-  "id": "b07dc671-9743-477a-af34-3f13deb6d197",
+  "id": "c30d4946-daaa-420d-9760-72e34c2a81da",
   "adminConsentDescription": "Allow the application to read data from the API.",
   "userConsentDisplayName": "Read data from API",
   "isEnabled": true,

@@ -1811,6 +1811,8 @@ function New-AppRegistration {
             #     --headers 'Content-Type=application/json' `
             #     --body "{api:{preAuthorizedApplications:[{'appId':'$appRegistrationClientId','delegatedPermissionIds':['242e8d29-4a20-4d96-9369-9bb59b7b26ad', 'd4d93556-98ca-4b51-8712-02854daf8197'] }] }}"
 
+            # { api: { preAuthorizedApplications: [{ 'appId': '6782b97e-07a2-48fa-9f7e-5fa0c237fd52', 'delegatedPermissionIds': ['242e8d29-4a20-4d96-9369-9bb59b7b26ad', 'd4d93556-98ca-4b51-8712-02854daf8197'] }] } }
+
             # The issue with the below code is that the entries made for the API access permissions are using AD Graph and not MS Graph. The AD graph does not have "name" or "description" properties.
             # So even though the original code I had set in the parameters file was correct, the code below is not working as expected so I removed those two properties from the parameters.json file.
             # It was then that I realized that it was using the wrong Graph API because instead of the name of the permission being showm it was the GUID instead.
@@ -4853,9 +4855,6 @@ function Update-ConfigFile {
             $storageSAS = $storageSAS -replace "st=$encodedSt", "st=$decodedSt"
         }
 
-        #Write-Output "Modified SAS Token: $storageSAS"
-
-        $storageUrl = "https://$storageServiceName.blob.core.windows.net/content?comp=list&include=metadata&restype=container&$storageSAS"
 
         # Extract the 'sig' parameter value from the SAS token
         if ($storageSAS -match "sig=([^&]+)") {
@@ -4918,9 +4917,16 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_SERVICE_SEMANTIC_CONFIG = "vector-profile-srch-index-$fullResourceBaseName-semantic-configuration" -join ""
         $config.AZURE_SEARCH_SERVICE_NAME = $global:searchService.Name
 
+        #Write-Output "Modified SAS Token: $storageSAS"
+        $storageUrl = "https://$storageServiceName.blob.core.windows.net"
+        $fullStorageUrl = "$storageUrl/content?comp=list&include=metadata&restype=container"
+        $fullStorageUrlSas = "$fullStorageUrl&$storageSAS"
+
         $config.AZURE_STORAGE_ACCOUNT_NAME = $global:storageService.Name
         $config.AZURE_STORAGE_API_VERSION = $global:storageService.ApiVersion
-        $config.AZURE_STORAGE_FULL_URL = $storageUrl
+        $config.AZURE_STORAGE_URL = $storageUrl
+        $config.AZURE_STORAGE_FULL_URL = $fullStorageUrl
+        $config.AZURE_STORAGE_FULL_URL_SAS = $fullStorageUrlSas
         $config.AZURE_STORAGE_API_KEY = $storageKey
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSIG

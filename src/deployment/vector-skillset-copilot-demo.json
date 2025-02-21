@@ -1,8 +1,8 @@
 {
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "cognitiveServices": {
-    "key": "d49e0e5590b04e1fae7ce011e9b67a01",
-    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
+    "key": "0cded4345ad0422b98a2824fb1fee334"
   },
   "description": "Skillset to chunk documents for vectorization.",
   "indexProjections": {
@@ -31,7 +31,7 @@
         ],
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-009"
+        "targetIndexName": "vector-srch-index-copilot-demo-007"
       },
       {
         "mappings": [
@@ -50,11 +50,11 @@
         ],
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-009"
+        "targetIndexName": "vector-srch-index-copilot-demo-007"
       }
     ]
   },
-  "name": "vector-srch-skillset-copilot-demo-009",
+  "name": "vector-srch-skillset-copilot-demo-007",
   "skills": [
     {
       "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",

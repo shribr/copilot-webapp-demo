@@ -286,6 +286,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
+    document.querySelectorAll('document-delete-button').forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            const link = item.querySelector('a');
+            if (link) {
+                event.preventDefault();
+                deleteDocument(item.title);
+            }
+        });
+    });
+
+    document.querySelectorAll('document-edit-button').forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            const link = item.querySelector('a');
+            if (link) {
+                event.preventDefault();
+                editDocument(item.title);
+            }
+        });
+    });
+
     document.getElementById('datasource-all').addEventListener('change', toggleAllCheckboxes);
 
     // Add event listeners to column headers for sorting
@@ -632,7 +652,7 @@ function clearChatDisplay() {
     document.getElementById('chat-examples-container').style.display = 'block';
 }
 
-//code to clear file input
+// Function to clear file input
 function clearFileInput() {
     const fileInput = document.getElementById('file-input');
     fileInput.value = ''; // Clear the file input
@@ -658,6 +678,7 @@ function countOccurrences(mainString, searchString) {
     return matches ? matches.length : 0;
 }
 
+// Function to count the number of dollar signs in the provided string
 function countQuadrupleDollarSigns(str) {
     const regex = /\$\$\$\$/g;
     let count = 0;
@@ -888,7 +909,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
 }
 
-//function to create side navigation links
+// Function to create side navigation links
 async function createSidenavLinks() {
 
     try {
@@ -1078,10 +1099,94 @@ function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) 
 
 }
 
-// function to delete documents
-function deleteDocuments() {
-    //code to delete documents
+// Function to delete a document
+async function deleteDocument(doc) {
 
+    const deleteUrl = doc.Url;
+    const apiVersion = config.AZURE_STORAGE_API_VERSION;
+    const keyVaultProxyOperation = "GetStorageServiceApiKey";
+    const httpMethod = "DELETE";
+    const httpContentType = "application/json";
+    const httpBody = null;
+    const returnData = false;
+
+    let httpHeaders = {
+        'x-ms-date': new Date().toUTCString(),
+        'x-ms-version': apiVersion
+    };
+
+    try {
+        const response = await invokeRESTAPI(doc.Url, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
+
+        if (response.ok) {
+            console.log(`Deleted document: ${doc.title}`);
+        } else {
+            const errorText = await response.text();
+            console.error(`Failed to delete document: ${doc.title}. Error: ${errorText}`);
+        }
+    } catch (error) {
+        console.error(`Error deleting document: ${doc.title}. Error: ${error.message}`);
+    }
+}
+
+// Function to delete documents
+async function deleteDocuments() {
+    const selectedDocs = getSelectedDocuments();
+
+    if (selectedDocs.length === 0) {
+        console.warn("No documents selected for deletion.");
+        return;
+    }
+
+    await deleteSelectedDocuments(selectedDocs);
+}
+
+// Function to delete documents
+async function deleteSelectedDocuments(selectedDocs) {
+    if (!Array.isArray(selectedDocs) || selectedDocs.length === 0) {
+        console.warn("No documents selected for deletion.");
+        return;
+    }
+
+    let keyVaultProxyOperation = "GetStorageServiceApiKey";
+
+    // NEED TO UPDATE CODE TO USE AZURE STORAGE API KEY INSTEAD OF SAS TOKEN
+
+    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
+    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const apiVersion = config.AZURE_STORAGE_API_VERSION;
+
+    // Construct the SAS token string
+    const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+
+    for (const doc of selectedDocs) {
+        // Assume doc.docId holds the blob name; URL encode it for safety
+        const blobName = encodeURIComponent(doc.docId);
+        const deleteUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+
+        try {
+            const response = await fetch(deleteUrl, {
+                method: 'DELETE',
+                headers: {
+                    'x-ms-date': new Date().toUTCString(),
+                    'x-ms-version': apiVersion
+                }
+            });
+            if (response.ok) {
+                console.log(`Deleted document: ${doc.title}`);
+            } else {
+                const errorText = await response.text();
+                console.error(`Failed to delete document: ${doc.title}. Error: ${errorText}`);
+            }
+        } catch (error) {
+            console.error(`Error deleting document: ${doc.title}. Error: ${error.message}`);
+        }
+    }
+
+    // Optionally, refresh the documents list after deletion:
+    // getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
 }
 
 // Function to download chat results to a file
@@ -1134,57 +1239,47 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
     if (!userInput) return;
 
-    const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
-    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
+    let openAIRequestBody = "";
+    let openAIRequestBodyJson = "";
+    let keyVaultProxyOperation = "";
+
+    const returnData = true;
+    const httpMethod = 'POST';
+    const httpHeaders = {};
+    let httpContentType = 'application/json';
+    let httpBody;
+
+    switch (isImageQuestion) {
+        case true:
+            keyVaultProxyOperation = "GetOpenAIServiceApiKey";
+            openAIRequestBody = config.DALL_E_REQUEST_BODY;
+            console.log('Image question detected');
+            break;
+        case false:
+            keyVaultProxyOperation = "GetSearchServiceApiKey";
+            openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
+            console.log('Non-image question detected');
+            break;
+    }
+
     const apiVersion = aiModel.ApiVersion;
     const urlPath = aiModel.Path;
     const deploymentName = aiModel.DeploymentName;
-
-    const openAIRequestBody = isImageQuestion ? config.DALL_E_REQUEST_BODY : config.AZURE_OPENAI_REQUEST_BODY;
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-
-    const keyVaultEndPoint = "https://vault.azure.net/.default"
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
-
-    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-
-    let searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
-    let jsonString = JSON.stringify(openAIRequestBody);
 
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/${urlPath}?api-version=${apiVersion}`;
 
     var results = [];
 
-    if (authMode === "MSAL") {
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
-
-        let tokenResponse;
-
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-    }
-
     if (isImageQuestion) {
 
         let aiImage = '';
+        httpContentType = 'image/jpeg';
 
         openAIRequestBody.prompt = currentQuestion;
         //openAIRequestBody.n = 4;
 
-        jsonString = JSON.stringify(openAIRequestBody);
+        openAIRequestBodyJson = JSON.stringify(openAIRequestBody);
 
         let imageTable = document.createElement('table');
         imageTable.id = `image-table-${answerResponseNumber}`;
@@ -1193,9 +1288,9 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
         let imageTableBody = document.createElement('tbody');
         imageTableBody.class = 'image-table-body';
 
-        const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
+        const images = await invokeRESTAPI(endpoint, httpMethod, httpContentType, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
 
-        for (const image of result.data) {
+        for (const image of images.data) {
 
             let imageTableRow = document.createElement('tr');
             imageTableRow.class = 'image-table-row';
@@ -1219,7 +1314,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
         //return imageTable;
 
-        return results
+        return images
     }
     else {
         openAIRequestBody.messages = [];
@@ -1237,11 +1332,11 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
                 //source.parameters.authentication.key = apiKey
                 openAIRequestBody.data_sources.push(source);
 
-                jsonString = JSON.stringify(openAIRequestBody);
+                openAIRequestBodyJson = JSON.stringify(openAIRequestBody);
 
                 //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
                 //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
-                const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
+                const result = await invokeRESTAPI(endpoint, httpMethod, httpContentType, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
 
                 results.push(result);
             }
@@ -1254,7 +1349,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
     }
 }
 
-//code to send chat message to Bing Search API (still under development)
+// Function to send chat message to Bing Search API (still under development)
 async function getAnswersFromPublicInternet(userInput) {
 
     if (!userInput) return;
@@ -1379,7 +1474,8 @@ async function getChatResponse(questionBubble) {
     }
 
     // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    //const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    const sasToken = getSasToken();
 
     // Get the selected chat persona
     const persona = getSelectedChatPersona();
@@ -1515,16 +1611,23 @@ async function getChatResponse(questionBubble) {
 }
 
 //Function to get documents from Azure Storage. This needs to be updated to have option to use MSAL in addition to API_KEY.
-async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
+async function getDocuments(blobs) {
+
+    const httpMethod = 'GET';
+    const returnData = true;
+    const contentType = 'text/xml';
+    const httpHeaders = {
+        'Content-Type': 'text/xml',
+        'Cache-Control': 'no-cache'
+    };
+
+    const sasToken = await getSasToken();
+
+    const keyVaultProxyOperation = "GetStorageServiceApiKey";
+    const fullStorageUrl = config.AZURE_STORAGE_FULL_URL;
 
     try {
-        const response = await fetch(`${fullStorageUrl}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'text/xml',
-                'Cache-Control': 'no-cache'
-            }
-        });
+        const response = await invokeRESTAPI(fullStorageUrl, httpMethod, contentType, httpHeaders, null, keyVaultProxyOperation, returnData);
 
         if (response.ok) {
             const data = await response.text();
@@ -1535,7 +1638,7 @@ async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sa
 
             // Render documents
             //renderDocuments(blobs);
-            renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+            renderDocumentsHtmlTable(blobs);
         } else {
             console.error('Failed to fetch documents:', response.statusText);
         }
@@ -1551,9 +1654,7 @@ async function getImageAnswers(input) {
 }
 
 // Function to get SAS token from Azure Key Vault
-async function getSasToken() {
-
-
+async function getSasTokenOld() {
 
     const credential = new DefaultAzureCredential();
     const vaultName = config.KEY_VAULT_NAME;
@@ -1571,47 +1672,28 @@ async function getSasToken() {
     return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 }
 
+// Function to get SAS token from config file
+async function getSasToken() {
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+
+    return `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+}
+
 // Function to get the search indexer status
 async function getSearchIndexerStatus(searchIndexers) {
     // Retrieve configuration which should include your Azure Search service name and API key
-    let searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
+    const method = 'POST';
+    const returnData = true;
+    const contentType = 'application/json';
+    const httpHeaders = "";
+    const httpBody = "";
+
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const searchServiceApiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
-    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
-    const keyVaultEndPoint = "https://vault.azure.net/.default"
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
 
     //https://learn.microsoft.com/en-us/rest/api/searchservice/indexers/get-status?view=rest-searchservice-2024-07-01&tabs=HTTP#indexerexecutionstatus
 
     let searchIndexerStatusArray = [];
-
-    if (authMode === 'MSAL') {
-
-        const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
-
-        let tokenResponse;
-
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-
-        // Insert a delay of 5 seconds
-        await new Promise(resolve => setTimeout(resolve, 5000));
-    }
 
     // Iterate over the search indexers to get their current statuses
     for (const searchIndexer of searchIndexers) {
@@ -1623,21 +1705,13 @@ async function getSearchIndexerStatus(searchIndexers) {
             continue;
         }
 
-        var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/status?api-version=${searchServiceApiVersion}`;
-
-        var headers = {
-            'api-key': searchApiKey,
-            'Content-Type': 'application/json'
-        };
-
         // Invoke the REST method to get the search indexer status
         try {
-            const response = await fetch(searchIndexerUrl, {
-                method: 'GET',
-                headers: headers
-            });
+
+            const response = await invokeRESTAPI(searchIndexerUrl, method, contentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
 
             const data = await response.json();
+
             console.log(`Indexer: ${searchIndexerName} status:`, data.lastResult.status);
 
             searchIndexerStatusArray.push({ "name": searchIndexerName, "status": data.lastResult.status });
@@ -1647,6 +1721,18 @@ async function getSearchIndexerStatus(searchIndexers) {
     }
 
     return searchIndexerStatusArray;
+}
+
+// Function to get the selected documents
+function getSelectedDocuments() {
+    const selectedDocs = [];
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    checkboxes.forEach(checkbox => {
+        const docId = checkbox.getAttribute('data-doc-id');
+        const docTitle = checkbox.getAttribute('data-doc-title');
+        selectedDocs.push({ docId, docTitle });
+    });
+    return selectedDocs;
 }
 
 // Function to get user presence
@@ -1715,16 +1801,42 @@ async function getUserProfilePic() {
     return data;
 }
 
-//code to toggle between chat and document screens
+// Function to toggle between chat and document screens
 function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
 }
 
 // Function to retrieve secret from Azure Key Vault
-async function getSecretFromKeyVault(keyVaultEndPoint, apiSecretName, apiVersion, apimSubscriptionKey, accessToken) {
+async function getSecretFromKeyVault(keyVaultProxyOperation) {
 
-    const keyVaultUrl = `${keyVaultEndPoint}/${apiSecretName}?api-version=${apiVersion}`;
+    let tokenResponse;
+    let accessToken;
+
+    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
+
+    const tokenRequest = {
+        scopes: [`https://vault.azure.net/.default`],
+        account: activeAccount
+    };
+
+    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+
+    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
+    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
+
+    try {
+        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        accessToken = tokenResponse.accessToken;
+        console.log("Token acquired silently");
+    } catch (silentError) {
+        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        accessToken = tokenResponse.accessToken;
+        console.log("Token acquired via popup");
+    }
+
+    const keyVaultUrl = `${keyVaultProxyEndPoint}/${keyVaultProxyOperation}?api-version=${keyVaultApiVersion}`;
 
     try {
         const response = await fetch(keyVaultUrl, {
@@ -1852,56 +1964,58 @@ function insertDollarSigns(str) {
 }
 
 // Function to call the rest API
-async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
+async function invokeRESTAPI(httpEndpoint, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData) {
 
     let data = {};
-    let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+    let apiKey = "";
 
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
-
-    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-
-    const tokenRequest = {
-        scopes: [`https://vault.azure.net/.default`],
-        account: activeAccount
-    };
+    method = (method === undefined || method === "") ? "POST" : method;
 
     try {
 
         if (authMode === "MSAL") {
-            let tokenResponse;
-
-            try {
-                tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-                accessToken = tokenResponse.accessToken;
-                console.log("Token acquired silently");
-            } catch (silentError) {
-                console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-                tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-                accessToken = tokenResponse.accessToken;
-                console.log("Token acquired via popup");
+            apiKey = await getSecretFromKeyVault(keyVaultProxyOperation);
+        }
+        else {
+            switch (keyVaultProxyOperation) {
+                case "GetOpenAIServiceApiKey":
+                    apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+                    break;
+                case "GetSearchServiceApiKey":
+                    apiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
+                    break;
+                case "GetStorageServiceApiKey":
+                    apiKey = config.AZURE_STORAGE_API_KEY;
+                    break;
             }
-
-            openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, accessToken);
         }
 
-        const contentType = isImageQuestion ? 'image/jpeg' : 'application/json';
+        httpContentType = isImageQuestion ? 'image/jpeg' : 'application/json';
 
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': `${contentType}`,
-                'api-key': `${openAiApiKey}`,
-                'http2': 'true'
-            },
-            body: jsonString
+        if (httpHeaders === undefined || httpHeaders === "" || httpHeaders === null) {
+            httpHeaders = {
+                'Content-Type': `${httpContentType}`,
+                'api-key': `${apiKey}`,
+                'http2': 'true',
+                'mode': 'no-cors'
+            };
+        }
+        else {
+            httpHeaders['api-key'] = apiKey;
+        }
+
+        const response = await fetch(httpEndpoint, {
+            method: httpMethod,
+            headers: httpHeaders,
+            body: httpBody
         });
 
-        data = await response.json();
+        if (returnData) {
 
-        return data;
+            data = await response.json();
+
+            return data;
+        }
     }
     catch (error) {
         if (error.code == 429 || error.code == 400) {
@@ -2038,10 +2152,15 @@ async function renderChatPersonas() {
 }
 
 // Function to render documents in HTML table format
-function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
+function renderDocumentsHtmlTable(blobs) {
 
     const docList = document.getElementById('document-table-body');
     const sampleRows = document.querySelectorAll('.document-row.sample');
+    const storageUrl = config.AZURE_STORAGE_URL;
+    const sasToken = config.AZURE_STORAGE_SAS_TOKEN;
+    const editIcon = config.ICONS.EDIT_BUTTON.MONOTONE;
+    const deleteIcon = config.ICONS.DELETE_BUTTON.MONOTONE;
+    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
 
     // Clear existing document rows except the header
     const existingRows = docList.querySelectorAll('tr.document-row');
@@ -2070,7 +2189,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
             blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
             const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
-            return { blobName, lastModified, contentType, blobUrl, blobSize };
+            return { title, lastModified, contentType, blobUrl, blobSize };
         });
 
         originalDocumentCount = blobData.length;
@@ -2085,7 +2204,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             const documentRow = document.createElement('tr');
             documentRow.className = 'document-row';
 
-            var blobName = blob.blobName;
+            var blobName = blob.title;
             const lastModified = blob.lastModified;
             const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
             let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
@@ -2138,7 +2257,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
 
             const actionDiv = document.createElement('div');
             actionDiv.className = 'action-content';
-            actionDiv.innerHTML = `<a href="#" title="delete file" class="edit-button">${editIcon}</a><a href="#" title="edit file" class="delete-button">${deleteIcon}</a>`;
+            actionDiv.innerHTML = `<a href="#" title="${blobData}" class="document-edit-button">${editIcon}</a><a href="#" title="${blobData}" class="document-delete-button">${deleteIcon}</a>`;
 
             const actionCell = document.createElement('td');
             actionCell.className = 'document-cell action-container';
@@ -2187,40 +2306,16 @@ async function renderPanelIcons() {
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
-    let searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
+    const httpMethod = 'POST';
+    const httpContentType = 'application/json';
+    let httpBody = "";
+    const httpHeaders = {};
+    const returnData = false;
+
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const searchServiceApiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
-    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
-    const keyVaultEndPoint = "https://vault.azure.net/.default"
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
 
-    if (authMode === 'MSAL') {
-
-        const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
-
-        let tokenResponse;
-
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-
-        // Insert a delay of 5 seconds
-        await new Promise(resolve => setTimeout(resolve, 5000));
-    }
+    let keyVaultProxyOperation = "GetSearchServiceApiKey";
 
     const searchIndexerStatus = await getSearchIndexerStatus(searchIndexers);
 
@@ -2244,18 +2339,10 @@ async function runSearchIndexer(searchIndexers) {
 
         var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
 
-        var headers = {
-            'api-key': searchApiKey,
-            'Content-Type': 'application/json',
-            'mode': 'no-cors'
-        };
-
         // Invoke the REST method to run the search indexer
         try {
-            const response = await fetch(searchIndexerUrl, {
-                method: 'POST',
-                headers: headers
-            });
+            await invokeRESTAPI(searchIndexerUrl, httpMethod, httpContentType, null, httpBody, keyVaultProxyOperation, returnData);
+
             //No need to return anything from the search indexer
             //const data = await response.json();
             console.log('Operation "run search indexer" is now executing for', searchIndexerName);
@@ -2460,6 +2547,7 @@ function sortDocuments(criteria) {
     renderDocuments(sortedBlobs);
 }
 
+// Function to start the timer
 function startTimer() {
     startTime = Date.now();
     timerInterval = setInterval(() => {
@@ -2468,6 +2556,7 @@ function startTimer() {
     }, 1000);
 }
 
+// Function to stop the timer
 function stopTimer() {
     clearInterval(timerInterval);
     //document.getElementById('chat-response-timer').innerText = `Time: 0s`;
@@ -2584,7 +2673,7 @@ function updateFileCount() {
     document.getElementById('file-count').textContent = `Files selected: ${fileCount}`;
 }
 
-//code to update placeholder text
+// Function to update placeholder text
 function updatePlaceholder() {
     const noFilesPlaceholder = document.getElementById('num-files-selected-placeholder');
     const fileList = document.getElementById('file-list');
@@ -2611,8 +2700,14 @@ function updatePlaceholder() {
     }
 }
 
-//code to upload files to Azure Storage
+// Function to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
+
+    let httpContentType = 'application/json';
+    let httpHeaders = {};
+    const httpMethod = 'PUT';
+    const returnData = false;
+    const keyVaultProxyOperation = "GetStorageServiceApiKey";
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
@@ -2632,22 +2727,24 @@ async function uploadFilesToAzure(files) {
 
     for (const file of files) {
         const fileName = file.name.replace("#", "");
-        const uploadUrl = `${storageUrl}/${fileName}?&${sasToken}`;
+        const uploadUrl = `${storageUrl}/${fileName}`;
         const date = new Date().toUTCString();
 
+        httpContentType = file.type;
+
+        httpHeaders = {
+            'x-ms-blob-type': 'BlockBlob',
+            'Content-Type': file.type,
+            'Content-Length': file.size.toString(),
+            'x-ms-date': date,
+            'x-ms-version': apiVersion,
+            'x-ms-blob-content-type': file.type,
+            'mode': 'no-cors',
+            'http2': 'true'
+        };
+
         try {
-            const response = await fetch(uploadUrl, {
-                method: 'PUT',
-                headers: {
-                    'x-ms-blob-type': 'BlockBlob',
-                    'Content-Type': file.type,
-                    'Content-Length': file.size.toString(),
-                    'x-ms-date': date,
-                    'x-ms-version': apiVersion,
-                    'x-ms-blob-content-type': file.type
-                },
-                body: file
-            });
+            const response = await invokeRESTAPI(uploadUrl, httpMethod, httpContentType, httpHeaders, file, keyVaultProxyOperation, returnData);
 
             if (response.ok) {
                 showToastNotification(`Upload successful for ${file.name}.`, true);
@@ -2668,4 +2765,84 @@ async function uploadFilesToAzure(files) {
 
     //The isn't working yet because of permissions issues
     await runSearchIndexer(searchIndexers);
+}
+
+// Function to batch upload files to Azure
+async function uploadFilesToAzureBatch(files) {
+    if (!files || files.length === 0) {
+        console.log('No files selected for upload.');
+        return;
+    }
+
+    const httpMethod = 'PUT';
+    const returnData = false;
+    const keyVaultProxyOperation = "GetStorageServiceApiKey";
+
+    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
+    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
+    const apiVersion = config.AZURE_STORAGE_API_VERSION;
+    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
+    const editIcon = config.ICONS.EDIT.MONOTONE;
+    const deleteIcon = config.ICONS.DELETE.MONOTONE;
+    const searchIndexers = config.SEARCH_INDEXERS;
+    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
+
+    // Construct the SAS token from the individual components
+    const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
+
+    // Create an array of upload promises for concurrent processing.
+    const uploadPromises = Array.from(files).map(file => {
+        return (async () => {
+            const fileName = file.name.replace("#", "");
+            const uploadUrl = `${storageUrl}/${fileName}?&${sasToken}`;
+            const date = new Date().toUTCString();
+            const httpContentType = file.type;
+            const fileHeaders = {
+                'x-ms-blob-type': 'BlockBlob',
+                'Content-Type': file.type,
+                'Content-Length': file.size.toString(),
+                'x-ms-date': date,
+                'x-ms-version': apiVersion,
+                'x-ms-blob-content-type': file.type,
+                'mode': 'no-cors',
+                'http2': 'true'
+            };
+
+            try {
+                const response = await invokeRESTAPI(uploadUrl, httpMethod, httpContentType, fileHeaders, file, keyVaultProxyOperation, returnData);
+                // Check for success—if not, throw error for Promise.all rejection.
+                if (response && response.ok) {
+                    console.log(`Upload successful for ${file.name}.`);
+                    showToastNotification(`Upload successful for ${file.name}.`, true);
+                } else {
+                    let errorText = "";
+                    try {
+                        errorText = response ? await response.text() : 'Unknown error';
+                    } catch (e) {
+                        errorText = 'Unknown error';
+                    }
+                    console.error(`Error uploading file ${file.name} to Azure Storage:`, errorText);
+                    showToastNotification(`Error uploading file ${file.name}: ${errorText}`, false);
+                    throw new Error(`Error uploading ${file.name}`);
+                }
+            } catch (error) {
+                console.error(`Error uploading file ${file.name}:`, error.message);
+                throw error;
+            }
+        })();
+    });
+
+    try {
+        await Promise.all(uploadPromises);
+        // Clear file input and refresh document list after all uploads complete
+        clearFileInput();
+        getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+        // Optionally, run the search indexer after batch uploading
+        await runSearchIndexer(searchIndexers);
+    } catch (error) {
+        console.error('One or more file uploads failed:', error);
+    }
 }
