@@ -2,6 +2,7 @@
   "CUSTOM_APP_TITLE": "GAO Chat using Microsoft Copilot",
   "DEFAULT_APP_TITLE": "Chat with Microsoft Copilot",
   "AUTHENTICATION_MODE": "MSAL",
+  "USE_SAS": "true",
   "AZURE_OPENAI_SERVICE_API_KEY": "3e15025e80484c70b2c03e6aa98db4b8",
   "AZURE_OPENAI_SERVICE_SECRET_NAME": "OpenAIServiceApiKey",
   "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-007",
@@ -25,8 +26,9 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
+  "AZURE_STORAGE_SAS": "se=2026-02-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bqtf&srt=co&sig=GeM1C3iHvit/uzmUS6pvHFOlUzdP49F6JKJQtX3qR50%3D",
   "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container",
-  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-18T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tfqb&srt=co&sig=BlXjE%2BJf8msox99SsEwKUbhXeysTpG/jTh7AIRccCpU%3D",
+  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bqtf&srt=co&sig=GeM1C3iHvit/uzmUS6pvHFOlUzdP49F6JKJQtX3qR50%3D",
   "AZURE_STORAGE_API_KEY": "W+py7QmkrPsI68ZH9fyJBaf/QZcAi+wG0ZGqrC6F/Z6OckHMBKrLa0JdptJsAZ1WR4f2LV6JSMcm+AStBKt7Tg==",
   "AZURE_STORAGE_BASE_URL": "blob.core.windows.net",
   "AZURE_STORAGE_URL": "https://stcopilotdemo007.blob.core.windows.net",
@@ -52,46 +54,46 @@
   "SITE_LOGO": null,
   "AI_MODELS": [
     {
-      "DeploymentName": "gpt-4o",
-      "Format": "OpenAI",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
-      "Sku": {
-        "Name": "GlobalStandard",
-        "Capacity": 100
-      },
-      "Path": "chat/completions",
       "ApiVersion": "2024-08-01-preview",
-      "KeyWordTriggers": null,
+      "Sku": {
+        "Capacity": 100,
+        "Name": "GlobalStandard"
+      },
       "ModelVersion": "2024-08-06",
-      "Type": "gpt-4o"
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
+      "KeyWordTriggers": null,
+      "DeploymentName": "gpt-4o",
+      "Type": "gpt-4o",
+      "Path": "chat/completions",
+      "Format": "OpenAI"
     },
     {
-      "DeploymentName": "text-embedding",
-      "Format": "OpenAI",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
-      "Sku": {
-        "Name": "Standard",
-        "Capacity": 100
-      },
-      "Path": "images/generations",
       "ApiVersion": "2023-05-15",
-      "KeyWordTriggers": null,
+      "Sku": {
+        "Capacity": 100,
+        "Name": "Standard"
+      },
       "ModelVersion": "1",
-      "Type": "text-embedding-3-large"
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
+      "KeyWordTriggers": null,
+      "DeploymentName": "text-embedding",
+      "Type": "text-embedding-3-large",
+      "Path": "images/generations",
+      "Format": "OpenAI"
     },
     {
-      "DeploymentName": "dall-e-3",
-      "Format": "OpenAI",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
-      "Sku": {
-        "Name": "Standard",
-        "Capacity": 2
-      },
-      "Path": "images/generations",
       "ApiVersion": "2024-02-01",
-      "KeyWordTriggers": null,
+      "Sku": {
+        "Capacity": 2,
+        "Name": "Standard"
+      },
       "ModelVersion": "3.0",
-      "Type": "dall-e-3"
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
+      "KeyWordTriggers": null,
+      "DeploymentName": "dall-e-3",
+      "Type": "dall-e-3",
+      "Path": "images/generations",
+      "Format": "OpenAI"
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -116,49 +118,49 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "tfqb",
+    "SS": "bqtf",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-02-18T23:59:59Z",
-    "ST": "2025-02-18T23:59:59Z",
+    "SE": "2026-02-19T23:59:59Z",
+    "ST": "2025-02-19T23:59:59Z",
     "SPR": "https",
-    "SIG": "BlXjE%2BJf8msox99SsEwKUbhXeysTpG/jTh7AIRccCpU%3D",
+    "SIG": "GeM1C3iHvit/uzmUS6pvHFOlUzdP49F6JKJQtX3qR50%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
     "frequency_penalty": 0,
-    "top_p": 0.95,
-    "presence_penalty": 0,
-    "stop": null,
+    "messages": [
+      {
+        "content": "",
+        "role": "system",
+        "role_information": "You are a helpful assistant"
+      },
+      {
+        "content": "",
+        "role": "user"
+      }
+    ],
     "stream": false,
+    "stop": null,
+    "max_tokens": 800,
     "data_sources": [
       {
+        "type": "azure_search",
         "parameters": {
           "index_name": "vector-srch-index-copilot-demo-007",
           "endpoint": "https://srch-copilot-demo-007.search.windows.net",
           "authentication": {
-            "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ",
-            "type": "api_key"
+            "type": "api_key",
+            "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ"
           }
-        },
-        "type": "azure_search"
+        }
       }
     ],
-    "max_tokens": 800,
-    "messages": [
-      {
-        "content": "",
-        "role_information": "You are a helpful assistant",
-        "role": "system"
-      },
-      {
-        "role": "user",
-        "content": ""
-      }
-    ],
-    "temperature": 0.7
+    "temperature": 0.7,
+    "presence_penalty": 0,
+    "top_p": 0.95
   },
   "CHAT_PERSONAS": [
     {
@@ -283,16 +285,16 @@
   },
   "DATA_SOURCES": [
     {
+      "type": "azure_search",
       "parameters": {
-        "role_information": "",
+        "authentication": {
+          "type": "api_key",
+          "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ"
+        },
         "index_name": "vector-srch-index-copilot-demo-007",
         "endpoint": "https://srch-copilot-demo-007.search.windows.net",
-        "authentication": {
-          "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ",
-          "type": "api_key"
-        }
-      },
-      "type": "azure_search"
+        "role_information": ""
+      }
     }
   ],
   "FILE_TYPES": {
@@ -377,14 +379,14 @@
       "MONOTONE": "<svg viewBox=\"0 0 24 24\" fill=\"#000000\" class=\"icon-root icon-svg-mag icon-size-medium\" focusable=\"false\" aria-hidden=\"true\"><path d=\"M0 0h24v24H0z\" fill=\"none\"></path><path d=\"M11.5 9C10.12 9 9 10.12 9 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S12.88 9 11.5 9zM20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-3.21 14.21l-2.91-2.91c-.69.44-1.51.7-2.39.7C9.01 16 7 13.99 7 11.5S9.01 7 11.5 7 16 9.01 16 11.5c0 .88-.26 1.69-.7 2.39l2.91 2.9-1.42 1.42z\"></path></svg>",
       "COLOR": "<svg width=\"24\" align=\"center\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" aria-hidden=\"true\" role=\"img\" class=\"icon-svg\" preserveAspectRatio=\"xMidYMid meet\" fill=\"#000000\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g><path fill=\"#9AAAB4\" d=\"M27.388 24.642L24.56 27.47l-4.95-4.95l2.828-2.828z\"></path><path fill=\"#66757F\" d=\"M34.683 29.11l-5.879-5.879a2 2 0 0 0-2.828 0l-2.828 2.828a2 2 0 0 0 0 2.828l5.879 5.879a4 4 0 1 0 5.656-5.656z\"></path><circle fill=\"#8899A6\" cx=\"13.586\" cy=\"13.669\" r=\"13.5\"></circle><circle fill=\"#BBDDF5\" cx=\"13.586\" cy=\"13.669\" r=\"9.5\"></circle></g></svg>"
     },
-    "DELETE": {
+    "DELETE_BUTTON": {
       "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" fill=\"#000000\" class=\"icon-svg\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <title>1227</title> <defs> </defs> <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"> <path d=\"M12.566,8 L15.611,4.956 C16.031,4.535 16.031,3.853 15.611,3.434 L12.566,0.389 C12.146,-0.031 11.464,-0.031 11.043,0.389 L7.999,3.433 L4.955,0.389 C4.534,-0.031 3.852,-0.031 3.432,0.389 L0.388,3.434 C-0.034,3.854 -0.034,4.536 0.387,4.956 L3.431,8 L0.387,11.044 C-0.034,11.465 -0.034,12.147 0.388,12.567 L3.432,15.611 C3.852,16.032 4.534,16.032 4.955,15.611 L7.999,12.567 L11.043,15.611 C11.464,16.032 12.146,16.032 12.566,15.611 L15.611,12.567 C16.031,12.146 16.031,11.464 15.611,11.044 L12.566,8 L12.566,8 Z\" fill=\"#434343\" class=\"si-glyph-fill\"> </path> </g> </g></svg>",
       "MONOTONE2": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" class=\"icon-svg\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g><path d=\"M16.417 10.283A7.917 7.917 0 1 1 8.5 2.366a7.916 7.916 0 0 1 7.917 7.917zm-6.804.01 3.032-3.033a.792.792 0 0 0-1.12-1.12L8.494 9.173 5.46 6.14a.792.792 0 0 0-1.12 1.12l3.034 3.033-3.033 3.033a.792.792 0 0 0 1.12 1.119l3.032-3.033 3.033 3.033a.792.792 0 0 0 1.12-1.12z\"></path></g></svg>",
       "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"icon-svg delete-icon\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g><path d=\"M16.417 10.283A7.917 7.917 0 1 1 8.5 2.366a7.916 7.916 0 0 1 7.917 7.917zm-6.804.01 3.032-3.033a.792.792 0 0 0-1.12-1.12L8.494 9.173 5.46 6.14a.792.792 0 0 0-1.12 1.12l3.034 3.033-3.033 3.033a.792.792 0 0 0 1.12 1.119l3.032-3.033 3.033 3.033a.792.792 0 0 0 1.12-1.12z\"></path></g></svg>",
       "COLOR2": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"icon-svg delete-icon\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <polygon style=\"fill:#E21B1B;\" points=\"404.176,0 256,148.176 107.824,0 0,107.824 148.176,256 0,404.176 107.824,512 256,363.824 404.176,512 512,404.176 363.824,256 512,107.824 \"></polygon> </g></svg>",
       "COLOR": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" fill=\"#000000\" class=\"icon-svg\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <title>1227</title> <defs> </defs> <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"> <path d=\"M12.566,8 L15.611,4.956 C16.031,4.535 16.031,3.853 15.611,3.434 L12.566,0.389 C12.146,-0.031 11.464,-0.031 11.043,0.389 L7.999,3.433 L4.955,0.389 C4.534,-0.031 3.852,-0.031 3.432,0.389 L0.388,3.434 C-0.034,3.854 -0.034,4.536 0.387,4.956 L3.431,8 L0.387,11.044 C-0.034,11.465 -0.034,12.147 0.388,12.567 L3.432,15.611 C3.852,16.032 4.534,16.032 4.955,15.611 L7.999,12.567 L11.043,15.611 C11.464,16.032 12.146,16.032 12.566,15.611 L15.611,12.567 C16.031,12.146 16.031,11.464 15.611,11.044 L12.566,8 L12.566,8 Z\" fill=\"#434343\" class=\"si-glyph-fill\"> </path> </g> </g></svg>"
     },
-    "EDIT": {
+    "EDIT_BUTTON": {
       "MONOTONE": "<svg width=\"24\" viewBox=\"0 0 36 36\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-svg edit-icon\"></g><g> <path fill=\"#555\" d=\"M2.29171812,13.3600638 L6.81539686,18.1161843 L0.5,20 L2.29171812,13.3600638 Z M12.7049284,2.41181464 L17.2274301,7.16667706 L7.26550878,17.6404299 L2.74300106,12.8855675 L12.7049284,2.41181464 Z M16.1415118,0.347861156 C16.8783654,1.12259394 18.3106609,2.62843788 19.1175863,3.4768634 C19.9245902,4.32524768 19.2036068,5.09020427 19.2036068,5.09020427 L17.6827602,6.68916958 L13.1591207,1.93311092 L14.6798693,0.334186853 L14.6989777,0.315464422 C14.8180473,0.203171183 15.4749058,-0.352994255 16.1415118,0.347861156 Z\"></path> </g></svg>",
       "COLOR3": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <path style=\"fill:#DCE5FA;\" d=\"M357.382,0H54.545C35.838,0,20.673,15.165,20.673,33.873v444.254 c0,18.708,15.165,33.873,33.873,33.873h302.838c18.708,0,33.873-15.165,33.873-33.873V33.873C391.255,15.165,376.09,0,357.382,0z\"></path> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M391.255,99.394c-10.762,2.762-20.632,8.355-28.694,16.417L153.001,325.365 l-4.738,149.902l149.903-4.736l93.084-93.083V99.394H391.255z\"></path> <path style=\"fill:#FF999A;\" d=\"M483.12,196.748l-56.33-56.33c-10.942-10.942-28.681-10.942-39.622,0l-31.298,31.296l26.653,69.3 l69.3,26.653l31.298-31.298C494.062,225.429,494.062,207.69,483.12,196.748z\"></path> <polygon style=\"fill:#FFEBBF;\" points=\"184.221,439.317 187.353,340.232 217.138,310.446 313.091,406.399 283.306,436.185 \"></polygon> <polygon style=\"fill:#FFD782;\" points=\"283.306,436.185 187.353,340.232 315.416,212.169 382.524,241.014 411.369,308.121 \"></polygon> <rect x=\"315.764\" y=\"211.31\" transform=\"matrix(-0.7071 -0.7071 0.7071 -0.7071 485.226 680.8143)\" style=\"fill:#515262;\" width=\"135.7\" height=\"57.208\"></rect> <path style=\"opacity:0.1;enable-background:new ;\" d=\"M483.12,196.748l-41.01-41.01c10.942,10.942,10.942,28.681,0,39.622 L242.295,395.174l-56.736,1.793l-1.339,42.348l99.085-3.132L483.119,236.37C494.062,225.429,494.062,207.689,483.12,196.748z\"></path> </g></svg>",
       "COLOR2": "<svg width=\"24\" viewBox=\"0 0 36 36\" version=\"1.1\" class=\"icon-svg edit-icon\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" fill=\"#000000\" class=\"icon-svg edit-icon\"><g stroke-width=\"0\"></g><g stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g> <polygon style=\"fill:#E21B1B;\" points=\"404.176,0 256,148.176 107.824,0 0,107.824 148.176,256 0,404.176 107.824,512 256,363.824 404.176,512 512,404.176 363.824,256 512,107.824 \"></polygon> </g></svg>",

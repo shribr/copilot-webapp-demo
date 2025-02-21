@@ -8,6 +8,7 @@ let aiEnhancedAnswersArray = [];
 let originalDocumentCount = 0;
 let existingDocumentCount = 0;
 let filteredDocumentCount = 0;
+let useSaS;
 
 let timerInterval;
 let startTime;
@@ -89,6 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     config = await fetchConfig();
 
     authMode = config.AUTHENTICATION_MODE;
+    useSaS = config.USE_SAS;
 
     await checkIfLoggedIn();
 
@@ -126,24 +128,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const elements = document.getElementsByClassName('document-cell-name');
     Array.from(elements).forEach(element => element.classList.add('no-before'));
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
-    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
-    const editIcon = config.ICONS.EDIT.MONOTONE;
-    const deleteIcon = config.ICONS.DELETE.MONOTONE;
-
     creationTerms = config.DALL_E_CREATION_TERMS;
 
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
-
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-
-    const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
-
-    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+    getDocuments(blobs);
 
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatDisplay = document.getElementById('chat-display');
@@ -282,26 +269,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const screen = new URL(link.href).searchParams.get('screen');
                 toggleDisplay(screen);
                 history.pushState(null, '', link.href);
-            }
-        });
-    });
-
-    document.querySelectorAll('document-delete-button').forEach(function (item) {
-        item.addEventListener('click', function (event) {
-            const link = item.querySelector('a');
-            if (link) {
-                event.preventDefault();
-                deleteDocument(item.title);
-            }
-        });
-    });
-
-    document.querySelectorAll('document-edit-button').forEach(function (item) {
-        item.addEventListener('click', function (event) {
-            const link = item.querySelector('a');
-            if (link) {
-                event.preventDefault();
-                editDocument(item.title);
             }
         });
     });
@@ -691,17 +658,21 @@ function countQuadrupleDollarSigns(str) {
 }
 
 // Function to create chat response content
-function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, storageUrl, sasToken, downloadChatResultsSVG) {
+function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, downloadChatResultsSVG) {
 
-    var sourceNumber = 0;
-    var citationContentResults = "";
-    var openAIModelResultsId = "";
-    var answers = "";
+    let sourceNumber = 0;
+    let citationContentResults = "";
+    let openAIModelResultsId = "";
+    let answers = "";
 
     let numOccurrences = 0;
 
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
+    const sasToken = config.AZURE_STORAGE_SAS;
+    const storageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const fullStorageUrl = `https://${storageUrl}/${containerName}`;
 
     let footNoteLinks = "";
     let followUpQuestions = "";
@@ -769,7 +740,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
                         const docTitle = citation.title;
 
                         if (docTitle) {
-                            const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
+                            const docUrl = `${fullStorageUrl}/${docTitle}?${sasToken}`;
 
                             // Detect and replace [doc*] with [page *] and create hyperlink
                             answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
@@ -1004,18 +975,22 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
 }
 
 // Function to create tab contents for supporting content results returned from Azure Search
-function createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken) {
+function createTabContentSupportingContent(azureOpenAIResults, supportingContent) {
 
     if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         //var answerResults = "";
-        var citationContentResults = "";
-        var supportingContentResults = "";
-        var answerNumber = 1;
-        var sourceNumber = 1;
+        let citationContentResults = "";
+        let supportingContentResults = "";
+        let answerNumber = 1;
+        let sourceNumber = 1;
 
         // Initialize a Set to store unique document paths
         const listedPaths = new Set();
+        const sasToken = config.AZURE_STORAGE_SAS;
+        const storageUrl = config.AZURE_STORAGE_URL;
+        const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+        const fullStorageUrl = `https://${storageUrl}/${containerName}`;
 
         console.log(azureOpenAIResults);
 
@@ -1031,7 +1006,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
                 for (const citation of citations) {
 
                     const docTitle = citation.title;
-                    const docPath = `${storageUrl}/${docTitle}`;
+                    const docPath = `${fullStorageUrl}/${docTitle}`;
 
                     if (docTitle != "") {
                         var answerText = citation.content.replace(" **", "").replace(/\s+/g, " ");
@@ -1100,9 +1075,9 @@ function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) 
 }
 
 // Function to delete a document
-async function deleteDocument(doc) {
+async function deleteDocument(docJson) {
 
-    const deleteUrl = doc.Url;
+    const doc = JSON.parse(docJson);
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
     const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
     const httpMethod = "DELETE";
@@ -1110,13 +1085,25 @@ async function deleteDocument(doc) {
     const httpBody = null;
     const returnData = false;
 
+    let response;
+
     let httpHeaders = {
         'x-ms-date': new Date().toUTCString(),
-        'x-ms-version': apiVersion
+        'x-ms-version': apiVersion,
+        'mode': 'no-cors'
     };
 
     try {
-        const response = await invokeRESTAPI(doc.Url, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
+
+        if (useSaS) {
+            response = await fetch(doc.url, {
+                method: httpMethod,
+                headers: httpHeaders
+            });
+        }
+        else {
+            response = await invokeRESTAPI(doc.url, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
+        }
 
         if (response.ok) {
             console.log(`Deleted document: ${doc.title}`);
@@ -1148,32 +1135,38 @@ async function deleteSelectedDocuments(selectedDocs) {
         return;
     }
 
-    let keyVaultProxyOperation = "GetStorageServiceApiKey";
+    let response;
+
+    let keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
 
     // NEED TO UPDATE CODE TO USE AZURE STORAGE API KEY INSTEAD OF SAS TOKEN
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    const storageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
-
-    // Construct the SAS token string
-    const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    const fullStorageUrl = `${storageUrl}/${containerName}`;
+    const sasToken = config.AZURE_STORAGE_SAS;
 
     for (const doc of selectedDocs) {
         // Assume doc.docId holds the blob name; URL encode it for safety
         const blobName = encodeURIComponent(doc.docId);
-        const deleteUrl = `https://${accountName}.${azureStorageUrl}/${containerName}/${blobName}?${sasToken}`;
+        const deleteUrl = `${fullStorageUrl}/${blobName}?${sasToken}`;
 
         try {
-            const response = await fetch(deleteUrl, {
-                method: 'DELETE',
-                headers: {
-                    'x-ms-date': new Date().toUTCString(),
-                    'x-ms-version': apiVersion
-                }
-            });
+
+            if (useSas) {
+                response = await fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'x-ms-date': new Date().toUTCString(),
+                        'x-ms-version': apiVersion
+                    }
+                });
+            }
+            else {
+                response = invokeRESTAPI(deleteUrl, "DELETE", "application/json", null, null, keyVaultProxyOperation, false);
+            }
+
             if (response.ok) {
                 console.log(`Deleted document: ${doc.title}`);
             } else {
@@ -1440,22 +1433,16 @@ async function getAccessToken(clientId) {
 // Function to show responses to questions
 async function getChatResponse(questionBubble) {
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
-    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const dataSources = config.DATA_SOURCES;
 
     const responseTabList = Object.entries(config.RESPONSE_TABS);
     const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
-
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
     const chatInput = document.getElementById('chat-input').value.trim();
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.style.display = 'none';
 
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
 
     isImageQuestion = await checkIfImageQuestion(chatInput);
 
@@ -1532,14 +1519,14 @@ async function getChatResponse(questionBubble) {
             chatDisplay.appendChild(chatResponse);
 
             // Create tab contents for chat response content
-            createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, storageUrl, sasToken, downloadChatResultsSVG);
+            createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, downloadChatResultsSVG);
 
             if (isImageQuestion == false) {
                 // Create tab contents for thought process content
                 createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent);
 
                 // Create tab contents for supporting content
-                createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken);
+                createTabContentSupportingContent(azureOpenAIResults, supportingContent);
 
                 chatResponse.appendChild(thoughtProcessContent);
                 chatResponse.appendChild(supportingContent);
@@ -1614,6 +1601,7 @@ async function getChatResponse(questionBubble) {
 async function getDocuments(blobs) {
 
     const httpMethod = 'GET';
+    const httpBody = "";
     const returnData = true;
     const contentType = 'text/xml';
     const httpHeaders = {
@@ -1621,13 +1609,27 @@ async function getDocuments(blobs) {
         'Cache-Control': 'no-cache'
     };
 
-    const sasToken = await getSasToken();
+    let response;
+    let fullStorageUrl;
 
     const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
-    const fullStorageUrl = config.AZURE_STORAGE_FULL_URL;
 
     try {
-        const response = await invokeRESTAPI(fullStorageUrl, httpMethod, contentType, httpHeaders, null, keyVaultProxyOperation, returnData);
+        if (useSaS) {
+
+            fullStorageUrl = config.AZURE_STORAGE_FULL_URL_SAS;
+
+            response = await fetch(fullStorageUrl, {
+                method: httpMethod,
+                headers: httpHeaders
+            });
+        }
+        else {
+
+            fullStorageUrl = config.AZURE_STORAGE_FULL_URL;
+
+            response = await invokeRESTAPI(fullStorageUrl, httpMethod, contentType, httpHeaders, null, keyVaultProxyOperation, returnData);
+        }
 
         if (response.ok) {
             const data = await response.text();
@@ -1651,25 +1653,6 @@ async function getDocuments(blobs) {
 // Function to get answers for image related questions
 async function getImageAnswers(input) {
 
-}
-
-// Function to get SAS token from Azure Key Vault
-async function getSasTokenOld() {
-
-    const credential = new DefaultAzureCredential();
-    const vaultName = config.KEY_VAULT_NAME;
-    const url = `https://${vaultName}.vault.azure.net`;
-    const client = new SecretClient(url, credential);
-
-    const sasTokenConfig = {};
-    const secretNames = ['SV', 'INCLUDE', 'SS', 'SRT', 'SP', 'SE', 'SPR', 'SIG'];
-
-    for (const name of secretNames) {
-        const secret = await client.getSecret(`AZURE_STORAGE_SAS_TOKEN_${name}`);
-        sasTokenConfig[name] = secret.value;
-    }
-
-    return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 }
 
 // Function to get SAS token from config file
@@ -2159,7 +2142,8 @@ function renderDocumentsHtmlTable(blobs) {
     const docList = document.getElementById('document-table-body');
     const sampleRows = document.querySelectorAll('.document-row.sample');
     const storageUrl = config.AZURE_STORAGE_URL;
-    const sasToken = config.AZURE_STORAGE_SAS_TOKEN;
+    const storageContainerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasToken = config.AZURE_STORAGE_SAS;
     const editIcon = config.ICONS.EDIT_BUTTON.MONOTONE;
     const deleteIcon = config.ICONS.DELETE_BUTTON.MONOTONE;
     const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
@@ -2177,7 +2161,7 @@ function renderDocumentsHtmlTable(blobs) {
 
         // Extract blob data into an array of objects
         const blobData = Array.from(blobs).map(blob => {
-            const blobName = blob.getElementsByTagName("Name")[0].textContent;
+            const title = blob.getElementsByTagName("Name")[0].textContent;
             const lastModified = new Date(blob.getElementsByTagName("Last-Modified")[0].textContent).toLocaleString('en-US', {
                 year: 'numeric',
                 month: '2-digit',
@@ -2188,10 +2172,10 @@ function renderDocumentsHtmlTable(blobs) {
                 hour12: true
             });
             const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
-            blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
-            const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
-            return { title, lastModified, contentType, blobUrl, blobSize };
+            let url = `${storageUrl}/${storageContainerName}/${title}?${sasToken}`;
+            url = url.replace("&comp=list", "").replace("&restype=container", "");
+            const size = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
+            return { title, lastModified, contentType, url, size };
         });
 
         originalDocumentCount = blobData.length;
@@ -2209,9 +2193,10 @@ function renderDocumentsHtmlTable(blobs) {
             var blobName = blob.title;
             const lastModified = blob.lastModified;
             const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
+            let blobUrl = blob.url;
             //blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
-            const blobSize = blob.blobSize;
+            const blobSize = blob.size;
+            const blobJson = JSON.stringify(blob);
 
             // Create the document cells
             const previewCell = document.createElement('td');
@@ -2259,7 +2244,7 @@ function renderDocumentsHtmlTable(blobs) {
 
             const actionDiv = document.createElement('div');
             actionDiv.className = 'action-content';
-            actionDiv.innerHTML = `<a href="#" title="${blobData}" class="document-edit-button">${editIcon}</a><a href="#" title="${blobData}" class="document-delete-button">${deleteIcon}</a>`;
+            actionDiv.innerHTML = `<span title='${blobJson}' class="document-edit-button">${editIcon}</span><span title='${blobJson}' class="document-delete-button">${deleteIcon}</span>`;
 
             const actionCell = document.createElement('td');
             actionCell.className = 'document-cell action-container';
@@ -2288,6 +2273,20 @@ function renderDocumentsHtmlTable(blobs) {
         const elements = document.getElementsByClassName('blob-name');
         Array.from(elements).forEach(element => element.classList.add('no-before'));
     }
+
+    document.querySelectorAll('.document-delete-button').forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            deleteDocument(item.title);
+        });
+    });
+
+    document.querySelectorAll('.document-edit-button').forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            editDocument(item.title);
+        });
+    });
 }
 
 // Function to render panel icons
@@ -2707,25 +2706,19 @@ async function uploadFilesToAzure(files) {
 
     let httpContentType = 'application/json';
     let httpHeaders = {};
+    let httpBody = "";
+    let response = "";
+
     const httpMethod = 'PUT';
     const returnData = false;
     const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
-    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
-    const editIcon = config.ICONS.EDIT.MONOTONE;
-    const deleteIcon = config.ICONS.DELETE.MONOTONE;
 
     const searchIndexers = config.SEARCH_INDEXERS;
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-    const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
+    let fullStorageUrl;
 
     for (const file of files) {
         const fileName = file.name.replace("#", "");
@@ -2746,7 +2739,20 @@ async function uploadFilesToAzure(files) {
         };
 
         try {
-            const response = await invokeRESTAPI(uploadUrl, httpMethod, httpContentType, httpHeaders, file, keyVaultProxyOperation, returnData);
+            if (useSaS) {
+                fullStorageUrl = config.AZURE_STORAGE_FULL_URL_SAS;
+
+                response = await fetch(fullStorageUrl, {
+                    method: httpMethod,
+                    headers: httpHeaders,
+                    body: httpBody
+                });
+            }
+            else {
+                fullStorageUrl = config.AZURE_STORAGE_URL;
+
+                response = await invokeRESTAPI(fullStorageUrl, httpMethod, httpContentType, httpHeaders, file, keyVaultProxyOperation, returnData);
+            }
 
             if (response.ok) {
                 showToastNotification(`Upload successful for ${file.name}.`, true);
@@ -2763,7 +2769,7 @@ async function uploadFilesToAzure(files) {
     // Clear the file input after successful upload
     clearFileInput();
 
-    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
+    getDocuments(blobs); // Refresh the document list after successful upload
 
     //The isn't working yet because of permissions issues
     await runSearchIndexer(searchIndexers);
@@ -2780,26 +2786,17 @@ async function uploadFilesToAzureBatch(files) {
     const returnData = false;
     const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
-    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
-    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
-    const editIcon = config.ICONS.EDIT.MONOTONE;
-    const deleteIcon = config.ICONS.DELETE.MONOTONE;
     const searchIndexers = config.SEARCH_INDEXERS;
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-    const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
+    let fullStorageUrl;
+
+    let response;
 
     // Create an array of upload promises for concurrent processing.
     const uploadPromises = Array.from(files).map(file => {
         return (async () => {
             const fileName = file.name.replace("#", "");
-            const uploadUrl = `${storageUrl}/${fileName}?&${sasToken}`;
             const date = new Date().toUTCString();
             const httpContentType = file.type;
             const fileHeaders = {
@@ -2814,7 +2811,22 @@ async function uploadFilesToAzureBatch(files) {
             };
 
             try {
-                const response = await invokeRESTAPI(uploadUrl, httpMethod, httpContentType, fileHeaders, file, keyVaultProxyOperation, returnData);
+
+                if (useSaS) {
+                    fullStorageUrl = config.AZURE_STORAGE_FULL_URL_SAS;
+
+                    response = await fetch(fullStorageUrl, {
+                        method: httpMethod,
+                        headers: fileHeaders,
+                        body: file
+                    });
+                }
+                else {
+                    fullStorageUrl = config.AZURE_STORAGE_URL;
+
+                    response = await invokeRESTAPI(fullStorageUrl, httpMethod, httpContentType, fileHeaders, file, keyVaultProxyOperation, returnData);
+                }
+
                 // Check for success—if not, throw error for Promise.all rejection.
                 if (response && response.ok) {
                     console.log(`Upload successful for ${file.name}.`);
@@ -2841,7 +2853,7 @@ async function uploadFilesToAzureBatch(files) {
         await Promise.all(uploadPromises);
         // Clear file input and refresh document list after all uploads complete
         clearFileInput();
-        getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+        getDocuments(blobs);
         // Optionally, run the search indexer after batch uploading
         await runSearchIndexer(searchIndexers);
     } catch (error) {

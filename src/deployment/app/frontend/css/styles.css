@@ -475,6 +475,11 @@ code {
   white-space: nowrap;
 }
 
+.document-edit-button,
+.document-delete-button {
+  cursor: pointer;
+}
+
 .document-row {
   display: table-row;
 }

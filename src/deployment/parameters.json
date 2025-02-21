@@ -9,6 +9,7 @@
   "resourceSuffix": 1,
   "resourceSuffixCounter": "007",
   "resourceBaseName": "copilot-demo",
+  "storageServiceSasTemplate": "sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tfqb&srt=co",
   "aiHubConnections": [
     {
       "Name": "AIService"

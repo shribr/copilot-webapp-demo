@@ -1081,6 +1081,7 @@ function Initialize-Parameters {
     $global:searchService = $parametersObject.searchService
     $global:searchSkillSets = $parametersObject.searchSkillSets          
     $global:storageService = $parametersObject.storageService
+    $global:storageServiceSasTemplate = $parametersObject.storageServiceSasTemplate
     $global:subNet = $parametersObject.subNet
     $global:userAssignedIdentity = $parametersObject.userAssignedIdentity         
     $global:virtualNetwork = $parametersObject.virtualNetwork         
@@ -1197,6 +1198,7 @@ function Initialize-Parameters {
         searchSkillSets              = $global:searchSkillSets
         siteLogo                     = $parametersObject.siteLogo
         storageService               = $global:storageService
+        storageServiceSasTemplate    = $global:storageServiceSasTemplate
         subNet                       = $global:subNet
         subscriptionId               = $global:subscriptionId
         tenantId                     = $global:tenantId
@@ -4028,6 +4030,44 @@ function Set-KeyVaultRoles {
     }
 }
 
+# Function to set Key Vault storage SAS
+function Set-KeyVaultStorageSas {
+    param (
+        [string]$keyVaultName,
+        [string]$resourceGroupName
+    )
+
+    Write-Host "Executing Set-KeyVaultStorageSas function..." -ForegroundColor Magenta
+
+    $storageServiceName = $global:storageService.Name
+    $storageServiceSasTemplate = $global:storageServiceSasTemplate
+    $subscriptionId = $global:subscriptionId
+
+    #$storageKey = az storage account keys list --resource-group  $resourceGroupName --account-name $storageServiceName --query "[0].value" --output tsv
+    #$storageSAS = az storage account generate-sas --account-name $storageServiceName --account-key $storageKey --resource-types co --services btfq --permissions rwdlacupiytfx --expiry $expirationDate --https-only --output tsv
+    
+    try {
+        $ErrorActionPreference = 'Stop'
+        # Create a new key vault managed storage account
+        az keyvault storage add --vault-name $keyVaultName -n $storageServiceName --active-key-name key1 --auto-regenerate-key --regeneration-period P30D --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageServiceName"
+
+        # Set shared access signature (SAS) definition in key vault
+        az keyvault storage sas-definition create --vault-name $keyVaultName --account-name $storageServiceName -n $storageServiceSasTemplate --validity-period P2D --sas-type account --template-uri $storageServiceSasTemplate
+        
+        # Store the SAS token in Key Vault
+        az keyvault secret set --vault-name $keyVaultName --name "StorageSasToken" --value $sasToken --output none
+
+        Write-Host "Key Vault '$keyVaultName' secret 'StorageSasToken' created successfully."
+        Write-Log -message "Key Vault '$keyVaultName' secret 'StorageSasToken' created successfully."
+
+        #az keyvault storage sas-definition show --id https://<YourKeyVaultName>.vault.azure.net/storage/<YourStorageAccountName>/sas/<YourSASDefinitionName>
+    }
+    catch {
+        Write-Error "Failed to create Key Vault '$keyVaultName' secret 'StorageSasToken': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to create Key Vault '$keyVaultName' secret 'StorageSasToken': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
 # Function to create secrets in Key Vault
 function Set-KeyVaultSecrets {
     param (
@@ -4928,6 +4968,7 @@ function Update-ConfigFile {
         $config.AZURE_STORAGE_FULL_URL = $fullStorageUrl
         $config.AZURE_STORAGE_FULL_URL_SAS = $fullStorageUrlSas
         $config.AZURE_STORAGE_API_KEY = $storageKey
+        $config.AZURE_STORAGE_SAS = $storageSAS
         $config.AZURE_STORAGE_SAS_TOKEN.SE = $expirationDate
         $config.AZURE_STORAGE_SAS_TOKEN.SIG = $storageSIG
         $config.AZURE_STORAGE_SAS_TOKEN.SP = $storageSP
