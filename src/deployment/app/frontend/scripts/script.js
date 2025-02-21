@@ -1234,25 +1234,33 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
     let openAIRequestBody = "";
     let openAIRequestBodyJson = "";
-    let keyVaultProxyOperation = "";
+    let keyVaultProxyOperation = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
 
     const returnData = true;
     const httpMethod = 'POST';
-    const httpHeaders = {};
+    let httpHeaders = {};
     let httpContentType = 'application/json';
-    let httpBody;
+    let apiKey;
+    let searchApiKey;
 
     switch (isImageQuestion) {
         case true:
-            keyVaultProxyOperation = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
             openAIRequestBody = config.DALL_E_REQUEST_BODY;
             console.log('Image question detected');
             break;
         case false:
-            keyVaultProxyOperation = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
             openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
             console.log('Non-image question detected');
             break;
+    }
+
+    if (authMode == 'MSAL') {
+        apiKey = await getSecretFromKeyVault(keyVaultProxyOperation);
+        searchApiKey = await getSecretFromKeyVault(config.AZURE_SEARCH_SERVICE_SECRET_NAME);
+    }
+    else {
+        apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+        searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
     }
 
     const apiVersion = aiModel.ApiVersion;
@@ -1281,7 +1289,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
         let imageTableBody = document.createElement('tbody');
         imageTableBody.class = 'image-table-body';
 
-        const images = await invokeRESTAPI(endpoint, httpMethod, httpContentType, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
+        const images = await invokeRESTAPI(endpoint, httpMethod, httpContentType, httpHeaders, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
 
         for (const image of images.data) {
 
@@ -1319,7 +1327,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
             for (const source of dataSources) {
                 source.parameters.role_information = persona.Prompt;
-                //If authMode is MSAL then we usw the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
+                //If authMode is MSAL then we use the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
                 //If the authMode is API_KEY then we just use the search API key directly from the config.json file.
                 source.parameters.authentication.key = searchApiKey;
                 //source.parameters.authentication.key = apiKey
@@ -1329,7 +1337,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
                 //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
                 //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
-                const result = await invokeRESTAPI(endpoint, httpMethod, httpContentType, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
+                const result = await invokeRESTAPI(endpoint, httpMethod, httpContentType, httpHeaders, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
 
                 results.push(result);
             }
@@ -1665,15 +1673,15 @@ async function getSasToken() {
 // Function to get the search indexer status
 async function getSearchIndexerStatus(searchIndexers) {
     // Retrieve configuration which should include your Azure Search service name and API key
-    const method = 'POST';
+    const httpMethod = 'GET';
     const returnData = true;
-    const contentType = 'application/json';
+    const httpContentType = 'application/json';
     const httpHeaders = "";
     const httpBody = "";
 
     const keyVaultProxyOperation = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
     const searchServiceUrl = config.AZURE_SEARCH_SERVICE_URL;
-    const apiVersion = config.AZURE_SEARCH_API_VERSION;
+    const apiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
 
     //https://learn.microsoft.com/en-us/rest/api/searchservice/indexers/get-status?view=rest-searchservice-2024-07-01&tabs=HTTP#indexerexecutionstatus
 
@@ -1693,9 +1701,7 @@ async function getSearchIndexerStatus(searchIndexers) {
         try {
             const searchIndexerUrl = `${searchServiceUrl}/indexers/${searchIndexerName}/status?api-version=${apiVersion}`;
 
-            const response = await invokeRESTAPI(searchIndexerUrl, method, contentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
-
-            const data = await response.json();
+            const data = await invokeRESTAPI(searchIndexerUrl, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
 
             console.log(`Indexer: ${searchIndexerName} status:`, data.lastResult.status);
 
@@ -1953,6 +1959,7 @@ async function invokeRESTAPI(httpEndpoint, httpMethod, httpContentType, httpHead
 
     let data = {};
     let apiKey = "";
+    let response;
 
     //httpMethod = (httpMethod === undefined || httpMethod === "") ? "POST" : httpMethod;
 
@@ -1989,11 +1996,19 @@ async function invokeRESTAPI(httpEndpoint, httpMethod, httpContentType, httpHead
             httpHeaders['api-key'] = apiKey;
         }
 
-        const response = await fetch(httpEndpoint, {
-            method: httpMethod,
-            headers: httpHeaders,
-            body: httpBody
-        });
+        if (httpBody === undefined || httpBody === "" || httpBody === null) {
+            response = await fetch(httpEndpoint, {
+                method: httpMethod,
+                headers: httpHeaders
+            });
+        }
+        else {
+            response = await fetch(httpEndpoint, {
+                method: httpMethod,
+                headers: httpHeaders,
+                body: httpBody
+            });
+        }
 
         if (returnData) {
 
@@ -2315,8 +2330,9 @@ async function runSearchIndexer(searchIndexers) {
 
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
     const searchServiceApiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
+    const searchServiceUrl = config.AZURE_SEARCH_SERVICE_URL;
 
-    let keyVaultProxyOperation = "GetSearchServiceApiKey";
+    let keyVaultProxyOperation = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
 
     const searchIndexerStatus = await getSearchIndexerStatus(searchIndexers);
 
@@ -2342,7 +2358,8 @@ async function runSearchIndexer(searchIndexers) {
 
         // Invoke the REST method to run the search indexer
         try {
-            await invokeRESTAPI(searchIndexerUrl, httpMethod, httpContentType, null, httpBody, keyVaultProxyOperation, returnData);
+
+            await invokeRESTAPI(searchIndexerUrl, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
 
             //No need to return anything from the search indexer
             //const data = await response.json();
@@ -2712,6 +2729,8 @@ async function uploadFilesToAzure(files) {
     const httpMethod = 'PUT';
     const returnData = false;
     const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
+    const storageUrl = config.AZURE_STORAGE_URL;
+    const sasToken = config.AZURE_STORAGE_SAS;
 
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
@@ -2722,7 +2741,6 @@ async function uploadFilesToAzure(files) {
 
     for (const file of files) {
         const fileName = file.name.replace("#", "");
-        const uploadUrl = `${storageUrl}/${fileName}`;
         const date = new Date().toUTCString();
 
         httpContentType = file.type;
@@ -2740,16 +2758,16 @@ async function uploadFilesToAzure(files) {
 
         try {
             if (useSaS) {
-                fullStorageUrl = config.AZURE_STORAGE_FULL_URL_SAS;
+                fullStorageUrl = `${storageUrl}/${containerName}/${fileName}?&${sasToken}`;
 
                 response = await fetch(fullStorageUrl, {
                     method: httpMethod,
                     headers: httpHeaders,
-                    body: httpBody
+                    body: file
                 });
             }
             else {
-                fullStorageUrl = config.AZURE_STORAGE_URL;
+                fullStorageUrl = `${storageUrl}/${containerName}/${fileName}`;
 
                 response = await invokeRESTAPI(fullStorageUrl, httpMethod, httpContentType, httpHeaders, file, keyVaultProxyOperation, returnData);
             }
