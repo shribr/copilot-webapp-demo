@@ -1104,7 +1104,7 @@ async function deleteDocument(doc) {
 
     const deleteUrl = doc.Url;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
-    const keyVaultProxyOperation = "GetStorageServiceApiKey";
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
     const httpMethod = "DELETE";
     const httpContentType = "application/json";
     const httpBody = null;
@@ -1251,12 +1251,12 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
     switch (isImageQuestion) {
         case true:
-            keyVaultProxyOperation = "GetOpenAIServiceApiKey";
+            keyVaultProxyOperation = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
             openAIRequestBody = config.DALL_E_REQUEST_BODY;
             console.log('Image question detected');
             break;
         case false:
-            keyVaultProxyOperation = "GetSearchServiceApiKey";
+            keyVaultProxyOperation = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
             openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
             console.log('Non-image question detected');
             break;
@@ -1623,7 +1623,7 @@ async function getDocuments(blobs) {
 
     const sasToken = await getSasToken();
 
-    const keyVaultProxyOperation = "GetStorageServiceApiKey";
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
     const fullStorageUrl = config.AZURE_STORAGE_FULL_URL;
 
     try {
@@ -1688,8 +1688,9 @@ async function getSearchIndexerStatus(searchIndexers) {
     const httpHeaders = "";
     const httpBody = "";
 
-    const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const searchServiceApiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
+    const keyVaultProxyOperation = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
+    const searchServiceUrl = config.AZURE_SEARCH_SERVICE_URL;
+    const apiVersion = config.AZURE_SEARCH_API_VERSION;
 
     //https://learn.microsoft.com/en-us/rest/api/searchservice/indexers/get-status?view=rest-searchservice-2024-07-01&tabs=HTTP#indexerexecutionstatus
 
@@ -1697,7 +1698,7 @@ async function getSearchIndexerStatus(searchIndexers) {
 
     // Iterate over the search indexers to get their current statuses
     for (const searchIndexer of searchIndexers) {
-        var searchIndexerName = searchIndexer.Name;
+        const searchIndexerName = searchIndexer.Name;
         //var searchIndexName = searchIndexer.IndexName;
         //var searchIndexerSchema = searchIndexer.Schema;
 
@@ -1707,6 +1708,7 @@ async function getSearchIndexerStatus(searchIndexers) {
 
         // Invoke the REST method to get the search indexer status
         try {
+            const searchIndexerUrl = `${searchServiceUrl}/indexers/${searchIndexerName}/status?api-version=${apiVersion}`;
 
             const response = await invokeRESTAPI(searchIndexerUrl, method, contentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
 
@@ -1969,7 +1971,7 @@ async function invokeRESTAPI(httpEndpoint, httpMethod, httpContentType, httpHead
     let data = {};
     let apiKey = "";
 
-    method = (method === undefined || method === "") ? "POST" : method;
+    //httpMethod = (httpMethod === undefined || httpMethod === "") ? "POST" : httpMethod;
 
     try {
 
@@ -1978,19 +1980,19 @@ async function invokeRESTAPI(httpEndpoint, httpMethod, httpContentType, httpHead
         }
         else {
             switch (keyVaultProxyOperation) {
-                case "GetOpenAIServiceApiKey":
+                case "OpenAIServiceApiKey":
                     apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
                     break;
-                case "GetSearchServiceApiKey":
+                case "SearchServiceApiKey":
                     apiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
                     break;
-                case "GetStorageServiceApiKey":
+                case "StorageServiceApiKey":
                     apiKey = config.AZURE_STORAGE_API_KEY;
                     break;
             }
         }
 
-        httpContentType = isImageQuestion ? 'image/jpeg' : 'application/json';
+        //httpContentType = isImageQuestion ? 'image/jpeg' : 'application/json';
 
         if (httpHeaders === undefined || httpHeaders === "" || httpHeaders === null) {
             httpHeaders = {
@@ -2337,7 +2339,7 @@ async function runSearchIndexer(searchIndexers) {
             continue;
         }
 
-        var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
+        var searchIndexerUrl = `${searchServiceUrl}/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
 
         // Invoke the REST method to run the search indexer
         try {
@@ -2707,7 +2709,7 @@ async function uploadFilesToAzure(files) {
     let httpHeaders = {};
     const httpMethod = 'PUT';
     const returnData = false;
-    const keyVaultProxyOperation = "GetStorageServiceApiKey";
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;
@@ -2776,7 +2778,7 @@ async function uploadFilesToAzureBatch(files) {
 
     const httpMethod = 'PUT';
     const returnData = false;
-    const keyVaultProxyOperation = "GetStorageServiceApiKey";
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
 
     const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
     const azureStorageUrl = config.AZURE_STORAGE_URL;

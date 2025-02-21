@@ -1461,10 +1461,10 @@ function New-ApiManagementApi {
         try {
             # Check if the operations already exist
 
-            $keyVaultProxyOperationsList = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+            $keyVaultProxyOperationsList = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --query "[].name" --output tsv
 
             foreach ($operation in $global:keyVaultProxyOperations) {
-                if ($keyVaultProxyOperationsList -notcontains $operation) {
+                if ($keyVaultProxyOperationsList -notcontains $operation.Name) {
                     
                     try {
                         az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id $operation.Name --display-name $operation.DisplayName --method $operation.Method --url-template $operation.UrlTemplate
@@ -1508,10 +1508,10 @@ function New-ApiManagementApi {
         try {
             # Check if the operations already exist
 
-            $keyVaultProxyOperationsList = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy
+            $keyVaultProxyOperationsList = az apim api operation list --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --query "[].name" --output tsv
 
             foreach ($operation in $global:keyVaultProxyOperations) {
-                if ($keyVaultProxyOperationsList -notcontains $operation) {
+                if ($keyVaultProxyOperationsList -notcontains $operation.Name) {
                     
                     try {
                         az apim api operation create --resource-group $resourceGroupName --service-name $apiManagementServiceName --api-id KeyVaultProxy --operation-id $operation.Name --display-name $operation.DisplayName --method $operation.Method --url-template $operation.UrlTemplate
@@ -4916,7 +4916,7 @@ function Update-ConfigFile {
         $config.AZURE_SEARCH_SERVICE_API_VERSION = $global:searchService.ApiVersion
         $config.AZURE_SEARCH_SERVICE_SEMANTIC_CONFIG = "vector-profile-srch-index-$fullResourceBaseName-semantic-configuration" -join ""
         $config.AZURE_SEARCH_SERVICE_NAME = $global:searchService.Name
-
+        $config.AZURE_SEARCH_SERVICE_URL = "https://$searchServiceName.search.windows.net"
         #Write-Output "Modified SAS Token: $storageSAS"
         $storageUrl = "https://$storageServiceName.blob.core.windows.net"
         $fullStorageUrl = "$storageUrl/content?comp=list&include=metadata&restype=container"
