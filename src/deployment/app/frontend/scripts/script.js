@@ -220,25 +220,37 @@ document.addEventListener("DOMContentLoaded", async () => {
             leftNavContainer.style.display = 'none';
         }
 
-        if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
-            leftNavContainer.style.display = 'none';
-        }
+        // if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
+        //     leftNavContainer.style.display = 'none';
+        // }
     });
 
     window.addEventListener('resize', function () {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        // Add your resize logic here
-        //console.log(`Window resized to width: ${width}, height: ${height}`);
-
         // Example: Adjust the display of leftNavContainer based on the new width
         const leftNavContainer = document.getElementById('left-nav-container');
-        if (width > 600) {
-            leftNavContainer.style.display = 'block';
-        } else {
-            leftNavContainer.style.display = 'none';
-        }
+        const mainContent = document.getElementById('main-content');
+        const mainContentWidth = mainContent.getBoundingClientRect().width;
+
+        const mainTitleWidth = document.getElementById("main-header-title").getBoundingClientRect().width;
+
+        let resizeWidth = mainTitleWidth > mainContentWidth ? mainTitleWidth + 210 : 660;
+
+        // Add your resize logic here
+        //console.log(`Window resized to width: ${width}, height: ${height}`);
+        //console.log(`Main title width: ${mainTitleWidth}`);
+        //console.log(`Resize width: ${resizeWidth}`);
+
+        //User to be compared to 600
+        // if (width > resizeWidth) {
+        //     leftNavContainer.style.display = 'block';
+        //     mainContent.style.marginLeft = '210px';
+        // } else {
+        //     leftNavContainer.style.display = 'none';
+        //     mainContent.style.marginLeft = '20px';
+        // }
 
         if (width < 1350) {
             const elements = document.getElementsByClassName('blob-name');
@@ -674,6 +686,8 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const fullStorageUrl = `${storageUrl}/${containerName}`;
 
+    const iconInfo = config.ICONS.INFO.MONOTONE;
+
     let footNoteLinks = "";
     let followUpQuestions = "";
 
@@ -719,8 +733,8 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                         const message = { "role": role, "content": answerText };
 
-                        if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
-                            answerText = persona.NoResults;
+                        if (answerText.startsWith(config.NO_RESULTS_FOUND)) {
+                            answerText = answerText.replace(config.NO_RESULTS_FOUND, persona.NoResults);
                         }
                         else {
                             addMessageToChatHistory(thread, message);
@@ -805,7 +819,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
                 console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
             }
             else {
-                answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+                answerListHTML = `<div class="answer-results" title="${azureOpenAIResults[0].error}">${persona.NoResults}</div>`;
                 console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
             }
         }
@@ -817,11 +831,16 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         if (azureOpenAIResults.error === undefined) {
             if (azureOpenAIResults.data.length > 0) {
                 answerListHTML = `<div class="answer-results"><img src='${azureOpenAIResults.data[0].url}' title='${azureOpenAIResults.data[0].revised_prompt}' style='width:100%'></div>`;
+                console.log(azureOpenAIResults.data[0].revised_prompt);
             }
             else {
-                answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+                answerListHTML = `<div class="answer-results" title="${azureOpenAIResults[0].error}">${persona.NoResults} <span class="icon-info">${iconInfo}</span></div>`;
                 console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
             }
+        }
+        else {
+            answerListHTML = `<div class="answer-results" title="${azureOpenAIResults.error.message}">${persona.NoResults} <span class="icon-info">${iconInfo}</span></div>`;
+            console.error('Error getting results from Azure OpenAI:', azureOpenAIResults.error.message);
         }
 
         answers += answerListHTML;
@@ -1892,7 +1911,7 @@ function hideLeftNav() {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    if (width < 601) {
+    if (width < 831) {
         document.getElementById('left-nav-container').style.display = 'none';
     }
 }
