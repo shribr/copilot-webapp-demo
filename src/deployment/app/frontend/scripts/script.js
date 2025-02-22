@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
+        if (width < 831 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
             leftNavContainer.style.display = 'none';
         }
 

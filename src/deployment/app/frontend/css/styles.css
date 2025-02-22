@@ -55,14 +55,27 @@ body {
   }
 }
 
-/* THIS MEANS GREATER THAN OR EQUAL TO 768PX */
-@media (min-width: 660px) {
+/* THIS MEANS GREATER THAN OR EQUAL TO 661PX */
+@media (min-width: 661px) {
   #hamburger-menu {
     display: none;
   }
 
+  #main-header-title {
+    font-size: 1.8em !important;
+    margin-left: 160px !important;
+  }
+
   .followup-questions {
     margin-bottom: 2px !important;
+  }
+}
+
+/* THIS MEANS LESS THAN OR EQUAL TO 660PX */
+@media (max-width: 660px) {
+  #main-header-title {
+    font-size: 1.4em !important;
+    margin-left: 0px !important;
   }
 }
 
@@ -109,11 +122,6 @@ body {
     line-height: 2px;
   }
 
-  #main-header-title {
-    font-size: 1.4em !important;
-    margin-left: 0px !important;
-  }
-
   #filter-container {
     flex: 1 1 100%;
   }
@@ -136,7 +144,7 @@ body {
   }
 
   #left-nav-container {
-    display: none !important;
+    display: none;
   }
 
   #site-logo-container {
