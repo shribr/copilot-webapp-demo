@@ -1,92 +1,94 @@
 {
+  "@odata.etag": "\"0x8DD52D9658BA097\"",
   "name": "embeddings-srch-index-copilot-demo-007",
   "fields": [
     {
       "name": "id",
       "type": "Edm.String",
-      "key": true,
-      "retrievable": true,
-      "stored": true,
       "searchable": true,
       "filterable": true,
+      "retrievable": true,
+      "stored": true,
       "sortable": true,
       "facetable": true,
+      "key": true,
       "synonymMaps": []
     },
     {
       "name": "content",
       "type": "Edm.String",
-      "key": false,
-      "retrievable": true,
-      "stored": true,
       "searchable": true,
       "filterable": false,
+      "retrievable": true,
+      "stored": true,
       "sortable": false,
       "facetable": false,
+      "key": false,
       "analyzer": "en.microsoft",
       "synonymMaps": []
     },
     {
       "name": "category",
       "type": "Edm.String",
-      "key": false,
-      "retrievable": true,
-      "stored": true,
       "searchable": true,
       "filterable": false,
-      "sortable": false,
-      "facetable": true,
-      "synonymMaps": []
-    },
-    {
-      "name": "title",
-      "type": "Edm.String",
-      "key": false,
       "retrievable": true,
       "stored": true,
-      "searchable": true,
-      "filterable": true,
       "sortable": false,
-      "facetable": false,
+      "facetable": true,
+      "key": false,
       "synonymMaps": []
     },
     {
       "name": "sourcepage",
       "type": "Edm.String",
-      "key": false,
-      "retrievable": true,
-      "stored": true,
       "searchable": false,
       "filterable": false,
+      "retrievable": true,
+      "stored": true,
       "sortable": false,
       "facetable": true,
+      "key": false,
       "synonymMaps": []
     },
     {
       "name": "sourcefile",
       "type": "Edm.String",
-      "key": false,
-      "retrievable": true,
-      "stored": true,
       "searchable": false,
       "filterable": false,
+      "retrievable": true,
+      "stored": true,
       "sortable": false,
       "facetable": true,
+      "key": false,
       "synonymMaps": []
     },
     {
       "name": "embedding",
       "type": "Collection(Edm.Single)",
-      "key": false,
-      "retrievable": true,
-      "stored": true,
       "searchable": true,
       "filterable": false,
+      "retrievable": true,
+      "stored": true,
       "sortable": false,
       "facetable": false,
-      "synonymMaps": [],
+      "key": false,
       "dimensions": 3072,
-      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-009-text-profile"
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-009-text-profile",
+      "synonymMaps": []
+    },
+    {
+      "name": "title",
+      "type": "Edm.String",
+      "searchable": true,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": true,
+      "facetable": false,
+      "key": false,
+      "analyzer": "standard.lucene",
+      "synonymMaps": []
     }
   ],
   "scoringProfiles": [],
@@ -96,10 +98,10 @@
   },
   "suggesters": [],
   "analyzers": [],
+  "normalizers": [],
   "tokenizers": [],
   "tokenFilters": [],
   "charFilters": [],
-  "normalizers": [],
   "similarity": {
     "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
   },
@@ -124,10 +126,10 @@
         "name": "vector-config-srch-index-copilot-demo-009-algorithm",
         "kind": "hnsw",
         "hnswParameters": {
+          "metric": "cosine",
           "m": 4,
           "efConstruction": 400,
-          "efSearch": 500,
-          "metric": "cosine"
+          "efSearch": 500
         }
       }
     ],
@@ -139,6 +141,5 @@
     ],
     "vectorizers": [],
     "compressions": []
-  },
-  "@odata.etag": "\"0x8DD101A99DFDAE1\""
+  }
 }

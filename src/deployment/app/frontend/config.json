@@ -26,9 +26,9 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_SAS": "se=2026-02-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bftq&srt=co&sig=GJRZpsmuHMfJytqSJkwaf%2Bd29UaK3LRprj8Oh7EV4sU%3D",
+  "AZURE_STORAGE_SAS": "se=2026-02-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tqbf&srt=co&sig=sP3RSIocdfXIiu3vVDVD0jsHoam7TcRMqOekPfdmg9o%3D",
   "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container",
-  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bftq&srt=co&sig=GJRZpsmuHMfJytqSJkwaf%2Bd29UaK3LRprj8Oh7EV4sU%3D",
+  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-19T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tqbf&srt=co&sig=sP3RSIocdfXIiu3vVDVD0jsHoam7TcRMqOekPfdmg9o%3D",
   "AZURE_STORAGE_API_KEY": "W+py7QmkrPsI68ZH9fyJBaf/QZcAi+wG0ZGqrC6F/Z6OckHMBKrLa0JdptJsAZ1WR4f2LV6JSMcm+AStBKt7Tg==",
   "AZURE_STORAGE_BASE_URL": "blob.core.windows.net",
   "AZURE_STORAGE_URL": "https://stcopilotdemo007.blob.core.windows.net",
@@ -47,53 +47,53 @@
   "OPENAI_ACCOUNT_NAME": "openai-service-copilot-demo-007",
   "OPENAI_API_KEY": "37d2613f1b1d470396dd2a7f8288561c",
   "OPENAI_API_VERSION": "2024-10-01",
-  "PROMPT_SUFFIX": " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response using $$$$ to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set of followup questions surrounded by <ol id='followup-questions-list'> also separated by $$$$. For the follow up questions only return the questions. no header text or anything like that.",
+  "PROMPT_SUFFIX": " Include an explanation of your thought process to arrivate at this answer and have the thought process content placed at the end of your response delimited by exactly 4 dollar sign symbols (i.e. $$$$) to mark where the thought process content begins. Also include 3 possible follow up questions after the thought process with each one surrounded by <li class='followup-questions'> elements and the entire set of followup questions surrounded by <ol id='followup-questions-list'> also using $$$$ as the delimiter. For the follow up questions only return the questions. no header text or anything like that.",
   "REGION": "eastus",
   "SEARCH_AZURE_OPENAI_MODEL": null,
   "SEARCH_PUBLIC_INTERNET_RESULTS": null,
   "SITE_LOGO": null,
   "AI_MODELS": [
     {
+      "Format": "OpenAI",
       "ApiVersion": "2024-08-01-preview",
+      "Path": "chat/completions",
+      "DeploymentName": "gpt-4o",
+      "KeyWordTriggers": null,
+      "ModelVersion": "2024-11-20",
       "Sku": {
         "Capacity": 100,
         "Name": "GlobalStandard"
       },
-      "ModelVersion": "2024-08-06",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
-      "KeyWordTriggers": null,
-      "DeploymentName": "gpt-4o",
       "Type": "gpt-4o",
-      "Path": "chat/completions",
-      "Format": "OpenAI"
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8"
     },
     {
+      "Format": "OpenAI",
       "ApiVersion": "2023-05-15",
+      "Path": "images/generations",
+      "DeploymentName": "text-embedding",
+      "KeyWordTriggers": null,
+      "ModelVersion": "1",
       "Sku": {
         "Capacity": 100,
         "Name": "Standard"
       },
-      "ModelVersion": "1",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
-      "KeyWordTriggers": null,
-      "DeploymentName": "text-embedding",
       "Type": "text-embedding-3-large",
-      "Path": "images/generations",
-      "Format": "OpenAI"
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8"
     },
     {
+      "Format": "OpenAI",
       "ApiVersion": "2024-02-01",
+      "Path": "images/generations",
+      "DeploymentName": "dall-e-3",
+      "KeyWordTriggers": null,
+      "ModelVersion": "3.0",
       "Sku": {
         "Capacity": 2,
         "Name": "Standard"
       },
-      "ModelVersion": "3.0",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
-      "KeyWordTriggers": null,
-      "DeploymentName": "dall-e-3",
       "Type": "dall-e-3",
-      "Path": "images/generations",
-      "Format": "OpenAI"
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8"
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -118,33 +118,21 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "bftq",
+    "SS": "tqbf",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-02-19T23:59:59Z",
     "ST": "2025-02-19T23:59:59Z",
     "SPR": "https",
-    "SIG": "GJRZpsmuHMfJytqSJkwaf%2Bd29UaK3LRprj8Oh7EV4sU%3D",
+    "SIG": "sP3RSIocdfXIiu3vVDVD0jsHoam7TcRMqOekPfdmg9o%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
-    "frequency_penalty": 0,
-    "messages": [
-      {
-        "content": "",
-        "role": "system",
-        "role_information": "You are a helpful assistant"
-      },
-      {
-        "content": "",
-        "role": "user"
-      }
-    ],
-    "stream": false,
     "stop": null,
-    "max_tokens": 800,
+    "presence_penalty": 0,
+    "top_p": 0.95,
     "data_sources": [
       {
         "type": "azure_search",
@@ -158,9 +146,21 @@
         }
       }
     ],
+    "stream": false,
+    "messages": [
+      {
+        "role": "system",
+        "content": "",
+        "role_information": "You are a helpful assistant"
+      },
+      {
+        "role": "user",
+        "content": ""
+      }
+    ],
+    "frequency_penalty": 0,
     "temperature": 0.7,
-    "presence_penalty": 0,
-    "top_p": 0.95
+    "max_tokens": 800
   },
   "CHAT_PERSONAS": [
     {
@@ -287,12 +287,12 @@
     {
       "type": "azure_search",
       "parameters": {
+        "index_name": "vector-srch-index-copilot-demo-007",
+        "endpoint": "https://srch-copilot-demo-007.search.windows.net",
         "authentication": {
           "type": "api_key",
           "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ"
         },
-        "index_name": "vector-srch-index-copilot-demo-007",
-        "endpoint": "https://srch-copilot-demo-007.search.windows.net",
         "role_information": ""
       }
     }

@@ -1,6 +1,6 @@
 {
   "appendUniqueSuffix": false,
-  "appDeploymentOnly": true,
+  "appDeploymentOnly": false,
   "currentFullResourceBaseName": "copilot-demo-007",
   "deploymentType": "Existing",
   "fullResourceBaseName": "copilot-demo-007",
@@ -35,7 +35,7 @@
       "ApiKey": "xxx",
       "ApiVersion": "2024-08-01-preview",
       "Format": "OpenAI",
-      "ModelVersion": "2024-08-06",
+      "ModelVersion": "2024-11-20",
       "DeploymentName": "gpt-4o",
       "Location": "east us",
       "Sku": {
@@ -102,7 +102,11 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": ["text", "hybrid", "vector"],
+    "RetrievalModel": [
+      "text",
+      "hybrid",
+      "vector"
+    ],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"

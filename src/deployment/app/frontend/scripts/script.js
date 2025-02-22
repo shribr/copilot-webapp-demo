@@ -515,7 +515,7 @@ function checkIfImageQuestion(input) {
 // Function to check if user is logged in
 async function checkIfLoggedIn() {
 
-    config = await fetchConfig();
+    //config = await fetchConfig();
 
     authMode = config.AUTHENTICATION_MODE;
 
@@ -730,7 +730,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                         const citations = context.citations;
 
-                        // NOTE #1: At the time of this writing if model version 2024-08-06 is not used, the title value from the citations object is not returned in the response.
+                        // NOTE #1: At the time of this writing if model version 2024-11-20 is not used, the title value from the citations object is not returned in the response.
 
                         // NOTE #2: If additional metadata like filepath, title or url are null, you may need to reset and rerun the indexer(s). 
                         // This may be the ACTUAL reason for the null values and not the model version as stated above. Need further investigation.

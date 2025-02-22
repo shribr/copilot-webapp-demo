@@ -1238,6 +1238,7 @@ function Invoke-AzureRestMethod {
     param (
         [string]$method,
         [string]$url,
+        [hashtable]$headers = $null,
         [string]$jsonBody = $null
     )
 
@@ -1249,9 +1250,12 @@ function Invoke-AzureRestMethod {
     $body = $jsonBody | ConvertFrom-Json
 
     $token = az account get-access-token --query accessToken --output tsv
-    $headers = @{
-        "Authorization" = "Bearer $token"
-        "Content-Type"  = "application/json"
+
+    if ($headers -eq $null) {
+        $headers = @{
+            "Authorization" = "Bearer $token"
+            "Content-Type"  = "application/json"
+        }
     }
 
     try {
@@ -3455,13 +3459,28 @@ function New-SearchService {
 
                 $filteredSearchIndexers = $global:searchIndexers | Where-Object { $_.Active -eq $true }
 
+                #$existingSearchIndexers = az search indexer list --resource-group $resourceGroupName --service-name $searchServiceName --output table
+
+                if ($searchServiceApiKey -eq "") {
+                    $searchServiceApiKey = az search admin-key show --resource-group $resourceGroupName --service-name $searchServiceName --query "primaryKey" --output tsv
+                }
+
+                $headers = @{
+                    "content-type" = "application/json"
+                    "api-key"      = $searchServiceApiKey
+                }
+
+                $existingSearchIndexers = Invoke-AzureRestMethod -Method Get -headers $headers -url "https://$searchServiceName.search.windows.net/indexers?api-version=$($searchService.ApiVersion)"
+
+                $existingSearchIndexerNames = $existingSearchIndexers.value.name
+
                 foreach ($indexer in $filteredSearchIndexers) {
                     $indexName = $indexer.IndexName
                     $indexerName = $indexer.Name
 
                     $searchDataSourceName = $indexer.DataSourceName
 
-                    $searchIndexerExists = $searchIndexers -contains $indexerName
+                    $searchIndexerExists = $existingSearchIndexerNames -contains $indexerName
 
                     if ($searchIndexerExists -eq $false) {
                         New-SearchIndexer -searchService $searchService `
