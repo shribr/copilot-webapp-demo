@@ -79,6 +79,12 @@ body {
   }
 }
 
+@media (max-width: 430px) {
+  #main-header-title {
+    font-size: 0.9em !important;
+  }
+}
+
 /* THIS MEANS LESS THAN OR EQUAL TO 970PX */
 @media (max-width: 970px) {
   #top-navigation-toolbar-link-container {
@@ -89,9 +95,9 @@ body {
     display: inline-block !important;
   }
 
-  .followup-questions {
+  /* .followup-questions {
     margin-bottom: 2px !important;
-  }
+  } */
 }
 
 /* THIS MEANS LESS THAN OR EQUAL TO 830PX */
@@ -117,10 +123,9 @@ body {
     word-break: keep-all;
   }
 
-  .followup-questions {
+  /* .followup-questions {
     margin-bottom: 2px !important;
-    /* line-height: 2px; */
-  }
+  } */
 
   #filter-container {
     flex: 1 1 100%;
@@ -139,9 +144,9 @@ body {
     max-width: 99%;
   }
 
-  .followup-questions {
+  /* .followup-questions {
     margin-bottom: 2px !important;
-  }
+  } */
 
   #left-nav-container {
     display: none;
@@ -367,18 +372,22 @@ code {
   font-size: 14px;
   padding: 4px;
   margin-left: 8px;
-  margin-bottom: 2px;
+  /* margin-bottom: 2px; */
   text-decoration: underline;
   cursor: pointer;
   top: 0px;
 }
 
+.followup-questions-list {
+  margin-top: -25px;
+}
+
 .followup-questions {
   padding: 0px;
   background-color: transparent;
-  height: 24px;
+  /* height: 24px; */
   font-size: 14px;
-  margin-bottom: -12px;
+  /* margin-bottom: -12px; */
 }
 
 .answer-results {
@@ -1145,9 +1154,9 @@ code {
   margin-top: 40px;
 }
 
-#followup-questions-container ol {
+/* #followup-questions-container ol {
   line-height: 0.8;
-}
+} */
 
 /* File upload styles */
 
@@ -1665,7 +1674,6 @@ code {
   width: 210px;
   height: 100% !important;
   flex-shrink: 0;
-  display: flex;
   /* height: calc(100vh - 60px); */
   height: 100%;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);

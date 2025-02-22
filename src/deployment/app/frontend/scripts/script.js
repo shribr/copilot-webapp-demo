@@ -707,7 +707,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
                         let rawText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
 
                         //let answerText = ensureDollarSigns(rawText);
-                        let answerText = rawText;
+                        let answerText = rawText.replace("###", "");
 
                         console.log(answerText);
 
@@ -769,7 +769,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
                                         sourceNumber++;
 
-                                        const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
+                                        const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank"><span style="text-decoration: none">${sourceNumber}.</span> ${truncateText(docTitle, 90)}</a>`;
 
                                         citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
 
@@ -873,7 +873,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         }
         else {
             answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><div class="ai-enhanced-answer-results">${answers}</div><br/></div>`;
-            answerContent.innerHTML += `<div id="followup-questions-container"><h6 class="followup-question">Suggested Follow Up Questions:</h6>${followUpQuestions}</div>`;
+            answerContent.innerHTML += `<div id="followup-questions-container">${followUpQuestions}</div>`;
             answerContent.innerHTML += `<div id="answer-sources-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div ></div> `;
 
             chatResponse.appendChild(answerContent);
