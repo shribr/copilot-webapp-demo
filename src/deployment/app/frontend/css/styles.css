@@ -35,6 +35,31 @@ body {
   height: 42px;
 }
 
+#left-nav-container {
+  display: block;
+  background-color: #ffffff;
+  color: #333;
+  padding: 20px;
+  width: 210px;
+  height: 100% !important;
+  flex-shrink: 0;
+  /* height: calc(100vh - 60px); */
+  height: 100%;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  justify-content: top;
+  align-items: top;
+  z-index: 50;
+  position: fixed;
+}
+
+#left-nav-container hide {
+  display: none;
+}
+
+#left-nav-container show {
+  display: block;
+}
+
 /* THIS MEANS GREATER THAN OR EQUAL TO 980PX */
 @media (max-width: 980px) {
   .tabs {
@@ -149,7 +174,7 @@ body {
   } */
 
   #left-nav-container {
-    display: none;
+    display: none !important;
   }
 
   #site-logo-container {
@@ -179,8 +204,8 @@ body {
   }
 
   #main-content {
-    margin-left: 210px !important;
-    width: 70% !important;
+    padding-left: 210px !important;
+    /* width: 70% !important; */
   }
 
   /* #home-container,
@@ -309,7 +334,7 @@ body {
 }
 
 #main-content {
-  width: 70%;
+  width: 95%;
 }
 
 #chat-container,
@@ -1242,7 +1267,7 @@ code {
 #chat-info-text-copy,
 #login-info {
   padding: 10px;
-  /* width: 500px; */
+  width: 100%;
 }
 
 #chat-info-text-copy h2 {
@@ -1664,23 +1689,6 @@ code {
   margin-bottom: 12px;
   z-index: 900;
   display: none;
-}
-
-#left-nav-container {
-  display: block;
-  background-color: #ffffff;
-  color: #333;
-  padding: 20px;
-  width: 210px;
-  height: 100% !important;
-  flex-shrink: 0;
-  /* height: calc(100vh - 60px); */
-  height: 100%;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  justify-content: top;
-  align-items: top;
-  z-index: 50;
-  position: fixed;
 }
 
 #left-nav-container nav ul {

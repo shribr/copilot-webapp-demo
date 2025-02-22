@@ -26,9 +26,9 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_SAS": "se=2026-02-20T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tfbq&srt=co&sig=gF1YXIKkOqsQnpIt/U4WapOid%2BVo4wkeL%2BDpYewCFX8%3D",
+  "AZURE_STORAGE_SAS": "se=2026-02-20T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=btqf&srt=co&sig=ZJHoa3ef91T3l2IM73JaIg32h2LNpIf%2BboIJ90LYeMQ%3D",
   "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container",
-  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-20T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tfbq&srt=co&sig=gF1YXIKkOqsQnpIt/U4WapOid%2BVo4wkeL%2BDpYewCFX8%3D",
+  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo007.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-02-20T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=btqf&srt=co&sig=ZJHoa3ef91T3l2IM73JaIg32h2LNpIf%2BboIJ90LYeMQ%3D",
   "AZURE_STORAGE_API_KEY": "W+py7QmkrPsI68ZH9fyJBaf/QZcAi+wG0ZGqrC6F/Z6OckHMBKrLa0JdptJsAZ1WR4f2LV6JSMcm+AStBKt7Tg==",
   "AZURE_STORAGE_BASE_URL": "blob.core.windows.net",
   "AZURE_STORAGE_URL": "https://stcopilotdemo007.blob.core.windows.net",
@@ -55,46 +55,46 @@
   "SITE_LOGO": null,
   "AI_MODELS": [
     {
+      "Type": "gpt-4o",
+      "KeyWordTriggers": null,
       "Format": "OpenAI",
+      "DeploymentName": "gpt-4o",
+      "ModelVersion": "2024-11-20",
       "ApiVersion": "2024-08-01-preview",
       "Path": "chat/completions",
-      "DeploymentName": "gpt-4o",
-      "KeyWordTriggers": null,
-      "ModelVersion": "2024-11-20",
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
       "Sku": {
-        "Capacity": 100,
-        "Name": "GlobalStandard"
-      },
-      "Type": "gpt-4o",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8"
+        "Name": "GlobalStandard",
+        "Capacity": 100
+      }
     },
     {
+      "Type": "text-embedding-3-large",
+      "KeyWordTriggers": null,
       "Format": "OpenAI",
+      "DeploymentName": "text-embedding",
+      "ModelVersion": "1",
       "ApiVersion": "2023-05-15",
       "Path": "images/generations",
-      "DeploymentName": "text-embedding",
-      "KeyWordTriggers": null,
-      "ModelVersion": "1",
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
       "Sku": {
-        "Capacity": 100,
-        "Name": "Standard"
-      },
-      "Type": "text-embedding-3-large",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8"
+        "Name": "Standard",
+        "Capacity": 100
+      }
     },
     {
+      "Type": "dall-e-3",
+      "KeyWordTriggers": null,
       "Format": "OpenAI",
+      "DeploymentName": "dall-e-3",
+      "ModelVersion": "3.0",
       "ApiVersion": "2024-02-01",
       "Path": "images/generations",
-      "DeploymentName": "dall-e-3",
-      "KeyWordTriggers": null,
-      "ModelVersion": "3.0",
+      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8",
       "Sku": {
-        "Capacity": 2,
-        "Name": "Standard"
-      },
-      "Type": "dall-e-3",
-      "ApiKey": "3e15025e80484c70b2c03e6aa98db4b8"
+        "Name": "Standard",
+        "Capacity": 2
+      }
     }
   ],
   "ANSWER_GENERATION_CONFIG": {
@@ -119,49 +119,49 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "tfbq",
+    "SS": "btqf",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-02-20T23:59:59Z",
     "ST": "2025-02-20T23:59:59Z",
     "SPR": "https",
-    "SIG": "gF1YXIKkOqsQnpIt/U4WapOid%2BVo4wkeL%2BDpYewCFX8%3D",
+    "SIG": "ZJHoa3ef91T3l2IM73JaIg32h2LNpIf%2BboIJ90LYeMQ%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
   },
   "AZURE_OPENAI_REQUEST_BODY": {
-    "stop": null,
-    "presence_penalty": 0,
-    "top_p": 0.95,
-    "data_sources": [
-      {
-        "type": "azure_search",
-        "parameters": {
-          "index_name": "vector-srch-index-copilot-demo-007",
-          "endpoint": "https://srch-copilot-demo-007.search.windows.net",
-          "authentication": {
-            "type": "api_key",
-            "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ"
-          }
-        }
-      }
-    ],
-    "stream": false,
     "messages": [
       {
         "role": "system",
-        "content": "",
-        "role_information": "You are a helpful assistant"
+        "role_information": "You are a helpful assistant",
+        "content": ""
       },
       {
-        "role": "user",
-        "content": ""
+        "content": "",
+        "role": "user"
       }
     ],
-    "frequency_penalty": 0,
+    "max_tokens": 800,
     "temperature": 0.7,
-    "max_tokens": 800
+    "frequency_penalty": 0,
+    "data_sources": [
+      {
+        "parameters": {
+          "endpoint": "https://srch-copilot-demo-007.search.windows.net",
+          "authentication": {
+            "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ",
+            "type": "api_key"
+          },
+          "index_name": "vector-srch-index-copilot-demo-007"
+        },
+        "type": "azure_search"
+      }
+    ],
+    "presence_penalty": 0,
+    "stream": false,
+    "stop": null,
+    "top_p": 0.95
   },
   "CHAT_PERSONAS": [
     {
@@ -286,16 +286,16 @@
   },
   "DATA_SOURCES": [
     {
-      "type": "azure_search",
       "parameters": {
-        "index_name": "vector-srch-index-copilot-demo-007",
+        "role_information": "",
         "endpoint": "https://srch-copilot-demo-007.search.windows.net",
         "authentication": {
-          "type": "api_key",
-          "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ"
+          "key": "UyyBPMN87Iwd6mPu6Ytu4yb1nDeybTz5bXUVzX51zOAzSeDMUBZQ",
+          "type": "api_key"
         },
-        "role_information": ""
-      }
+        "index_name": "vector-srch-index-copilot-demo-007"
+      },
+      "type": "azure_search"
     }
   ],
   "FILE_TYPES": {

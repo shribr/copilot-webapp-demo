@@ -176,7 +176,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById('hamburger-menu').addEventListener('click', function () {
         const leftNav = document.getElementById('left-nav-container');
-        leftNav.style.display = (leftNav.style.display === 'block' || leftNav.style.display === 'block !important' || leftNav.style.display === "") ? 'none' : 'block';
+        const computedDisplay = window.getComputedStyle(leftNav).display;
+        if (computedDisplay === "none") {
+            // Force display to block regardless of media queries.
+            leftNav.style.setProperty("display", "block", "important");
+        } else {
+            leftNav.style.setProperty("display", "none", "important");
+        }
     });
 
     const chatInput = document.getElementById('chat-input');
@@ -238,6 +244,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         let resizeWidth = mainTitleWidth > mainContentWidth ? mainTitleWidth + 210 : 660;
 
+        leftNavContainer.style.removeProperty("display");
         // Add your resize logic here
         //console.log(`Window resized to width: ${width}, height: ${height}`);
         //console.log(`Main title width: ${mainTitleWidth}`);

@@ -1,229 +1,55 @@
 *** LOG SEQUENCE: 1 ***
-*** SCRIPT START TIME: 2025-02-21 08:25:37 PM ***
-2025-02-21 08:25:56 PM - The file Config.json has been updated successfully.
-2025-02-21 08:26:14 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 08:26:58 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 02:38:26 PM ***
+2025-02-22 02:38:41 PM - The file Config.json has been updated successfully.
+2025-02-22 02:39:08 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 02:40:04 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 2 ***
-*** SCRIPT START TIME: 2025-02-21 08:47:35 PM ***
-2025-02-21 08:47:50 PM - The file Config.json has been updated successfully.
-2025-02-21 08:48:13 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 08:49:03 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 02:41:11 PM ***
+2025-02-22 02:41:22 PM - The file Config.json has been updated successfully.
+2025-02-22 02:41:39 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 02:42:21 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 3 ***
-*** SCRIPT START TIME: 2025-02-21 08:53:03 PM ***
-2025-02-21 08:53:16 PM - The file Config.json has been updated successfully.
-2025-02-21 08:53:30 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 08:54:06 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 02:43:10 PM ***
+2025-02-22 02:43:21 PM - The file Config.json has been updated successfully.
+2025-02-22 02:43:35 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 02:44:23 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 4 ***
-*** SCRIPT START TIME: 2025-02-21 09:02:33 PM ***
-2025-02-21 09:02:45 PM - The file Config.json has been updated successfully.
-2025-02-21 09:02:59 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 09:03:46 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 02:45:48 PM ***
+2025-02-22 02:46:01 PM - The file Config.json has been updated successfully.
+2025-02-22 02:46:17 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 02:46:57 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 5 ***
-*** SCRIPT START TIME: 2025-02-21 09:19:41 PM ***
-2025-02-21 09:19:55 PM - The file Config.json has been updated successfully.
-2025-02-21 09:20:18 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 09:21:22 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 02:50:05 PM ***
+2025-02-22 02:50:15 PM - The file Config.json has been updated successfully.
+2025-02-22 02:50:30 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 02:51:11 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 6 ***
-*** SCRIPT START TIME: 2025-02-21 09:24:49 PM ***
-2025-02-21 09:25:01 PM - The file Config.json has been updated successfully.
-2025-02-21 09:25:22 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 09:26:00 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 02:57:00 PM ***
+2025-02-22 02:57:10 PM - The file Config.json has been updated successfully.
+2025-02-22 02:57:24 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 02:58:00 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 7 ***
-*** SCRIPT START TIME: 2025-02-21 10:01:13 PM ***
-2025-02-21 10:01:30 PM - The file Config.json has been updated successfully.
-2025-02-21 10:01:54 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 10:02:57 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 02:59:56 PM ***
+2025-02-22 03:00:09 PM - The file Config.json has been updated successfully.
+2025-02-22 03:00:36 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 03:01:14 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 8 ***
-*** SCRIPT START TIME: 2025-02-21 10:13:10 PM ***
-2025-02-21 10:13:24 PM - The file Config.json has been updated successfully.
-2025-02-21 10:13:45 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 10:14:32 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 03:11:59 PM ***
+2025-02-22 03:12:10 PM - The file Config.json has been updated successfully.
+2025-02-22 03:12:27 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 03:13:08 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 9 ***
-*** SCRIPT START TIME: 2025-02-21 10:15:05 PM ***
-2025-02-21 10:15:17 PM - The file Config.json has been updated successfully.
-2025-02-21 10:15:33 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 10:16:12 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 06:01:26 PM ***
+2025-02-22 06:01:40 PM - The file Config.json has been updated successfully.
+2025-02-22 06:02:04 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 06:02:48 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 10 ***
-*** SCRIPT START TIME: 2025-02-21 10:27:20 PM ***
-2025-02-21 10:27:37 PM - The file Config.json has been updated successfully.
-2025-02-21 10:27:54 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 10:28:32 PM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 06:04:34 PM ***
+2025-02-22 06:04:45 PM - The file Config.json has been updated successfully.
+2025-02-22 06:05:00 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 06:05:41 PM - Function app 'func-copilot-demo-007' deployed successfully.
 *** LOG SEQUENCE: 11 ***
-*** SCRIPT START TIME: 2025-02-21 11:25:10 PM ***
-2025-02-21 11:25:30 PM - The file Config.json has been updated successfully.
-2025-02-21 11:25:54 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 11:26:35 PM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 12 ***
-*** SCRIPT START TIME: 2025-02-21 11:30:19 PM ***
-2025-02-21 11:30:30 PM - The file Config.json has been updated successfully.
-2025-02-21 11:30:44 PM - Web app 'app-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 13 ***
-*** SCRIPT START TIME: 2025-02-21 11:31:31 PM ***
-2025-02-21 11:31:42 PM - The file Config.json has been updated successfully.
-2025-02-21 11:31:56 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 11:32:53 PM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 14 ***
-*** SCRIPT START TIME: 2025-02-21 11:39:24 PM ***
-2025-02-21 11:39:38 PM - The file Config.json has been updated successfully.
-2025-02-21 11:39:53 PM - Web app 'app-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 15 ***
-*** SCRIPT START TIME: 2025-02-21 11:40:15 PM ***
-2025-02-21 11:40:26 PM - The file Config.json has been updated successfully.
-2025-02-21 11:40:39 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 11:41:27 PM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 16 ***
-*** SCRIPT START TIME: 2025-02-21 11:42:40 PM ***
-2025-02-21 11:42:51 PM - The file Config.json has been updated successfully.
-2025-02-21 11:43:04 PM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-21 11:43:50 PM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 17 ***
-*** SCRIPT START TIME: 2025-02-22 12:08:18 AM ***
-2025-02-22 12:08:32 AM - The file Config.json has been updated successfully.
-2025-02-22 12:08:56 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 12:09:48 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 18 ***
-*** SCRIPT START TIME: 2025-02-22 12:21:14 AM ***
-2025-02-22 12:21:29 AM - The file Config.json has been updated successfully.
-2025-02-22 12:21:46 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 12:22:35 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 19 ***
-*** SCRIPT START TIME: 2025-02-22 12:44:08 AM ***
-2025-02-22 12:44:27 AM - The file Config.json has been updated successfully.
-2025-02-22 12:44:51 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 12:45:42 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 20 ***
-*** SCRIPT START TIME: 2025-02-22 12:50:58 AM ***
-2025-02-22 12:51:11 AM - The file Config.json has been updated successfully.
-*** LOG SEQUENCE: 21 ***
-*** SCRIPT START TIME: 2025-02-22 12:51:34 AM ***
-2025-02-22 12:51:43 AM - The file Config.json has been updated successfully.
-2025-02-22 12:51:57 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 12:52:41 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 22 ***
-*** SCRIPT START TIME: 2025-02-22 12:54:13 AM ***
-2025-02-22 12:54:22 AM - The file Config.json has been updated successfully.
-2025-02-22 12:54:36 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 12:55:25 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 23 ***
-*** SCRIPT START TIME: 2025-02-22 01:06:09 AM ***
-2025-02-22 01:06:31 AM - The file Config.json has been updated successfully.
-2025-02-22 01:06:50 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:07:47 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 24 ***
-*** SCRIPT START TIME: 2025-02-22 01:09:53 AM ***
-2025-02-22 01:10:09 AM - The file Config.json has been updated successfully.
-2025-02-22 01:10:28 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:11:38 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 25 ***
-*** SCRIPT START TIME: 2025-02-22 01:14:12 AM ***
-2025-02-22 01:14:29 AM - The file Config.json has been updated successfully.
-2025-02-22 01:14:47 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:15:35 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 26 ***
-*** SCRIPT START TIME: 2025-02-22 01:21:48 AM ***
-2025-02-22 01:22:05 AM - The file Config.json has been updated successfully.
-2025-02-22 01:22:24 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:23:00 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 27 ***
-*** SCRIPT START TIME: 2025-02-22 01:24:15 AM ***
-2025-02-22 01:24:25 AM - The file Config.json has been updated successfully.
-2025-02-22 01:24:38 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:25:38 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 28 ***
-*** SCRIPT START TIME: 2025-02-22 01:32:10 AM ***
-2025-02-22 01:32:44 AM - The file Config.json has been updated successfully.
-2025-02-22 01:33:05 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:34:01 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 29 ***
-*** SCRIPT START TIME: 2025-02-22 01:35:11 AM ***
-2025-02-22 01:35:44 AM - The file Config.json has been updated successfully.
-2025-02-22 01:36:21 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:37:37 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 30 ***
-*** SCRIPT START TIME: 2025-02-22 01:51:41 AM ***
-2025-02-22 01:52:19 AM - The file Config.json has been updated successfully.
-2025-02-22 01:52:39 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:53:33 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 31 ***
-*** SCRIPT START TIME: 2025-02-22 01:56:04 AM ***
-2025-02-22 01:56:16 AM - The file Config.json has been updated successfully.
-2025-02-22 01:56:33 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 01:57:33 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 32 ***
-*** SCRIPT START TIME: 2025-02-22 02:07:54 AM ***
-2025-02-22 02:08:26 AM - The file Config.json has been updated successfully.
-2025-02-22 02:08:45 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:09:41 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 33 ***
-*** SCRIPT START TIME: 2025-02-22 02:14:45 AM ***
-2025-02-22 02:15:03 AM - The file Config.json has been updated successfully.
-2025-02-22 02:15:28 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:16:15 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 34 ***
-*** SCRIPT START TIME: 2025-02-22 02:19:19 AM ***
-2025-02-22 02:19:29 AM - The file Config.json has been updated successfully.
-2025-02-22 02:19:44 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:20:39 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 35 ***
-*** SCRIPT START TIME: 2025-02-22 02:24:18 AM ***
-2025-02-22 02:24:37 AM - The file Config.json has been updated successfully.
-2025-02-22 02:24:54 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:25:45 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 36 ***
-*** SCRIPT START TIME: 2025-02-22 02:33:45 AM ***
-2025-02-22 02:33:56 AM - The file Config.json has been updated successfully.
-2025-02-22 02:34:13 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:35:16 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 37 ***
-*** SCRIPT START TIME: 2025-02-22 02:36:57 AM ***
-2025-02-22 02:37:12 AM - The file Config.json has been updated successfully.
-2025-02-22 02:37:24 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:38:17 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 38 ***
-*** SCRIPT START TIME: 2025-02-22 02:39:16 AM ***
-2025-02-22 02:39:27 AM - The file Config.json has been updated successfully.
-2025-02-22 02:39:42 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:40:38 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 39 ***
-*** SCRIPT START TIME: 2025-02-22 02:43:44 AM ***
-2025-02-22 02:44:01 AM - The file Config.json has been updated successfully.
-2025-02-22 02:44:16 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:44:55 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 40 ***
-*** SCRIPT START TIME: 2025-02-22 02:45:50 AM ***
-2025-02-22 02:46:00 AM - The file Config.json has been updated successfully.
-2025-02-22 02:46:15 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:46:55 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 41 ***
-*** SCRIPT START TIME: 2025-02-22 02:53:36 AM ***
-2025-02-22 02:53:54 AM - The file Config.json has been updated successfully.
-2025-02-22 02:54:20 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 02:55:17 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 42 ***
-*** SCRIPT START TIME: 2025-02-22 03:10:45 AM ***
-2025-02-22 03:11:02 AM - The file Config.json has been updated successfully.
-2025-02-22 03:11:20 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 03:12:12 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 43 ***
-*** SCRIPT START TIME: 2025-02-22 03:13:11 AM ***
-2025-02-22 03:13:23 AM - The file Config.json has been updated successfully.
-2025-02-22 03:13:39 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 03:14:30 AM - Function app 'func-copilot-demo-007' deployed successfully.
-*** LOG SEQUENCE: 44 ***
-*** SCRIPT START TIME: 2025-02-22 03:32:01 AM ***
-2025-02-22 03:32:17 AM - The file Config.json has been updated successfully.
-*** LOG SEQUENCE: 45 ***
-*** SCRIPT START TIME: 2025-02-22 03:33:37 AM ***
-2025-02-22 03:33:48 AM - The file Config.json has been updated successfully.
-2025-02-22 03:34:08 AM - Web app 'app-copilot-demo-002' deployed successfully.
-2025-02-22 03:34:56 AM - Function app 'func-copilot-demo-002' deployed successfully.
-*** LOG SEQUENCE: 46 ***
-*** SCRIPT START TIME: 2025-02-22 03:39:32 AM ***
-2025-02-22 03:39:46 AM - The file Config.json has been updated successfully.
-2025-02-22 03:40:05 AM - Web app 'app-copilot-demo-002' deployed successfully.
-2025-02-22 03:40:58 AM - Function app 'func-copilot-demo-002' deployed successfully.
-*** LOG SEQUENCE: 47 ***
-*** SCRIPT START TIME: 2025-02-22 03:41:57 AM ***
-2025-02-22 03:42:07 AM - The file Config.json has been updated successfully.
-2025-02-22 03:42:30 AM - Web app 'app-copilot-demo-007' deployed successfully.
-2025-02-22 03:43:10 AM - Function app 'func-copilot-demo-007' deployed successfully.
+*** SCRIPT START TIME: 2025-02-22 06:06:57 PM ***
+2025-02-22 06:07:08 PM - The file Config.json has been updated successfully.
+2025-02-22 06:07:26 PM - Web app 'app-copilot-demo-007' deployed successfully.
+2025-02-22 06:08:05 PM - Function app 'func-copilot-demo-007' deployed successfully.
