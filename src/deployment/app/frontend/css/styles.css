@@ -114,12 +114,12 @@ body {
   }
 
   .chat-response {
-    word-break: break-all;
+    word-break: keep-all;
   }
 
   .followup-questions {
     margin-bottom: 2px !important;
-    line-height: 2px;
+    /* line-height: 2px; */
   }
 
   #filter-container {
