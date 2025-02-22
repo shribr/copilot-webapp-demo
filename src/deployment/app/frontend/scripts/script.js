@@ -672,7 +672,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
     const sasToken = config.AZURE_STORAGE_SAS;
     const storageUrl = config.AZURE_STORAGE_URL;
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const fullStorageUrl = `https://${storageUrl}/${containerName}`;
+    const fullStorageUrl = `${storageUrl}/${containerName}`;
 
     let footNoteLinks = "";
     let followUpQuestions = "";
@@ -1000,7 +1000,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
         const sasToken = config.AZURE_STORAGE_SAS;
         const storageUrl = config.AZURE_STORAGE_URL;
         const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-        const fullStorageUrl = `https://${storageUrl}/${containerName}`;
+        const fullStorageUrl = `${storageUrl}/${containerName}`;
 
         console.log(azureOpenAIResults);
 
