@@ -1049,6 +1049,7 @@ function Initialize-Parameters {
     }
 
     # Initialize globals by mapping to nested objects when applicable
+    $global:aiAssistant = $parametersObject.aiAssistant
     $global:aiHub = $parametersObject.aiHub            
     $global:aiModels = $parametersObject.aiModels
     $global:aiProject = $parametersObject.aiProject          
@@ -1062,6 +1063,7 @@ function Initialize-Parameters {
     $global:appServicePlan = $parametersObject.AppServicePlan
     $global:appServices = $parametersObject.appServices
     $global:azureManagement = $parametersObject.azureManagement
+    $global:bingSearchService = $parametersObject.bingSearchService
     $global:cognitiveService = $parametersObject.cognitiveService       
     $global:computerVisionService = $parametersObject.computerVisionService  
     $global:containerRegistry = $parametersObject.containerRegistry      
@@ -1137,6 +1139,7 @@ function Initialize-Parameters {
     # Build-ResourceList -parametersObject $parametersObject
 
     return @{
+        aiAssistant                  = $global:aiAssistant
         aiHub                        = $global:aiHub
         aiModels                     = $global:aiModels
         aiProject                    = $global:aiProject
@@ -1151,6 +1154,7 @@ function Initialize-Parameters {
         appServiceEnvironment        = $global:appServiceEnvironment
         appServicePlan               = $global:appServicePlan
         azureManagement              = $global:azureManagement
+        bingSearchService            = $global:bingSearchService
         cognitiveService             = $global:cognitiveService
         computerVisionService        = $global:computerVisionService
         configFilePath               = $parametersObject.configFilePath
@@ -1265,6 +1269,55 @@ function Invoke-AzureRestMethod {
     catch {
         Write-Host "Error: $_"
         throw $_
+    }
+}
+
+# Function to create a new AI Assistant
+function New-AiAssistant {
+    param(
+        [psobject]$aiAssistant
+    )
+
+    Write-Host "Executing New-AiAssistant function..." -ForegroundColor Magenta
+
+    $openAiKey = $global:openAIService.ApiKey
+
+    $aiAssistantName = $aiAssistant.Name
+    $aiAssistantDescription = $aiAssistant.Description
+    $aiAssistantTools = $aiAssistant.Tools
+    $aiAssistantModel = $aiAssistant.model
+    $aiAssistantTemperature = $aiAssistant.temperature
+    $aiAssistantInstructions = $aiAssistant.instructions
+    $aiAssistantToolsResources = $aiAssistant.toolsResources
+    $aiAssistantTopP = $aiAssistant.topP
+    $aiAssistantUrl = "https://eastus.api.cognitive.microsoft.com/openai/assistants?api-version=2024-05-01-preview"
+
+    $headers = @{
+        "Content-Type" = "application/json"
+        "api-key"      = $openAiKey
+    }
+
+    $jsonBody = @{
+        name           = $aiAssistantName
+        description    = $aiAssistantDescription
+        tools          = $aiAssistantTools
+        model          = $aiAssistantModel
+        temperature    = $aiAssistantTemperature
+        instructions   = $aiAssistantInstructions
+        toolsResources = $aiAssistantToolsResources
+        topP           = $aiAssistantTopP
+    }
+
+    $jsonBody = $jsonBody | ConvertTo-Json -Depth 10
+
+    $ErrorActionPreference = 'Stop'
+
+    try {
+        Invoke-AzureRestMethod -method "POST" -url $aiAssistantUrl -jsonBody $jsonBody -headers $headers
+        Write-Host "AI Assistant '$aiAssistantName' created successfully." -ForegroundColor Green
+    }
+    catch {
+        Write-Error "Failed to create AI Assistant '$aiAssistantName': $_"
     }
 }
 
@@ -2177,6 +2230,38 @@ function New-AppServicePlanInASE {
     catch {
         Write-Error "Failed to create App Service Plan '$appServicePlanName' in ASE '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create App Service Plan '$appServicePlanName' in ASE '$appServiceEnvironmentName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
+}
+
+# Function to create a new Bing Grounding resource
+function New-BingGrounding {
+    param (
+        [psobject]$bingGrounding,
+        [string]$resourceGroupName,
+        [array]$existingResources
+    )
+
+    $bingGroundingName = $bingGrounding.Name
+
+    Write-Host "Executing New-BingGrounding ('$bingGroundingName') function..." -ForegroundColor Magenta
+
+    if ($existingResources -notcontains $bingGroundingName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az cognitiveservices account create --name $bingGroundingName --resource-group $resourceGroupName --kind Bing.Search v7 --sku S0 --location $location --output none
+
+            $global:resourceCounter += 1
+            Write-Host "Bing Grounding '$bingGroundingName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+            Write-Log -message "Bing Grounding '$bingGroundingName' created successfully. [$global:resourceCounter]"
+        }
+        catch {
+            Write-Error "Failed to create Bing Grounding '$bingGroundingName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Bing Grounding '$bingGroundingName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "Bing Grounding '$bingGroundingName' already exists." -ForegroundColor Blue
+        Write-Log -message "Bing Grounding '$bingGroundingName' already exists."
     }
 }
 
@@ -5110,6 +5195,10 @@ function Update-ConfigFile {
         }
 
         #$config.OPEN_AI_KEY = az cognitiveservices account keys list --resource-group $resourceGroupName --name $openAIName --query "key1" --output tsv
+
+        #$config.BING_SEARCH_SERVICE.API_KEY = $global:bingSearchService.ApiKey
+        #$config.BING_SEARCH_SERVICE.API_VERSION = $global:bingSearchService.ApiVersion
+        #$config.BING_SEARCH_SERVICE.URL = $global:bingSearchService.Url
 
         # Convert the updated object back to JSON format
         $updatedConfig = $config | ConvertTo-Json -Depth 10

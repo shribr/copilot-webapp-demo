@@ -10,6 +10,15 @@
   "resourceSuffixCounter": "007",
   "resourceBaseName": "copilot-demo",
   "storageServiceSasTemplate": "sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tfqb&srt=co",
+  "aiAssistant": {
+    "tools": [],
+    "name": "ai-assistant-copilot-demo-007",
+    "instructions": "",
+    "model": "gpt-4o",
+    "tool_resources": {},
+    "temperature": 1,
+    "top_p": 1
+  },
   "aiHubConnections": [
     {
       "Name": "AIService"
@@ -204,9 +213,11 @@
     "Name": "bing-ai-copilot-demo-007",
     "Description": "Bing Search Service",
     "Endpoint": "https://api.bing.microsoft.com/",
-    "ApiKey": "05a9f168da5744eca7e0484fb7daa15f",
+    "ApiKey": "631ef0e81b3e48f99f7d955989dc04e1",
     "ApiVersion": "v7.0",
-    "Path": "search"
+    "Path": "search",
+    "Base_Url": "https://api.bing.microsoft.com",
+    "Url": "https://api.bing.microsoft.com/v7.0/search"
   },
   "chatPersonas": [
     {

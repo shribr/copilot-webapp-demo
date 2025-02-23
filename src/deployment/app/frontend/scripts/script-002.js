@@ -8,6 +8,7 @@ let aiEnhancedAnswersArray = [];
 let originalDocumentCount = 0;
 let existingDocumentCount = 0;
 let filteredDocumentCount = 0;
+let useSaS;
 
 let timerInterval;
 let startTime;
@@ -73,6 +74,11 @@ const loginRequest = {
 
 let thread = { "messages": [] };
 
+let ai_assistant = {};
+let ai_assistant_thread_list = [];
+let ai_assistant_thread = [];
+let ai_assistant_threadId = "";
+
 let tool_resources = {
     "azure_ai_search": {
         "indexes": [
@@ -89,6 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     config = await fetchConfig();
 
     authMode = config.AUTHENTICATION_MODE;
+    useSaS = config.USE_SAS;
 
     await checkIfLoggedIn();
 
@@ -122,28 +129,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     setSiteLogo();
 
+    // Initial resize
+    //resizeIcons();
+
+    // Resize on window resize
+    //window.addEventListener('resize', resizeIcons);
+
     // Add event listeners to the buttons
     const elements = document.getElementsByClassName('document-cell-name');
     Array.from(elements).forEach(element => element.classList.add('no-before'));
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
-    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
-    const editIcon = config.ICONS.EDIT.MONOTONE;
-    const deleteIcon = config.ICONS.DELETE.MONOTONE;
-
     creationTerms = config.DALL_E_CREATION_TERMS;
 
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
-
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-
-    const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
-
-    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+    getDocuments(blobs);
 
     const chatDisplayContainer = document.getElementById('chat-display-container');
     const chatDisplay = document.getElementById('chat-display');
@@ -189,7 +187,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById('hamburger-menu').addEventListener('click', function () {
         const leftNav = document.getElementById('left-nav-container');
-        leftNav.style.display = (leftNav.style.display === 'block' || leftNav.style.display === 'block !important' || leftNav.style.display === "") ? 'none' : 'block';
+        const computedDisplay = window.getComputedStyle(leftNav).display;
+        if (computedDisplay === "none") {
+            // Force display to block regardless of media queries.
+            leftNav.style.setProperty("display", "block", "important");
+        } else {
+            leftNav.style.setProperty("display", "none", "important");
+        }
     });
 
     const chatInput = document.getElementById('chat-input');
@@ -229,29 +233,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
+        if (width < 831 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
             leftNavContainer.style.display = 'none';
         }
 
-        if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
-            leftNavContainer.style.display = 'none';
-        }
+        // if (width < 601 && leftNavContainer.style.display === 'block' && !leftNavContainer.contains(event.target) && !document.getElementById('hamburger-menu').contains(event.target)) {
+        //     leftNavContainer.style.display = 'none';
+        // }
     });
 
     window.addEventListener('resize', function () {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        // Add your resize logic here
-        console.log(`Window resized to width: ${width}, height: ${height}`);
-
         // Example: Adjust the display of leftNavContainer based on the new width
         const leftNavContainer = document.getElementById('left-nav-container');
-        if (width > 600) {
-            leftNavContainer.style.display = 'block';
-        } else {
-            leftNavContainer.style.display = 'none';
-        }
+        const mainContent = document.getElementById('main-content');
+        const mainContentWidth = mainContent.getBoundingClientRect().width;
+
+        const mainTitleWidth = document.getElementById("main-header-title").getBoundingClientRect().width;
+
+        let resizeWidth = mainTitleWidth > mainContentWidth ? mainTitleWidth + 210 : 660;
+
+        leftNavContainer.style.removeProperty("display");
+        // Add your resize logic here
+        //console.log(`Window resized to width: ${width}, height: ${height}`);
+        //console.log(`Main title width: ${mainTitleWidth}`);
+        //console.log(`Resize width: ${resizeWidth}`);
+
+        //User to be compared to 600
+        // if (width > resizeWidth) {
+        //     leftNavContainer.style.display = 'block';
+        //     mainContent.style.marginLeft = '210px';
+        // } else {
+        //     leftNavContainer.style.display = 'none';
+        //     mainContent.style.marginLeft = '20px';
+        // }
 
         if (width < 1350) {
             const elements = document.getElementsByClassName('blob-name');
@@ -506,10 +523,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('link-user-profile').style.display = 'none';
         document.getElementById('user-profile-icon').style.display = 'none';
     }
+
+    //await initAiAssistant();
 });
 
 // Function to build chat history
-function addMessageToChatHistory(thread, message) {
+function addMessageToChatHistory(message) {
     //code to build chat history
     thread.messages.push(message);
 
@@ -528,7 +547,7 @@ function checkIfImageQuestion(input) {
 // Function to check if user is logged in
 async function checkIfLoggedIn() {
 
-    config = await fetchConfig();
+    //config = await fetchConfig();
 
     authMode = config.AUTHENTICATION_MODE;
 
@@ -632,7 +651,7 @@ function clearChatDisplay() {
     document.getElementById('chat-examples-container').style.display = 'block';
 }
 
-//code to clear file input
+// Function to clear file input
 function clearFileInput() {
     const fileInput = document.getElementById('file-input');
     fileInput.value = ''; // Clear the file input
@@ -658,6 +677,7 @@ function countOccurrences(mainString, searchString) {
     return matches ? matches.length : 0;
 }
 
+// Function to count the number of dollar signs in the provided string
 function countQuadrupleDollarSigns(str) {
     const regex = /\$\$\$\$/g;
     let count = 0;
@@ -670,138 +690,177 @@ function countQuadrupleDollarSigns(str) {
 }
 
 // Function to create chat response content
-function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, storageUrl, sasToken, downloadChatResultsSVG) {
+function createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, downloadChatResultsSVG) {
 
-    var sourceNumber = 0;
-    var citationContentResults = "";
-    var openAIModelResultsId = "";
-    var answers = "";
+    let sourceNumber = 0;
+    let citationContentResults = "";
+    let openAIModelResultsId = "";
+    let answers = "";
 
     let numOccurrences = 0;
 
     // Initialize a Set to store unique document paths
     const listedPaths = new Set();
+    const sasToken = config.AZURE_STORAGE_SAS;
+    const storageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const fullStorageUrl = `${storageUrl}/${containerName}`;
+
+    const iconInfo = config.ICONS.INFO.MONOTONE;
 
     let footNoteLinks = "";
     let followUpQuestions = "";
 
-    if (azureOpenAIResults.length > 0 && !azureOpenAIResults.error && azureOpenAIResults[0].choices && !isImageQuestion) {
+    if (!isImageQuestion) {
 
-        // Loop through the answers and create the response content   
-        try {
-            for (const choice of azureOpenAIResults[0].choices) {
+        if (azureOpenAIResults.error === undefined) {
 
-                console.log(choice);
+            if (azureOpenAIResults.length > 0 && azureOpenAIResults[0].choices) {
+                // Loop through the answers and create the response content   
+                try {
+                    for (const choice of azureOpenAIResults[0].choices) {
 
-                const answer = choice.message;
-                const role = answer.role;
-                let rawText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
+                        console.log(choice);
 
-                //let answerText = ensureDollarSigns(rawText);
-                let answerText = rawText;
+                        const answer = choice.message;
+                        const role = answer.role;
+                        let rawText = answer.content.replace(/\*\*/g, "").replace(/\s+/g, " ");
 
-                console.log(answerText);
+                        //let answerText = ensureDollarSigns(rawText);
+                        let answerText = rawText.replace("###", "");
 
-                //numOccurrences = countOccurrences(answerText, "[$$$$]");
-                numOccurrences = countQuadrupleDollarSigns(answerText);
+                        console.log(answerText);
 
-                if (numOccurrences != 2) {
-                    answerText = insertDollarSigns(answerText);
-                    numOccurrences = countQuadrupleDollarSigns(answerText);
-                }
+                        //numOccurrences = countOccurrences(answerText, "[$$$$]");
+                        numOccurrences = countQuadrupleDollarSigns(answerText);
 
-                followUpQuestions = numOccurrences > 1 ? answerText.split("$$$$")[2] : "";
+                        if (numOccurrences != 2) {
+                            answerText = insertDollarSigns(answerText);
+                            numOccurrences = countQuadrupleDollarSigns(answerText);
+                        }
 
-                console.log('Number of occurrences of $$$$:', numOccurrences);
+                        followUpQuestions = numOccurrences > 1 ? answerText.split("$$$$")[2] : "";
 
-                if (followUpQuestions.length > 0) {
-                    followUpQuestions = followUpQuestions.trim();
-                }
+                        console.log('Number of occurrences of $$$$:', numOccurrences);
 
-                //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
+                        if (followUpQuestions.length > 0) {
+                            followUpQuestions = followUpQuestions.trim();
+                        }
 
-                answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
+                        //followUpQuestions = followUpQuestions.replace('<li>', '<li class="followup-questions">');
 
-                const message = { "role": role, "content": answerText };
+                        answerText = numOccurrences > 0 ? answerText.split("$$$$")[0] : answerText;
 
-                if (answerText.startsWith("The requested information is not available in the retrieved data.")) {
-                    answerText = persona.NoResults;
-                }
-                else {
-                    addMessageToChatHistory(thread, message);
-                }
+                        const message = { "role": role, "content": answerText };
 
-                const context = answer.context;
+                        if (answerText.startsWith(config.NO_RESULTS_FOUND)) {
+                            answerText = answerText.replace(config.NO_RESULTS_FOUND, persona.NoResults);
+                        }
+                        else {
+                            addMessageToChatHistory(thread, message);
+                        }
 
-                const citations = context.citations;
+                        const context = answer.context;
 
-                // NOTE: At the time of this writing if model version 2024-08-06 is not used, the title value from the citations object is not returned in the response
-                if (citations) {
+                        const citations = context.citations;
 
-                    console.log(citations);
+                        // NOTE #1: At the time of this writing if model version 2024-11-20 is not used, the title value from the citations object is not returned in the response.
 
-                    for (const citation of citations) {
-                        const docTitle = citation.title;
+                        // NOTE #2: If additional metadata like filepath, title or url are null, you may need to reset and rerun the indexer(s). 
+                        // This may be the ACTUAL reason for the null values and not the model version as stated above. Need further investigation.
 
-                        if (docTitle) {
-                            const docUrl = `${storageUrl}/${docTitle}?${sasToken}`;
+                        if (citations) {
 
-                            // Detect and replace [doc*] with [page *] and create hyperlink
-                            answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
-                                return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
-                            });
+                            console.log(citations);
 
-                            if (!listedPaths.has(docTitle) && docTitle != "") {
-                                listedPaths.add(docTitle);
+                            for (const citation of citations) {
+                                const docTitle = citation.title;
 
-                                sourceNumber++;
+                                if (docTitle) {
+                                    const docUrl = `${fullStorageUrl}/${docTitle}?${sasToken}`;
 
-                                const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank">${sourceNumber}. ${truncateText(docTitle, 90)}</a>`;
+                                    // Detect and replace [doc*] with [page *] and create hyperlink
+                                    answerText = answerText.replace(/\[doc(\d+)\]/g, (match, p1) => {
+                                        return `<sup class="answer-citations page-number"><a href="${docUrl}#page=${p1}" target="_blank">[page ${p1}]</a></sup>`;
+                                    });
 
-                                citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+                                    if (!listedPaths.has(docTitle) && docTitle != "") {
+                                        listedPaths.add(docTitle);
 
-                                footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
-                            }
-                            else {
-                                console.log(`Document already listed: ${docTitle}`);
+                                        sourceNumber++;
+
+                                        const supportingContentLink = `<a class="answer-citations" title="${docTitle}" href="${docUrl}" style="text-decoration: underline" target="_blank"><span style="text-decoration: none">${sourceNumber}.</span> ${truncateText(docTitle, 90)}</a>`;
+
+                                        citationContentResults += `<div id="answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${supportingContentLink}</div>`;
+
+                                        footNoteLinks += `<sup class="answer-citations"><a title="${docTitle}" href="#answer-response-number-${answerResponseNumber}-citation-link-${sourceNumber}">${sourceNumber}</a></sup>`;
+                                    }
+                                    else {
+                                        console.log(`Document already listed: ${docTitle}`);
+                                    }
+                                }
+
                             }
                         }
 
+                        // Regex explanation:
+                        // - (\d+\.\s): Matches a number, a dot and a following space
+                        // - (.*?)(?=\s+\d+\.|$): Lazily captures all characters until it finds another numbered item (preceded by some whitespace and a number and dot)
+                        //   or reaches the end of the string.
+                        const regex = /(\d+\.\s)(.*?)(?=\s+\d+\.|$)/g;
+
+                        let formattedText = answerText.replace(regex, (_, marker, content) => `<li>${content.trim()}</li>`);
+
+                        if (formattedText.includes('<li>')) {
+                            formattedText = `<ol>${formattedText}</ol>`;
+                        }
+
+                        //console.log(formattedText);
+
+                        const answerListHTML = '<div class="answer-results">' + formattedText + footNoteLinks + '</div>';
+
+                        answers += answerListHTML;
+
                     }
                 }
+                catch (error) {
 
-                const answerListHTML = '<div class="answer-results">' + answerText + footNoteLinks + '</div>';
+                    let answerListHTML = `<div class="answer-results no-results">${persona.NoResults}</div>`;
 
-                answers += answerListHTML;
-
+                    answers += answerListHTML;
+                    console.error(error);
+                }
             }
-        } catch (error) {
-
-            let answerListHTML = `<div class="answer-results no-results">${persona.NoResults}</div>`;
-
-            answers += answerListHTML;
-            console.error(error);
-        }
-
-    }
-    else {
-
-        let answerListHTML = '';
-
-        if (isImageQuestion && azureOpenAIResults.length > 0 && !azureOpenAIResults.error) {
-            answerListHTML = `<div class="answer-results">${azureOpenAIResults[0]}</div>`;
         }
         else {
-
             if (azureOpenAIResults[0].error && (azureOpenAIResults[0].error.code == 429 || azureOpenAIResults[0].error.code == 400)) {
 
                 answerListHTML = `<div class="answer-results">Token rate limit exceeded. Please try again later.</div>`;
                 console.error('Token rate limit exceeded. Please try again later.', azureOpenAIResults[0].error);
             }
             else {
-                answerListHTML = `<div class="answer-results">${persona.NoResults}</div>`;
+                answerListHTML = `<div class="answer-results" title="${azureOpenAIResults[0].error}">${persona.NoResults}</div>`;
                 console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
             }
+        }
+    }
+    else {
+
+        let answerListHTML = '';
+
+        if (azureOpenAIResults.error === undefined) {
+            if (azureOpenAIResults.data.length > 0) {
+                answerListHTML = `<div class="answer-results"><img src='${azureOpenAIResults.data[0].url}' title='${azureOpenAIResults.data[0].revised_prompt}' style='width:100%'></div>`;
+                console.log(azureOpenAIResults.data[0].revised_prompt);
+            }
+            else {
+                answerListHTML = `<div class="answer-results" title="${azureOpenAIResults[0].error}">${persona.NoResults} <span class="icon-info">${iconInfo}</span></div>`;
+                console.error('Error getting results from Azure OpenAI:', azureOpenAIResults[0].error);
+            }
+        }
+        else {
+            answerListHTML = `<div class="answer-results" title="${azureOpenAIResults.error.message}">${persona.NoResults} <span class="icon-info">${iconInfo}</span></div>`;
+            console.error('Error getting results from Azure OpenAI:', azureOpenAIResults.error.message);
         }
 
         answers += answerListHTML;
@@ -834,7 +893,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
         }
         else {
             answerContent.innerHTML += `<div id="${openAIModelResultsContainerId}" class="openai-model-results"><div id="${openAIModelResultsId}"><div class="ai-enhanced-answer-results">${answers}</div><br/></div>`;
-            answerContent.innerHTML += `<div id="followup-questions-container"><h6 class="followup-question">Suggested Follow Up Questions:</h6>${followUpQuestions}</div>`;
+            answerContent.innerHTML += `<div id="followup-questions-container">${followUpQuestions}</div>`;
             answerContent.innerHTML += `<div id="answer-sources-container"><h6 class="answer-sources">Sources:</h6>${citationContentResults}</div ></div> `;
 
             chatResponse.appendChild(answerContent);
@@ -870,7 +929,7 @@ function createChatResponseContent(azureOpenAIResults, chatResponse, answerConte
 
 }
 
-//function to create side navigation links
+// Function to create side navigation links
 async function createSidenavLinks() {
 
     try {
@@ -965,18 +1024,22 @@ function createFollowUpQuestionsContent(azureOpenAIResults, followUpQuestionsCon
 }
 
 // Function to create tab contents for supporting content results returned from Azure Search
-function createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken) {
+function createTabContentSupportingContent(azureOpenAIResults, supportingContent) {
 
     if (azureOpenAIResults.length > 0 && !azureOpenAIResults[0].error) {
 
         //var answerResults = "";
-        var citationContentResults = "";
-        var supportingContentResults = "";
-        var answerNumber = 1;
-        var sourceNumber = 1;
+        let citationContentResults = "";
+        let supportingContentResults = "";
+        let answerNumber = 1;
+        let sourceNumber = 1;
 
         // Initialize a Set to store unique document paths
         const listedPaths = new Set();
+        const sasToken = config.AZURE_STORAGE_SAS;
+        const storageUrl = config.AZURE_STORAGE_URL;
+        const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+        const fullStorageUrl = `${storageUrl}/${containerName}`;
 
         console.log(azureOpenAIResults);
 
@@ -992,7 +1055,7 @@ function createTabContentSupportingContent(azureOpenAIResults, supportingContent
                 for (const citation of citations) {
 
                     const docTitle = citation.title;
-                    const docPath = `${storageUrl}/${docTitle}`;
+                    const docPath = `${fullStorageUrl}/${docTitle}`;
 
                     if (docTitle != "") {
                         var answerText = citation.content.replace(" **", "").replace(/\s+/g, " ");
@@ -1060,10 +1123,112 @@ function createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent) 
 
 }
 
-// function to delete documents
-function deleteDocuments() {
-    //code to delete documents
+// Function to delete a document
+async function deleteDocument(docJson) {
 
+    const doc = JSON.parse(docJson);
+    const apiVersion = config.AZURE_STORAGE_API_VERSION;
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
+    const httpMethod = "DELETE";
+    const httpContentType = "application/json";
+    const httpBody = null;
+    const returnData = false;
+
+    let response;
+
+    let httpHeaders = {
+        'x-ms-date': new Date().toUTCString(),
+        'x-ms-version': apiVersion,
+        'mode': 'no-cors'
+    };
+
+    try {
+
+        if (useSaS) {
+            response = await fetch(doc.url, {
+                method: httpMethod,
+                headers: httpHeaders
+            });
+        }
+        else {
+            response = await invokeRESTAPI(doc.url, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
+        }
+
+        if (response.ok) {
+            console.log(`Deleted document: ${doc.title}`);
+        } else {
+            const errorText = await response.text();
+            console.error(`Failed to delete document: ${doc.title}. Error: ${errorText}`);
+        }
+    } catch (error) {
+        console.error(`Error deleting document: ${doc.title}. Error: ${error.message}`);
+    }
+}
+
+// Function to delete documents
+async function deleteDocuments() {
+    const selectedDocs = getSelectedDocuments();
+
+    if (selectedDocs.length === 0) {
+        console.warn("No documents selected for deletion.");
+        return;
+    }
+
+    await deleteSelectedDocuments(selectedDocs);
+}
+
+// Function to delete documents
+async function deleteSelectedDocuments(selectedDocs) {
+    if (!Array.isArray(selectedDocs) || selectedDocs.length === 0) {
+        console.warn("No documents selected for deletion.");
+        return;
+    }
+
+    let response;
+
+    let keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
+
+    // NEED TO UPDATE CODE TO USE AZURE STORAGE API KEY INSTEAD OF SAS TOKEN
+
+    const storageUrl = config.AZURE_STORAGE_URL;
+    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const apiVersion = config.AZURE_STORAGE_API_VERSION;
+    const fullStorageUrl = `${storageUrl}/${containerName}`;
+    const sasToken = config.AZURE_STORAGE_SAS;
+
+    for (const doc of selectedDocs) {
+        // Assume doc.docId holds the blob name; URL encode it for safety
+        const blobName = encodeURIComponent(doc.docId);
+        const deleteUrl = `${fullStorageUrl}/${blobName}?${sasToken}`;
+
+        try {
+
+            if (useSas) {
+                response = await fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'x-ms-date': new Date().toUTCString(),
+                        'x-ms-version': apiVersion
+                    }
+                });
+            }
+            else {
+                response = invokeRESTAPI(deleteUrl, "DELETE", "application/json", null, null, keyVaultProxyOperation, false);
+            }
+
+            if (response.ok) {
+                console.log(`Deleted document: ${doc.title}`);
+            } else {
+                const errorText = await response.text();
+                console.error(`Failed to delete document: ${doc.title}. Error: ${errorText}`);
+            }
+        } catch (error) {
+            console.error(`Error deleting document: ${doc.title}. Error: ${error.message}`);
+        }
+    }
+
+    // Optionally, refresh the documents list after deletion:
+    // getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
 }
 
 // Function to download chat results to a file
@@ -1111,62 +1276,150 @@ function formatBytes(bytes) {
     else return (bytes / 1048576).toFixed(2) + ' MB';
 }
 
+// Function to get AI Assistant results
+async function getAnswersFromAiAssistant(message) {
+
+    const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai`;
+    const apiVersion = "2024-05-01-preview";
+
+    let url = `${endpoint}/threads?api-version=${apiVersion}`;
+
+    try {
+
+        const assistantResponse = await initAiAssistant();
+
+        // First get the thread ID
+        const threadId = ai_assistant_thread.id;
+
+        // Then send the message
+        console.log('AI Assistant posting message:', message);
+
+        url = `${endpoint}/threads/${threadId}/messages?api-version=${apiVersion}`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(message)
+        });
+
+        const data = await response.json();
+
+        // Then run the thread
+        console.log('AI Assistant running thread...');
+
+        const body = JSON.stringify({ "assistant_id": ai_assistant.first_id });
+
+        url = `${endpoint}/threads/${threadId}/runs?api-version=${apiVersion}`;
+        const runResponse = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: body
+        });
+
+        const runData = await runResponse.json();
+
+        // Then get the status of the run
+        console.log('AI Assistant getting run status...');
+
+        url = `${endpoint}/threads/${threadId}/runs/${runData.id}?api-version=${apiVersion}`;
+        const statusResponse = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const statusData = await statusResponse.json();
+
+        console.log('AI Assistant run status:', statusData);
+
+        // Then get the results of the run
+        console.log('AI Assistant getting run results...');
+
+        url = `${endpoint}/threads/${threadId}/messages?api-version=${apiVersion}`;
+        const resultsResponse = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const runResults = await resultsResponse.json();
+
+        console.log('AI Assistant run results:', runResults);
+
+        ai_assistant_thread_list = runResults.data;
+    }
+    catch (error) {
+        console.error('Error fetching AI Assistant search results:', error);
+        return null;
+    }
+}
+
 //Function to send chat message to Azure OpenAI model to either search the model directly or internal data sources
 async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSources) {
 
     if (!userInput) return;
 
-    const openAiTokenSecretName = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
-    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
+    let openAIRequestBody = "";
+    let openAIRequestBodyJson = "";
+    let keyVaultProxyOperation = config.AZURE_OPENAI_SERVICE_SECRET_NAME;
+
+    const returnData = true;
+    const httpMethod = 'POST';
+    let httpHeaders = {};
+    let httpContentType = 'application/json';
+    let apiKey;
+    let searchApiKey;
+
+    switch (isImageQuestion) {
+        case true:
+            openAIRequestBody = config.DALL_E_REQUEST_BODY;
+            console.log('Image question detected');
+            break;
+        case false:
+            openAIRequestBody = config.AZURE_OPENAI_REQUEST_BODY;
+            console.log('Non-image question detected');
+            break;
+    }
+
+    if (authMode == 'MSAL') {
+        apiKey = await getSecretFromKeyVault(keyVaultProxyOperation);
+        searchApiKey = await getSecretFromKeyVault(config.AZURE_SEARCH_SERVICE_SECRET_NAME);
+    }
+    else {
+        apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+        searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
+    }
+
     const apiVersion = aiModel.ApiVersion;
     const urlPath = aiModel.Path;
     const deploymentName = aiModel.DeploymentName;
-
-    const openAIRequestBody = isImageQuestion ? config.DALL_E_REQUEST_BODY : config.AZURE_OPENAI_REQUEST_BODY;
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-
-    const keyVaultEndPoint = "https://vault.azure.net/.default"
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
-
-    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
-    let jsonString = JSON.stringify(openAIRequestBody);
 
     const region = config.REGION;
     const endpoint = `https://${region}.api.cognitive.microsoft.com/openai/deployments/${deploymentName}/${urlPath}?api-version=${apiVersion}`;
 
     var results = [];
 
-    if (authMode === "MSAL") {
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
-
-        let tokenResponse;
-
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-    }
-
     if (isImageQuestion) {
 
         let aiImage = '';
+        httpContentType = 'image/jpeg';
 
         openAIRequestBody.prompt = currentQuestion;
         //openAIRequestBody.n = 4;
 
-        jsonString = JSON.stringify(openAIRequestBody);
+        openAIRequestBodyJson = JSON.stringify(openAIRequestBody);
 
         let imageTable = document.createElement('table');
         imageTable.id = `image-table-${answerResponseNumber}`;
@@ -1175,33 +1428,35 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
         let imageTableBody = document.createElement('tbody');
         imageTableBody.class = 'image-table-body';
 
-        const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
+        const images = await invokeRESTAPI(endpoint, httpMethod, httpContentType, httpHeaders, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
 
-        for (const image of result.data) {
+        if (!images.error) {
+            for (const image of images.data) {
 
-            let imageTableRow = document.createElement('tr');
-            imageTableRow.class = 'image-table-row';
+                let imageTableRow = document.createElement('tr');
+                imageTableRow.class = 'image-table-row';
 
-            let imageTableCell = document.createElement('td');
-            imageTableCell.class = 'image-table-cell';
+                let imageTableCell = document.createElement('td');
+                imageTableCell.class = 'image-table-cell';
 
-            imageTableCell.innerHTML = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image">`;
+                imageTableCell.innerHTML = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image">`;
 
-            imageTableRow.appendChild(imageTableCell);
-            imageTableBody.appendChild(imageTableRow);
+                imageTableRow.appendChild(imageTableCell);
+                imageTableBody.appendChild(imageTableRow);
 
-            aiImage = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image" style="width: 80%; height: auto;">`;
+                aiImage = `<img src="${image.url}" alt="Generated image" title="${image.revised_prompt}" class="dall-e-generated-image" style="width: 80%; height: auto;">`;
 
-            results.push(aiImage);
+                results.push(aiImage);
 
-            console.log('Image generation result URL: ' + image.url);
+                console.log('Image generation result URL: ' + image.url);
+            }
         }
 
         imageTable.appendChild(imageTableBody);
 
         //return imageTable;
 
-        return results
+        return images
     }
     else {
         openAIRequestBody.messages = [];
@@ -1213,17 +1468,17 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
             for (const source of dataSources) {
                 source.parameters.role_information = persona.Prompt;
-                //If authMode is MSAL then we usw the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
+                //If authMode is MSAL then we use the searchTokenSecretName to get the search token from the Key Vault to store in the data source parameters for the search API
                 //If the authMode is API_KEY then we just use the search API key directly from the config.json file.
                 source.parameters.authentication.key = searchApiKey;
                 //source.parameters.authentication.key = apiKey
                 openAIRequestBody.data_sources.push(source);
 
-                jsonString = JSON.stringify(openAIRequestBody);
+                openAIRequestBodyJson = JSON.stringify(openAIRequestBody);
 
                 //If authMode is MSAL we need to pass the openAiTokenSecretName to the invokeRESTAPI function so that getSecretFromKeyVault can be called to get the token from the Key Vault for the OpenAI service before calling the OpenAI API.
                 //If the authMode is API_KEY then we just use the OpenAI API key directly from the config.json file.
-                const result = await invokeRESTAPI(jsonString, endpoint, openAiTokenSecretName);
+                const result = await invokeRESTAPI(endpoint, httpMethod, httpContentType, httpHeaders, openAIRequestBodyJson, keyVaultProxyOperation, returnData);
 
                 results.push(result);
             }
@@ -1236,7 +1491,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
     }
 }
 
-//code to send chat message to Bing Search API (still under development)
+// Function to send chat message to Bing Search API (still under development)
 async function getAnswersFromPublicInternet(userInput) {
 
     if (!userInput) return;
@@ -1327,22 +1582,16 @@ async function getAccessToken(clientId) {
 // Function to show responses to questions
 async function getChatResponse(questionBubble) {
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
-    const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
     const dataSources = config.DATA_SOURCES;
 
     const responseTabList = Object.entries(config.RESPONSE_TABS);
     const downloadChatResultsSVG = config.ICONS.DOWNLOAD_BUTTON.SVG;
-
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
     const chatInput = document.getElementById('chat-input').value.trim();
     const chatDisplay = document.getElementById('chat-display');
     chatDisplay.style.display = 'none';
 
     const chatCurrentQuestionContainer = document.getElementById('chat-info-current-question-container');
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
 
     isImageQuestion = await checkIfImageQuestion(chatInput);
 
@@ -1361,14 +1610,15 @@ async function getChatResponse(questionBubble) {
     }
 
     // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    //const sasToken = `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    const sasToken = getSasToken();
 
     // Get the selected chat persona
     const persona = getSelectedChatPersona();
 
     if (persona.Type != previousPersona.Type) {
         const system_message = { "role": "assistant", "content": persona.Prompt };
-        addMessageToChatHistory(thread, system_message);
+        addMessageToChatHistory(system_message);
 
         previousPersona.Type = persona.Type;
     }
@@ -1381,7 +1631,7 @@ async function getChatResponse(questionBubble) {
 
         const message = { "role": "user", "content": prompt };
 
-        addMessageToChatHistory(thread, message);
+        addMessageToChatHistory(message);
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
@@ -1418,14 +1668,14 @@ async function getChatResponse(questionBubble) {
             chatDisplay.appendChild(chatResponse);
 
             // Create tab contents for chat response content
-            createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, storageUrl, sasToken, downloadChatResultsSVG);
+            createChatResponseContent(azureOpenAIResults, chatResponse, answerContent, persona, downloadChatResultsSVG);
 
             if (isImageQuestion == false) {
                 // Create tab contents for thought process content
                 createThoughtProcessContent(azureOpenAIResults, thoughtProcessContent);
 
                 // Create tab contents for supporting content
-                createTabContentSupportingContent(azureOpenAIResults, supportingContent, storageUrl, sasToken);
+                createTabContentSupportingContent(azureOpenAIResults, supportingContent);
 
                 chatResponse.appendChild(thoughtProcessContent);
                 chatResponse.appendChild(supportingContent);
@@ -1497,16 +1747,38 @@ async function getChatResponse(questionBubble) {
 }
 
 //Function to get documents from Azure Storage. This needs to be updated to have option to use MSAL in addition to API_KEY.
-async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
+async function getDocuments(blobs) {
+
+    const httpMethod = 'GET';
+    const httpBody = "";
+    const returnData = true;
+    const contentType = 'text/xml';
+    const httpHeaders = {
+        'Content-Type': 'text/xml',
+        'Cache-Control': 'no-cache'
+    };
+
+    let response;
+    let fullStorageUrl;
+
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
 
     try {
-        const response = await fetch(`${fullStorageUrl}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'text/xml',
-                'Cache-Control': 'no-cache'
-            }
-        });
+        if (useSaS) {
+
+            fullStorageUrl = config.AZURE_STORAGE_FULL_URL_SAS;
+
+            response = await fetch(fullStorageUrl, {
+                method: httpMethod,
+                headers: httpHeaders
+            });
+        }
+        else {
+
+            fullStorageUrl = config.AZURE_STORAGE_FULL_URL;
+
+            response = await invokeRESTAPI(fullStorageUrl, httpMethod, contentType, httpHeaders, null, keyVaultProxyOperation, returnData);
+        }
 
         if (response.ok) {
             const data = await response.text();
@@ -1517,7 +1789,7 @@ async function getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sa
 
             // Render documents
             //renderDocuments(blobs);
-            renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon);
+            renderDocumentsHtmlTable(blobs);
         } else {
             console.error('Failed to fetch documents:', response.statusText);
         }
@@ -1532,91 +1804,47 @@ async function getImageAnswers(input) {
 
 }
 
-// Function to get SAS token from Azure Key Vault
+// Function to get SAS token from config file
 async function getSasToken() {
+    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
 
-
-
-    const credential = new DefaultAzureCredential();
-    const vaultName = config.KEY_VAULT_NAME;
-    const url = `https://${vaultName}.vault.azure.net`;
-    const client = new SecretClient(url, credential);
-
-    const sasTokenConfig = {};
-    const secretNames = ['SV', 'INCLUDE', 'SS', 'SRT', 'SP', 'SE', 'SPR', 'SIG'];
-
-    for (const name of secretNames) {
-        const secret = await client.getSecret(`AZURE_STORAGE_SAS_TOKEN_${name}`);
-        sasTokenConfig[name] = secret.value;
-    }
-
-    return `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
+    return `sv=${sasTokenConfig.SV}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
 }
 
 // Function to get the search indexer status
 async function getSearchIndexerStatus(searchIndexers) {
     // Retrieve configuration which should include your Azure Search service name and API key
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
-    const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
-    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
-    const keyVaultEndPoint = "https://vault.azure.net/.default"
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+    const httpMethod = 'GET';
+    const returnData = true;
+    const httpContentType = 'application/json';
+    const httpHeaders = "";
+    const httpBody = "";
+
+    const keyVaultProxyOperation = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
+    const searchServiceUrl = config.AZURE_SEARCH_SERVICE_URL;
+    const apiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
 
     //https://learn.microsoft.com/en-us/rest/api/searchservice/indexers/get-status?view=rest-searchservice-2024-07-01&tabs=HTTP#indexerexecutionstatus
 
     let searchIndexerStatusArray = [];
 
-    if (authMode === 'MSAL') {
-
-        const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
-
-        let tokenResponse;
-
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-
-        // Insert a delay of 5 seconds
-        await new Promise(resolve => setTimeout(resolve, 5000));
-    }
-
     // Iterate over the search indexers to get their current statuses
     for (const searchIndexer of searchIndexers) {
-        var searchIndexerName = searchIndexer.Name;
+        const searchIndexerName = searchIndexer.Name;
         //var searchIndexName = searchIndexer.IndexName;
         //var searchIndexerSchema = searchIndexer.Schema;
 
-        var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/status?api-version=${searchServiceApiVersion}`;
-
-        var headers = {
-            'api-key': searchApiKey,
-            'Content-Type': 'application/json'
-        };
+        if (searchIndexerName.indexOf("sharepoint") > -1) {
+            continue;
+        }
 
         // Invoke the REST method to get the search indexer status
         try {
-            const response = await fetch(searchIndexerUrl, {
-                method: 'GET',
-                headers: headers
-            });
+            const searchIndexerUrl = `${searchServiceUrl}/indexers/${searchIndexerName}/status?api-version=${apiVersion}`;
 
-            const data = await response.json();
-            console.log('Indexer status:', data.lastResult.status);
+            const data = await invokeRESTAPI(searchIndexerUrl, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
+
+            console.log(`Indexer: ${searchIndexerName} status:`, data.lastResult.status);
 
             searchIndexerStatusArray.push({ "name": searchIndexerName, "status": data.lastResult.status });
         } catch (error) {
@@ -1625,6 +1853,18 @@ async function getSearchIndexerStatus(searchIndexers) {
     }
 
     return searchIndexerStatusArray;
+}
+
+// Function to get the selected documents
+function getSelectedDocuments() {
+    const selectedDocs = [];
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    checkboxes.forEach(checkbox => {
+        const docId = checkbox.getAttribute('data-doc-id');
+        const docTitle = checkbox.getAttribute('data-doc-title');
+        selectedDocs.push({ docId, docTitle });
+    });
+    return selectedDocs;
 }
 
 // Function to get user presence
@@ -1693,16 +1933,42 @@ async function getUserProfilePic() {
     return data;
 }
 
-//code to toggle between chat and document screens
+// Function to toggle between chat and document screens
 function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
 }
 
 // Function to retrieve secret from Azure Key Vault
-async function getSecretFromKeyVault(keyVaultEndPoint, apiSecretName, apiVersion, apimSubscriptionKey, accessToken) {
+async function getSecretFromKeyVault(keyVaultProxyOperation) {
 
-    const keyVaultUrl = `${keyVaultEndPoint}/${apiSecretName}?api-version=${apiVersion}`;
+    let tokenResponse;
+    let accessToken;
+
+    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
+
+    const tokenRequest = {
+        scopes: [`https://vault.azure.net/.default`],
+        account: activeAccount
+    };
+
+    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+
+    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
+    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
+
+    try {
+        tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        accessToken = tokenResponse.accessToken;
+        console.log("Token acquired silently");
+    } catch (silentError) {
+        console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
+        tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+        accessToken = tokenResponse.accessToken;
+        console.log("Token acquired via popup");
+    }
+
+    const keyVaultUrl = `${keyVaultProxyEndPoint}/${keyVaultProxyOperation}?api-version=${keyVaultApiVersion}`;
 
     try {
         const response = await fetch(keyVaultUrl, {
@@ -1755,9 +2021,55 @@ function hideLeftNav() {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    if (width < 601) {
+    if (width < 831) {
         document.getElementById('left-nav-container').style.display = 'none';
     }
+}
+
+// Function to initialize the AI Assistant
+async function initAiAssistant() {
+
+    if (ai_assistant_thread.length > 0) {
+        return ai_assistant;
+    }
+
+    const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai`;
+    const apiVersion = "2024-05-01-preview";
+
+    let url = `${endpoint}/assistants?api-version=${apiVersion}`;
+
+    const responseAssistant = await fetch(url, {
+        method: 'GET',
+        headers: {
+            contentType: 'application/json',
+            'api-key': apiKey,
+        }
+    });
+
+    ai_assistant = await responseAssistant.json();
+
+    // Get the main thread
+    url = `${endpoint}/threads?api-version=${apiVersion}`;
+
+    const responseThread = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'api-key': apiKey,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    const threadList = await responseThread.json();
+
+    ai_assistant_thread_list = threadList.data;
+
+    ai_assistant_thread = threadList.data[0];
+
+    ai_assistant_threadId = threadList.first_id;
+
+    return ai_assistant;
 }
 
 // Function to initialize new instance of MSAL
@@ -1830,56 +2142,67 @@ function insertDollarSigns(str) {
 }
 
 // Function to call the rest API
-async function invokeRESTAPI(jsonString, endpoint, apiTokenSecretName) {
+async function invokeRESTAPI(httpEndpoint, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData) {
 
     let data = {};
-    let openAiApiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+    let apiKey = "";
+    let response;
 
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
-
-    const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-
-    const tokenRequest = {
-        scopes: [`https://vault.azure.net/.default`],
-        account: activeAccount
-    };
+    //httpMethod = (httpMethod === undefined || httpMethod === "") ? "POST" : httpMethod;
 
     try {
 
         if (authMode === "MSAL") {
-            let tokenResponse;
-
-            try {
-                tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-                accessToken = tokenResponse.accessToken;
-                console.log("Token acquired silently");
-            } catch (silentError) {
-                console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-                tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-                accessToken = tokenResponse.accessToken;
-                console.log("Token acquired via popup");
+            apiKey = await getSecretFromKeyVault(keyVaultProxyOperation);
+        }
+        else {
+            switch (keyVaultProxyOperation) {
+                case "OpenAIServiceApiKey":
+                    apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+                    break;
+                case "SearchServiceApiKey":
+                    apiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
+                    break;
+                case "StorageServiceApiKey":
+                    apiKey = config.AZURE_STORAGE_API_KEY;
+                    break;
             }
-
-            openAiApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, apiTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, accessToken);
         }
 
-        const contentType = isImageQuestion ? 'image/jpeg' : 'application/json';
+        //httpContentType = isImageQuestion ? 'image/jpeg' : 'application/json';
 
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': `${contentType}`,
-                'api-key': `${openAiApiKey}`,
-                'http2': 'true'
-            },
-            body: jsonString
-        });
+        if (httpHeaders === undefined || httpHeaders === "" || httpHeaders === null) {
+            httpHeaders = {
+                'Content-Type': `${httpContentType}`,
+                'api-key': `${apiKey}`,
+                'http2': 'true',
+                'mode': 'no-cors'
+            };
+        }
+        else {
+            httpHeaders['api-key'] = apiKey;
+        }
 
-        data = await response.json();
+        if (httpBody === undefined || httpBody === "" || httpBody === null) {
+            response = await fetch(httpEndpoint, {
+                method: httpMethod,
+                headers: httpHeaders
+            });
+        }
+        else {
+            response = await fetch(httpEndpoint, {
+                method: httpMethod,
+                headers: httpHeaders,
+                body: httpBody
+            });
+        }
 
-        return data;
+        if (returnData) {
+
+            data = await response.json();
+
+            return data;
+        }
     }
     catch (error) {
         if (error.code == 429 || error.code == 400) {
@@ -1977,6 +2300,8 @@ async function postQuestion() {
     stopTimer(); // Stop the timer
 
     document.getElementById("chat-info-text-copy").style.display = 'none';
+
+    //await getAnswersFromAiAssistant(chatInput);
 }
 
 // Function to render chat personas
@@ -2016,14 +2341,20 @@ async function renderChatPersonas() {
 }
 
 // Function to render documents in HTML table format
-function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon) {
+function renderDocumentsHtmlTable(blobs) {
 
     const docList = document.getElementById('document-table-body');
     const sampleRows = document.querySelectorAll('.document-row.sample');
+    const storageUrl = config.AZURE_STORAGE_URL;
+    const storageContainerName = config.AZURE_STORAGE_CONTAINER_NAME;
+    const sasToken = config.AZURE_STORAGE_SAS;
+    const editIcon = config.ICONS.EDIT_BUTTON.MONOTONE;
+    const deleteIcon = config.ICONS.DELETE_BUTTON.MONOTONE;
+    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.MONOTONE;
 
     // Clear existing document rows except the header
-    const existingRows = docList.querySelectorAll('document-table .document-row:not(.header)');
-    existingRows.forEach(row => row.style.display = 'none');
+    const existingRows = docList.querySelectorAll('tr.document-row');
+    existingRows.forEach(row => docList.removeChild(row));
 
     if (blobs.length === 0) {
         // Show sample rows if no results
@@ -2034,7 +2365,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
 
         // Extract blob data into an array of objects
         const blobData = Array.from(blobs).map(blob => {
-            const blobName = blob.getElementsByTagName("Name")[0].textContent;
+            const title = blob.getElementsByTagName("Name")[0].textContent;
             const lastModified = new Date(blob.getElementsByTagName("Last-Modified")[0].textContent).toLocaleString('en-US', {
                 year: 'numeric',
                 month: '2-digit',
@@ -2045,10 +2376,10 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
                 hour12: true
             });
             const contentType = blob.getElementsByTagName("Content-Type")[0].textContent.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
-            blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
-            const blobSize = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
-            return { blobName, lastModified, contentType, blobUrl, blobSize };
+            let url = `${storageUrl}/${storageContainerName}/${title}?${sasToken}`;
+            url = url.replace("&comp=list", "").replace("&restype=container", "");
+            const size = formatBytes(parseInt(blob.getElementsByTagName("Content-Length")[0].textContent));
+            return { title, lastModified, contentType, url, size };
         });
 
         originalDocumentCount = blobData.length;
@@ -2063,12 +2394,13 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             const documentRow = document.createElement('tr');
             documentRow.className = 'document-row';
 
-            var blobName = blob.blobName;
+            var blobName = blob.title;
             const lastModified = blob.lastModified;
             const contentType = blob.contentType.replace('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx').replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx');
-            let blobUrl = `${storageUrl}/${blobName}?${sasToken}`;
+            let blobUrl = blob.url;
             //blobUrl = blobUrl.replace("&comp=list", "").replace("&restype=container", "");
-            const blobSize = blob.blobSize;
+            const blobSize = blob.size;
+            const blobJson = JSON.stringify(blob);
 
             // Create the document cells
             const previewCell = document.createElement('td');
@@ -2116,7 +2448,7 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
 
             const actionDiv = document.createElement('div');
             actionDiv.className = 'action-content';
-            actionDiv.innerHTML = `<a href="#" title="delete file" class="edit-button">${editIcon}</a><a href="#" title="edit file" class="delete-button">${deleteIcon}</a>`;
+            actionDiv.innerHTML = `<span title='${blobJson}' class="document-edit-button">${editIcon}</span><span title='${blobJson}' class="document-delete-button">${deleteIcon}</span>`;
 
             const actionCell = document.createElement('td');
             actionCell.className = 'document-cell action-container';
@@ -2134,6 +2466,31 @@ function renderDocumentsHtmlTable(blobs, storageUrl, containerName, sasToken, ma
             docList.appendChild(documentRow);
         });
     }
+
+    const width = window.innerWidth;
+
+    if (width < 1350) {
+        const elements = document.getElementsByClassName('blob-name');
+        Array.from(elements).forEach(element => element.classList.remove('no-before'));
+    }
+    else {
+        const elements = document.getElementsByClassName('blob-name');
+        Array.from(elements).forEach(element => element.classList.add('no-before'));
+    }
+
+    document.querySelectorAll('.document-delete-button').forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            deleteDocument(item.title);
+        });
+    });
+
+    document.querySelectorAll('.document-edit-button').forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            editDocument(item.title);
+        });
+    });
 }
 
 // Function to render panel icons
@@ -2151,43 +2508,56 @@ async function renderPanelIcons() {
 
 }
 
+// Function to resize icons (currently doesn't work as expected)
+function resizeIcons() {
+    const windowWidth = window.innerWidth; // Use window.innerWidth for viewport width
+    const calculatedWidth = Math.floor(windowWidth / 60);
+    const iconWidth = Math.min(42, Math.max(16, calculatedWidth));
+    const iconHeight = iconWidth; // Keep it square
+
+    console.log("windowWidth:", windowWidth);
+    console.log("calculatedWidth:", calculatedWidth);
+    console.log("iconWidth:", iconWidth);
+
+    const settingsIcon = document.getElementById('settings-icon');
+    const userProfileIcon = document.getElementById('user-profile-icon');
+
+    const newMinX = 0;
+    const newMinY = 0;
+    const newWidth = iconWidth;
+    const newHeight = iconHeight;
+
+    if (settingsIcon) {
+        settingsIcon.style.setProperty('width', `${iconWidth}px`, 'important');
+        settingsIcon.style.setProperty('height', `${iconHeight}px`, 'important');
+        settingsIcon.setAttribute('viewBox', `${newMinX} ${newMinY} ${newWidth} ${newHeight}`);
+    }
+
+    if (userProfileIcon) {
+        userProfileIcon.style.setProperty('width', `${iconWidth}px`, 'important');
+        userProfileIcon.style.setProperty('height', `${iconHeight}px`, 'important');
+        userProfileIcon.setAttribute('viewBox', `${newMinX} ${newMinY} ${newWidth} ${newHeight}`);
+    }
+
+    console.log(`Icon resized to ${iconWidth}px by ${iconHeight}px`);
+}
+
 // Function to run Search Indexer after new file is uploaded
 async function runSearchIndexer(searchIndexers) {
 
-    let searchApiKey = config.AZURE_SEARCH_API_KEY;
+    const httpMethod = 'POST';
+    const httpContentType = 'application/json';
+    let httpBody = "";
+    const httpHeaders = {};
+    const returnData = false;
+
     const searchServiceName = config.AZURE_SEARCH_SERVICE_NAME;
-    const searchServiceApiVersion = config.AZURE_SEARCH_API_VERSION;
-    const searchTokenSecretName = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
-    const keyVaultEndPoint = "https://vault.azure.net/.default"
-    const apimSubscriptionKey = config.AZURE_APIM_SUBSCRIPTION_KEY;
-    const apimServiceName = config.AZURE_APIM_SERVICE_NAME;
-    const keyVaultApiVersion = config.AZURE_KEY_VAULT_API_VERSION;
+    const searchServiceApiVersion = config.AZURE_SEARCH_SERVICE_API_VERSION;
+    const searchServiceUrl = config.AZURE_SEARCH_SERVICE_URL;
 
-    if (authMode === 'MSAL') {
+    let keyVaultProxyOperation = config.AZURE_SEARCH_SERVICE_SECRET_NAME;
 
-        const keyVaultProxyEndPoint = `https://${apimServiceName}.azure-api.net/keyvault/secrets`
-
-        const tokenRequest = {
-            scopes: [`${keyVaultEndPoint}`],
-            account: activeAccount
-        };
-
-        let tokenResponse;
-
-        try {
-            tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
-            console.log("Token acquired silently");
-        } catch (silentError) {
-            console.warn("Silent token acquisition failed, acquiring token using popup", silentError);
-            tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
-            console.log("Token acquired via popup");
-        }
-
-        const searchApiKey = await getSecretFromKeyVault(keyVaultProxyEndPoint, searchTokenSecretName, keyVaultApiVersion, apimSubscriptionKey, tokenResponse.accessToken);
-
-        // Insert a delay of 5 seconds
-        await new Promise(resolve => setTimeout(resolve, 5000));
-    }
+    const searchIndexerStatus = await getSearchIndexerStatus(searchIndexers);
 
     // Iterate over the search indexers and run each one
     for (const searchIndexer of searchIndexers) {
@@ -2195,22 +2565,28 @@ async function runSearchIndexer(searchIndexers) {
         //var searchIndexName = searchIndexer.IndexName;
         //var searchIndexerSchema = searchIndexer.Schema;
 
-        var searchIndexerUrl = `https://${searchServiceName}.search.windows.net/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
+        const indexer = searchIndexerStatus.find(indexer => indexer.name === searchIndexerName);
+        const indexerStatus = indexer ? indexer.status : 'unknown';
 
-        var headers = {
-            'api-key': searchApiKey,
-            'Content-Type': 'application/json'
-        };
+        // Skip the indexer if it is already running
+        if (indexerStatus === "inProgress" || indexerStatus === "running") {
+            console.log(`Indexer ${searchIndexerName} is already running. Skipping...`);
+            continue;
+        }
+        if (searchIndexerName.indexOf("sharepoint") > -1) {
+            continue;
+        }
+
+        var searchIndexerUrl = `${searchServiceUrl}/indexers/${searchIndexerName}/run?api-version=${searchServiceApiVersion}`;
 
         // Invoke the REST method to run the search indexer
         try {
-            const response = await fetch(searchIndexerUrl, {
-                method: 'POST',
-                headers: headers
-            });
+
+            await invokeRESTAPI(searchIndexerUrl, httpMethod, httpContentType, httpHeaders, httpBody, keyVaultProxyOperation, returnData);
+
             //No need to return anything from the search indexer
-            const data = response;
-            console.log('Indexer run response:', data);
+            //const data = await response.json();
+            console.log('Operation "run search indexer" is now executing for', searchIndexerName);
         } catch (error) {
             console.error(`Error running search indexer`, error.message);
         }
@@ -2412,6 +2788,7 @@ function sortDocuments(criteria) {
     renderDocuments(sortedBlobs);
 }
 
+// Function to start the timer
 function startTimer() {
     startTime = Date.now();
     timerInterval = setInterval(() => {
@@ -2420,6 +2797,7 @@ function startTimer() {
     }, 1000);
 }
 
+// Function to stop the timer
 function stopTimer() {
     clearInterval(timerInterval);
     //document.getElementById('chat-response-timer').innerText = `Time: 0s`;
@@ -2536,7 +2914,7 @@ function updateFileCount() {
     document.getElementById('file-count').textContent = `Files selected: ${fileCount}`;
 }
 
-//code to update placeholder text
+// Function to update placeholder text
 function updatePlaceholder() {
     const noFilesPlaceholder = document.getElementById('num-files-selected-placeholder');
     const fileList = document.getElementById('file-list');
@@ -2563,44 +2941,59 @@ function updatePlaceholder() {
     }
 }
 
-//code to upload files to Azure Storage
+// Function to upload files to Azure Storage
 async function uploadFilesToAzure(files) {
 
-    const accountName = config.AZURE_STORAGE_ACCOUNT_NAME;
-    const azureStorageUrl = config.AZURE_STORAGE_URL;
+    let httpContentType = 'application/json';
+    let httpHeaders = {};
+    let httpBody = "";
+    let response = "";
+
+    const httpMethod = 'PUT';
+    const returnData = false;
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
+    const storageUrl = config.AZURE_STORAGE_URL;
+    const sasToken = config.AZURE_STORAGE_SAS;
+
     const containerName = config.AZURE_STORAGE_CONTAINER_NAME;
-    const sasTokenConfig = config.AZURE_STORAGE_SAS_TOKEN;
     const apiVersion = config.AZURE_STORAGE_API_VERSION;
-    const magnifyingGlassIcon = config.ICONS.MAGNIFYING_GLASS.SVG;
-    const editIcon = config.ICONS.EDIT.MONOTONE;
-    const deleteIcon = config.ICONS.DELETE.MONOTONE;
 
     const searchIndexers = config.SEARCH_INDEXERS;
-    const storageUrl = `https://${accountName}.${azureStorageUrl}/${containerName}`;
 
-    // Construct the SAS token from the individual components
-    const sasToken = `sv=${sasTokenConfig.SV}&include=${sasTokenConfig.INCLUDE}&ss=${sasTokenConfig.SS}&srt=${sasTokenConfig.SRT}&sp=${sasTokenConfig.SP}&se=${sasTokenConfig.SE}&spr=${sasTokenConfig.SPR}&sig=${sasTokenConfig.SIG}`;
-    const fullStorageUrl = storageUrl + `?comp=list&include=metadata&restype=container&${sasToken}`;
+    let fullStorageUrl;
 
     for (const file of files) {
         const fileName = file.name.replace("#", "");
-        const uploadUrl = `${storageUrl}/${fileName}?&${sasToken}`;
         const date = new Date().toUTCString();
 
+        httpContentType = file.type;
+
+        httpHeaders = {
+            'x-ms-blob-type': 'BlockBlob',
+            'Content-Type': file.type,
+            'Content-Length': file.size.toString(),
+            'x-ms-date': date,
+            'x-ms-version': apiVersion,
+            'x-ms-blob-content-type': file.type,
+            'mode': 'no-cors',
+            'http2': 'true'
+        };
+
         try {
-            const response = await fetch(uploadUrl, {
-                method: 'PUT',
-                headers: {
-                    'x-ms-blob-type': 'BlockBlob',
-                    'Content-Type': file.type,
-                    'Content-Length': file.size.toString(),
-                    'x-ms-date': date,
-                    'x-ms-version': apiVersion,
-                    'x-ms-blob-content-type': file.type,
-                    'x-ms-blob-type': 'BlockBlob'
-                },
-                body: file
-            });
+            if (useSaS) {
+                fullStorageUrl = `${storageUrl}/${containerName}/${fileName}?&${sasToken}`;
+
+                response = await fetch(fullStorageUrl, {
+                    method: httpMethod,
+                    headers: httpHeaders,
+                    body: file
+                });
+            }
+            else {
+                fullStorageUrl = `${storageUrl}/${containerName}/${fileName}`;
+
+                response = await invokeRESTAPI(fullStorageUrl, httpMethod, httpContentType, httpHeaders, file, keyVaultProxyOperation, returnData);
+            }
 
             if (response.ok) {
                 showToastNotification(`Upload successful for ${file.name}.`, true);
@@ -2617,8 +3010,94 @@ async function uploadFilesToAzure(files) {
     // Clear the file input after successful upload
     clearFileInput();
 
-    getDocuments(blobs, storageUrl, fullStorageUrl, containerName, sasToken, magnifyingGlassIcon, editIcon, deleteIcon); // Refresh the document list after successful upload
+    getDocuments(blobs); // Refresh the document list after successful upload
 
     //The isn't working yet because of permissions issues
     await runSearchIndexer(searchIndexers);
+}
+
+// Function to batch upload files to Azure
+async function uploadFilesToAzureBatch(files) {
+    if (!files || files.length === 0) {
+        console.log('No files selected for upload.');
+        return;
+    }
+
+    const httpMethod = 'PUT';
+    const returnData = false;
+    const keyVaultProxyOperation = config.AZURE_STORAGE_ACCOUNT_SECRET_NAME;
+
+    const apiVersion = config.AZURE_STORAGE_API_VERSION;
+    const searchIndexers = config.SEARCH_INDEXERS;
+
+    let fullStorageUrl;
+
+    let response;
+
+    // Create an array of upload promises for concurrent processing.
+    const uploadPromises = Array.from(files).map(file => {
+        return (async () => {
+            const fileName = file.name.replace("#", "");
+            const date = new Date().toUTCString();
+            const httpContentType = file.type;
+            const fileHeaders = {
+                'x-ms-blob-type': 'BlockBlob',
+                'Content-Type': file.type,
+                'Content-Length': file.size.toString(),
+                'x-ms-date': date,
+                'x-ms-version': apiVersion,
+                'x-ms-blob-content-type': file.type,
+                'mode': 'no-cors',
+                'http2': 'true'
+            };
+
+            try {
+
+                if (useSaS) {
+                    fullStorageUrl = config.AZURE_STORAGE_FULL_URL_SAS;
+
+                    response = await fetch(fullStorageUrl, {
+                        method: httpMethod,
+                        headers: fileHeaders,
+                        body: file
+                    });
+                }
+                else {
+                    fullStorageUrl = config.AZURE_STORAGE_URL;
+
+                    response = await invokeRESTAPI(fullStorageUrl, httpMethod, httpContentType, fileHeaders, file, keyVaultProxyOperation, returnData);
+                }
+
+                // Check for success—if not, throw error for Promise.all rejection.
+                if (response && response.ok) {
+                    console.log(`Upload successful for ${file.name}.`);
+                    showToastNotification(`Upload successful for ${file.name}.`, true);
+                } else {
+                    let errorText = "";
+                    try {
+                        errorText = response ? await response.text() : 'Unknown error';
+                    } catch (e) {
+                        errorText = 'Unknown error';
+                    }
+                    console.error(`Error uploading file ${file.name} to Azure Storage:`, errorText);
+                    showToastNotification(`Error uploading file ${file.name}: ${errorText}`, false);
+                    throw new Error(`Error uploading ${file.name}`);
+                }
+            } catch (error) {
+                console.error(`Error uploading file ${file.name}:`, error.message);
+                throw error;
+            }
+        })();
+    });
+
+    try {
+        await Promise.all(uploadPromises);
+        // Clear file input and refresh document list after all uploads complete
+        clearFileInput();
+        getDocuments(blobs);
+        // Optionally, run the search indexer after batch uploading
+        await runSearchIndexer(searchIndexers);
+    } catch (error) {
+        console.error('One or more file uploads failed:', error);
+    }
 }

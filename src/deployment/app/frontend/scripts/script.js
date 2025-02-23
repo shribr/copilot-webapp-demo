@@ -74,6 +74,11 @@ const loginRequest = {
 
 let thread = { "messages": [] };
 
+let ai_assistant = {};
+let ai_assistant_thread_list = [];
+let ai_assistant_thread = [];
+let ai_assistant_threadId = "";
+
 let tool_resources = {
     "azure_ai_search": {
         "indexes": [
@@ -123,6 +128,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     hideLeftNav();
 
     setSiteLogo();
+
+    // Initial resize
+    //resizeIcons();
+
+    // Resize on window resize
+    //window.addEventListener('resize', resizeIcons);
 
     // Add event listeners to the buttons
     const elements = document.getElementsByClassName('document-cell-name');
@@ -512,10 +523,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('link-user-profile').style.display = 'none';
         document.getElementById('user-profile-icon').style.display = 'none';
     }
+
+    //await initAiAssistant();
 });
 
 // Function to build chat history
-function addMessageToChatHistory(thread, message) {
+function addMessageToChatHistory(message) {
     //code to build chat history
     thread.messages.push(message);
 
@@ -1263,6 +1276,96 @@ function formatBytes(bytes) {
     else return (bytes / 1048576).toFixed(2) + ' MB';
 }
 
+// Function to get AI Assistant results
+async function getAnswersFromAiAssistant(message) {
+
+    const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai`;
+    const apiVersion = "2024-05-01-preview";
+
+    let url = `${endpoint}/threads?api-version=${apiVersion}`;
+
+    try {
+
+        const assistantResponse = await initAiAssistant();
+
+        // First get the thread ID
+        const threadId = ai_assistant_thread.id;
+
+        // Then send the message
+        console.log('AI Assistant posting message:', message);
+
+        url = `${endpoint}/threads/${threadId}/messages?api-version=${apiVersion}`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(message)
+        });
+
+        const data = await response.json();
+
+        // Then run the thread
+        console.log('AI Assistant running thread...');
+
+        const body = JSON.stringify({ "assistant_id": ai_assistant.first_id });
+
+        url = `${endpoint}/threads/${threadId}/runs?api-version=${apiVersion}`;
+        const runResponse = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: body
+        });
+
+        const runData = await runResponse.json();
+
+        // Then get the status of the run
+        console.log('AI Assistant getting run status...');
+
+        url = `${endpoint}/threads/${threadId}/runs/${runData.id}?api-version=${apiVersion}`;
+        const statusResponse = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const statusData = await statusResponse.json();
+
+        console.log('AI Assistant run status:', statusData);
+
+        // Then get the results of the run
+        console.log('AI Assistant getting run results...');
+
+        url = `${endpoint}/threads/${threadId}/messages?api-version=${apiVersion}`;
+        const resultsResponse = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const runResults = await resultsResponse.json();
+
+        console.log('AI Assistant run results:', runResults);
+
+        ai_assistant_thread_list = runResults.data;
+    }
+    catch (error) {
+        console.error('Error fetching AI Assistant search results:', error);
+        return null;
+    }
+}
+
 //Function to send chat message to Azure OpenAI model to either search the model directly or internal data sources
 async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSources) {
 
@@ -1515,7 +1618,7 @@ async function getChatResponse(questionBubble) {
 
     if (persona.Type != previousPersona.Type) {
         const system_message = { "role": "assistant", "content": persona.Prompt };
-        addMessageToChatHistory(thread, system_message);
+        addMessageToChatHistory(system_message);
 
         previousPersona.Type = persona.Type;
     }
@@ -1528,7 +1631,7 @@ async function getChatResponse(questionBubble) {
 
         const message = { "role": "user", "content": prompt };
 
-        addMessageToChatHistory(thread, message);
+        addMessageToChatHistory(message);
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
@@ -1923,6 +2026,52 @@ function hideLeftNav() {
     }
 }
 
+// Function to initialize the AI Assistant
+async function initAiAssistant() {
+
+    if (ai_assistant_thread.length > 0) {
+        return ai_assistant;
+    }
+
+    const apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+    const region = config.REGION;
+    const endpoint = `https://${region}.api.cognitive.microsoft.com/openai`;
+    const apiVersion = "2024-05-01-preview";
+
+    let url = `${endpoint}/assistants?api-version=${apiVersion}`;
+
+    const responseAssistant = await fetch(url, {
+        method: 'GET',
+        headers: {
+            contentType: 'application/json',
+            'api-key': apiKey,
+        }
+    });
+
+    ai_assistant = await responseAssistant.json();
+
+    // Get the main thread
+    url = `${endpoint}/threads?api-version=${apiVersion}`;
+
+    const responseThread = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'api-key': apiKey,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    const threadList = await responseThread.json();
+
+    ai_assistant_thread_list = threadList.data;
+
+    ai_assistant_thread = threadList.data[0];
+
+    ai_assistant_threadId = threadList.first_id;
+
+    return ai_assistant;
+}
+
 // Function to initialize new instance of MSAL
 async function initMSALInstance(config) {
 
@@ -2151,6 +2300,8 @@ async function postQuestion() {
     stopTimer(); // Stop the timer
 
     document.getElementById("chat-info-text-copy").style.display = 'none';
+
+    //await getAnswersFromAiAssistant(chatInput);
 }
 
 // Function to render chat personas
@@ -2355,6 +2506,40 @@ async function renderPanelIcons() {
     settingsIconContainer.innerHTML = settingsIcon;
     profileIconContainer.innerHTML = userProfileIcon;
 
+}
+
+// Function to resize icons (currently doesn't work as expected)
+function resizeIcons() {
+    const windowWidth = window.innerWidth; // Use window.innerWidth for viewport width
+    const calculatedWidth = Math.floor(windowWidth / 60);
+    const iconWidth = Math.min(42, Math.max(16, calculatedWidth));
+    const iconHeight = iconWidth; // Keep it square
+
+    console.log("windowWidth:", windowWidth);
+    console.log("calculatedWidth:", calculatedWidth);
+    console.log("iconWidth:", iconWidth);
+
+    const settingsIcon = document.getElementById('settings-icon');
+    const userProfileIcon = document.getElementById('user-profile-icon');
+
+    const newMinX = 0;
+    const newMinY = 0;
+    const newWidth = iconWidth;
+    const newHeight = iconHeight;
+
+    if (settingsIcon) {
+        settingsIcon.style.setProperty('width', `${iconWidth}px`, 'important');
+        settingsIcon.style.setProperty('height', `${iconHeight}px`, 'important');
+        settingsIcon.setAttribute('viewBox', `${newMinX} ${newMinY} ${newWidth} ${newHeight}`);
+    }
+
+    if (userProfileIcon) {
+        userProfileIcon.style.setProperty('width', `${iconWidth}px`, 'important');
+        userProfileIcon.style.setProperty('height', `${iconHeight}px`, 'important');
+        userProfileIcon.setAttribute('viewBox', `${newMinX} ${newMinY} ${newWidth} ${newHeight}`);
+    }
+
+    console.log(`Icon resized to ${iconWidth}px by ${iconHeight}px`);
 }
 
 // Function to run Search Indexer after new file is uploaded
