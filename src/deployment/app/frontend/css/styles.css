@@ -82,9 +82,9 @@ body {
 
 /* THIS MEANS GREATER THAN OR EQUAL TO 661PX */
 @media (min-width: 661px) {
-  #hamburger-menu {
+  /* #hamburger-menu {
     display: none;
-  }
+  } */
 
   #main-header-title {
     font-size: 1.8em !important;
@@ -97,16 +97,106 @@ body {
 }
 
 /* THIS MEANS LESS THAN OR EQUAL TO 660PX */
-@media (max-width: 660px) {
+@media (max-width: 655px) {
+  #main-header-title {
+    font-size: 1.7em !important;
+    margin-left: 0px !important;
+  }
+}
+
+@media (max-width: 630px) {
+  #main-header-title {
+    font-size: 1.6em !important;
+    margin-left: 0px !important;
+  }
+}
+
+@media (max-width: 605px) {
   #main-header-title {
     font-size: 1.4em !important;
     margin-left: 0px !important;
+  }
+
+  #user-profile-icon {
+    width: 26px;
+  }
+
+  #settings-icon {
+    width: 26px;
   }
 }
 
 @media (max-width: 570px) {
   #main-header-title {
+    font-size: 1.3em !important;
+  }
+
+  #user-profile-icon {
+    width: 24px;
+  }
+
+  #settings-icon {
+    width: 24px;
+  }
+}
+
+@media (max-width: 530px) {
+  #main-header-title {
+    font-size: 1.2em !important;
+    margin-left: 0px !important;
+  }
+
+  #user-profile-icon {
+    width: 22px;
+  }
+
+  #settings-icon {
+    width: 22px;
+  }
+}
+
+@media (max-width: 500px) {
+  #main-header-title {
+    font-size: 1.1em !important;
+    margin-left: 0px !important;
+  }
+
+  #user-profile-icon {
+    width: 20px;
+  }
+
+  #settings-icon {
+    width: 20px;
+  }
+}
+
+@media (max-width: 470px) {
+  #main-header-title {
+    font-size: 1em !important;
+    margin-left: 0px !important;
+  }
+
+  #user-profile-icon {
+    width: 18px;
+  }
+
+  #settings-icon {
+    width: 18px;
+  }
+}
+
+@media (max-width: 460px) {
+  #main-header-title {
     font-size: 0.9em !important;
+    margin-left: 0px !important;
+  }
+
+  #user-profile-icon {
+    width: 16px;
+  }
+
+  #settings-icon {
+    width: 16px;
   }
 }
 

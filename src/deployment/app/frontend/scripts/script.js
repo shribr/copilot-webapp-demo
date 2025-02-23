@@ -255,6 +255,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         let resizeWidth = mainTitleWidth > mainContentWidth ? mainTitleWidth + 210 : 660;
 
+        //resizeIcons();
+
         leftNavContainer.style.removeProperty("display");
         // Add your resize logic here
         //console.log(`Window resized to width: ${width}, height: ${height}`);
@@ -1616,7 +1618,7 @@ async function getChatResponse(questionBubble) {
     // Get the selected chat persona
     const persona = getSelectedChatPersona();
 
-    if (persona.Type != previousPersona.Type) {
+    if (persona.Type != previousPersona.Type || thread.messages.length == 0) {
         const system_message = { "role": "assistant", "content": persona.Prompt };
         addMessageToChatHistory(thread, system_message);
 
