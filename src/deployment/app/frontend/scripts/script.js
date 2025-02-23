@@ -528,7 +528,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Function to build chat history
-function addMessageToChatHistory(message) {
+function addMessageToChatHistory(thread, message) {
     //code to build chat history
     thread.messages.push(message);
 
@@ -1618,7 +1618,7 @@ async function getChatResponse(questionBubble) {
 
     if (persona.Type != previousPersona.Type) {
         const system_message = { "role": "assistant", "content": persona.Prompt };
-        addMessageToChatHistory(system_message);
+        addMessageToChatHistory(thread, system_message);
 
         previousPersona.Type = persona.Type;
     }
@@ -1631,7 +1631,7 @@ async function getChatResponse(questionBubble) {
 
         const message = { "role": "user", "content": prompt };
 
-        addMessageToChatHistory(message);
+        addMessageToChatHistory(thread, message);
 
         const chatExamplesContainer = document.getElementById('chat-examples-container');
         chatExamplesContainer.style.display = 'none';
