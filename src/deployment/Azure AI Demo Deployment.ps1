@@ -1747,6 +1747,7 @@ function New-AppRegistration {
         
         if ($existingApp) {
             $appId = $existingApp.appId
+
             $objectId = az ad app show --id $appId --query "id" --output json | ConvertFrom-Json
             $appUri = $existingApp.appUri
 
@@ -1767,6 +1768,10 @@ function New-AppRegistration {
 
         # Update the parameters file with the new app registration details
         Update-ParametersFileAppRegistration -parametersFile $parametersFile -appId $appId -appUri $appUri
+
+        $global:appRegistrationClientId = $appId
+        $global:appRegistrationObjectId = $existingApp.objectId
+        $global:appRegistrationAppUri = $existingApp.appUri
 
         $permissions = "User.Read.All"
         $apiPermissions = ""
@@ -1928,17 +1933,6 @@ function New-AppRegistration {
                 Write-Log -message "Failed to update 'oauth2PermissionScopes' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             }
             
-            try {
-                az ad app update --id $appId --required-resource-accesses $appRegRequiredResourceAccessJson
-
-                Write-Host "The property 'required-resource-accesses' for '$appServiceName' app registration updated successfully." -ForegroundColor Green
-                Write-Log -message "The property 'required-resource-accesses' for '$appServiceName' app registration updated successfully." -logFilePath $global:LogFilePath
-            }
-            catch {
-                Write-Error "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-                Write-Log -message "Failed to update 'required-resource-accesses' property for '$appServiceName' app registration: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-            }
-
             try {
                 az ad app update --id $appId --required-resource-accesses $appRegRequiredResourceAccessJson
 
@@ -5081,9 +5075,13 @@ function Update-ConfigFile {
         $config.AZURE_STORAGE_SAS_TOKEN.ST = $startDate
 
         $config.AZURE_SUBSCRIPTION_ID = $global:subscriptionId
+
+        # DALL-E-3 MODEL IS ONLY DEPLOYED TO THE AI SERVICE AND NOT OPENAI. IT WAS A MISTAKE ON MY PART BUT NOW I CAN'T GET THE MODEL TO DEPLOY TO OPENAI BECAUSE OF CAPACITY LIMITATIONS.
+        # THE ONLY SUCCESSFUL DALL-E-3 DEPLOYMENT I'VE MADE TO DATE IN EASTUS WAS FOR THE 002 DEPLOYMENT. THEREFORE, EVEN THOUGH I AM SETTING THE STANDALONE OPENAI VALUES EQUAL TO THE OPENAI ONES,
+        # THEY ARE NOT THE SAME AND THE OPENAI KEYS WILL NOT WORK FOR DALL-E-3. TO MITIGATE THIS, I AM USING THE APIKEY FROM THE AI SERVICE DEPLOYED TO 002 IN THE CODE DOWN BELOW AND SETTING THOSE VALUES AT THE AI MODEL LEVEL IN THE CONFIG.JSON FILE.
         $config.OPENAI_ACCOUNT_NAME = $global:openAIService.Name
-        $config.OPENAI_API_KEY = $openAIApiKey
-        $config.OPENAI_API_VERSION = $global:openAIService.ApiVersion
+        $config.OPENAI_SERVICE_API_KEY = $openAIApiKey
+        $config.OPENAI_SERVICE_API_VERSION = $global:openAIService.ApiVersion
         $config.SEARCH_AZURE_OPENAI_MODEL = $global:searchAzureOpenAIModel
         $config.SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.SITE_LOGO = $global:siteLogo
@@ -5164,6 +5162,11 @@ function Update-ConfigFile {
         $config.AI_MODELS = @()
 
         #$aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
+        # IDEALLY ALL MODELS SHOULD BE DEPLOYED TO THE OPEN AI SERVICE AND NOT JUST THE PLAIN AI SERVICE.
+        # FOR SOME REASON I CAN NO LONGER DEPLOY THE DALL-E-3 MODEL TO EASYUS AND IT CAN ONLY BE DEPLOYED TO EAST SWEDEDN OR EAST AUSTRALIA.
+        # FURTHERMORE, THE ONLY SUCCESSFUL DALL-E-3 DEPLOYMENT I'VE MADE TO DATE IN EASTUS WAS FOR THE 002 DEPLOYMENT.
+        # UNFORTUNATELY I DEPLOYED IT TO THE AI SERVICE BY MISTAKE. 
+        # SO IN ORDER TO USE DALL-E-3, FOR NOW I WILL BE USING THE APIKEY FROM THE AI SERVICE DEPLOYED TO 002 AS OPPOSED TO THE OPEN AI SERVICE FOR EACH UNIQUE WEBAPP DEPLOYMENT. 
         $apiKey = Get-CognitiveServicesApiKey -resourceGroupName $resourceGroupName -cognitiveServiceName $global:aiService.Name
 
         # Loop through the AI models collection from global:aiModels

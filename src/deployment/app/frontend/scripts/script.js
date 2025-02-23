@@ -1400,7 +1400,7 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
         searchApiKey = await getSecretFromKeyVault(config.AZURE_SEARCH_SERVICE_SECRET_NAME);
     }
     else {
-        apiKey = config.AZURE_OPENAI_SERVICE_API_KEY;
+        apiKey = aiModel.ApiKey;
         searchApiKey = config.AZURE_SEARCH_SERVICE_API_KEY;
     }
 
@@ -2172,6 +2172,12 @@ async function invokeRESTAPI(httpEndpoint, httpMethod, httpContentType, httpHead
                     apiKey = config.AZURE_STORAGE_API_KEY;
                     break;
             }
+        }
+
+        // Using this code because I can't deploy DALL-E-3 due to quota restrictions.
+        if (httpContentType === "image/jpeg") {
+            //apikey = aiModel.ApiKey;
+            apiKey = "617fbecd68bb4835af175a0503bac785";
         }
 
         //httpContentType = isImageQuestion ? 'image/jpeg' : 'application/json';
