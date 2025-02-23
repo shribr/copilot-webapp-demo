@@ -1413,6 +1413,9 @@ async function getAnswersFromAzureOpenAI(userInput, aiModel, persona, dataSource
 
     var results = [];
 
+    // Only copilot-demo-002 has a DALL-E model deployed and it is deployed using the ai-copilot-demo-002 and not the openai-service-copilot-demo-002.
+    // As of right now I have deployed the javascript version that points to the openai-copilot-demo-002 which does not have the DALL-E model deployed.
+    // This is why image creation is not working.
     if (isImageQuestion) {
 
         let aiImage = '';
