@@ -5033,8 +5033,8 @@ function Update-ConfigFile {
         $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
 
         # Update the config with the new key-value pair
-        # Update the config with the new key-value pair
         $config.AZURE_OPENAI_SERVICE_API_KEY = $openAIApiKey
+        $config.AZURE_OPENAI_SERVICE_API_VERSION = $global:openAIService.ApiVersion
         $config.AZURE_FUNCTION_API_KEY = $functionApiKey
         $config.AZURE_FUNCTION_APP_NAME = $functionAppName
         $config.AZURE_FUNCTION_APP_URL = $functionAppUrl
@@ -5080,8 +5080,8 @@ function Update-ConfigFile {
         # THE ONLY SUCCESSFUL DALL-E-3 DEPLOYMENT I'VE MADE TO DATE IN EASTUS WAS FOR THE 002 DEPLOYMENT. THEREFORE, EVEN THOUGH I AM SETTING THE STANDALONE OPENAI VALUES EQUAL TO THE OPENAI ONES,
         # THEY ARE NOT THE SAME AND THE OPENAI KEYS WILL NOT WORK FOR DALL-E-3. TO MITIGATE THIS, I AM USING THE APIKEY FROM THE AI SERVICE DEPLOYED TO 002 IN THE CODE DOWN BELOW AND SETTING THOSE VALUES AT THE AI MODEL LEVEL IN THE CONFIG.JSON FILE.
         $config.OPENAI_ACCOUNT_NAME = $global:openAIService.Name
-        $config.OPENAI_SERVICE_API_KEY = $openAIApiKey
-        $config.OPENAI_SERVICE_API_VERSION = $global:openAIService.ApiVersion
+        $config.OPENAI_API_KEY = $openAIApiKey
+        $config.OPENAI_API_VERSION = $global:openAIService.ApiVersion
         $config.SEARCH_AZURE_OPENAI_MODEL = $global:searchAzureOpenAIModel
         $config.SEARCH_PUBLIC_INTERNET_RESULTS = $global:searchPublicInternetResults
         $config.SITE_LOGO = $global:siteLogo

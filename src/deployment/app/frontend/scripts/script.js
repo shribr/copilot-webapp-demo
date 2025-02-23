@@ -1685,6 +1685,15 @@ async function getChatResponse(questionBubble) {
                 chatResponse.appendChild(thoughtProcessContent);
                 chatResponse.appendChild(supportingContent);
             }
+            else {
+
+                if (azureOpenAIResults.error === undefined) {
+                    if (azureOpenAIResults.data.length > 0) {
+                        thoughtProcessContent.innerHTML += `<div id="thought-process-results-container">Revised Prompt:<br/>${azureOpenAIResults.data[0].revised_prompt}</div>`;
+                        chatResponse.appendChild(thoughtProcessContent);
+                    }
+                }
+            }
 
             setEqualHeightForTabContents();
 
