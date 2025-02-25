@@ -169,6 +169,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('search-indexer-status-refresh').innerHTML = `<a href="#" id="run-search-indexer-link">${config.ICONS.REFRESH.SVG}</a>`;
     document.getElementById('search-indexer-status-refresh').title = searchIndexStatusMessage;
 
+    let downloadChatLogContainer = document.getElementById('download-chat-log-container');
+
+    if (thread.messages.length > 0) {
+        downloadChatLogContainer.style.display = 'block';
+    }
+    else {
+        downloadChatLogContainer.style.display = 'none';
+    }
+
+    downloadChatLogContainer.addEventListener('click', downloadChatLog);
+
     document.getElementById('run-search-indexer-link').addEventListener('click', function (event) {
         event.preventDefault();
         runSearchIndexer(searchIndexers);
@@ -407,7 +418,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const documentRows = document.querySelectorAll('#document-table .document-row:not(.header)');
         documentRows.forEach(row => {
             if (!row.classList.contains('sample')) {
-                row.style.display = 'block'; // Reset the visibility of all rows except sample ones
+                row.style.display = ''; // Reset the visibility of all rows except sample ones
             }
         });
         this.style.display = 'none'; // Hide the clear filter button
@@ -648,6 +659,10 @@ function clearChatDisplay() {
     document.getElementById('clear-button').style.display = 'none';
 
     thread.messages = []; // Clear the chat history
+
+    let downloadChatLogContainer = document.getElementById('download-chat-log-container');
+
+    downloadChatLogContainer.style.display = 'none';
 
     document.getElementById('chat-info-text-copy').style.display = 'block';
     document.getElementById('chat-examples-container').style.display = 'block';
@@ -1248,6 +1263,27 @@ function downloadChatResults(event) {
     URL.revokeObjectURL(url);
 }
 
+// Function to download chat log
+function downloadChatLog() {
+    let chatlog = thread.messages;
+    let filename = 'chat-log.json';
+    let chatLogJson = JSON.stringify(chatlog, null, 2);
+
+    const blob = new Blob([chatLogJson], { type: 'application/json' });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+
+}
+
 // Function to make sure $$$$ exists in query response.
 function ensureDollarSigns(text) {
     // Split the text into paragraphs
@@ -1747,6 +1783,9 @@ async function getChatResponse(questionBubble) {
 
         chatCurrentQuestionContainer.innerHTML = ''; // Clear the current question
 
+        let downloadChatLogContainer = document.getElementById('download-chat-log-container');
+
+        downloadChatLogContainer.style.display = 'block';
     }
     else {
         loadingAnimation.style.display = 'none';
@@ -1758,6 +1797,14 @@ async function getChatResponse(questionBubble) {
     document.getElementById('clear-button').style.display = '';
 
     answerResponseNumber++;
+
+    scrollToNewestQuestionBubble();
+
+    scrollToNewestQuestionBubble();
+
+    const questionBubbleTop = questionBubble.offsetTop;
+    chatDisplay.scrollTop = questionBubbleTop - chatDisplay.offsetTop;
+
 }
 
 //Function to get documents from Azure Storage. This needs to be updated to have option to use MSAL in addition to API_KEY.
@@ -2281,6 +2328,7 @@ async function postQuestion() {
     // Create a new div for the chat bubble
     const questionBubble = document.createElement('div');
     questionBubble.setAttribute('class', 'question-bubble fade-in'); // Add fade-in class
+    questionBubble.setAttribute('id', `question-bubble-${answerResponseNumber}`);
 
     const svg = document.createElement("div");
     svg.className = 'question-bubble-svg';
@@ -2611,6 +2659,17 @@ async function runSearchIndexer(searchIndexers) {
             console.error(`Error running search indexer`, error.message);
         }
     }
+}
+
+function scrollToLatestBubbleMessage() {
+    const chatDisplay = document.getElementById('chat-display');
+    if (!chatDisplay) return;
+
+    const bubbles = chatDisplay.getElementsByClassName('chat-response');
+    if (bubbles.length === 0) return;
+
+    const latestBubble = bubbles[bubbles.length - 1];
+    latestBubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Function to scroll to the newest question bubble
