@@ -1,6 +1,6 @@
 {
   "appendUniqueSuffix": false,
-  "appDeploymentOnly": true,
+  "appDeploymentOnly": false,
   "currentFullResourceBaseName": "copilot-demo-010",
   "deploymentType": "Existing",
   "fullResourceBaseName": "copilot-demo-010",
