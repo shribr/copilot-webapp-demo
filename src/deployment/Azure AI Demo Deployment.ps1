@@ -790,36 +790,38 @@ function Get-UniqueSuffix {
 
     #$resourceGroupName = $resourceGroup.Name
 
+    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+
     $appResourceExists = $true
 
     do {
-        $global:storageService.Name = "$($parameters.storageService.Name)$resourceGuid$resourceSuffix"
-        $global:appServicePlan.Name = "$($parameters.appServicePlan.Name)-$resourceGuid-$resourceSuffix"
-        $global:searchService.Name = "$($parameters.searchServic.eName)-$resourceGuid-$resourceSuffix"
-        $global:logAnalyticsWorkspace.Name = "$($parameters.logAnalyticsWorkspace.Name)-$resourceGuid-$resourceSuffix"
-        $global:cognitiveService.Name = "$($parameters.cognitiveService.Name)-$resourceGuid-$resourceSuffix"
-        $global:containerRegistry.Name = "$($parameters.containerRegistry.Name)-$resourceGuid-$resourceSuffix"
-        $global:keyVault.Name = "$($parameters.keyVault.Name)-$resourceGuid-$resourceSuffix"
-        $global:appInsights.Name = "$($parameters.appInsights.Name)-$resourceGuid-$resourceSuffix"
-        $global:userAssignedIdentity.Name = "$($parameters.userAssignedIdentity.Name)-$resourceGuid-$resourceSuffix"
-        $global:documentIntelligenceService.Name = "$($parameters.documentIntelligenceService.Name)-$resourceGuid-$resourceSuffix"
-        $global:aiHub.Name = "$($aiHub.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:aiService.Name = "$($aiService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:computerVisionService.Name = "$($computerVisioService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:openAIService.Name = "$($openAIService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:virtualNetwork.Name = "$($virtualNetwork.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:subnet.Name = "$($subnet.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:apiManagementService.Name = "$($apiManagementService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:aiProject.Name = "$($aiProject.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:virtualNetwork.Name = "$($virtualNetwork.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:storageService.Name = "$($global:storageService.Name)$resourceGuid$resourceSuffix"
+        $global:appServicePlan.Name = "$($global:appServicePlan.Name)-$resourceGuid-$resourceSuffix"
+        $global:searchService.Name = "$($global:searchService.Name)-$resourceGuid-$resourceSuffix"
+        $global:logAnalyticsWorkspace.Name = "$($global:logAnalyticsWorkspace.Name)-$resourceGuid-$resourceSuffix"
+        $global:cognitiveService.Name = "$($global:cognitiveService.Name)-$resourceGuid-$resourceSuffix"
+        $global:containerRegistry.Name = "$($global:containerRegistry.Name)-$resourceGuid-$resourceSuffix"
+        $global:keyVault.Name = "$($global:keyVault.Name)-$resourceGuid-$resourceSuffix"
+        $global:appInsightsService.Name = "$($global:appInsightsService.Name) - $resourceGuid - $resourceSuffix"
+        $global:userAssignedIdentity.Name = "$($global:userAssignedIdentity.Name)-$resourceGuid-$resourceSuffix"
+        $global:documentIntelligenceService.Name = "$($global:documentIntelligenceService.Name)-$resourceGuid-$resourceSuffix"
+        $global:aiHub.Name = "$($parametersObject.aiHub.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:aiService.Name = "$($parametersObject.aiService.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:computerVisionService.Name = "$($global:computerVisionService.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:openAIService.Name = "$($global:openAIService.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:virtualNetwork.Name = "$($global:virtualNetwork.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:subNet.Name = "$($global:subNet.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:apiManagementService.Name = "$($global:apiManagementService.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:aiProject.Name = "$($global:aiProject.Name)-$($resourceGuid)-$($resourceSuffix)"
+        $global:virtualNetwork.Name = "$($global:virtualNetwork.Name)-$($resourceGuid)-$($resourceSuffix)"
 
         foreach ($appService in $global:appServices) {
             $appService.Name = "$($appService.Name)-$($resourceGuid)-$($resourceSuffix)"
         }
 
-        foreach ($aiModel in $global:aiModels) {
-            $aiModel.DeploymentName = "$($aiModel.DeploymentName)-$($resourceGuid)-$($resourceSuffix)"
-        }
+        # foreach ($aiModel in $global:aiModels) {
+        #     $aiModel.DeploymentName = "$($aiModel.DeploymentName)-$($resourceGuid)-$($resourceSuffix)"
+        # }
 
         $resourceExists = Test-ResourceExists -resourceName $storageService.Name -resourceType "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $appServicePlan.Name -resourceType "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
@@ -827,7 +829,7 @@ function Get-UniqueSuffix {
         Test-ResourceExists -resourceName $logAnalyticsWorkspace.Name -resourceType "Microsoft.OperationalInsights/workspaces" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $cognitiveService.Name -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $keyVault.Name -resourceType "Microsoft.KeyVault/vaults" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $appInsights.Name -resourceType "Microsoft.Insights/components" -resourceGroupName $resourceGroupName -or
+        Test-ResourceExists -resourceName $appInsightsService.Name -resourceType "Microsoft.Insights/components" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $apiManagementService.Name -resourceType "Microsoft.Portal/ApiManagement/service" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $openAIService.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
         Test-ResourceExists -resourceName $aiService.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
@@ -860,7 +862,7 @@ function Get-UniqueSuffix {
         }
     } while ($resourceExists)
 
-    return $global:resourceSuffix
+    return "-$resourceGuid-$global:resourceSuffix"
 }
 
 # Ensure the service name is valid
@@ -1056,6 +1058,7 @@ function Initialize-Parameters {
     $global:aiService = $parametersObject.aiService
     $global:apiManagementService = $parametersObject.apiManagementService
     $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
+    $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
     $global:appInsightsService = $parametersObject.appInsightsService
     $global:appRegistrationClientId = $parametersObject.appRegistrationClientId
     $global:appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
@@ -1150,7 +1153,7 @@ function Initialize-Parameters {
         appRegistrationClientId      = $global:appRegistrationClientId
         appRegRequiredResourceAccess = $global:appRegRequiredResourceAccess
         appDeploymentOnly            = $global:appDeploymentOnly
-        appendUniqueSuffix           = $parametersObject.appendUniqueSuffix
+        appendUniqueSuffix           = $global:appendUniqueSuffix
         appServiceEnvironment        = $global:appServiceEnvironment
         appServicePlan               = $global:appServicePlan
         azureManagement              = $global:azureManagement
@@ -4307,9 +4310,11 @@ function Start-Deployment {
 
     # Initialize parameters
     #$initParams = Initialize-Parameters -parametersFile $parametersFile
-    Initialize-Parameters -parametersFile $parametersFile
+    $parameters = Initialize-Parameters -parametersFile $parametersFile
+    
     # Alphabetize the parameters object
-    #$parameters = Get-Parameters-Sorted -Parameters $initParams.parameters
+    $parameters = Get-Parameters-Sorted -Parameters $parameters | ConvertTo-Json -Depth 100
+    $parametersObj = $parameters | ConvertFrom-Json
 
     if ($global:appDeploymentOnly -eq $false) {
     
@@ -4387,12 +4392,12 @@ function Start-Deployment {
         return
     }
 
-    if ($appendUniqueSuffix -eq $true) {
+    if ($global:appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
-        Get-UniqueSuffix -resourceGroupName $resourceGroupName
+        $global:resourceSuffix = Get-UniqueSuffix -resourceGroupName $resourceGroupName -parameters $parametersObj
 
-        $global:resourceSuffix = 1
+        #$global:resourceSuffix = 1
 
         $newUniqueResourceGroupName = "$resourceGroupName-$global:resourceSuffix"
 
