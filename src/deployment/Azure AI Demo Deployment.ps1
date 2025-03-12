@@ -4125,7 +4125,8 @@ function Set-KeyVaultAccessPolicies {
 
     Write-Host "Executing Set-KeyVaultAccessPolicies function..." -ForegroundColor Magenta
 
-    $userPrincipalName = $global:userPrincipalName
+    #$userPrincipalName = $global:userPrincipalName
+    $userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
 
     try {
         $ErrorActionPreference = 'Stop'

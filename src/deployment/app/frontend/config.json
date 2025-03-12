@@ -9,7 +9,7 @@
   "AZURE_APIM_SERVICE_NAME": "apim-copilot-demo-010",
   "AZURE_APIM_SUBSCRIPTION_KEY": "4da6fa1779a347f88e1b37f6cf0c1295",
   "AZURE_APP_SERVICE_NAME": "app-copilot-demo-010",
-  "AZURE_APP_REG_CLIENT_APP_ID": null,
+  "AZURE_APP_REG_CLIENT_APP_ID": "3faf2de4-4b1b-4618-9b0e-acd12cacbc7e",
   "AZURE_FUNCTION_API_KEY": "tN6c9rFcSc1caJa9Lbm431k4MlcANBiLdtNaHXXOvIp8AzFuFQMTfg==",
   "AZURE_FUNCTION_APP_NAME": "func-copilot-demo-010",
   "AZURE_FUNCTION_APP_URL": "https://func-copilot-demo-010.azurewebsites.net",
@@ -27,9 +27,9 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_SAS": "se=2026-03-09T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bqft&srt=co&sig=lvevz13yoVF/cigAtn8xeJbpODDYCBHzs%2B9btCtJeE8%3D",
+  "AZURE_STORAGE_SAS": "se=2026-03-09T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbqt&srt=co&sig=H903bWlyW0YxY01rsKXVTOlDujnug4g0ScN5DiIJrow%3D",
   "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo010.blob.core.windows.net/content?comp=list&include=metadata&restype=container",
-  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo010.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-03-09T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=bqft&srt=co&sig=lvevz13yoVF/cigAtn8xeJbpODDYCBHzs%2B9btCtJeE8%3D",
+  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo010.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-03-09T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbqt&srt=co&sig=H903bWlyW0YxY01rsKXVTOlDujnug4g0ScN5DiIJrow%3D",
   "AZURE_STORAGE_API_KEY": "3nPrd9wx0jDxxmFaah/sByzt1tPmdeOOyYlJfpsdzuiDih+kiw6sO+7Bj4yqdqV3Vny2lLLLeqVH+AStWLPo/w==",
   "AZURE_STORAGE_BASE_URL": "blob.core.windows.net",
   "AZURE_STORAGE_URL": "https://stcopilotdemo010.blob.core.windows.net",
@@ -127,13 +127,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "bqft",
+    "SS": "fbqt",
     "SRT": "co",
     "SP": "rwdxylacupfti",
     "SE": "2026-03-09T23:59:59Z",
     "ST": "2025-03-09T23:59:59Z",
     "SPR": "https",
-    "SIG": "lvevz13yoVF/cigAtn8xeJbpODDYCBHzs%2B9btCtJeE8%3D",
+    "SIG": "H903bWlyW0YxY01rsKXVTOlDujnug4g0ScN5DiIJrow%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -601,8 +601,7 @@
       "DataSourceName": "srch-datasource-sharepoint-copilot-demo-010",
       "Active": false
     },
-    "srch-indexer-copilot-demo-010",
-    "vector-srch-indexer-copilot-demo-010"
+    "embeddings-srch-indexer-copilot-demo-010"
   ],
   "SEARCH_INDEXES": [
     {
@@ -625,9 +624,7 @@
       "Name": "sharepoint-srch-index-copilot-demo-010",
       "Schema": "sharepoint-search-index-schema.json"
     },
-    "srch-index-copilot-demo-010",
-    "vector-srch-index-copilot-demo-010",
-    "sharepoint-srch-index-copilot-demo-010"
+    "embeddings-srch-index-copilot-demo-010"
   ],
   "SIDEBAR_NAV_ITEMS": {
     "ITEM1": {
