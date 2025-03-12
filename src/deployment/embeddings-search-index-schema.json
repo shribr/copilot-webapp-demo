@@ -1,6 +1,6 @@
 {
   "@odata.etag": "\"0x8DD52D9658BA097\"",
-  "name": "embeddings-srch-index-copilot-demo-007",
+  "name": "embeddings-srch-index-copilot-demo-010",
   "fields": [
     {
       "name": "id",
@@ -93,7 +93,9 @@
   ],
   "scoringProfiles": [],
   "corsOptions": {
-    "allowedOrigins": ["*"],
+    "allowedOrigins": [
+      "*"
+    ],
     "maxAgeInSeconds": 300
   },
   "suggesters": [],

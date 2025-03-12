@@ -1,15 +1,16 @@
 {
-  "appendUniqueSuffix": true,
+  "appendUniqueSuffix": false,
   "appDeploymentOnly": false,
   "currentFullResourceBaseName": "copilot-demo-008",
   "deploymentType": "Existing",
   "fullResourceBaseName": "copilot-demo-008",
-  "previousFullResourceBaseName": "copilot-demo-007",
-  "previousResourceBaseName": "copilot-demo",
+  "previousFullResourceBaseName": "copilot-demo-008",
+  "previousResourceBaseName": "copilot-demo-008",
   "resourceSuffix": 1,
   "resourceSuffixCounter": "008",
   "resourceBaseName": "copilot-demo",
   "storageServiceSasTemplate": "sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tfqb&srt=co",
+  "useGuid": false,
   "aiAssistant": {
     "tools": [],
     "name": "ai-assistant-copilot-demo-008",
@@ -37,7 +38,9 @@
     "Name": "hub-ai-copilot-demo-008",
     "Location": "east us",
     "Kind": "AzureAIHub",
-    "Type": "Azure AI Hub"
+    "Type": "Azure AI Hub",
+    "ResourceType": "Microsoft.MachineLearningServices/aiHubs",
+    "UseHyphen": true
   },
   "aiModels": [
     {
@@ -85,7 +88,9 @@
   ],
   "aiProject": {
     "Name": "project-ai-copilot-demo-008",
-    "Location": "east us"
+    "Location": "east us",
+    "ResourceType": "Microsoft.MachineLearningServices/workspaces",
+    "UseHyphen": true
   },
   "aiService": {
     "ApiKey": "5c25eb463aa8431588b6d0f22f0ba417",
@@ -98,7 +103,9 @@
     "Type": "CognitiveService",
     "Kind": "AIServices",
     "Sku": "S0",
-    "YamlFileName": "ai.connection.yaml"
+    "YamlFileName": "ai.connection.yaml",
+    "ResourceType": "Microsoft.CognitiveServices/accounts",
+    "UseHyphen": true
   },
   "answerGenerationConfig": {
     "ExcludeCategories": "[]",
@@ -127,9 +134,11 @@
     "PublisherEmail": "amschrei@microsoft.com",
     "PublisherName": "Ami Schreiber",
     "ResourceGroup": "RG-copilot-demo-008",
-    "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295"
+    "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295",
+    "ResourceType": "Microsoft.ApiManagement/service",
+    "UseHyphen": true
   },
-  "appRegistrationClientId": "ec0c2272-c9b3-4c30-9121-c7bd8b3576bc",
+  "appRegistrationClientId": "3faf2de4-4b1b-4618-9b0e-acd12cacbc7e",
   "appRegRequiredResourceAccess": [
     {
       "resourceAppId": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
@@ -168,7 +177,9 @@
   ],
   "appInsightsService": {
     "Name": "appi-copilot-demo-008",
-    "Location": "east us"
+    "Location": "east us",
+    "ResourceType": "Microsoft.Insights/components",
+    "UseHyphen": true
   },
   "appServiceEnvironment": {
     "Name": "ase-copilot-demo-008"
@@ -176,7 +187,9 @@
   "appServicePlan": {
     "Name": "asp-copilot-demo-008",
     "Sku": "B1",
-    "Location": "east us"
+    "Location": "east us",
+    "ResourceType": "Microsoft.Web/serverfarms",
+    "UseHyphen": true
   },
   "appServices": [
     {
@@ -189,7 +202,9 @@
       "ResourceGroup": "RG-copilot-demo-008",
       "Runtime": "NODE:20LTS",
       "Type": "Web",
-      "Url": "https://app-copilot-demo-008.azurewebsites.net"
+      "Url": "https://app-copilot-demo-008.azurewebsites.net",
+      "ResourceType": "Microsoft.Web/sites",
+      "UseHyphen": true
     },
     {
       "Name": "func-copilot-demo-008",
@@ -201,7 +216,9 @@
       "ResourceGroup": "RG-copilot-demo-008",
       "Runtime": "dotnet-isolated",
       "Type": "Function",
-      "Url": "https://func-copilot-demo-008.azurewebsites.net"
+      "Url": "https://func-copilot-demo-008.azurewebsites.net",
+      "ResourceType": "Microsoft.Web/sites",
+      "UseHyphen": true
     }
   ],
   "appTitle": "Chat with Microsoft Copilot",
@@ -270,7 +287,9 @@
     "Location": "east us",
     "Sku": "S0",
     "Type": "CognitiveService",
-    "Kind": "CognitiveServices"
+    "Kind": "CognitiveServices",
+    "ResourceType": "Microsoft.CognitiveServices/accounts",
+    "UseHyphen": true
   },
   "computerVisionService": {
     "Name": "cv-copilot-demo-008",
@@ -281,13 +300,17 @@
     "Location": "east us",
     "Sku": "S1",
     "Type": "CognitiveService",
-    "Kind": "ComputerVision"
+    "Kind": "ComputerVision",
+    "ResourceType": "Microsoft.CognitiveServices/accounts",
+    "UseHyphen": true
   },
   "configFilePath": "app/frontend/config.json",
   "containerRegistry": {
     "Description": "",
     "Location": "east us",
     "Name": "crcopilotdemo008",
+    "ResourceType": "Microsoft.ContainerRegistry/registries",
+    "UseHyphen": false,
     "ReplicationLocations": {
       "Location1": "",
       "Location2": "",
@@ -311,7 +334,9 @@
     "Location": "east us",
     "Type": "CognitiveService",
     "Kind": "FormRecognizer",
-    "Sku": "S0"
+    "Sku": "S0",
+    "ResourceType": "Microsoft.CognitiveServices/accounts",
+    "UseHyphen": true
   },
   "domainName": "azurewebsites.net",
   "exposeApiScopes": [
@@ -339,7 +364,9 @@
     "Location": "east us",
     "Type": "KeyVault",
     "UseRBAC": false,
-    "userAssignedIdentityName": "id-copilot-demo-008"
+    "userAssignedIdentityName": "id-copilot-demo-008",
+    "ResourceType": "Microsoft.KeyVault/vaults",
+    "UseHyphen": true
   },
   "keyVaultProxyOperations": [
     {
@@ -384,7 +411,9 @@
   "location": "east us",
   "logAnalyticsWorkspace": {
     "Name": "log-copilot-demo-008",
-    "Location": "east us"
+    "Location": "east us",
+    "ResourceType": "Microsoft.OperationalInsights/workspaces",
+    "UseHyphen": true
   },
   "machineLearningService": {
     "ApplicationInsightsName": "appi-copilot-demo-008",
@@ -395,6 +424,8 @@
     "Location": "east us",
     "Name": "ml-copilot-demo-008",
     "StorageAccountName": "stcopilotdemo008",
+    "ResourceType": "Microsoft.MachineLearningServices/workspaces",
+    "UseHyphen": true,
     "Tags": {
       "Purpose": ""
     },
@@ -414,7 +445,9 @@
     "Type": "CognitiveService",
     "Kind": "OpenAI",
     "Sku": "S0",
-    "YamlFileName": "openai.connection.yaml"
+    "YamlFileName": "openai.connection.yaml",
+    "ResourceType": "Microsoft.CognitiveServices/accounts",
+    "UseHyphen": true
   },
   "organizationInfo": {
     "Contact": {
@@ -598,7 +631,9 @@
     "Name": "srch-copilot-demo-008",
     "Sku": "basic",
     "Type": "azure_ai_search",
-    "YamlFileName": "search.connection.yaml"
+    "YamlFileName": "search.connection.yaml",
+    "ResourceType": "Microsoft.Search/searchServices",
+    "UseHyphen": true
   },
   "searchSkillSetName": "srch-skillset-copilot-demo-008",
   "searchSkillSetSchema": "search-skillset-copilot-demo.json",
@@ -1150,7 +1185,9 @@
     "Name": "stcopilotdemo008",
     "Type": "azure_blob",
     "Url": "https://stcopilotdemo008.blob.core.windows.net/azureml",
-    "YamlFileName": "storage.connection.yaml"
+    "YamlFileName": "storage.connection.yaml",
+    "ResourceType": "Microsoft.Storage/storageAccounts",
+    "UseHyphen": false
   },
   "subNet": {
     "AddressPrefix": "10.0.1.0/24",
@@ -1190,10 +1227,12 @@
       }
     ]
   },
-  "subscriptionId": "00000000-0000-0000-0000-000000000000",
+  "subscriptionId": "bfb3a031-f26f-4783-b278-60173de9ccf4",
   "userAssignedIdentity": {
     "Name": "id-copilot-demo-008",
-    "Location": "east us"
+    "Location": "east us",
+    "ResourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
+    "UseHyphen": true
   },
   "virtualNetwork": {
     "AddressPrefix": "",
@@ -1201,6 +1240,8 @@
     "Location": "east us",
     "Name": "vnet-copilot-demo-008",
     "ResourceGroup": "RG-copilot-demo-008",
+    "ResourceType": "Microsoft.Network/virtualNetworks",
+    "UseHyphen": true,
     "Subnets": [
       {
         "Name": "subnet-copilot-demo-008"

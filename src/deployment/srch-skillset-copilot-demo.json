@@ -1,8 +1,8 @@
 {
   "@odata.etag": "\"0x8DCEFEA8DCAFAE0\"",
   "cognitiveServices": {
-    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
-    "key": "0cded4345ad0422b98a2824fb1fee334"
+    "key": "dd73f31fa73c4a52ad33a5b341c9401d",
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey"
   },
   "description": "Generic Skillset",
   "indexProjections": {
@@ -31,7 +31,7 @@
         ],
         "parentKeyFieldName": "text_parent_id",
         "sourceContext": "/document/pages/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-007"
+        "targetIndexName": "vector-srch-index-copilot-demo-010"
       },
       {
         "mappings": [
@@ -50,11 +50,11 @@
         ],
         "parentKeyFieldName": "image_parent_id",
         "sourceContext": "/document/normalized_images/*",
-        "targetIndexName": "vector-srch-index-copilot-demo-007"
+        "targetIndexName": "vector-srch-index-copilot-demo-010"
       }
     ]
   },
-  "name": "srch-skillset-copilot-demo-007",
+  "name": "srch-skillset-copilot-demo-010",
   "skills": [
     {
       "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",

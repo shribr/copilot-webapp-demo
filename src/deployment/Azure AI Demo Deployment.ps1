@@ -94,8 +94,14 @@
 param (
     [string]$parametersFile = "parameters.json",
     [string]$deploymentType = "Existing",
-    [string]$resourceBaseName = "copilot-demo"
+    [string]$resourceBaseName = "copilot-demo",
+    [string]$subscriptionId = "bfb3a031-f26f-4783-b278-60173de9ccf4"
 )
+
+# Prompt the user for the subscriptionId if not provided
+if (-not $subscriptionId) {
+    $subscriptionId = Read-Host "Please enter your Azure subscription ID"
+}
 
 # Function to Generate visual map of all resources
 function Build-ResourceList {
@@ -632,7 +638,7 @@ function Get-OperatingSystem {
 }
 
 # Function to alphabetize the parameters object
-function Get-Parameters-Sorted {
+function Get-ParametersSorted {
     param (
         [Parameter(Mandatory = $true)]
         [psobject]$Parameters
@@ -783,86 +789,87 @@ function Get-SearchSkillSets {
 function Get-UniqueSuffix {
     param
     (
-        [string]$resourceGroupName
+        [string]$resourceGroupName,
+        [bool]$useGuid = $false
     )
 
     Write-Host "Executing Get-UniqueSuffix function..." -ForegroundColor Yellow
 
-    #$resourceGroupName = $resourceGroup.Name
-
-    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
-
-    $appResourceExists = $true
+    #$parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
 
     do {
-        $global:storageService.Name = "$($global:storageService.Name)$resourceGuid$resourceSuffix"
-        $global:appServicePlan.Name = "$($global:appServicePlan.Name)-$resourceGuid-$resourceSuffix"
-        $global:searchService.Name = "$($global:searchService.Name)-$resourceGuid-$resourceSuffix"
-        $global:logAnalyticsWorkspace.Name = "$($global:logAnalyticsWorkspace.Name)-$resourceGuid-$resourceSuffix"
-        $global:cognitiveService.Name = "$($global:cognitiveService.Name)-$resourceGuid-$resourceSuffix"
-        $global:containerRegistry.Name = "$($global:containerRegistry.Name)-$resourceGuid-$resourceSuffix"
-        $global:keyVault.Name = "$($global:keyVault.Name)-$resourceGuid-$resourceSuffix"
-        $global:appInsightsService.Name = "$($global:appInsightsService.Name) - $resourceGuid - $resourceSuffix"
-        $global:userAssignedIdentity.Name = "$($global:userAssignedIdentity.Name)-$resourceGuid-$resourceSuffix"
-        $global:documentIntelligenceService.Name = "$($global:documentIntelligenceService.Name)-$resourceGuid-$resourceSuffix"
-        $global:aiHub.Name = "$($parametersObject.aiHub.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:aiService.Name = "$($parametersObject.aiService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:computerVisionService.Name = "$($global:computerVisionService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:openAIService.Name = "$($global:openAIService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:virtualNetwork.Name = "$($global:virtualNetwork.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:subNet.Name = "$($global:subNet.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:apiManagementService.Name = "$($global:apiManagementService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:aiProject.Name = "$($global:aiProject.Name)-$($resourceGuid)-$($resourceSuffix)"
-        $global:virtualNetwork.Name = "$($global:virtualNetwork.Name)-$($resourceGuid)-$($resourceSuffix)"
+        foreach ($resource in $global:resourceList) {
 
-        foreach ($appService in $global:appServices) {
-            $appService.Name = "$($appService.Name)-$($resourceGuid)-$($resourceSuffix)"
-        }
+            $newResourceName = $resource.Item.Name
 
-        # foreach ($aiModel in $global:aiModels) {
-        #     $aiModel.DeploymentName = "$($aiModel.DeploymentName)-$($resourceGuid)-$($resourceSuffix)"
-        # }
+            $resource.CurrentName = $resource.Item.Name
 
-        $resourceExists = Test-ResourceExists -resourceName $storageService.Name -resourceType "Microsoft.Storage/storageAccounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $appServicePlan.Name -resourceType "Microsoft.Web/serverFarms" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $searchService.Name -resourceType "Microsoft.Search/searchServices" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $logAnalyticsWorkspace.Name -resourceType "Microsoft.OperationalInsights/workspaces" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $cognitiveService.Name -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $keyVault.Name -resourceType "Microsoft.KeyVault/vaults" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $appInsightsService.Name -resourceType "Microsoft.Insights/components" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $apiManagementService.Name -resourceType "Microsoft.Portal/ApiManagement/service" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $openAIService.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $aiService.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $computerVisionService.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $userAssignedIdentity.Name -resourceType "Microsoft.ManagedIdentity/userAssignedIdentities" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $virtualNetwork.Name -resourceType "Microsoft.Network/virtualNetworks" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $documentIntelligenceService.Name -resourceType "Microsoft.CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $aiHub.Name -resourceType "Microsoft.App/CognitiveServices/accounts" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $aiProject.Name -resourceType "Microsoft.App/MachineLearningServices/workspaces" -resourceGroupName $resourceGroupName -or
-        Test-ResourceExists -resourceName $containerRegistry.Name -resourceType "Microsoft.App/MachineLearningServices/registries" -resourceGroupName $resourceGroupName
+            if ($useGuid) {
+                $newResourceName = "$($newResourceName)-$resourceGuid-$global:resourceSuffix"
+            }
+            else {
+                $newResourceName = "$($newResourceName)-$global:resourceSuffix"
+            }
 
-        foreach ($appService in $global:appServices) {
-            $appResourceExists = Test-ResourceExists resourceName $appService.Name -resourceType "Microsoft.Web/sites" -resourceGroupName $resourceGroupName -or $resourceExists
-            if ($appResourceExists) {
+            if ($resource.UseHyphen -eq $false) {
+                $newResourceName = $newResourceName.Replace("-", "")
+            }
+
+            if (Test-ResourceExists -resourceName $newResourceName `
+                    -resourceType $resource.ResourceType `
+                    -resourceGroupName $resourceGroupName) {
                 $resourceExists = $true
                 break
             }
+            else {
+                $resource.Item.Name = $newResourceName
+            }
         }
 
-        foreach ($aiModel in $global:aiModels) {
-            $aiModelResourceExists = Test-ResourceExists -resourceName $aiModel.DeploymentName -resourceType "Microsoft.CognitiveServices/accounts/deployments" -resourceGroupName $resourceGroupName -or $resourceExists
-            if ($aiModelResourceExists) {
-                $resourceExists = $true
-                break
+        if ($resourceExists -eq $false) {
+            foreach ($appService in $global:appServices) {
+                if ($useGuid) {
+                    $appService.Name = "$($appService.Name)-$resourceGuid-$global:resourceSuffix"
+                }
+                else {
+                    $appService.Name = "$($appService.Name)-$global:resourceSuffix"
+                }
+            }
+        }
+        if ($resourceExists -eq $false) {
+            foreach ($appService in $global:appServices) {
+                if (Test-ResourceExists -resourceName $appService.Name `
+                        -resourceType "Microsoft.Web/sites" `
+                        -resourceGroupName $resourceGroupName -or $resourceExists) {
+                    $resourceExists = $true
+                    break
+                }
+            }
+        }
+
+        if ($resourceExists -eq $false) {
+            foreach ($aiModel in $global:aiModels) {
+                $aiModelResourceExists = Test-ResourceExists -resourceName $aiModel.DeploymentName -resourceType "Microsoft.CognitiveServices/accounts/deployments" -resourceGroupName $resourceGroupName -or $resourceExists
+                if ($aiModelResourceExists) {
+                    $resourceExists = $true
+                    break
+                }
             }
         }
 
         if ($resourceExists) {
             $global:resourceSuffix++
         }
+
     } while ($resourceExists)
 
-    return "-$resourceGuid-$global:resourceSuffix"
+    if ($useGuid) {
+        return "$resourceGuid-$global:resourceSuffix"
+    }
+    else {
+        return "$global:resourceSuffix"
+    }
+    
 }
 
 # Ensure the service name is valid
@@ -1006,140 +1013,151 @@ function Install-Extensions {
 # Initialize the parameters
 function Initialize-Parameters {
     param (
-        [string]$parametersFile = "parameters.json"
+        [string]$parametersFile = "parameters.json",
+        [psobject]$updatedResourceList
     )
 
     Write-Host "Executing Initialize-Parameters function..." -ForegroundColor Magenta
 
-    # List of all resources pending creation
-    $global:ResourceList = @()
+    $global:resourceList = @()
 
-    # Mapping of global AI Hub connected resources
-    $global:AIHubConnectedResources = @()
-
-    # List of all KeyVault secret keys
-    $global:KeyVaultSecrets = [PSCustomObject]@{
-        StorageServiceApiKey = ""
-        SearchServiceApiKey  = ""
-        OpenAIServiceApiKey  = ""
+    if ($updatedResourceList) {
+        $global:resourceList = $updatedResourceList
     }
+    else {
+        # List of all KeyVault secret keys
+        $global:KeyVaultSecrets = [PSCustomObject]@{
+            StorageServiceApiKey = ""
+            SearchServiceApiKey  = ""
+            OpenAIServiceApiKey  = ""
+        }
 
-    # Navigate to the project directory
-    Set-DirectoryPath -targetDirectory $global:deploymentPath
+        # Navigate to the project directory
+        Set-DirectoryPath -targetDirectory $global:deploymentPath
 
-    # Load parameters from the JSON file
-    $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
-
-    $global:deploymentType = $parametersObject.deploymentType
-
-    #$global:keyVaultSecrets = $parametersObject.KeyVaultSecrets
-    $global:resourceTypes = $parametersObject.resourceTypes
-    $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
-    $global:newResourceBaseName = $parametersObject.newResourceBaseName
-    $global:previousFullResourceBaseName = $parametersObject.previousFullResourceBaseName
-    $global:currentFullResourceBaseName = $parametersObject.currentFullResourceBaseName
-
-    $global:restoreSoftDeletedResourcess = $parametersObject.restoreSoftDeletedResourcess
-
-    if ($global:deploymentType -eq "New") {
-        Update-ResourceBaseName -newResourceBaseName $global:newResourceBaseName
+        # Load parameters from the JSON file
         $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+
+        $global:deploymentType = $parametersObject.deploymentType
+
+        #$global:keyVaultSecrets = $parametersObject.KeyVaultSecrets
+        $global:resourceTypes = $parametersObject.resourceTypes
+        $global:previousResourceBaseName = $parametersObject.previousResourceBaseName
+        $global:newResourceBaseName = $parametersObject.newResourceBaseName
+        $global:previousFullResourceBaseName = $parametersObject.previousFullResourceBaseName
+        $global:currentFullResourceBaseName = $parametersObject.currentFullResourceBaseName
+
+        $global:restoreSoftDeletedResourcess = $parametersObject.restoreSoftDeletedResourcess
+
+        if ($global:deploymentType -eq "New") {
+            Update-ResourceBaseName -newResourceBaseName $global:newResourceBaseName
+            $parametersObject = Get-Content -Raw -Path $parametersFile | ConvertFrom-Json
+        }
+        else {
+            # Use fullResourceBaseName from the new schema
+            $global:newFullResourceBaseName = $parametersObject.fullResourceBaseName
+        }
+
+        # Initialize globals by mapping to nested objects when applicable
+        $global:aiAssistant = $parametersObject.aiAssistant
+        $global:aiHub = $parametersObject.aiHub            
+        $global:aiModels = $parametersObject.aiModels
+        $global:aiProject = $parametersObject.aiProject          
+        $global:aiService = $parametersObject.aiService
+        $global:apiManagementService = $parametersObject.apiManagementService
+        $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
+        $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
+        $global:appInsightsService = $parametersObject.appInsightsService
+        $global:appRegistrationClientId = $parametersObject.appRegistrationClientId
+        $global:appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
+        $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
+        $global:appServicePlan = $parametersObject.AppServicePlan
+        $global:appServices = $parametersObject.appServices
+        $global:azureManagement = $parametersObject.azureManagement
+        $global:bingSearchService = $parametersObject.bingSearchService
+        $global:cognitiveService = $parametersObject.cognitiveService       
+        $global:computerVisionService = $parametersObject.computerVisionService  
+        $global:containerRegistry = $parametersObject.containerRegistry      
+        $global:documentIntelligenceService = $parametersObject.documentIntelligenceService
+        $global:exposeApiScopes = $parametersObject.exposeApiScopes
+        $global:functionAppService = $appServices | Where-Object { $_.Type -eq "Function" | Select-Object -First 1 }
+        $global:keyVault = $parametersObject.keyVault
+        $global:keyVaultProxyOperations = $parametersObject.keyVaultProxyOperations   
+        $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
+        $global:openAIService = $parametersObject.openAIService
+        $global:previousResourceBaseName = $parametersObject.previousResourceBaseName          
+        $global:resourceGroup = $parametersObject.resourceGroup
+        $global:searchDataSources = $parametersObject.searchDataSources
+        $global:searchRestApiVersion = $parametersObject.searchRestApiVersion
+        $global:searchIndexers = $parametersObject.searchIndexers
+        $global:searchIndexes = $parametersObject.searchIndexes
+        $global:searchService = $parametersObject.searchService
+        $global:searchSkillSets = $parametersObject.searchSkillSets          
+        $global:storageService = $parametersObject.storageService
+        $global:storageServiceSasTemplate = $parametersObject.storageServiceSasTemplate
+        $global:subNet = $parametersObject.subNet
+        $global:userAssignedIdentity = $parametersObject.userAssignedIdentity
+        $global:useGuid = $parametersObject.useGuid
+        $global:virtualNetwork = $parametersObject.virtualNetwork         
+
+        if ($global:keyVault.PermissionModel -eq "RoleBased") {
+            $global:useRBAC = $true
+        }
+        else {
+            $global:useRBAC = $false
+        }
+
+        $global:cognitiveServicesList = @(
+            $global:aiService,
+            $global:cognitiveService,
+            $global:computerVisionService,
+            $global:openAIService,
+            $global:documentIntelligenceService
+        )
+
+
+        # Make sure the previousFullResourceBaseName is different than the current one.
+        if ($parametersObject.previousFullResourceBaseName -eq $parametersObject.newFullResourceBaseName -and $parametersObject.redeployResources -eq $false) {
+            Write-Host "The previousFullResourceBaseName parameter is the same as the newFullResourceBaseName parameter. Please change the previousFullResourceBaseName parameter to a different value."
+            exit
+        }
+
+        # 2025-02-11 ADS: Commenting out objectId related code because it seems to be slowing the script down significantly. 
+        # I can't recall what it's for but I guess I'll find out soon enough with stuff starts breaking.
+
+        # Retrieve subscription, tenant, object and user details
+        $global:subscriptionId = az account show --query "id" --output tsv
+        $global:tenantId = az account show --query "tenantId" --output tsv
+        #$global:objectId = az ad signed-in-user show --query "objectId" --output tsv
+        $global:userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
+        $global:resourceGuid = Split-Guid
+
+        $parametersObject | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
+        $parametersObject | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
+        $parametersObject | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
+
+        # Build-ResourceList -parametersObject $parametersObject
+        $global:resourceList = @(
+            @{ Item = $global:storageService; CurrentName = $global:storageService.Name; UseHyphen = $false },
+            @{ Item = $global:appServicePlan; CurrentName = $global:appServicePlan.Name; UseHyphen = $true },
+            @{ Item = $global:appServiceEnvironment; CurrentName = $global:appServiceEnvironment.Name; UseHyphen = $true },
+            @{ Item = $global:logAnalyticsWorkspace; CurrentName = $global:logAnalyticsWorkspace.Name; UseHyphen = $true },
+            @{ Item = $global:bingSearchService; CurrentName = $global:bingSearchService.Name; UseHyphen = $true },
+            @{ Item = $global:searchService; CurrentName = $global:searchService.Name; UseHyphen = $true },
+            @{ Item = $global:containerRegistry; CurrentName = $global:containerRegistry.Name; UseHyphen = $false },
+            @{ Item = $global:apiManagementService; CurrentName = $global:apiManagementService.Name; UseHyphen = $true },
+            @{ Item = $global:appInsightsService; CurrentName = $global:appInsightsService.Name; UseHyphen = $true },
+            @{ Item = $global:documentIntelligenceService; CurrentName = $global:documentIntelligenceService.Name; UseHyphen = $true },
+            @{ Item = $global:computerVisionService; CurrentName = $global:computerVisionService.Name; UseHyphen = $true },
+            @{ Item = $global:openAIService; CurrentName = $global:openAIService.Name; UseHyphen = $true },
+            @{ Item = $global:aiService; CurrentName = $global:aiService.Name; UseHyphen = $true },
+            @{ Item = $global:aiHub; CurrentName = $global:aiHub.Name; UseHyphen = $true },
+            @{ Item = $global:aiProject; CurrentName = $global:aiProject.Name; UseHyphen = $true },
+            @{ Item = $global:virtualNetwork; CurrentName = $global:virtualNetwork.Name; UseHyphen = $true },
+            @{ Item = $global:keyVault; CurrentName = $global:keyVault.Name; UseHyphen = $true },
+            @{ Item = $global:userAssignedIdentity; CurrentName = $global:userAssignedIdentityName; UseHyphen = $true }
+        )
     }
-    else {
-        # Use fullResourceBaseName from the new schema
-        $global:newFullResourceBaseName = $parametersObject.fullResourceBaseName
-    }
-
-    # Initialize globals by mapping to nested objects when applicable
-    $global:aiAssistant = $parametersObject.aiAssistant
-    $global:aiHub = $parametersObject.aiHub            
-    $global:aiModels = $parametersObject.aiModels
-    $global:aiProject = $parametersObject.aiProject          
-    $global:aiService = $parametersObject.aiService
-    $global:apiManagementService = $parametersObject.apiManagementService
-    $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
-    $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
-    $global:appInsightsService = $parametersObject.appInsightsService
-    $global:appRegistrationClientId = $parametersObject.appRegistrationClientId
-    $global:appRegRequiredResourceAccess = $parametersObject.appRegRequiredResourceAccess
-    $global:appServiceEnvironment = $parametersObject.appServiceEnvironment
-    $global:appServicePlan = $parametersObject.AppServicePlan
-    $global:appServices = $parametersObject.appServices
-    $global:azureManagement = $parametersObject.azureManagement
-    $global:bingSearchService = $parametersObject.bingSearchService
-    $global:cognitiveService = $parametersObject.cognitiveService       
-    $global:computerVisionService = $parametersObject.computerVisionService  
-    $global:containerRegistry = $parametersObject.containerRegistry      
-    $global:documentIntelligenceService = $parametersObject.documentIntelligenceService
-    $global:exposeApiScopes = $parametersObject.exposeApiScopes
-    $global:functionAppService = $appServices | Where-Object { $_.Type -eq "Function" | Select-Object -First 1 }
-    $global:keyVault = $parametersObject.keyVault
-    $global:keyVaultProxyOperations = $parametersObject.keyVaultProxyOperations   
-    $global:logAnalyticsWorkspace = $parametersObject.logAnalyticsWorkspace
-    $global:openAIService = $parametersObject.openAIService
-    $global:previousResourceBaseName = $parametersObject.previousResourceBaseName          
-    $global:resourceGroup = $parametersObject.resourceGroup
-    $global:searchDataSources = $parametersObject.searchDataSources
-    $global:searchRestApiVersion = $parametersObject.searchRestApiVersion
-    $global:searchIndexers = $parametersObject.searchIndexers
-    $global:searchIndexes = $parametersObject.searchIndexes
-    $global:searchService = $parametersObject.searchService
-    $global:searchSkillSets = $parametersObject.searchSkillSets          
-    $global:storageService = $parametersObject.storageService
-    $global:storageServiceSasTemplate = $parametersObject.storageServiceSasTemplate
-    $global:subNet = $parametersObject.subNet
-    $global:userAssignedIdentity = $parametersObject.userAssignedIdentity         
-    $global:virtualNetwork = $parametersObject.virtualNetwork         
-
-    if ($global:keyVault.PermissionModel -eq "RoleBased") {
-        $global:useRBAC = $true
-    }
-    else {
-        $global:useRBAC = $false
-    }
-
-    $global:cognitiveServicesList = @(
-        $global:aiService,
-        $global:cognitiveService,
-        $global:computerVisionService,
-        $global:openAIService,
-        $global:documentIntelligenceService
-    )
-
-
-    # Make sure the previousFullResourceBaseName is different than the current one.
-    if ($parametersObject.previousFullResourceBaseName -eq $parametersObject.newFullResourceBaseName -and $parametersObject.redeployResources -eq $false) {
-        Write-Host "The previousFullResourceBaseName parameter is the same as the newFullResourceBaseName parameter. Please change the previousFullResourceBaseName parameter to a different value."
-        exit
-    }
-
-    # 2025-02-11 ADS: Commenting out objectId related code because it seems to be slowing the script down significantly. 
-    # I can't recall what it's for but I guess I'll find out soon enough with stuff starts breaking.
-
-    # Retrieve subscription, tenant, object and user details
-    $global:subscriptionId = az account show --query "id" --output tsv
-    $global:tenantId = az account show --query "tenantId" --output tsv
-    #$global:objectId = az ad signed-in-user show --query "objectId" --output tsv
-    $global:userPrincipalName = az ad signed-in-user show --query userPrincipalName --output tsv
-    $global:resourceGuid = Split-Guid
-
-
-
-    #if ($parametersObject.PSObject.Properties.Name.Contains("objectId")) {
-    #    $global:objectId = $parametersObject.objectId
-    #}
-    #else {
-    #    $global:objectId = az ad signed-in-user show --query "objectId" --output tsv
-    #    $parametersObject | Add-Member -MemberType NoteProperty -Name "objectId" -Value $global:objectId
-    #}
-
-    # Add new authentication and resource properties to parameters object
-    #$parametersObject | Add-Member -MemberType NoteProperty -Name "subscriptionId" -Value $global:subscriptionId
-    $parametersObject | Add-Member -MemberType NoteProperty -Name "tenantId" -Value $global:tenantId
-    $parametersObject | Add-Member -MemberType NoteProperty -Name "userPrincipalName" -Value $global:userPrincipalName
-    $parametersObject | Add-Member -MemberType NoteProperty -Name "resourceGuid" -Value $global:resourceGuid
-
-    # Build-ResourceList -parametersObject $parametersObject
 
     return @{
         aiAssistant                  = $global:aiAssistant
@@ -1210,6 +1228,7 @@ function Initialize-Parameters {
         subscriptionId               = $global:subscriptionId
         tenantId                     = $global:tenantId
         userAssignedIdentity         = $global:userAssignedIdentity
+        useGuid                      = $global:useGuid
         useRBAC                      = $global:useRBAC
         userPrincipalName            = $global:userPrincipalName
         virtualNetwork               = $global:virtualNetwork
@@ -2183,6 +2202,15 @@ function New-AppServicePlan {
     if ($existingResources -notcontains $appServicePlanName) {
         try {
             $ErrorActionPreference = 'Stop'
+
+            # Check if Microsoft.Web resource provider has been registered
+            $resourceProvider = az provider show --namespace Microsoft.Web --query "registrationState" -o tsv
+
+            if ($resourceProvider -ne "Registered") {
+                Write-Host "Registering Microsoft.Web resource provider..."
+                az provider register --namespace Microsoft.Web
+            }
+
             az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $appServicePlanLocation --sku $appServicePlanSku --output none
 
             $global:resourceCounter += 1
@@ -3031,21 +3059,21 @@ function New-SearchDataSource {
             Write-Host "DataSource '$searchDataSourceName' created successfully." -ForegroundColor Green
             Write-Log -message "DataSource '$searchDataSourceName' created successfully."
                 
-            return true
+            return $true
         }
         catch {
 
             Write-Error "Failed to create datasource '$searchDataSourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create datasource '$searchDataSourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-            return false
+            return $false
         }
     }
     catch {
         Write-Error "Failed to create datasource '$searchDataSourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create datasource '$searchDataSourceName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-        return false
+        return $false
     }
 }
 
@@ -3107,21 +3135,23 @@ function New-SearchIndex {
             Write-Host "Index '$searchIndexName' created successfully." -ForegroundColor Green
             Write-Log -message "Index '$searchIndexName' created successfully."
 
-            return true
+            $global:searchIndexes += $searchIndexName
+
+            return $true
         }
         catch {
             # If you are getting the 'Normalizers" error, create the index via the Azure Portal and just select "Add index (JSON)" and copy the contents of the appropriate index json file into the textarea and click "save".
             Write-Error "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-            return false
+            return $false
         }
     }
     catch {
         Write-Error "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create index '$searchIndexName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-        return false
+        return $false
     }
 }
 
@@ -3186,26 +3216,36 @@ function New-SearchIndexer {
         # Construct the REST API URL
         $searchServiceUrl = "https://$searchServiceName.search.windows.net/indexers?api-version=$searchServiceApiVersion"
 
+        $searchIndexes = Get-SearchIndexes -searchServiceName $searchServiceName -resourceGroupName $resourceGroupName
+            
+        $searchIndexExists = $searchIndexes -contains $searchIndexName
+
+        if ($searchIndexExists -eq $false) {
+            New-SearchIndex -searchService $searchService -resourceGroupName $resourceGroupName -searchIndex $index
+        }
+
         # Create the indexer
         try {
             Invoke-RestMethod -Uri $searchServiceUrl -Method Post -Body $updatedJsonContent -ContentType "application/json" -Headers @{ "api-key" = $searchServiceApiKey }
             Write-Host "Search Indexer '$searchIndexerName' created successfully." -ForegroundColor Green
             Write-Log -message "Search Indexer '$searchIndexerName' created successfully."
 
-            return true
+            $global:searchIndexers += $searchIndexerName
+
+            return $true
         }
         catch {
             Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-            return false
+            return $false
         }
     }
     catch {
         Write-Error "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create Search Indexer '$searchIndexerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-        return false
+        return $false
     }
 }
 
@@ -3650,20 +3690,20 @@ function New-SearchSkillSet {
             Write-Host "Skillset '$searchSkillSetName' created successfully." -ForegroundColor Green
             Write-Log -message "Skillset '$searchSkillSetName' created successfully."
 
-            return true
+            return $true
         }
         catch {
             Write-Error "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
             Write-Log -message "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-            return false
+            return $false
         }
     }
     catch {
         Write-Error "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
         Write-Log -message "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
-        return false
+        return $false
     }
 }
 
@@ -4313,7 +4353,7 @@ function Start-Deployment {
     $parameters = Initialize-Parameters -parametersFile $parametersFile
     
     # Alphabetize the parameters object
-    $parameters = Get-Parameters-Sorted -Parameters $parameters | ConvertTo-Json -Depth 100
+    $parameters = Get-ParametersSorted -Parameters $parameters | ConvertTo-Json -Depth 100
     $parametersObj = $parameters | ConvertFrom-Json
 
     if ($global:appDeploymentOnly -eq $false) {
@@ -4377,6 +4417,8 @@ function Start-Deployment {
 
     $resourceGroupName = $global:resourceGroup.Name
 
+    $global:currentResourceGroupName = $resourceGroupName
+
     if ($global:appDeploymentOnly -eq $true) {
 
         # Update configuration file for web frontend
@@ -4395,7 +4437,7 @@ function Start-Deployment {
     if ($global:appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
-        $global:resourceSuffix = Get-UniqueSuffix -resourceGroupName $resourceGroupName -parameters $parametersObj
+        $global:resourceSuffix = Get-UniqueSuffix -resourceGroupName $resourceGroupName -useGuid $global:useGuid -parameters $parametersObj
 
         #$global:resourceSuffix = 1
 
@@ -4408,6 +4450,10 @@ function Start-Deployment {
         Write-Host "Setting local 'resourceGroupName' variable to '$newUniqueResourceGroupName'." -ForegroundColor Cyan
 
         $resourceGroupName = $global:resourceGroup.Name
+
+        Initialize-Parameters -parametersFile $global:parametersFile -updatedResourceList $global:resourceList
+
+        Update-ParametersFile -parametersFile $global:parametersFile
 
     }
 
@@ -4438,8 +4484,6 @@ function Start-Deployment {
     Reset-DeploymentPath
 
     $userPrincipalName = $global:userPrincipalName
-
-
 
     #**********************************************************************************************************************
     # Create User Assigned Identity
@@ -5329,6 +5373,47 @@ identity:
         Write-Log -message "Failed to create or write to 'ml.workspace.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
     }
     return $filePath
+}
+
+function Update-ParametersFile {
+    param (
+        [string]$parametersFile
+    )
+
+    Write-Host "Executing Update-ParametersFile function..." -ForegroundColor Yellow
+
+    try {
+        $ErrorActionPreference = 'Stop'
+
+        # Read the existing parameters.json file
+        $parametersObj = Get-Content -Path $parametersFile -Raw | ConvertFrom-Json
+
+        $parametersObj.resourceGroupName = $global:currentResourceGroupName
+        $parametersObj.fullResourceBaseName = $global:newFullResourceBaseName
+        $parametersObj.resourceGroup.Name = $global:resourceGroupName
+
+        # Update the parameters with new values
+
+        foreach ($resource in $global:resourceList) {
+            $parametersResource = $parametersObj.PSObject.Properties | Where-Object { $_.Name -eq $resource.CurrentName }
+            $parametersResource.Name = $resource.Name
+        }
+
+        # Convert the updated parameters back to JSON
+        $updatedParametersJson = $parametersObj | ConvertTo-Json -Depth 10
+
+        # Write the updated JSON back to the parameters.json file
+        Set-Content -Path $parametersFile -Value $updatedParametersJson
+
+        Write-Host "The parameters.json file has been updated successfully." -ForegroundColor Green
+        Write-Log -message "The parameters.json file has been updated successfully."
+
+        Initialize-Parameters -parametersFile $parametersFile -updatedResourceList $global:resourceList
+    }
+    catch {
+        Write-Error "Failed to update parameters.json: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        Write-Log -message "Failed to update parameters.json: (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+    }
 }
 
 # Function to update parameters.json with new values from app registration
