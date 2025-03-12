@@ -58,12 +58,10 @@
   "deletedDateTime": null,
   "description": null,
   "disabledByMicrosoftStatus": null,
-  "displayName": "app-copilot-demo-008",
+  "displayName": "app-copilot-demo-010",
   "groupMembershipClaims": null,
   "id": "f1b56dc6-cf24-46fb-a56d-b7243f421649",
-  "identifierUris": [
-    "api://6782b97e-07a2-48fa-9f7e-5fa0c237fd52"
-  ],
+  "identifierUris": ["api://6782b97e-07a2-48fa-9f7e-5fa0c237fd52"],
   "info": {
     "logoUrl": null,
     "marketingUrl": null,
@@ -129,7 +127,7 @@
   "signInAudience": "AzureADandPersonalMicrosoftAccount",
   "spa": {
     "redirectUris": {
-      "uri": "https://app-copilot-demo-008.azurewebsites.net"
+      "uri": "https://app-copilot-demo-010.azurewebsites.net"
     }
   },
   "tags": [],

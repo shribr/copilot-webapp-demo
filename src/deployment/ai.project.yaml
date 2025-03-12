@@ -1,9 +1,9 @@
 $schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json
-name: project-ai-copilot-demo-000
+name: project-ai-copilot-demo-010
 description: This configuration specifies a workspace configuration with existing dependent resources
-display_name: project-ai-copilot-demo-000
+display_name: project-ai-copilot-demo-010
 location: east us
-application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-copilot-demo-000/providers/Microsoft.insights/components/appi-copilot-demo-000
+application_insights: /subscriptions/bfb3a031-f26f-4783-b278-60173de9ccf4/resourceGroups/RG-copilot-demo-010/providers/Microsoft.insights/components/appi-copilot-demo-000
 identity:
   type: user_assigned
   tenant_id: e362c86f-e64a-4e58-b26a-c8bf314b1093

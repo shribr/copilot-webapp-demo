@@ -5,7 +5,7 @@
   "applicationTemplateId": null,
   "disabledByMicrosoftStatus": null,
   "createdDateTime": "2025-01-13T16:57:53Z",
-  "displayName": "app-copilot-demo-003",
+  "displayName": "app-copilot-demo-010",
   "description": null,
   "groupMembershipClaims": null,
   "identifierUris": ["api://a157200d-0915-44a6-89bc-f60540cbad09"],
@@ -106,7 +106,7 @@
   },
   "web": {
     "homePageUrl": null,
-    "logoutUrl": "https://app-copilot-demo-002.azurewebsites.net",
+    "logoutUrl": "https://app-copilot-demo-010.azurewebsites.net",
     "redirectUris": [],
     "implicitGrantSettings": {
       "enableAccessTokenIssuance": false,
@@ -123,6 +123,6 @@
     "tokenEncryptionKeyId": true
   },
   "spa": {
-    "redirectUris": ["https://app-copilot-demo-002.azurewebsites.net"]
+    "redirectUris": ["https://app-copilot-demo-010.azurewebsites.net"]
   }
 }
