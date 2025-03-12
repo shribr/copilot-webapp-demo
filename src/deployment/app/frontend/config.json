@@ -1,7 +1,7 @@
 {
   "CUSTOM_APP_TITLE": "GAO Chat using Microsoft Copilot",
   "DEFAULT_APP_TITLE": "Chat with Microsoft Copilot",
-  "AUTHENTICATION_MODE": "MSAL",
+  "AUTHENTICATION_MODE": "API_KEY",
   "USE_SAS": "true",
   "AZURE_OPENAI_SERVICE_API_KEY": "4fda1246b9394cefa0d559fe4e56b938",
   "AZURE_OPENAI_SERVICE_API_VERSION": "2024-10-01",
@@ -27,9 +27,9 @@
   "AZURE_STORAGE_ACCOUNT_SECRET_NAME": "StorageServiceApiKey",
   "AZURE_STORAGE_API_VERSION": "2025-01-05",
   "AZURE_STORAGE_CONTAINER_NAME": "content",
-  "AZURE_STORAGE_SAS": "se=2026-03-09T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbqt&srt=co&sig=H903bWlyW0YxY01rsKXVTOlDujnug4g0ScN5DiIJrow%3D",
+  "AZURE_STORAGE_SAS": "se=2026-03-10T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tqfb&srt=co&sig=nEFxaGGVKjM4Cs7z55V4SPtobzNloWONKc02GZyoSvM%3D",
   "AZURE_STORAGE_FULL_URL": "https://stcopilotdemo010.blob.core.windows.net/content?comp=list&include=metadata&restype=container",
-  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo010.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-03-09T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=fbqt&srt=co&sig=H903bWlyW0YxY01rsKXVTOlDujnug4g0ScN5DiIJrow%3D",
+  "AZURE_STORAGE_FULL_URL_SAS": "https://stcopilotdemo010.blob.core.windows.net/content?comp=list&include=metadata&restype=container&se=2026-03-10T23:59:59Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tqfb&srt=co&sig=nEFxaGGVKjM4Cs7z55V4SPtobzNloWONKc02GZyoSvM%3D",
   "AZURE_STORAGE_API_KEY": "3nPrd9wx0jDxxmFaah/sByzt1tPmdeOOyYlJfpsdzuiDih+kiw6sO+7Bj4yqdqV3Vny2lLLLeqVH+AStWLPo/w==",
   "AZURE_STORAGE_BASE_URL": "blob.core.windows.net",
   "AZURE_STORAGE_URL": "https://stcopilotdemo010.blob.core.windows.net",
@@ -127,13 +127,13 @@
   },
   "AZURE_STORAGE_SAS_TOKEN": {
     "SV": "2022-11-02",
-    "SS": "fbqt",
+    "SS": "tqfb",
     "SRT": "co",
     "SP": "rwdxylacupfti",
-    "SE": "2026-03-09T23:59:59Z",
-    "ST": "2025-03-09T23:59:59Z",
+    "SE": "2026-03-10T23:59:59Z",
+    "ST": "2025-03-10T23:59:59Z",
     "SPR": "https",
-    "SIG": "H903bWlyW0YxY01rsKXVTOlDujnug4g0ScN5DiIJrow%3D",
+    "SIG": "nEFxaGGVKjM4Cs7z55V4SPtobzNloWONKc02GZyoSvM%3D",
     "COMP": "list",
     "RESTYPE": "container",
     "INCLUDE": "metadata"
@@ -600,8 +600,7 @@
       "Schedule": "0 0 0 * * *",
       "DataSourceName": "srch-datasource-sharepoint-copilot-demo-010",
       "Active": false
-    },
-    "embeddings-srch-indexer-copilot-demo-010"
+    }
   ],
   "SEARCH_INDEXES": [
     {
@@ -623,8 +622,7 @@
       "Model": "gpt-4o",
       "Name": "sharepoint-srch-index-copilot-demo-010",
       "Schema": "sharepoint-search-index-schema.json"
-    },
-    "embeddings-srch-index-copilot-demo-010"
+    }
   ],
   "SIDEBAR_NAV_ITEMS": {
     "ITEM1": {

@@ -1087,6 +1087,7 @@ function Initialize-Parameters {
         $global:openAIService = $parametersObject.openAIService
         $global:previousResourceBaseName = $parametersObject.previousResourceBaseName          
         $global:resourceGroup = $parametersObject.resourceGroup
+        $global:resourceProviders = $parametersObject.resourceProviders
         $global:searchDataSources = $parametersObject.searchDataSources
         $global:searchRestApiVersion = $parametersObject.searchRestApiVersion
         $global:searchIndexers = $parametersObject.searchIndexers
@@ -1208,6 +1209,7 @@ function Initialize-Parameters {
         resourceBaseName             = $parametersObject.resourceBaseName
         resourceGroup                = $global:resourceGroup
         resourceGuid                 = $global:resourceGuid
+        resourceProviders            = $global:resourceProviders
         resourceSuffix               = $parametersObject.resourceSuffix
         resourceSuffixCounter        = $parametersObject.resourceSuffixCounter
         resourceTypes                = $global:resourceTypes
@@ -1461,31 +1463,7 @@ function New-AIProject {
         $userAssignedIdentityResourceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$userAssignedIdentityName"
         $aiHubResoureceId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.MachineLearningServices/workspaces/$aiHubName"
 
-        <#
-  {        $aiProjectFile = Update-AIProjectFile `
-            -aiProjectName $aiProjectName `
-            -resourceGroupName $resourceGroup.Name `
-            -appInsightsName $appInsightsResourceId `
-            -location $location `
-            -subscriptionId $subscriptionId `
-            -storageServiceName $storageAccountResourceId `
-            -containerRegistryName $containerRegistryResourceId `
-            -keyVaultName $keyVaultResourceId `
-            -userAssignedIdentityName $userAssignedIdentityResourceId:Enter a comment or description}
-#>
-
-        #az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroup.Name 2>&1
-        #$jsonOutput = az ml workspace create --file $aiProjectFile --resource-group $resourceGroup.Name --name $aiProjectName --location $location --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId 2>&1
-
-        #https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace-cli?view=azureml-api-2
-
-        #https://azuremlschemas.azureedge.net/latest/workspace.schema.json
-
-        #$jsonOutput = az ml workspace create --file $mlWorkspaceFile --hub-id $aiHubName --resource-group $resourceGroup.Name 2>&1
-        #$jsonOutput = az ml workspace create --file $aiProjectFile -g $resourceGroup.Name --primary-user-assigned-identity $userAssignedIdentityResourceId --kind project --hub-id $aiHubResoureceId
-
         az ml workspace create --kind project --resource-group $resourceGroupName --name $aiProjectName --hub-id $aiHubResoureceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
-        #az ml workspace create --kind project --resource-group $resourceGroup.Name --name $aiProjectName --hub-id $$aiHubResoureceId --storage-account $storageAccountResourceId --key-vault $keyVaultResourceId --container-registry $containerRegistryResourceId --application-insights $appInsightsResourceId --primary-user-assigned-identity $userAssignedIdentityResourceId --location $location
 
         $global:resourceCounter += 1
         Write-Host "AI Project: '$aiProjectName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
@@ -3867,6 +3845,26 @@ function New-VirtualNetwork {
     }
 }
 
+# Function to register list of required resource providers
+function Register-ResourceProviders {
+
+    Write-Host "Executing Register-ResourceProviders function..." -ForegroundColor Magenta
+
+    foreach ($resourceProvider in $global:resourceProviders) {
+        $providerExists = az provider show --namespace $resourceProvider --query "registrationState" --output tsv
+
+        if ($providerExists -ne "Registered") {
+            az provider register --namespace $resourceProvider --output none
+            Write-Host "Resource provider '$resourceProvider' registered successfully."
+            Write-Log -message "Resource provider '$resourceProvider' registered successfully."
+        }
+        else {
+            Write-Host "Resource provider '$resourceProvider' is already registered." -ForegroundColor Blue
+            Write-Log -message "Resource provider '$resourceProvider' is already registered."
+        }
+    }
+}
+
 # Function to delete Azure resource groups
 function Remove-ResourceGroup {
     param
@@ -4435,6 +4433,9 @@ function Start-Deployment {
         return
     }
 
+    # Register required resource providers
+    Register-ResourceProviders
+
     if ($global:appendUniqueSuffix -eq $true) {
 
         # Find a unique suffix
@@ -4672,7 +4673,6 @@ function Start-Deployment {
 }
 
 # Function to run search indexer
-# https://learn.microsoft.com/en-us/azure/search/search-howto-run-reset-indexers?tabs=reset-indexer-rest
 function Start-SearchIndexer {
     param (
         [string]$searchServiceName,
@@ -4869,6 +4869,8 @@ function Update-AIConnectionFile {
 
     # Access the YamlFileName property
     $yamlFileName = $servicePropertiesHashtable['YamlFileName']
+    $location = $servicePropertiesHashtable['Location'].Replace(" ", "").ToLower()
+    $azureEndpoint = "https://$location.api.cognitive.microsoft.com/"
 
     $filePath = "$rootPath/$yamlFileName"
 
@@ -4894,7 +4896,7 @@ ai_services_resource_id: $resourceId
             $content = @"
 name: $serviceName
 type: azure_open_ai
-azure_endpoint: https://eastus.api.cognitive.microsoft.com/
+azure_endpoint: $azureEndpoint
 api_key: $apiKey
 "@
         }
@@ -4934,55 +4936,6 @@ account_name: $serviceName
     }
 
     return $filePath
-}
-
-# Function to update the AI project file
-function Update-AIProjectFile {
-    param (
-        [string]$resourceGroupName,
-        [string]$aiProjectName,
-        [string]$appInsightsName,
-        [string]$userAssignedIdentityName,
-        [string]$location,
-        [string]$storageServiceName
-    )
-
-    Write-Host "Executing Update-AIProjectFile function..." -ForegroundColor Yellow
-
-    $rootPath = Get-Item -Path (Get-Location).Path
-
-    $filePath = "$rootPath/ai.project.yaml"
-
-    $assigneePrincipalId = az identity show --resource-group $resourceGroupName --name $userAssignedIdentityName --query 'principalId' --output tsv
-
-    $content = @"
-`$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json`
-name: $aiProjectName
-description: This configuration specifies a workspace configuration with existing dependent resources
-display_name: $aiProjectName
-location: $location
-application_insights: $appInsightsName
-identity:
-  type: user_assigned
-  tenant_id: $global:tenantId
-  principal_id: $assigneePrincipalId
-  user_assigned_identities:
-    ${userAssignedIdentityName}: {}
-#tags:
-#  purpose: Azure AI Hub Project
-"@
-
-    try {
-        $content | Out-File -FilePath $filePath -Encoding utf8 -Force
-        Write-Host "File 'ai.project.yaml' created and populated."
-        Write-Log -message "File 'ai.project.yaml' created and populated."
-    }
-    catch {
-        Write-Error "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-        Write-Log -message "Failed to create or write to 'ai.project.yaml': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
-    }
-    return $filePath
-
 }
 
 # Function to update the config file
@@ -5213,7 +5166,7 @@ function Update-ConfigFile {
 
         #$aiServiceApiVersion = Get-LatestApiVersion -resourceProviderNamespace "Microsoft.CognitiveServices" -resourceType "accounts"
         # IDEALLY ALL MODELS SHOULD BE DEPLOYED TO THE OPEN AI SERVICE AND NOT JUST THE PLAIN AI SERVICE.
-        # FOR SOME REASON I CAN NO LONGER DEPLOY THE DALL-E-3 MODEL TO EASYUS AND IT CAN ONLY BE DEPLOYED TO EAST SWEDEDN OR EAST AUSTRALIA.
+        # FOR SOME REASON I CAN NO LONGER DEPLOY THE DALL-E-3 MODEL TO EASTUS AND IT CAN ONLY BE DEPLOYED TO EAST SWEDEDN OR EAST AUSTRALIA.
         # FURTHERMORE, THE ONLY SUCCESSFUL DALL-E-3 DEPLOYMENT I'VE MADE TO DATE IN EASTUS WAS FOR THE 002 DEPLOYMENT.
         # UNFORTUNATELY I DEPLOYED IT TO THE AI SERVICE BY MISTAKE. 
         # SO IN ORDER TO USE DALL-E-3, FOR NOW I WILL BE USING THE APIKEY FROM THE AI SERVICE DEPLOYED TO 002 AS OPPOSED TO THE OPEN AI SERVICE FOR EACH UNIQUE WEBAPP DEPLOYMENT. 
@@ -5536,6 +5489,16 @@ function Update-ResourceBaseName() {
 
 # Function to update search index files (not currently used)
 function Update-SearchIndexFiles {
+    param (
+        [string]$resourceGroupName,
+        [pspbject]$searchService
+    )
+
+    $location = $searchService.Location.Replace(" ", "").ToLower()
+    $previousLocation = $searchService.PreviousLocation.Replace(" ", "").ToLower()
+
+    $endpoint = "https://$location.api.cognitive.microsoft.com/"
+    $previousEndpoint = "https://$previousLocation.api.cognitive.microsoft.com/"
 
     Write-Host "Executing Update-SearchIndexFiles function..." -ForegroundColor Yellow
 
@@ -5547,6 +5510,8 @@ function Update-SearchIndexFiles {
         $content = Get-Content -Path $fileName
 
         $updatedContent = $content -replace $global:previousFullResourceBaseName, $global:fullResourceBaseName
+
+        $updatedContent = $updatedContent -replace $endpoint, $previousEndpoint
 
         Set-Content -Path $searchIndexFilePath -Value $updatedContent
     }

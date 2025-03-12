@@ -17,7 +17,7 @@
   "userConsentDisplayName": "Access API as user",
   "value": "access_as_user"
 }, {
-  "id": "309b5f3e-13b4-4ea2-baca-c65657e65f4a",
+  "id": "4a739846-f9c8-4cb3-8586-37677a401f68",
   "userConsentDisplayName": "Access API as user",
   "value": "access_as_user",
   "userConsentDescription": "Allow the application to access the API on your behalf.",
@@ -26,7 +26,7 @@
   "isEnabled": true,
   "adminConsentDisplayName": "Access API as user"
 }, {
-  "id": "6ae437a8-6f4f-4d71-8276-588381043b23",
+  "id": "fd2841d9-dd06-4216-93ce-f515d53760c5",
   "userConsentDisplayName": "Read data from API",
   "value": "read_data",
   "userConsentDescription": "Allow the application to read data from the API on your behalf.",
