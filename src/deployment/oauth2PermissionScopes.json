@@ -17,21 +17,21 @@
   "userConsentDisplayName": "Access API as user",
   "value": "access_as_user"
 }, {
-  "id": "4a739846-f9c8-4cb3-8586-37677a401f68",
-  "userConsentDisplayName": "Access API as user",
-  "value": "access_as_user",
-  "userConsentDescription": "Allow the application to access the API on your behalf.",
   "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-  "type": "User",
   "isEnabled": true,
-  "adminConsentDisplayName": "Access API as user"
+  "adminConsentDisplayName": "Access API as user",
+  "userConsentDescription": "Allow the application to access the API on your behalf.",
+  "type": "User",
+  "value": "access_as_user",
+  "id": "e38969f8-0681-4581-b13a-8a57a6e6425b",
+  "userConsentDisplayName": "Access API as user"
 }, {
-  "id": "fd2841d9-dd06-4216-93ce-f515d53760c5",
-  "userConsentDisplayName": "Read data from API",
-  "value": "read_data",
-  "userConsentDescription": "Allow the application to read data from the API on your behalf.",
   "adminConsentDescription": "Allow the application to read data from the API.",
-  "type": "User",
   "isEnabled": true,
-  "adminConsentDisplayName": "Read data from API"
+  "adminConsentDisplayName": "Read data from API",
+  "userConsentDescription": "Allow the application to read data from the API on your behalf.",
+  "type": "User",
+  "value": "read_data",
+  "id": "0b0b1555-0bd7-4282-a9ef-f775f2bb8634",
+  "userConsentDisplayName": "Read data from API"
 }] }

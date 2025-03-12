@@ -1,6 +1,6 @@
 {
   "appendUniqueSuffix": false,
-  "appDeploymentOnly": true,
+  "appDeploymentOnly": false,
   "currentFullResourceBaseName": "copilot-demo-010",
   "deploymentType": "Existing",
   "fullResourceBaseName": "copilot-demo-010",
@@ -118,7 +118,11 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": ["text", "hybrid", "vector"],
+    "RetrievalModel": [
+      "text",
+      "hybrid",
+      "vector"
+    ],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
