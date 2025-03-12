@@ -74,7 +74,7 @@
       "facetable": false,
       "key": false,
       "dimensions": 3072,
-      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-009-text-profile",
+      "vectorSearchProfile": "vector-profile-srch-index-copilot-demo-010-text-profile",
       "synonymMaps": []
     },
     {
@@ -93,9 +93,7 @@
   ],
   "scoringProfiles": [],
   "corsOptions": {
-    "allowedOrigins": [
-      "*"
-    ],
+    "allowedOrigins": ["*"],
     "maxAgeInSeconds": 300
   },
   "suggesters": [],
@@ -110,7 +108,7 @@
   "semantic": {
     "configurations": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-009-semantic-configuration",
+        "name": "vector-profile-srch-index-copilot-demo-010-semantic-configuration",
         "prioritizedFields": {
           "prioritizedContentFields": [
             {
@@ -125,7 +123,7 @@
   "vectorSearch": {
     "algorithms": [
       {
-        "name": "vector-config-srch-index-copilot-demo-009-algorithm",
+        "name": "vector-config-srch-index-copilot-demo-010-algorithm",
         "kind": "hnsw",
         "hnswParameters": {
           "metric": "cosine",
@@ -137,8 +135,8 @@
     ],
     "profiles": [
       {
-        "name": "vector-profile-srch-index-copilot-demo-009-text-profile",
-        "algorithm": "vector-config-srch-index-copilot-demo-009-algorithm"
+        "name": "vector-profile-srch-index-copilot-demo-010-text-profile",
+        "algorithm": "vector-config-srch-index-copilot-demo-010-algorithm"
       }
     ],
     "vectorizers": [],
