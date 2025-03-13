@@ -118,11 +118,7 @@
     },
     "NumDocsToRetrieve": 5,
     "OverridePromptTemplate": "false",
-    "RetrievalModel": [
-      "text",
-      "hybrid",
-      "vector"
-    ],
+    "RetrievalModel": ["text", "hybrid", "vector"],
     "SuggestFollowupQuestions": "true",
     "UseQueryContextualSummaries": "true",
     "UseSemanticRankerForRetrieval": "true"
@@ -135,8 +131,8 @@
     "Path": "/path",
     "Type": "Api Management",
     "Kind": "api_management",
-    "PublisherEmail": "amschrei@microsoft.com",
-    "PublisherName": "Ami Schreiber",
+    "PublisherEmail": "john.doe@internet.com",
+    "PublisherName": "John Doe",
     "ResourceGroup": "RG-copilot-demo-010",
     "SubscriptionKey": "4da6fa1779a347f88e1b37f6cf0c1295",
     "ResourceType": "Microsoft.ApiManagement/service",
@@ -550,6 +546,28 @@
     "Location": "east us"
   },
   "resourceGroupName": "RG-COPILOT-DEMO-010",
+  "resourceSkills": [
+    "Microsoft.Skills.Text.CustomEntityLookupSkill",
+    "Microsoft.Skills.Text.KeyPhraseExtractionSkill",
+    "Microsoft.Skills.Text.LanguageDetectionSkill",
+    "Microsoft.Skills.Text.V3.EntityLinkingSkill",
+    "Microsoft.Skills.Text.V3.EntityRecognitionSkill",
+    "Microsoft.Skills.Text.PIIDetectionSkill",
+    "Microsoft.Skills.Text.V3.SentimentSkill",
+    "Microsoft.Skills.Text.TranslationSkill",
+    "Microsoft.Skills.Vision.ImageAnalysisSkill",
+    "Microsoft.Skills.Vision.OcrSkill",
+    "Microsoft.Skills.Vision.VectorizeSkill",
+    "Microsoft.Skills.Util.DocumentIntelligenceLayoutSkill",
+    "Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+    "Microsoft.Skills.Util.ConditionalSkill",
+    "Microsoft.Skills.Util.DocumentExtractionSkill",
+    "Microsoft.Skills.Text.MergeSkill",
+    "Microsoft.Skills.Util.ShaperSkill",
+    "Microsoft.Skills.Text.SplitSkill",
+    "Microsoft.Skills.Custom.WebApiSkill",
+    "Microsoft.Skills.Custom.AmlSkill"
+  ],
   "restoreSoftDeletedResources": true,
   "resourceTypes": [
     "Microsoft.ApiManagement",

@@ -1064,7 +1064,7 @@ function Initialize-Parameters {
         $global:aiModels = $parametersObject.aiModels
         $global:aiProject = $parametersObject.aiProject          
         $global:aiService = $parametersObject.aiService
-        $global:apiManagementService = $parametersObject.apiManagementService
+        
         $global:appDeploymentOnly = $parametersObject.appDeploymentOnly
         $global:appendUniqueSuffix = $parametersObject.appendUniqueSuffix
         $global:appInsightsService = $parametersObject.appInsightsService
@@ -1088,6 +1088,7 @@ function Initialize-Parameters {
         $global:previousResourceBaseName = $parametersObject.previousResourceBaseName          
         $global:resourceGroup = $parametersObject.resourceGroup
         $global:resourceProviders = $parametersObject.resourceProviders
+        $global:resourceSkills = $parametersObject.resourceSkills
         $global:searchDataSources = $parametersObject.searchDataSources
         $global:searchRestApiVersion = $parametersObject.searchRestApiVersion
         $global:searchIndexers = $parametersObject.searchIndexers
@@ -1099,7 +1100,12 @@ function Initialize-Parameters {
         $global:subNet = $parametersObject.subNet
         $global:userAssignedIdentity = $parametersObject.userAssignedIdentity
         $global:useGuid = $parametersObject.useGuid
-        $global:virtualNetwork = $parametersObject.virtualNetwork         
+        $global:virtualNetwork = $parametersObject.virtualNetwork
+
+        $global:apiManagementService = $parametersObject.apiManagementService
+
+        $global:apiManagementService.PublisherName = az ad signed-in-user show --query displayName --output tsv
+        $global:apiManagementService.PublisherEmail = az ad signed-in-user show --query userPrincipalName --output tsv
 
         if ($global:keyVault.PermissionModel -eq "RoleBased") {
             $global:useRBAC = $true
@@ -1210,6 +1216,7 @@ function Initialize-Parameters {
         resourceGroup                = $global:resourceGroup
         resourceGuid                 = $global:resourceGuid
         resourceProviders            = $global:resourceProviders
+        resourceSkills               = $global:resourceSkills
         resourceSuffix               = $parametersObject.resourceSuffix
         resourceSuffixCounter        = $parametersObject.resourceSuffixCounter
         resourceTypes                = $global:resourceTypes
@@ -1294,6 +1301,56 @@ function Invoke-AzureRestMethod {
         Write-Host "Error: $_"
         throw $_
     }
+}
+
+# Function to check if a resource is supported in a region
+function Is-ResourceSupported {
+    param (
+        [string]$region,
+        [string]$resourceType
+    )
+
+    Write-Host "Executing Is-ResourceSupported function..." -ForegroundColor Magenta
+
+    $supportedRegions = az provider show --namespace $resourceType --expand "resourceTypes" --query "resourceTypes[?resourceType=='accounts'].locations" --output json
+
+    $isSupported = $supportedRegions -contains $region
+
+    if ($isSupported) {
+        Write-Host "Resource type '$resourceType' is supported in region '$region'." -ForegroundColor Green
+    }
+    else {
+        Write-Host "Resource type '$resourceType' is NOT supported in region '$region'." -ForegroundColor Red
+    }
+    
+    return $isSupported
+}
+
+# Function to check if a skill is supported in a region
+function Is-SkillSupported {
+    param (
+        [string]$region,
+        [string]$skillType
+    )
+
+    Write-Host "Executing Is-SkillSupported function..." -ForegroundColor Magenta
+
+    $supportedSkills = @(
+        "TextSplitter",
+        "TextSummarizer",
+        "TextSentimentAnalyzer",
+        "TextTranslator",
+        "TextToSpeech",
+        "SpeechToText",
+        "ImageCaptioning",
+        "ImageClassifier",
+        "ImageObjectDetector",
+        "ImageSegmenter"
+    )
+
+    $isSupported = $supportedSkills -contains $skillName
+    
+    return $isSupported
 }
 
 # Function to create a new AI Assistant
