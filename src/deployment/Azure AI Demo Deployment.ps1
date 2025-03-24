@@ -243,10 +243,19 @@ function Deploy-AppService {
 
                 $appPath = Join-Path -Path $currentLocation -ChildPath $appService.Path
                 Set-Location $appPath
+                
+                # Get the operating system
+                $os = Get-OperatingSystem
 
-                # compress the app code
-                zip -r $zipFilePath * .env
+                # Compress the app code
 
+                if ($os -eq "Windows") {
+                    Compress-Archive -Path * .env -DestinationPath $zipFilePath -Force
+                }
+                else {
+                    zip -r $zipFilePath * .env
+                }
+                
                 if ($appService.Type -eq "Web") {
                     # Deploy the web app
                     #az webapp deployment source config-zip --name $appServiceName --resource-group $resourceGroup.Name --src $zipFilePath
@@ -2231,6 +2240,7 @@ function New-AppServicePlan {
     $appServicePlanName = $appServicePlan.Name
     $appServicePlanLocation = $appServicePlan.Location
     $appServicePlanSku = $appServicePlan.Sku
+    $appServicePlanOS = $appServicePlan.OS
 
     Write-Host "Executing New-AppServicePlan ('$appServicePlanName') function..." -ForegroundColor Magenta
 
@@ -2246,7 +2256,13 @@ function New-AppServicePlan {
                 az provider register --namespace Microsoft.Web
             }
 
-            az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $appServicePlanLocation --sku $appServicePlanSku --output none
+            # Create the App Service Plan (check if OS is Linux or Windows)
+            if ($appServicePlanOS -eq "Linux") {
+                az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $appServicePlanLocation --sku $appServicePlanSku --is-linux --output none
+            }
+            else {
+                az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $appServicePlanLocation --sku $appServicePlanSku --output none
+            }
 
             $global:resourceCounter += 1
             Write-Host "App Service Plan '$appServicePlanName' created successfully. [$global:resourceCounter]"
@@ -2446,6 +2462,39 @@ function New-ContainerRegistry {
     else {
         Write-Host "Container Registry '$containerRegistryName' already exists." -ForegroundColor Blue
         Write-Log -message "Container Registry '$containerRegistryName' already exists."
+    }
+}
+
+# Function to create a new database
+function New-Database {
+    param (
+        [psobject]$database,
+        [string]$resourceGroupName,
+        [array]$existingResources
+    )
+
+    $databaseName = $database.Name
+    $sqlServerName = $database.SqlServerName
+
+    Write-Host "Executing New-Database ('$databaseName') function..." -ForegroundColor Magenta
+
+    if ($existingResources -notcontains $databaseName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            az sql db create --name $databaseName --resource-group $resourceGroupName --server $sqlServerName --service-objective S0 --output none
+
+            $global:resourceCounter += 1
+            Write-Host "Database '$databaseName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+            Write-Log -message "Database '$databaseName' created successfully. [$global:resourceCounter]"
+        }
+        catch {
+            Write-Error "Failed to create Database '$databaseName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create Database '$databaseName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "Database '$databaseName' already exists." -ForegroundColor Blue
+        Write-Log -message "Database '$databaseName' already exists."
     }
 }
 
@@ -2920,6 +2969,13 @@ function New-Resources {
     New-SubNet -subNet $subNet -vnetName $virtualNetwork.Name -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     # **********************************************************************************************************************
+    # Create Private Endpoint
+    
+    # Still in testing phase
+
+    # New-PrivateEndPoint -privateEndpointName $subNet.PrivateEndpointName -privateLinkServiceName $subNet.PrivateLinkServiceName -resourceGroupName $resourceGroupName -location $virtualNetwork.Location -subnetId $subNet.Id -privateLinkServiceId $subNet.PrivateLinkServiceId -existingResources $existingResources
+
+    # **********************************************************************************************************************
     # Create App Service Environment
 
     #New-AppServiceEnvironment -appServiceEnvironmentName $appServiceEnvironmentName -resourceGroupName $resourceGroup.Name -location $location -vnetName $virtualNetwork.Name -subnetName $subnet.Name -subscriptionId $subscriptionId -existingResources $existingResources
@@ -2957,10 +3013,16 @@ function New-Resources {
     New-ContainerRegistry -containerRegistry $containerRegistry -resourceGroupName $resourceGroupName -existingResources $existingResources
 
     #**********************************************************************************************************************
-    # Create API Management Service
+    # Create SQL Server
 
-    # Commenting out for now because this resource is not being used in the deployment and it takes way too long to provision
-    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources -keyVaultName $global:keyVault.Name
+    # Still in testing phase
+    # New-SQLServer -sqlServer $sqlServer -resourceGroupName $resourceGroupName -existingResources $existingResources -databases $global:sqlDatabases -managedIdentityName $global:userAssignedIdentity.Name
+
+    #**********************************************************************************************************************
+    # Create SQL Database
+
+    # Still in testing phase
+    # New-SQLDatabase -sqlDatabase $global:sqlDatabase -resourceGroupName $resourceGroupName -existingResources $existingResources
 
 }
 
@@ -3739,6 +3801,59 @@ function New-SearchSkillSet {
         Write-Log -message "Failed to create skillset '$searchSkillSetName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
 
         return $false
+    }
+}
+
+# Function to create a new SQL Server
+function New-SQLServer {
+    param (
+        [psobject]$sqlServer,
+        [string]$resourceGroupName,
+        [array]$existingResources,
+        [string]$managedIdentityName
+    )
+
+    # Need to update code to use managed identity for authentication instead of admin user and password
+
+    $sqlServerName = $sqlServer.Name
+    $sqlAdminUser = $sqlServer.AdminUser
+    $sqlAdminPassword = $sqlServer.AdminPassword
+    $location = $sqlServer.Location
+
+    Write-Host "Executing New-SQLServer ('$sqlServerName') function..." -ForegroundColor Magenta
+
+    if ($existingResources -notcontains $sqlServerName) {
+        try {
+            $ErrorActionPreference = 'Stop'
+            
+            # First create storage account for SQL Server
+            $storageAccountName = $sqlServer.StorageAccountName
+
+            $storageAccountExists = az storage account check-name --name $storageAccountName --query "nameAvailable" --output tsv
+            if ($storageAccountExists -eq "false") {
+                Write-Host "Storage account '$storageAccountName' already exists." -ForegroundColor Blue
+                Write-Log -message "Storage account '$storageAccountName' already exists."
+            }
+            else {
+                az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_LRS --kind StorageV2 --output none
+                Write-Host "Storage account '$storageAccountName' created successfully." -ForegroundColor Green
+                Write-Log -message "Storage account '$storageAccountName' created successfully."
+            }
+            
+            az sql server create --name $sqlServerName --resource-group $resourceGroupName --location $location --admin-user $sqlAdminUser --admin-password $sqlAdminPassword --output none
+
+            $global:resourceCounter += 1
+            Write-Host "SQL Server '$sqlServerName' created successfully. [$global:resourceCounter]" -ForegroundColor Green
+            Write-Log -message "SQL Server '$sqlServerName' created successfully. [$global:resourceCounter]"
+        }
+        catch {
+            Write-Error "Failed to create SQL Server '$sqlServerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+            Write-Log -message "Failed to create SQL Server '$sqlServerName': (Line $($_.InvocationInfo.ScriptLineNumber)) : $_"
+        }
+    }
+    else {
+        Write-Host "SQL Server '$sqlServerName' already exists." -ForegroundColor Blue
+        Write-Log -message "SQL Server '$sqlServerName' already exists."
     }
 }
 
@@ -4694,6 +4809,12 @@ function Start-Deployment {
             }
         }
     }
+
+    #**********************************************************************************************************************
+    # Create API Management Service
+
+    # Commenting out for now because this resource is not being used in the deployment and it takes way too long to provision
+    New-ApiManagementService -apiManagementService $apiManagementService -resourceGroupName $resourceGroupName -existingResources $existingResources -keyVaultName $global:keyVault.Name
 
     # Set $global:previousFullResourceBaseName to the $currentResourceBaseName for use during the next deployment
     $global:previousFullResourceBaseName = $global:currentFullResourceBaseName

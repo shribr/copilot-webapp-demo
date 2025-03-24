@@ -1,37 +1,37 @@
 {"oauth2PermissionScopes": [{
-  "adminConsentDescription": "Allow the application to read data from the API.",
-  "adminConsentDisplayName": "Read data from API",
-  "id": "d3e234c7-ffde-486d-9e76-a9560a9359ee",
+  "adminConsentDescription": "Allows admin to manage data in the key vault",
+  "adminConsentDisplayName": "Manage Key Vault Data",
+  "id": "5db40993-622b-48e9-81a4-a4caf9af9ebc",
   "isEnabled": true,
   "type": "User",
-  "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-  "userConsentDisplayName": "Read data from API",
-  "value": "read_data"
+  "userConsentDescription": null,
+  "userConsentDisplayName": "Read Key Vault Secrets",
+  "value": "key_vault_read"
 }, {
-  "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-  "adminConsentDisplayName": "Access API as user",
-  "id": "0b8d4676-bfc2-4861-8d8e-246c5eb98185",
+  "adminConsentDescription": "Allow the app to read the signed-in users files.",
+  "adminConsentDisplayName": "Read User Files",
+  "id": "f2d6c95f-f070-46c0-abe4-1dd5e27608e3",
   "isEnabled": true,
   "type": "User",
-  "userConsentDescription": "Allow the application to access the API on your behalf.",
-  "userConsentDisplayName": "Access API as user",
+  "userConsentDescription": "Allow the app to read your files.",
+  "userConsentDisplayName": "Read your files",
   "value": "access_as_user"
 }, {
-  "isEnabled": true,
-  "adminConsentDisplayName": "Access API as user",
-  "id": "7c6cde81-8410-4de0-a898-2cfa8ae8b234",
   "adminConsentDescription": "Allow the application to access the API on behalf of the signed-in user.",
-  "value": "access_as_user",
+  "type": "User",
+  "adminConsentDisplayName": "Access API as user",
   "userConsentDisplayName": "Access API as user",
-  "userConsentDescription": "Allow the application to access the API on your behalf.",
-  "type": "User"
-}, {
   "isEnabled": true,
-  "adminConsentDisplayName": "Read data from API",
-  "id": "11f5654d-d838-413c-ac92-070b19422050",
+  "id": "81860ab4-b7e2-41f2-9cf5-ab4ef2d8e068",
+  "value": "access_as_user",
+  "userConsentDescription": "Allow the application to access the API on your behalf."
+}, {
   "adminConsentDescription": "Allow the application to read data from the API.",
-  "value": "read_data",
+  "type": "User",
+  "adminConsentDisplayName": "Read data from API",
   "userConsentDisplayName": "Read data from API",
-  "userConsentDescription": "Allow the application to read data from the API on your behalf.",
-  "type": "User"
+  "isEnabled": true,
+  "id": "e482e8ca-04f8-4d17-8752-e63ba6d6b73d",
+  "value": "read_data",
+  "userConsentDescription": "Allow the application to read data from the API on your behalf."
 }] }
